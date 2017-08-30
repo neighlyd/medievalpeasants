@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/../medieval_peasant_db_test/.idea/medieval_peasant_db_test.iml" filepath="$PROJECT_DIR$/../medieval_peasant_db_test/.idea/medieval_peasant_db_test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/medievalpeasants.iml" filepath="$PROJECT_DIR$/.idea/medievalpeasants.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../../programs/.idea/programs.iml" filepath="$PROJECT_DIR$/../../programs/.idea/programs.iml" />
+    </modules>
+  </component>
+</project>

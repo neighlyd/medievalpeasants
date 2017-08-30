@@ -1,0 +1,4 @@
+*.pyc
+secretsettings.py
+.coverage
+htmlcov
