@@ -338,7 +338,7 @@ class LandParcel(models.Model):
 
 class Litigant(models.Model):
     person = models.ForeignKey(Person, on_delete=models.CASCADE, related_name='litigant_cases')
-    case = models.ForeignKey(Case, on_delete=models.CASCADE, related_name='litigants')
+    case = models.ForeignKey(Case, on_delete=models.CASCADE, related_name='litigant_people')
     role = models.ForeignKey(Role, related_name='litigant_role')
     fine = models.ForeignKey(Money, null=True, related_name='litigant_fine')
     amercement = models.ForeignKey(Money, null=True, related_name='litigant_amercement')

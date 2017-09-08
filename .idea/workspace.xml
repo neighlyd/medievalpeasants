@@ -2,25 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="eea9fe3e-dda4-4919-ad55-8dbd037d51cd" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/vagrant.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/vcs.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/peasantlegaldb/migrations/0003_auto_20170830_2224.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/peasantlegaldb/migrations/0004_auto_20170907_0031.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/peasantlegaldb/serializers.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/peasantlegaldb/utils/__init__.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/peasantlegaldb/utils/autoregister.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/peasantlegaldb/utils/choiceprovider.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/requirements/production.txt" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/requirements/requirements.txt" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/requirements/testing.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/medievalpeasants.iml" afterPath="$PROJECT_DIR$/.idea/medievalpeasants.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/modules.xml" afterPath="$PROJECT_DIR$/.idea/modules.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/medievalpeasants/settings/_base.py" afterPath="$PROJECT_DIR$/medievalpeasants/settings/_base.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/medievalpeasants/urls.py" afterPath="$PROJECT_DIR$/medievalpeasants/urls.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/peasantlegaldb/admin.py" afterPath="$PROJECT_DIR$/peasantlegaldb/admin.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/peasantlegaldb/models.py" afterPath="$PROJECT_DIR$/peasantlegaldb/models.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/peasantlegaldb/tests.py" afterPath="$PROJECT_DIR$/peasantlegaldb/tests.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/peasantlegaldb/serializers.py" afterPath="$PROJECT_DIR$/peasantlegaldb/serializers.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/peasantlegaldb/views.py" afterPath="$PROJECT_DIR$/peasantlegaldb/views.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -40,11 +25,11 @@
     <splitter split-orientation="horizontal" split-proportion="0.5">
       <split-first>
         <leaf>
-          <file leaf-file-name="models.py" pinned="false" current-in-tab="true">
+          <file leaf-file-name="models.py" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/peasantlegaldb/models.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="407">
-                  <caret line="347" column="51" lean-forward="false" selection-start-line="347" selection-start-column="51" selection-end-line="347" selection-end-column="51" />
+                <state relative-caret-position="693">
+                  <caret line="340" column="90" lean-forward="false" selection-start-line="340" selection-start-column="90" selection-end-line="340" selection-end-column="90" />
                   <folding>
                     <element signature="e#0#28#0" expanded="true" />
                   </folding>
@@ -52,13 +37,13 @@
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="views.py" pinned="false" current-in-tab="false">
+          <file leaf-file-name="views.py" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/peasantlegaldb/views.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="-160">
-                  <caret line="96" column="64" lean-forward="false" selection-start-line="96" selection-start-column="64" selection-end-line="96" selection-end-column="64" />
+                <state relative-caret-position="430">
+                  <caret line="108" column="40" lean-forward="true" selection-start-line="108" selection-start-column="40" selection-end-line="108" selection-end-column="40" />
                   <folding>
-                    <element signature="e#0#51#0" expanded="true" />
+                    <element signature="e#0#35#0" expanded="true" />
                   </folding>
                 </state>
               </provider>
@@ -71,8 +56,8 @@
           <file leaf-file-name="serializers.py" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/peasantlegaldb/serializers.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="432">
-                  <caret line="136" column="26" lean-forward="false" selection-start-line="136" selection-start-column="26" selection-end-line="136" selection-end-column="26" />
+                <state relative-caret-position="185">
+                  <caret line="76" column="0" lean-forward="false" selection-start-line="76" selection-start-column="0" selection-end-line="76" selection-end-column="0" />
                   <folding>
                     <element signature="e#0#54#0" expanded="true" />
                   </folding>
@@ -122,8 +107,6 @@
       <find>relatedmanage</find>
       <find>relatedman`</find>
       <find>Litigant</find>
-      <find>FlexFieldsModelViewSet</find>
-      <find>FlexFieldsModelSerializer</find>
       <find>class Liti</find>
       <find>class C</find>
       <find>serializers.ModelSerializer</find>
@@ -135,18 +118,21 @@
       <find>class Case(</find>
       <find>class CaseV</find>
       <find>litigant_cases</find>
+      <find>FlexFieldsModelViewSet</find>
+      <find>FlexFieldsModelSerializer</find>
     </findStrings>
     <replaceStrings>
       <replace>BooleanField</replace>
       <replace>verbose_name_plural</replace>
       <replace>date</replace>
       <replace>case__session__village</replace>
-      <replace>SerializerExtensionsMixin, ModelSerializer</replace>
       <replace>SerializerExtensionsAPIViewMixin, RetrieveAPIView</replace>
       <replace>viewsets.ModelViewSet</replace>
       <replace>FlexFieldsModelSerializer</replace>
       <replace>serializers.ModelSerializer</replace>
       <replace>FlexFieldsModelViewSet</replace>
+      <replace>SerializerExtensionsAPIViewMixin, viewsets.ModelViewSet</replace>
+      <replace>SerializerExtensionsMixin, ModelSerializer</replace>
     </replaceStrings>
   </component>
   <component name="Git.Settings">
@@ -168,10 +154,11 @@
         <option value="$PROJECT_DIR$/peasantlegaldb/tests.py" />
         <option value="$PROJECT_DIR$/medievalpeasants/urls.py" />
         <option value="$PROJECT_DIR$/medievalpeasants/settings/_base.py" />
-        <option value="$PROJECT_DIR$/peasantlegaldb/views.py" />
-        <option value="$PROJECT_DIR$/peasantlegaldb/models.py" />
-        <option value="$PROJECT_DIR$/peasantlegaldb/serializers.py" />
         <option value="$PROJECT_DIR$/requirements/requirements.txt" />
+        <option value="$PROJECT_DIR$/.gitignore" />
+        <option value="$PROJECT_DIR$/peasantlegaldb/models.py" />
+        <option value="$PROJECT_DIR$/peasantlegaldb/views.py" />
+        <option value="$PROJECT_DIR$/peasantlegaldb/serializers.py" />
       </list>
     </option>
   </component>
@@ -432,22 +419,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/.gitignore">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/medievalpeasants/settings/secretsettings.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="486">
-          <caret line="27" column="40" lean-forward="false" selection-start-line="27" selection-start-column="21" selection-end-line="27" selection-end-column="40" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/peasantlegaldb/utils/__init__.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -544,26 +515,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/peasantlegaldb/views.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-160">
-          <caret line="96" column="64" lean-forward="false" selection-start-line="96" selection-start-column="64" selection-end-line="96" selection-end-column="64" />
-          <folding>
-            <element signature="e#0#51#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/peasantlegaldb/models.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="407">
-          <caret line="347" column="51" lean-forward="false" selection-start-line="347" selection-start-column="51" selection-end-line="347" selection-end-column="51" />
-          <folding>
-            <element signature="e#0#28#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/requirements/requirements.txt">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -572,10 +523,46 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="54">
+          <caret line="3" column="7" lean-forward="false" selection-start-line="3" selection-start-column="7" selection-end-line="3" selection-end-column="7" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/medievalpeasants/settings/secretsettings.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="486">
+          <caret line="27" column="40" lean-forward="false" selection-start-line="27" selection-start-column="21" selection-end-line="27" selection-end-column="40" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/peasantlegaldb/models.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="693">
+          <caret line="340" column="90" lean-forward="false" selection-start-line="340" selection-start-column="90" selection-end-line="340" selection-end-column="90" />
+          <folding>
+            <element signature="e#0#28#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/peasantlegaldb/views.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="430">
+          <caret line="108" column="40" lean-forward="true" selection-start-line="108" selection-start-column="40" selection-end-line="108" selection-end-column="40" />
+          <folding>
+            <element signature="e#0#35#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/peasantlegaldb/serializers.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="432">
-          <caret line="136" column="26" lean-forward="false" selection-start-line="136" selection-start-column="26" selection-end-line="136" selection-end-column="26" />
+        <state relative-caret-position="185">
+          <caret line="76" column="0" lean-forward="false" selection-start-line="76" selection-start-column="0" selection-end-line="76" selection-end-column="0" />
           <folding>
             <element signature="e#0#54#0" expanded="true" />
           </folding>

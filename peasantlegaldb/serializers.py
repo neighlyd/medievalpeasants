@@ -1,81 +1,80 @@
 from rest_framework.serializers import ModelSerializer
 from rest_framework_serializer_extensions.serializers import SerializerExtensionsMixin
-from rest_flex_fields import FlexFieldsModelSerializer
 from .models import *
 
-class ArchiveSerializer(FlexFieldsModelSerializer):
+class ArchiveSerializer(SerializerExtensionsMixin, ModelSerializer):
     class Meta:
         model = Archive
         fields = ('name', 'website', 'notes')
 
 
-class MoneySerializer(FlexFieldsModelSerializer):
+class MoneySerializer(SerializerExtensionsMixin, ModelSerializer):
     class Meta:
         model = Money
         fields = ('amount', 'in_denarius')
 
 
-class ChattelSerializer(FlexFieldsModelSerializer):
+class ChattelSerializer(SerializerExtensionsMixin, ModelSerializer):
     class Meta:
         model = Chattel
         fields = ('name')
 
 
-class CaseTypeSerializer(FlexFieldsModelSerializer):
+class CaseTypeSerializer(SerializerExtensionsMixin, ModelSerializer):
     class Meta:
         model = CaseType
         fields = ('case_type')
 
 
-class CountySerializer(FlexFieldsModelSerializer):
+class CountySerializer(SerializerExtensionsMixin, ModelSerializer):
     class Meta:
         model = County
         fields = ('name', 'abbreviation')
 
 
-class LandSerializer(FlexFieldsModelSerializer):
+class LandSerializer(SerializerExtensionsMixin, ModelSerializer):
     class Meta:
         model = Land
         fields = ('id', 'notes', 'owner_chain')
 
 
-class ParcelTenureSerializer(FlexFieldsModelSerializer):
+class ParcelTenureSerializer(SerializerExtensionsMixin, ModelSerializer):
     class Meta:
         model = ParcelTenure
         fields = ('tenure')
 
 
-class ParcelTypeSerializer(FlexFieldsModelSerializer):
+class ParcelTypeSerializer(SerializerExtensionsMixin, ModelSerializer):
     class Meta:
         model = ParcelType
         fields = ('parcel_type')
 
 
-class PositionTypeSerializer(FlexFieldsModelSerializer):
+class PositionTypeSerializer(SerializerExtensionsMixin, ModelSerializer):
     class Meta:
         model = PositionType
         fields = ('title')
 
 
-class RelationSerializer(FlexFieldsModelSerializer):
+class RelationSerializer(SerializerExtensionsMixin, ModelSerializer):
     class Meta:
         model = Relation
         fields = ('relation')
 
 
-class RoleSerializer(FlexFieldsModelSerializer):
+class RoleSerializer(SerializerExtensionsMixin, ModelSerializer):
     class Meta:
         model = Role
         fields = ('role')
 
 
-class VerdictSerializer(FlexFieldsModelSerializer):
+class VerdictSerializer(SerializerExtensionsMixin, ModelSerializer):
     class Meta:
         model = Verdict
         fields = ('verdict')
 
 
-class HundredSerializer(FlexFieldsModelSerializer):
+class HundredSerializer(SerializerExtensionsMixin, ModelSerializer):
     class Meta:
         model = Hundred
         fields = ('id','name', 'county')
@@ -85,7 +84,7 @@ class HundredSerializer(FlexFieldsModelSerializer):
     }
 '''
 
-class VillageSerializer(FlexFieldsModelSerializer):
+class VillageSerializer(SerializerExtensionsMixin, ModelSerializer):
     class Meta:
         model = Village
         fields = ('id','name', 'latitude', 'longitude', 'hundred', 'county', 'ancient_demesne',
@@ -96,7 +95,7 @@ class VillageSerializer(FlexFieldsModelSerializer):
     }
 '''
 
-class CasePeopleLandSerializer(FlexFieldsModelSerializer):
+class CasePeopleLandSerializer(SerializerExtensionsMixin, ModelSerializer):
     class Meta:
         model = CasePeopleLand
         fields = ('person', 'case', 'land', 'role', 'villeinage', 'notes')
@@ -110,7 +109,7 @@ class LitigantSerializer(SerializerExtensionsMixin, ModelSerializer):
                   'ad_proximum', 'distrained', 'attached', 'bail')
 
 
-class PersonSerializer(FlexFieldsModelSerializer):
+class PersonSerializer(SerializerExtensionsMixin, ModelSerializer):
 
     class Meta:
         model = Person
@@ -139,7 +138,7 @@ class CaseSerializer(SerializerExtensionsMixin, ModelSerializer):
         )
 '''
 
-class PledgeSerializer(FlexFieldsModelSerializer):
+class PledgeSerializer(SerializerExtensionsMixin, ModelSerializer):
     class Meta:
         model = Pledge
         fields = ('id', 'case', 'pledge_giver', 'pledge_receiver')
@@ -149,79 +148,79 @@ class PledgeSerializer(FlexFieldsModelSerializer):
     }
 '''
 
-class RecordSerializer(FlexFieldsModelSerializer):
+class RecordSerializer(SerializerExtensionsMixin, ModelSerializer):
     class Meta:
         model = Record
         fields = '__all__'
 
 
-class SessionSerializer(FlexFieldsModelSerializer):
+class SessionSerializer(SerializerExtensionsMixin, ModelSerializer):
     class Meta:
         model = Session
         fields = '__all__'
 
 
-class ChevageSerializer(FlexFieldsModelSerializer):
+class ChevageSerializer(SerializerExtensionsMixin, ModelSerializer):
     class Meta:
         model = Chevage
         fields = '__all__'
 
 
-class CornbotSerializer(FlexFieldsModelSerializer):
+class CornbotSerializer(SerializerExtensionsMixin, ModelSerializer):
     class Meta:
         model = Cornbot
         fields = '__all__'
 
 
-class ExtrahuraSerializer(FlexFieldsModelSerializer):
+class ExtrahuraSerializer(SerializerExtensionsMixin, ModelSerializer):
     class Meta:
         model = Extrahura
         fields = '__all__'
 
 
-class HeriotSerializer(FlexFieldsModelSerializer):
+class HeriotSerializer(SerializerExtensionsMixin, ModelSerializer):
     class Meta:
         model = Heriot
         fields = '__all__'
 
 
-class ImpercamentumSerializer(FlexFieldsModelSerializer):
+class ImpercamentumSerializer(SerializerExtensionsMixin, ModelSerializer):
     class Meta:
         model = Impercamentum
         fields = '__all__'
 
 
-class MurrainSerializer(FlexFieldsModelSerializer):
+class MurrainSerializer(SerializerExtensionsMixin, ModelSerializer):
     class Meta:
         model = Murrain
         fields = '__all__'
 
 
-class PlaceMentionedSerializer(FlexFieldsModelSerializer):
+class PlaceMentionedSerializer(SerializerExtensionsMixin, ModelSerializer):
     class Meta:
         model = PlaceMentioned
         fields = '__all__'
 
 
-class LandParcelSerializer(FlexFieldsModelSerializer):
+class LandParcelSerializer(SerializerExtensionsMixin, ModelSerializer):
     class Meta:
         model = LandParcel
         fields = '__all__'
 
 
-class LandSplitSerializer(FlexFieldsModelSerializer):
+class LandSplitSerializer(SerializerExtensionsMixin, ModelSerializer):
     class Meta:
         model = LandSplit
         fields = '__all__'
 
 
-class PositionSerializer(FlexFieldsModelSerializer):
+class PositionSerializer(SerializerExtensionsMixin, ModelSerializer):
     class Meta:
         model = Position
         fields = '__all__'
 
 
-class RelationshipSerializer(FlexFieldsModelSerializer):
+class RelationshipSerializer(SerializerExtensionsMixin, ModelSerializer):
     class Meta:
         model = Relationship
         fields = '__all__'
