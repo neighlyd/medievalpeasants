@@ -36,6 +36,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'peasantlegaldb',
+    'coverage',
+    'rest_framework',
+    'rest_framework_serializer_extensions'
 ]
 
 MIDDLEWARE = [
@@ -89,6 +92,18 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
 STATIC_URL = '/static/'
+
+
+# Django Rest Framework settings
+
+REST_FRAMEWORK = {
+    # Use Django's standard 'django.contrib.auth' permissions,
+    # or allow read-only access for unauthenticated users.
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+    ],
+    'PAGE_SIZE': 10
+}
 
 # SECRET_KEY and Database information stored in secret_settings.py which is excluded from git through .gitignore.
 # Import SECRET_KEY and Database information. Ensure that the secret_settings.py file is the correct one before using.

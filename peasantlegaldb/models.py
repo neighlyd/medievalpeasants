@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Count
 
 
 class Archive(models.Model):
@@ -14,8 +15,23 @@ class Money(models.Model):
     amount = models.CharField(max_length=150)
     in_denarius = models.IntegerField()
 
+    def __str__(self):
+        return '%s (%s d.)' % (self.amount, self.in_denarius)
+
+
+class Chattel(models.Model):
+    name = models.CharField(max_length=250)
+
+    def __str__(self):
+        return self.name
+
 
 class CaseType(models.Model):
+
+    class Meta:
+        verbose_name = "Case Type"
+        verbose_name_plural = "Case Types"
+
     case_type = models.CharField(max_length=150)
 
     def __str__(self):
@@ -23,11 +39,15 @@ class CaseType(models.Model):
 
 
 class County(models.Model):
+
+    class Meta:
+        verbose_name_plural = "Counties"
+
     name = models.CharField(max_length=20)
     abbreviation = models.CharField(max_length=15)
 
     def __str__(self):
-        self.name
+        return self.name
 
 
 class Land(models.Model):
@@ -35,8 +55,16 @@ class Land(models.Model):
     notes = models.TextField()
     owner_chain = models.TextField()
 
+    def __str__(self):
+        return "Land ID: %s" % (self.id)
+
 
 class ParcelTenure(models.Model):
+
+    class Meta:
+        verbose_name = "Parcel Tenure"
+        verbose_name_plural = "Parcel Tenures"
+
     tenure = models.CharField(max_length=50)
 
     def __str__(self):
@@ -44,6 +72,10 @@ class ParcelTenure(models.Model):
 
 
 class ParcelType(models.Model):
+    class Meta:
+        verbose_name = "Parcel Type"
+        verbose_name_plural = "Parcel Types"
+
     parcel_type = models.CharField(max_length=50)
 
     def __str__(self):
@@ -51,17 +83,25 @@ class ParcelType(models.Model):
 
 
 class PositionType(models.Model):
+    class Meta:
+        verbose_name = "Position Name"
+        verbose_name_plural = "Position Names"
+
     title = models.CharField(max_length=50)
 
     def __str__(self):
         return self.title
 
 
-class RelationshipType(models.Model):
-    relation_type = models.CharField(max_length=25)
+class Relation(models.Model):
+    class Meta:
+        verbose_name = "Relation Type"
+        verbose_name_plural = "Relation Types"
+
+    relation = models.CharField(max_length=25)
 
     def __str__(self):
-        return self.title
+        return self.relation
 
 
 class Role(models.Model):
@@ -83,12 +123,12 @@ class Hundred(models.Model):
     county = models.ForeignKey(County)
 
     def __str__(self):
-        return '%s | %s' % (self.name, self.county)
+        return '%s, %s' % (self.name, self.county)
 
 
 class Village(models.Model):
     name = models.CharField(max_length=50)
-    latitute = models.DecimalField(max_digits=10, decimal_places=7)
+    latitude = models.DecimalField(max_digits=10, decimal_places=7)
     longitude = models.DecimalField(max_digits=10, decimal_places=7)
     # rework so County info is normalized in Hundred table.
     county = models.ForeignKey(County)
@@ -98,13 +138,16 @@ class Village(models.Model):
     # Part of the "Great Rumor" petition of 1377.
     great_rumor = models.BooleanField(default=False)
     notes = models.TextField()
-    mentions = models.ManyToManyField('Case', through='PlaceMentioned', related_name='mentioned_in')
 
     def __str__(self):
         return '%s | %s' % (self.name, self.county)
 
 
 class Person(models.Model):
+
+    class Meta:
+        verbose_name_plural = "People"
+
     STATUS_CHOICES = {
         ('V', 'Villein'),
         ('F', 'Free'),
@@ -129,20 +172,19 @@ class Person(models.Model):
     tax_1332 = models.FloatField()
     tax_1379 = models.FloatField()
     notes = models.TextField()
-    case_roles = models.ManyToManyField(Role, through='Litigant', related_name='case_roles')
 
     def name_concat(self):
-        if self.relation_name.exists():
-            concated_name = self.first_name + ' ' + self.relation_name + ' ' + self.last_name
+        if self.relation_name:
+            concated_name = self.first_name + ' ' + self.relation_name + ' ' + self.last_name + ' | ' + self.village.name
         else:
-            concated_name = self.first_name + ' ' + self.last_name
+            concated_name = self.first_name + ' ' + self.last_name + ' | ' + self.village.name
         return concated_name
 
     def __str__(self):
-        if self.relation_name.exists():
-            return self.first_name + ' ' + self.relation_name + ' ' + self.last_name
+        if self.relation_name:
+            return self.first_name + ' ' + self.relation_name + ' ' + self.last_name + ' | ' + self.village.name
         else:
-            return self.first_name + ' ' + self.last_name
+            return self.first_name + ' ' + self.last_name + ' | ' + self.village.name
 
 
 class Record(models.Model):
@@ -160,6 +202,9 @@ class Record(models.Model):
     record_type = models.IntegerField(choices=RECORD_TYPE)
     reel = models.IntegerField()
     notes = models.TextField()
+
+    def __str__(self):
+        return self.name
 
 
 class Session(models.Model):
@@ -179,6 +224,9 @@ class Session(models.Model):
     record = models.ForeignKey(Record, on_delete=models.CASCADE)
     village = models.ForeignKey(Village)
     notes = models.TextField()
+
+    def __str__(self):
+        return '%s %s %s Session.' % (self.village.name, self.get_law_term_display(), self.date.year)
 
 
 class Case(models.Model):
@@ -202,11 +250,14 @@ class Case(models.Model):
     villeinage_mention = models.BooleanField(default=False)
     active_sale = models.BooleanField(default=False)
     incidental_land = models.BooleanField(default=False)
-    litigants = models.ManyToManyField(Person, through='Litigant', related_name='litigants')
+    case_litigants = models.ManyToManyField(Person, through='Litigant')
 
+    def litigant_count(self):
+        q = self.objects.all().annotate(litigant_count=Count('litigants', distinct=True))
+        return q
 
-class Chattel(models.Model):
-    name = models.CharField(max_length=250)
+    def __str__(self):
+        return 'Case %s | %s (%s)' % (self.id, self.session.village.name, self.session.date.year)
 
 
 class Chevage(models.Model):
@@ -243,6 +294,10 @@ class Heriot(models.Model):
 
 
 class Impercamentum(models.Model):
+
+    class Meta:
+        verbose_name_plural = "Impercamenta"
+
     person = models.ForeignKey(Person, on_delete=models.CASCADE)
     amount = models.IntegerField()
     animal = models.ForeignKey(Chattel)
@@ -259,12 +314,21 @@ class Murrain(models.Model):
 
 
 class PlaceMentioned(models.Model):
+
+    class Meta:
+        verbose_name_plural = "Places Mentioned"
+
     case = models.ForeignKey(Case, on_delete=models.CASCADE)
     village = models.ForeignKey(Village, on_delete=models.CASCADE)
     notes = models.TextField()
 
 
 class LandParcel(models.Model):
+
+    class Meta:
+        verbose_name = "Land Parcel"
+        verbose_name_plural = "Land Parcels"
+
     #   fix null in land_id
     land = models.ForeignKey(Land, null=True, on_delete=models.CASCADE)
     amount = models.FloatField()
@@ -273,12 +337,12 @@ class LandParcel(models.Model):
 
 
 class Litigant(models.Model):
-    person = models.ForeignKey(Person, on_delete=models.CASCADE)
-    case = models.ForeignKey(Case, on_delete=models.CASCADE)
-    role = models.ForeignKey(Role)
-    fine = models.ForeignKey(Money, null=True, related_name='fine')
-    amercement = models.ForeignKey(Money, null=True, related_name='amercement')
-    damage = models.ForeignKey(Money, null=True, related_name='damages')
+    person = models.ForeignKey(Person, on_delete=models.CASCADE, related_name='litigant_cases')
+    case = models.ForeignKey(Case, on_delete=models.CASCADE, related_name='litigants')
+    role = models.ForeignKey(Role, related_name='litigant_role')
+    fine = models.ForeignKey(Money, null=True, related_name='litigant_fine')
+    amercement = models.ForeignKey(Money, null=True, related_name='litigant_amercement')
+    damage = models.ForeignKey(Money, null=True, related_name='litigant_damages')
     damage_notes = models.TextField()
     ad_proximum = models.BooleanField(default=False)
     distrained = models.BooleanField(default=False)
@@ -289,6 +353,11 @@ class Litigant(models.Model):
 
 
 class CasePeopleLand(models.Model):
+
+    class Meta:
+        verbose_name = "Case to Person to Land"
+        verbose_name_plural = "Cases to People to Land"
+
     person = models.ForeignKey(Person, on_delete=models.CASCADE)
     case = models.ForeignKey(Case, on_delete=models.CASCADE)
     land = models.ForeignKey(Land, on_delete=models.CASCADE)
@@ -302,11 +371,21 @@ class Pledge(models.Model):
     pledge_giver = models.ForeignKey(Person, on_delete=models.CASCADE, related_name='pledge_giver')
     pledge_receiver = models.ForeignKey(Person, on_delete=models.CASCADE, related_name='pledge_receiver')
 
+    def __str__(self):
+        return "%s pledged %s, Case %s" % (self.pledge_giver, self.pledge_receiver, self.case)
+
 
 class LandSplit(models.Model):
+
+    class Meta:
+        verbose_name = "Land Split"
+        verbose_name_plural = "Land Splits"
+
     old_land = models.ForeignKey(Land, on_delete=models.CASCADE, related_name='old_land_parcel')
     new_land = models.ForeignKey(Land, on_delete=models.CASCADE, related_name='new_land_parcel')
 
+    def __str__(self):
+        return "Old Land ID %s, New Land ID %s" % (self.old_land, self.new_land)
 
 class Position(models.Model):
     person = models.ForeignKey(Person, on_delete=models.CASCADE)
@@ -315,10 +394,13 @@ class Position(models.Model):
     session = models.ForeignKey(Session, on_delete=models.CASCADE)
     definitive = models.BooleanField(default=False)
 
+    def __str__(self):
+        return self.PositionType.title
 
-class PeopleRelationship(models.Model):
+
+class Relationship(models.Model):
     person_one = models.ForeignKey(Person, on_delete=models.CASCADE, related_name='person_one')
     person_two = models.ForeignKey(Person, on_delete=models.CASCADE, related_name='person_two')
 #   need to rework so relationships are more descriptive.
-    relationship = models.ForeignKey(RelationshipType)
+    relationship = models.ForeignKey(Relation)
     definitive = models.BooleanField(default=False)
