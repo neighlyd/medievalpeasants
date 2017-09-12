@@ -93,8 +93,7 @@ class SessionViewSet(SerializerExtensionsAPIViewMixin, viewsets.ModelViewSet):
 
 
 class CaseViewSet(SerializerExtensionsAPIViewMixin, viewsets.ModelViewSet):
-    queryset = Case.objects.all().prefetch_related('litigants').order_by('session__village__name', 'session__date', 'court_type')
-    #queryset = Case.objects.all().prefetch_related('litigants')
+    queryset = Case.objects.all().prefetch_related('case_to_person').order_by('session__village__name', 'session__date', 'court_type').annotate(num_litigants=Count('case_to_person__person', distinct=True))
     serializer_class = CaseSerializer
 
 

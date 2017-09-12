@@ -112,7 +112,7 @@ class HundredFactory(factory.DjangoModelFactory):
         model = Hundred
 
     name = factory.Faker('word')
-    county = factory.Iterator(County.objects.all())
+    county = factory.SubFactory(CountyFactory)
 
 
 class VillageFactory(factory.DjangoModelFactory):
@@ -120,7 +120,7 @@ class VillageFactory(factory.DjangoModelFactory):
         model = Village
 
     name = factory.Faker('word')
-    latitute = factory.Faker('latitude')
+    latitude = factory.Faker('latitude')
     longitude = factory.Faker('longitude')
     # rework so County info is normalized in Hundred table.
     county = factory.SubFactory(CountyFactory)
@@ -315,6 +315,7 @@ class Full_Test_PeasantLegalDB(TestCase):
     def test_case_creation(self):
         s = SessionFactory.create()
         c = CaseFactory.create()
+        self.assertTrue(isinstance(c, Case))
 
 
 

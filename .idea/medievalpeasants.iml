@@ -17,6 +17,7 @@
     <orderEntry type="module" module-name="medieval_peasant_db_test" />
     <orderEntry type="module" module-name="programs" />
     <orderEntry type="module" module-name="django-admin-autoregister" />
+    <orderEntry type="module" module-name="testsite" />
   </component>
   <component name="TestRunnerService">
     <option name="PROJECT_TEST_RUNNER" value="Unittests" />

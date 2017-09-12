@@ -250,11 +250,60 @@ class Case(models.Model):
     villeinage_mention = models.BooleanField(default=False)
     active_sale = models.BooleanField(default=False)
     incidental_land = models.BooleanField(default=False)
-    case_litigants = models.ManyToManyField(Person, through='Litigant')
+    litigants = models.ManyToManyField(Person, through='Litigant')
 
+    @property
     def litigant_count(self):
-        q = self.objects.all().annotate(litigant_count=Count('litigants', distinct=True))
-        return q
+        # create a list of all litigants across all types of litigation tables (litigants, chevage, heriot, land, etc.)
+        # and check for duplicates to get an accurate count of unique litigants. This technique is required because Django
+        # only allows for Count Distinct in queryset creation, which is called with the view. Since SPA doesn't call views,
+        # this approach would clearly not work.
+        litigants = []
+        a = self.case_to_person.values_list('person_id', flat=True)
+        try:
+            for x in a:
+                litigants.append(x)
+        except:
+            pass
+        b = self.case_to_chevage.values_list('person_id', flat=True)
+        try:
+            for x in b:
+                litigants.append(x)
+        except:
+            pass
+        c = self.case_to_heriot.values_list('person_id', flat=True)
+        try:
+            for x in c:
+                litigants.append(x)
+        except:
+            pass
+        d = self.case_to_impercamentum.values_list('person_id', flat=True)
+        try:
+            for x in d:
+                litigants.append(x)
+        except:
+            pass
+        e = self.case_to_land.values_list('person_id', flat=True)
+        try:
+            for x in e:
+                litigants.append(x)
+        except:
+            pass
+        f = self.case_to_pledge.values_list('pledge_giver_id', flat=True)
+        try:
+            for x in f:
+                litigants.append(x)
+        except:
+            pass
+        g = self.case_to_pledge.values_list('pledge_receiver_id', flat=True)
+        try:
+            for x in g:
+                litigants.append(x)
+        except:
+            pass
+        litigants = set(litigants)
+        num = len(litigants)
+        return num
 
     def __str__(self):
         return 'Case %s | %s (%s)' % (self.id, self.session.village.name, self.session.date.year)
@@ -263,7 +312,7 @@ class Case(models.Model):
 class Chevage(models.Model):
     person = models.ForeignKey(Person, on_delete=models.CASCADE)
     amercement = models.ForeignKey(Money)
-    case = models.ForeignKey(Case, on_delete=models.CASCADE)
+    case = models.ForeignKey(Case, on_delete=models.CASCADE, related_name='case_to_chevage')
     cross = models.BooleanField(default=False)
     recessit = models.BooleanField(default=False)
     habet_terram = models.BooleanField(default=False)
@@ -287,10 +336,10 @@ class Extrahura(models.Model):
 
 class Heriot(models.Model):
     person = models.ForeignKey(Person, on_delete=models.CASCADE)
+    case = models.ForeignKey(Case, on_delete=models.CASCADE, related_name='case_to_heriot')
     amount = models.CharField(max_length=25)
     animal = models.ForeignKey(Chattel)
     assessment = models.ForeignKey(Money)
-    case = models.ForeignKey(Case, on_delete=models.CASCADE)
 
 
 class Impercamentum(models.Model):
@@ -299,10 +348,10 @@ class Impercamentum(models.Model):
         verbose_name_plural = "Impercamenta"
 
     person = models.ForeignKey(Person, on_delete=models.CASCADE)
+    case = models.ForeignKey(Case, on_delete=models.CASCADE, related_name='case_to_impercamentum')
     amount = models.IntegerField()
     animal = models.ForeignKey(Chattel)
     amercement = models.ForeignKey(Money)
-    case = models.ForeignKey(Case, on_delete=models.CASCADE)
     notes = models.TextField()
 
 
@@ -337,8 +386,8 @@ class LandParcel(models.Model):
 
 
 class Litigant(models.Model):
-    person = models.ForeignKey(Person, on_delete=models.CASCADE, related_name='litigant_cases')
-    case = models.ForeignKey(Case, on_delete=models.CASCADE, related_name='litigant_people')
+    person = models.ForeignKey(Person, on_delete=models.CASCADE, related_name='person_to_case')
+    case = models.ForeignKey(Case, on_delete=models.CASCADE, related_name='case_to_person')
     role = models.ForeignKey(Role, related_name='litigant_role')
     fine = models.ForeignKey(Money, null=True, related_name='litigant_fine')
     amercement = models.ForeignKey(Money, null=True, related_name='litigant_amercement')
@@ -359,7 +408,7 @@ class CasePeopleLand(models.Model):
         verbose_name_plural = "Cases to People to Land"
 
     person = models.ForeignKey(Person, on_delete=models.CASCADE)
-    case = models.ForeignKey(Case, on_delete=models.CASCADE)
+    case = models.ForeignKey(Case, on_delete=models.CASCADE, related_name='case_to_land')
     land = models.ForeignKey(Land, on_delete=models.CASCADE)
     role = models.ForeignKey(Role)
     villeinage = models.BooleanField(default=False)
@@ -367,7 +416,7 @@ class CasePeopleLand(models.Model):
 
 
 class Pledge(models.Model):
-    case = models.ForeignKey(Case, on_delete=models.CASCADE)
+    case = models.ForeignKey(Case, on_delete=models.CASCADE, related_name='case_to_pledge')
     pledge_giver = models.ForeignKey(Person, on_delete=models.CASCADE, related_name='pledge_giver')
     pledge_receiver = models.ForeignKey(Person, on_delete=models.CASCADE, related_name='pledge_receiver')
 
