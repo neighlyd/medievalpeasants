@@ -1,4 +1,4 @@
-from rest_framework import viewsets
+from rest_framework import viewsets, generics
 from rest_framework_serializer_extensions.views import SerializerExtensionsAPIViewMixin
 from .serializers import *
 from .models import *
@@ -10,6 +10,10 @@ class ArchiveViewSet(SerializerExtensionsAPIViewMixin, viewsets.ModelViewSet):
     '''
     queryset = Archive.objects.all()
     serializer_class = ArchiveSerializer
+
+class ArchiveListEndpoint(generics.ListAPIView):
+    queryset = Archive.objects.all()
+    serializer_class =  ArchiveSerializer
 
 
 class MoneyViewSet(SerializerExtensionsAPIViewMixin, viewsets.ModelViewSet):

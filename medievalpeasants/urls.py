@@ -15,12 +15,14 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 from django.contrib import admin
+from django.views.generic import TemplateView
 from rest_framework import routers
 from peasantlegaldb import views
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    url(r'^index', TemplateView.as_view(template_name='index.html')),
 ]
 
 # Routers provide an easy way of automatically determining the URL conf.
@@ -62,4 +64,5 @@ router.register(r'relationships', views.RelationshipViewSet)
 # Additionally, we include login URLs for the browsable API.
 urlpatterns += [
     url(r'^api/', include(router.urls)),
+    url(r'^api/archivelist', views.ArchiveListEndpoint.as_view(), name='archive-list'),
 ]

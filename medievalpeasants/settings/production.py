@@ -21,8 +21,15 @@ SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 X_FRAME_OPTIONS = 'DENY'
 
 # Location of static files. This path must be an absolute path.
-#STATIC_ROOT = "~/<WHATEVERTHEURLWILLBE>/public/static"
-STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
+#STATIC_ROOT = "~/<WHATEVERTHEURLWILLBE>/public/assets"
+STATICFILES_DIRS = (os.path.join(BASE_DIR, 'assets'),)
+
+WEBPACK_LOADER = {
+    'DEFAULT': {
+        'BUNDLE_DIR_NAME': 'bundles/',
+        'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats.json'),
+    }
+}
 
 
 # SITE_ID is used by django frameworks. To equal the ID of the site in the admin database under Sites/sites

@@ -3,11 +3,11 @@ from rest_framework_serializer_extensions.serializers import SerializerExtension
 from .models import *
 
 
-class ArchiveSerializer(SerializerExtensionsMixin, serializers.ModelSerializer):
+class ArchiveSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Archive
-        fields = ('name', 'website', 'notes')
+        fields = ('id', 'name', 'website', 'notes')
 
 
 class MoneySerializer(SerializerExtensionsMixin, serializers.ModelSerializer):
@@ -157,9 +157,15 @@ class PledgeSerializer(SerializerExtensionsMixin, serializers.ModelSerializer):
 
 class RecordSerializer(SerializerExtensionsMixin, serializers.ModelSerializer):
 
+    record_type = serializers.SerializerMethodField()
+    archive = ArchiveSerializer()
+
     class Meta:
         model = Record
-        fields = '__all__'
+        fields = ('name','archive','record_type','reel','notes')
+
+    def get_record_type(self, obj):
+        return obj.get_record_type_display()
 
 
 class SessionSerializer(SerializerExtensionsMixin, serializers.ModelSerializer):

@@ -2,3 +2,4 @@
 secretsettings.py
 .coverage
 htmlcov
+node_modules

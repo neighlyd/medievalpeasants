@@ -1,9 +1,11 @@
 coverage==4.2
 Django==1.11.4
 django-filter==1.0.4
+django-webpack-loader==0.5.0
 djangorestframework==3.6.4
 djangorestframework-serializer-extensions==0.5.2
 dnspython==1.15.0
+drf-flex-fields==0.2.2
 email-validator==1.0.2
 factory-boy==2.9.2
 Faker==0.8.1
