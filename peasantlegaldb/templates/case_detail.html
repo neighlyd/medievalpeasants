@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="container-fluid text-center">
+        <br>
+        <h1>Case {{ case.id }} - {{ case.session.village.name}}</h1>
+    </div>
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-body">
+                <div class="form-row">
+                    <div class="col-md-4">
+                        <label class="col-form-label"><b>Village:</b></label>
+                        <div class="d-flex p-2 border rounded">{{ case.session.village.name }}</div>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="col-form-label"><b>Date: </b></label>
+                        <div class="d-flex p-2 border rounded">{{ case.session.date }}</div>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="col-form-label"><b>Litigant Count:</b></label>
+                        <div class="d-flex p-2 border rounded">{{ case.litigant_count }}</div>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="col-md-4">
+                        <label class="col-form-label"><b>Court Type:</b></label>
+                        <div class="d-flex p-2 border rounded">{{ case.get_court_type_display }}</div>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="col-form-label"><b>Case Type:</b></label>
+                        <div class="d-flex p-2 border rounded">{{ case.case_type.case_type }}</div>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="col-form-label"><b>Verdict:</b></label>
+                        <div class="d-flex p-2 border rounded">{{ case.verdict.verdict }}</div>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="col-md-1">
+                        <label class="col-form-label"><b>Of Interest?</b></label>
+                        {% if case.of_interest %}
+                            <div class="d-flex p-2 border rounded">Yes</div>
+                        {% else %}
+                            <div class="d-flex p-2 border rounded">No</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-1">
+                        <label class="col-form-label"><b>At Law?</b></label>
+                        {% if case.ad_legem %}
+                            <div class="d-flex p-2 border rounded">Yes</div>
+                        {% else %}
+                            <div class="d-flex p-2 border rounded">No</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-1">
+                        <label class="col-form-label"><b>Villeinage?</b></label>
+                        {% if case.villeinage_mention %}
+                            <div class="d-flex p-2 border rounded">Yes</div>
+                        {% else %}
+                            <div class="d-flex p-2 border rounded">No</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-1">
+                        <label class="col-form-label"><b>Active Sale?</b></label>
+                        {% if case.active_sale%}
+                            <div class="d-flex p-2 border rounded">Yes</div>
+                        {% else %}
+                            <div class="d-flex p-2 border rounded">No</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-2">
+                        <label class="col-form-label"><b>Incidental Land?</b></label>
+                        {% if case.incidental_land %}
+                            <div class="d-flex p-2 border rounded">Yes</div>
+                        {% else %}
+                            <div class="d-flex p-2 border rounded">No</div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="form-group">
+                        <label class="col-form-label"><b>Summary:</b></label>
+                            {% if case.summary %}
+                                <div class="d-flex p-2 border rounded">{{ case.summary | linebreaksbr }}</div>
+                            {% else %}
+                                <div class="d-flex p-2 border rounded">‍   </div>
+                            {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<br>
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-center">
+        <a class="btn btn-success btn-large" data-toggle="collapse" id="show_litigants" data-target="#litigant_list" href="{% url 'litigant_list' case.id %}">Show Litigants</a>
+
+        <a class="btn btn-success btn-large" data-toggle="collapse" id="add_litigants" data-target="#new_litigants" href="#">Add Litigants</a>
+
+    </div>
+    <div class="container-fluid" id="litigant_list"></div>
+    <div class="container-fluid" id="new_litigants"></div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script type="text/javascript" src="https://cdn.datatables.net/v/bs4/dt-1.10.16/af-2.2.2/b-1.4.2/cr-1.4.1/fc-3.2.3/fh-3.1.3/sc-1.4.3/sl-1.2.3/datatables.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/buttons/1.4.2/js/buttons.colVis.min.js"></script>
+
+<script>
+
+    // Load Litigant List in collapse div from remote url.
+    $('#show_litigants').click(function(e){
+        var url = $(this).attr("href");
+        var target = $(this).data("target");
+        $(target).load(url);
+    });
+
+    // Older JS used to load tabs from remote urls; didn't work quite right.
+    $('#caseTab a').click(function (e) {
+        var url = $(this).attr("href");
+        var target = $(this).data("target");
+        var tab = $(this);
+
+        $(target).load(url, function(result){
+            tab.tab('show');
+        });
+    });
+
+</script>
+{% endblock %}

@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block content %}
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4/dt-1.10.16/af-2.2.2/b-1.4.2/cr-1.4.1/fc-3.2.3/fh-3.1.3/sc-1.4.3/sl-1.2.3/datatables.min.css"/>
+
+<div class="container">
+    <h2>People Table</h2>
+    <div id="control_cols">
+        <input type="checkbox" class="hide_show" id="1332"><span>1332 Tax</span></input>
+        <input type="checkbox" class="hide_show" id="1379"><span>1379 Tax</span></input>
+    </div>
+    <table class="table table-bordered table-hover" id="person_list" data-page-length="25">
+        <thead>
+            <th>Name</th>
+            <th>Village</th>
+            <th>Gender</th>
+            <th>Status</th>
+            <th>Case Count</th>
+            <th>1332 Tax</th>
+            <th>1379 Tax</th>
+        </thead>
+    </table>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script type="text/javascript" src="https://cdn.datatables.net/v/bs4/dt-1.10.16/af-2.2.2/b-1.4.2/cr-1.4.1/fc-3.2.3/fh-3.1.3/sc-1.4.3/sl-1.2.3/datatables.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/buttons/1.4.2/js/buttons.colVis.min.js"></script>
+<script>
+    $(document).ready(function(){
+        var table = $('#person_list').DataTable({
+            fixedHeader: true,
+            ajax: {
+                processing: true,
+                url: "/api/people",
+                type: "GET",
+                dataSrc: "",
+            },
+            "columns": [
+                {data: "full_name",
+                    fnCreatedCell: function(nTd, cellData, rowData, row, col) {
+                        $(nTd).html("<a href='/person/"+ rowData.id +"' target='_blank'>" + rowData.full_name + "</a>");
+                    }
+                },
+                {data: "village.name"},
+                {data: "gender"},
+                {data: "status"},
+                {data: "case_count"},
+                {data: "tax_1332", visible: false},
+                {data: "tax_1379", visible: false},
+            ]
+        });
+
+        $('#1332').change(function(){
+            table.column(5).visible($(this).is(':checked'))
+        });
+
+        $('#1379').change(function(){
+            table.column(6).visible($(this).is(':checked'))
+        });
+    });
+
+
+
+</script>
+{% endblock %}

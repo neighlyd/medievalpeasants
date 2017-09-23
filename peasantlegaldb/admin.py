@@ -5,8 +5,7 @@ from .models import *
 # Register non-m2m models
 singularModels = [Archive, Money, Chattel, CaseType, ParcelTenure,
                   ParcelType, PositionType, Relation, Role, Verdict,
-                  Hundred, Chevage, Cornbot, Extrahura, Heriot, Impercamentum,
-                  Murrain, PlaceMentioned, CasePeopleLand,
+                  Hundred, Cornbot, Extrahura, Murrain, PlaceMentioned, CasePeopleLand,
                   Position, Relationship, Pledge, LandSplit, LandParcel,]
 
 admin.site.register(singularModels)
@@ -61,11 +60,6 @@ class PlaceMentionedInline(admin.TabularInline):
     classes = ['collapse']
 
 
-class ChevageInline(admin.TabularInline):
-    model = Chevage
-    extra = 1
-    classes = ['collapse']
-
 class CornbotInline(admin.TabularInline):
     model = Cornbot
     extra = 1
@@ -76,15 +70,6 @@ class ExtrahuraInline(admin.TabularInline):
     extra = 1
     classes = ['collapse']
 
-class HeriotInline(admin.TabularInline):
-    model = Heriot
-    extra = 1
-    classes = ['collapse']
-
-class ImpercamentumInline(admin.TabularInline):
-    model = Impercamentum
-    extra = 1
-    classes = ['collapse']
 
 class MurrainInline(admin.TabularInline):
     model = Murrain
@@ -105,9 +90,6 @@ class LandSplitInline(admin.TabularInline):
 class PersonAdmin(admin.ModelAdmin):
     inlines = [
         LitigantInline,
-        ChevageInline,
-        HeriotInline,
-        ImpercamentumInline,
         RelationshipInline,
     ]
 
@@ -146,11 +128,8 @@ class CaseAdmin(admin.ModelAdmin):
     inlines = [
         LitigantInline,
         PlaceMentionedInline,
-        ChevageInline,
         CornbotInline,
         ExtrahuraInline,
-        HeriotInline,
-        ImpercamentumInline,
         MurrainInline,
 
     ]

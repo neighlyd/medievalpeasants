@@ -1,11 +1,20 @@
-{% load render_bundle from webpack_loader %}
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Hello React</title>
-    </head>
-        <body>
-            <div id="container"></div>
-        {% render_bundle 'main' %}
-        </body>
-</html>
+{% extends "base.html" %}
+
+{% block content %}
+<div class="jumbotron">
+    <div class="container">
+    <h1 class="display-3">Welcome to the Medieval Peasant Legal Database</h1>
+    <p class="lead">An open access portal to England's manorial courts.</p>
+    <hr class="my-4">
+    <p>The Medieval Peasant Database seeks to expand the field of English legal and social history by providing a free, open, and accessible database for the wealth of England's manorial court documentation.</p>
+    <p class="lead">
+        <button class="btn btn-success btn-lg" type="button" data-toggle="collapse" data-target="#learnMore" aria-expanded="false" aria-controls="learnMore">Learn More</button>
+    </p>
+        <div class="collapse" id="learnMore">
+            <div class="card card-body">
+                Placeholder text for description of project.
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

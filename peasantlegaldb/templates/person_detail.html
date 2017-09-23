@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="container-fluid text-center">
+        <h1>{{ person.full_name}} - {{ person.village.name}}</h1>
+    </div>
+    <div class="container-fluid">
+        <ul class="nav nav-tabs" id="personTab" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" id="home-tab" href="#profile" data-toggle="tab" aria-controls="home" aria-expanded="true">Profile</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="cases-tab" href="#stats" data-toggle="tab" aria-controls="stats">Stats</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="pledges-tab" href="#pledges" data-toggle="tab" aria-controls="pledges">Pledges</a>
+            </li>
+        </ul>
+        <div class="tab-content">
+            <div class="tab-pane active" id="profile" role="tabpanel">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="form-row">
+                            <div class="col-md-4">
+                                <label class="col-form-label"><b>First Name:</b></label>
+                                <div class="d-flex p-2 border rounded">{{ person.first_name }}</div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="col-form-label"><b>Relation Name:</b></label>
+                                {% if person.relation_name %}
+                                <div class="d-flex p-2 border rounded">{{ person.relation_name}}</div>
+                                {% else %}
+                                <div class="d-flex p-2 border rounded">‍   </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-4">
+                                <label class="col-form-label"><b>Last Name:</b></label>
+                                <div class="d-flex p-2 border rounded">{{ person.last_name }}</div>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="col-md-4">
+                                <label class="col-form-label"><b>Gender:</b></label>
+                                <div class="d-flex p-2 border rounded">{{ person.get_gender_display }}</div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="col-form-label"><b>Status:</b></label>
+                                <div class="d-flex p-2 border rounded">{{ person.get_status_display }}</div>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="col-form-label"><b>1332 Tax:</b></label>
+                                <div class="d-flex p-2 border rounded">{{ person.tax_1332}}</div>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="col-form-label"><b>1379 Tax:</b></label>
+                                <div class="d-flex p-2 border rounded">{{ person.tax_1379}}</div>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="col-md-2">
+                                <label class="col-form-label"><b>Earliest Case:</b></label>
+                                <div class="d-flex p-2 border rounded">{{ person.earliest_case }}</div>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="col-form-label"><b>Latest Case:</b></label>
+                                <div class="d-flex p-2 border rounded">{{ person.latest_case }}</div>
+                            </div>
+                            <div class="col-md-4">
+
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-form-label"><b>Notes:</b></label>
+                            {% if person.notes %}
+                            <div class="d-flex p-2 border rounded">{{ person.notes | linebreaksbr }}</div>
+                            {% else %}
+                            <div class="d-flex p-2 border rounded">‍   </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane" id="stats" role="tabpanel">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="form-row">
+                            <div class="col-md-1">
+                                <label class="col-form-label"><b>Case Count (excl. Chev)</b></label>
+                                <div class="d-flex p-2 border rounded">{{ person.case_count }}</div>
+                            </div>
+                            <div class="col-md-1">
+                                <label class="col-form-label"><b>Mininum Chevage:</b></label>
+                                <div class="d-flex p-2 border rounded">{{ person.min_chevage }}</div>
+                            </div>
+                            <div class="col-md-1">
+                                <label class="col-form-label"><b>Max Chevage:</b></label>
+                                <div class="d-flex p-2 border rounded">{{ person.max_chevage }}</div>
+                            </div>
+                            <div class="col-md-1">
+                                <label class="col-form-label"><b>Average Chevage:</b></label>
+                                <div class="d-flex p-2 border rounded">{{ person.avg_chevage }}</div>
+                            </div>
+                            <div class="col-md-1">
+                                <label class="col-form-label"><b>Total Num. of Chevages</b></label>
+                                <div class="d-flex p-2 border rounded">{{ person.chevage_count }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane" id="pledges" role="tabpanel">
+                <div class="card">
+                    <div class="card-body">
+                        Pledge Pane.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+{% block scripts %}
+{% endblock %}

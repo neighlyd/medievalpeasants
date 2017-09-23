@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.models import Count
+from django.db.models import Max, Min, Avg, Count
 
 
 class Archive(models.Model):
@@ -149,10 +149,10 @@ class Person(models.Model):
         verbose_name_plural = "People"
 
     STATUS_CHOICES = {
-        ('V', 'Villein'),
-        ('F', 'Free'),
-        ('U', 'Unknown'),
-        ('I', 'Institution')
+        (1, 'Villein'),
+        (2, 'Free'),
+        (3, 'Unknown'),
+        (4, 'Institution')
     }
 
     GENDER_CHOICES = {
@@ -167,13 +167,65 @@ class Person(models.Model):
     last_name = models.CharField(max_length=250)
     status = models.IntegerField(choices=STATUS_CHOICES)
     village = models.ForeignKey(Village)
-    gender = models.IntegerField(choices=GENDER_CHOICES)
+    gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
     # both taxes are to be input in denari.
     tax_1332 = models.FloatField()
     tax_1379 = models.FloatField()
     notes = models.TextField()
 
-    def name_concat(self):
+    @property
+    def earliest_case(self):
+        try:
+            earliest = self.case_set.order_by('session__date')[0]
+            earliest = earliest.session.get_law_term_display() + " - " + str(earliest.session.date.year)
+        except:
+            earliest = 'None'
+        return earliest
+
+    @property
+    def latest_case(self):
+        try:
+            latest = self.case_set.order_by('session__date').reverse()[0]
+            latest = latest.session.get_law_term_display() + " - " + str(latest.session.date.year)
+        except:
+            latest = 'None'
+        return latest
+
+    @property
+    def case_info(self):
+        return self.person_to_case.all().aggregate(Count('amercement'), Max('amercement__in_denarius'),
+                                                             Min('amercement__in_denarius'),
+                                                             Avg('amercement__in_denarius'), Count('fine'),
+                                                             Max('fine__in_denarius'), Min('fine__in_denarius'),
+                                                             Avg('fine__in_denarius'), Count('damage'),
+                                                             Max('damage__in_denarius'), Min('damage__in_denarius'),
+                                                             Avg('damage__in_denarius'), Count('chevage'),
+                                                             Max('chevage__in_denarius'), Min('chevage__in_denarius'),
+                                                             Avg('chevage__in_denarius'), Count('heriot_assessment'),
+                                                             Max('heriot_assessment__in_denarius'),
+                                                             Min('heriot_assessment__in_denarius'),
+                                                             Avg('heriot_assessment__in_denarius'),
+                                                             Count('impercamentum_amercement'),
+                                                             Max('impercamentum_amercement__in_denarius'),
+                                                             Min('impercamentum_amercement__in_denarius'),
+                                                             Avg('impercamentum_amercement__in_denarius'), )
+
+    @property
+    def case_count(self):
+        qs = self.person_to_case.exclude(chevage__isnull=False).exclude(heriot_assessment__isnull=False).exclude(impercamentum_amercement__isnull=False)
+        case_count = len(qs)
+        return case_count
+
+    @property
+    def full_name(self):
+        if self.relation_name:
+            concated_name = self.first_name + ' ' + self.relation_name + ' ' + self.last_name
+        else:
+            concated_name = self.first_name + ' ' + self.last_name
+        return concated_name
+
+    @property
+    def name_and_village(self):
         if self.relation_name:
             concated_name = self.first_name + ' ' + self.relation_name + ' ' + self.last_name + ' | ' + self.village.name
         else:
@@ -246,7 +298,7 @@ class Case(models.Model):
     verdict = models.ForeignKey(Verdict)
     of_interest = models.BooleanField(default=False)
 #   started ad legem at Case 578.
-    ad_legem = models.BooleanField(default=False)
+    ad_legem = models.NullBooleanField(default=False)
     villeinage_mention = models.BooleanField(default=False)
     active_sale = models.BooleanField(default=False)
     incidental_land = models.BooleanField(default=False)
@@ -259,45 +311,27 @@ class Case(models.Model):
         # only allows for Count Distinct in queryset creation, which is called with the view. Since SPA doesn't call views,
         # this approach would clearly not work.
         litigants = []
-        a = self.case_to_person.values_list('person_id', flat=True)
+        qs1 = self.case_to_person.values_list('person_id', flat=True)
         try:
-            for x in a:
+            for x in qs1:
                 litigants.append(x)
         except:
             pass
-        b = self.case_to_chevage.values_list('person_id', flat=True)
+        qs2 = self.case_to_land.values_list('person_id', flat=True)
         try:
-            for x in b:
+            for x in qs2:
                 litigants.append(x)
         except:
             pass
-        c = self.case_to_heriot.values_list('person_id', flat=True)
+        qs3 = self.case_to_pledge.values_list('pledge_giver_id', flat=True)
         try:
-            for x in c:
+            for x in qs3:
                 litigants.append(x)
         except:
             pass
-        d = self.case_to_impercamentum.values_list('person_id', flat=True)
+        qs4 = self.case_to_pledge.values_list('pledge_receiver_id', flat=True)
         try:
-            for x in d:
-                litigants.append(x)
-        except:
-            pass
-        e = self.case_to_land.values_list('person_id', flat=True)
-        try:
-            for x in e:
-                litigants.append(x)
-        except:
-            pass
-        f = self.case_to_pledge.values_list('pledge_giver_id', flat=True)
-        try:
-            for x in f:
-                litigants.append(x)
-        except:
-            pass
-        g = self.case_to_pledge.values_list('pledge_receiver_id', flat=True)
-        try:
-            for x in g:
+            for x in qs4:
                 litigants.append(x)
         except:
             pass
@@ -306,17 +340,7 @@ class Case(models.Model):
         return num
 
     def __str__(self):
-        return 'Case %s | %s (%s)' % (self.id, self.session.village.name, self.session.date.year)
-
-
-class Chevage(models.Model):
-    person = models.ForeignKey(Person, on_delete=models.CASCADE)
-    amercement = models.ForeignKey(Money)
-    case = models.ForeignKey(Case, on_delete=models.CASCADE, related_name='case_to_chevage')
-    cross = models.BooleanField(default=False)
-    recessit = models.BooleanField(default=False)
-    habet_terram = models.BooleanField(default=False)
-    notes = models.TextField()
+        return 'Case %s | %s (%s / %s)' % (self.id, self.session.village.name, self.session.get_law_term_display(), self.session.date.year)
 
 
 class Cornbot(models.Model):
@@ -332,27 +356,6 @@ class Extrahura(models.Model):
     animal = models.ForeignKey(Chattel)
     price = models.ForeignKey(Money)
     case = models.ForeignKey(Case, on_delete=models.CASCADE)
-
-
-class Heriot(models.Model):
-    person = models.ForeignKey(Person, on_delete=models.CASCADE)
-    case = models.ForeignKey(Case, on_delete=models.CASCADE, related_name='case_to_heriot')
-    amount = models.CharField(max_length=25)
-    animal = models.ForeignKey(Chattel)
-    assessment = models.ForeignKey(Money)
-
-
-class Impercamentum(models.Model):
-
-    class Meta:
-        verbose_name_plural = "Impercamenta"
-
-    person = models.ForeignKey(Person, on_delete=models.CASCADE)
-    case = models.ForeignKey(Case, on_delete=models.CASCADE, related_name='case_to_impercamentum')
-    amount = models.IntegerField()
-    animal = models.ForeignKey(Chattel)
-    amercement = models.ForeignKey(Money)
-    notes = models.TextField()
 
 
 class Murrain(models.Model):
@@ -392,13 +395,25 @@ class Litigant(models.Model):
     fine = models.ForeignKey(Money, null=True, related_name='litigant_fine')
     amercement = models.ForeignKey(Money, null=True, related_name='litigant_amercement')
     damage = models.ForeignKey(Money, null=True, related_name='litigant_damages')
-    damage_notes = models.TextField()
-    ad_proximum = models.BooleanField(default=False)
-    distrained = models.BooleanField(default=False)
+    damage_notes = models.TextField(null=True)
+    ad_proximum = models.NullBooleanField()
+    distrained = models.NullBooleanField()
 #   Added at Case 1189.
-    attached = models.BooleanField(default=False)
+    attached = models.NullBooleanField()
 #   Added at Case 1424
-    bail = models.BooleanField(default=False)
+    bail = models.NullBooleanField()
+    chevage = models.ForeignKey(Money, null=True, related_name='litigant_chevage')
+    crossed = models.NullBooleanField()
+    recessit = models.NullBooleanField()
+    habet_terram = models.NullBooleanField()
+    chevage_notes = models.TextField(null=True)
+    heriot_quantity = models.CharField(max_length=25, null=True)
+    heriot_animal = models.ForeignKey(Chattel, null=True, related_name='heriot_animal')
+    heriot_assessment = models.ForeignKey(Money, null=True, related_name='heriot_assessment')
+    impercamentum_quantity = models.IntegerField(null=True)
+    impercamentum_animal = models.ForeignKey(Chattel, null=True, related_name='impercamentum_animal')
+    impercamentum_amercement = models.ForeignKey(Money, null=True, related_name='impercamentum_amercement')
+    impercamentum_notes = models.TextField(null=True)
 
 
 class CasePeopleLand(models.Model):
@@ -411,7 +426,7 @@ class CasePeopleLand(models.Model):
     case = models.ForeignKey(Case, on_delete=models.CASCADE, related_name='case_to_land')
     land = models.ForeignKey(Land, on_delete=models.CASCADE)
     role = models.ForeignKey(Role)
-    villeinage = models.BooleanField(default=False)
+    villeinage = models.NullBooleanField()
     notes = models.TextField()
 
 
