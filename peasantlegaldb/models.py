@@ -192,29 +192,52 @@ class Person(models.Model):
         return latest
 
     @property
-    def case_info(self):
-        return self.person_to_case.all().aggregate(Count('amercement'), Max('amercement__in_denarius'),
-                                                             Min('amercement__in_denarius'),
-                                                             Avg('amercement__in_denarius'), Count('fine'),
-                                                             Max('fine__in_denarius'), Min('fine__in_denarius'),
-                                                             Avg('fine__in_denarius'), Count('damage'),
-                                                             Max('damage__in_denarius'), Min('damage__in_denarius'),
-                                                             Avg('damage__in_denarius'), Count('chevage'),
-                                                             Max('chevage__in_denarius'), Min('chevage__in_denarius'),
-                                                             Avg('chevage__in_denarius'), Count('heriot_assessment'),
-                                                             Max('heriot_assessment__in_denarius'),
-                                                             Min('heriot_assessment__in_denarius'),
-                                                             Avg('heriot_assessment__in_denarius'),
-                                                             Count('impercamentum_amercement'),
-                                                             Max('impercamentum_amercement__in_denarius'),
-                                                             Min('impercamentum_amercement__in_denarius'),
-                                                             Avg('impercamentum_amercement__in_denarius'), )
+    def pledges_given_count(self):
+        return self.pledge_giver.all().count()
 
     @property
-    def case_count(self):
-        qs = self.person_to_case.exclude(chevage__isnull=False).exclude(heriot_assessment__isnull=False).exclude(impercamentum_amercement__isnull=False)
+    def pledges_received_count(self):
+        return self.pledge_receiver.all().count()
+
+    @property
+    def relationship_count(self):
+        queryset1 = self.relationship_person_one.all().count()
+        queryset2 = self.relationship_person_two.all().count()
+        return queryset1 + queryset2
+
+    @property
+    def position_count(self):
+        return self.position.all().count()
+
+
+    @property
+    def case_info(self):
+        return self.person_to_case.all().aggregate(Count('amercement'), Max('amercement__in_denarius'),
+                                                   Min('amercement__in_denarius'), Avg('amercement__in_denarius'),
+                                                   Count('fine'), Max('fine__in_denarius'), Min('fine__in_denarius'),
+                                                   Avg('fine__in_denarius'), Count('damage'),
+                                                   Max('damage__in_denarius'), Min('damage__in_denarius'),
+                                                   Avg('damage__in_denarius'), Count('chevage'),
+                                                   Max('chevage__in_denarius'), Min('chevage__in_denarius'),
+                                                   Avg('chevage__in_denarius'), Count('heriot_assessment'),
+                                                   Max('heriot_assessment__in_denarius'),
+                                                   Min('heriot_assessment__in_denarius'),
+                                                   Avg('heriot_assessment__in_denarius'),
+                                                   Count('impercamentum_amercement'),
+                                                   Max('impercamentum_amercement__in_denarius'),
+                                                   Min('impercamentum_amercement__in_denarius'),
+                                                   Avg('impercamentum_amercement__in_denarius'), )
+
+    @property
+    def case_count_litigation(self):
+        qs = self.person_to_case.exclude(chevage__isnull=False).exclude(heriot_assessment__isnull=False).\
+            exclude(impercamentum_amercement__isnull=False)
         case_count = len(qs)
         return case_count
+
+    @property
+    def case_count_all(self):
+        return self.person_to_case.count()
 
     @property
     def full_name(self):
@@ -305,6 +328,36 @@ class Case(models.Model):
     litigants = models.ManyToManyField(Person, through='Litigant')
 
     @property
+    def litigant_list(self):
+        litigant_list = []
+        queryset = self.case_to_person.all()
+        try:
+            for x in queryset:
+                new_entry = {
+                    "name" : x.person.full_name,
+                    "role" : x.role.role
+                }
+                litigant_list.append(new_entry)
+        except:
+            pass
+        return litigant_list
+
+    @property
+    def litigant_list_concat(self):
+        litigant_list = ""
+        queryset = self.case_to_person.all().order_by('person__last_name')
+        # need to include the HTML for the list in the function, so it will be served through the Datatables child row
+        # correctly. Looking for solution.
+        try:
+            for x in queryset:
+                litigant_list = litigant_list + "<div class=d-flex justify-content-end><div class='mr-auto p-0'><u>Name:" \
+                                                "</u> " + x.person.full_name + "</div> <div class='p-0'><u>Role:</u> " + \
+                                                x.role.role + "</div></div><hr>"
+        except:
+            pass
+        return litigant_list
+
+    @property
     def litigant_count(self):
         # create a list of all litigants across all types of litigation tables (litigants, chevage, heriot, land, etc.)
         # and check for duplicates to get an accurate count of unique litigants. This technique is required because Django
@@ -389,6 +442,7 @@ class LandParcel(models.Model):
 
 
 class Litigant(models.Model):
+
     person = models.ForeignKey(Person, on_delete=models.CASCADE, related_name='person_to_case')
     case = models.ForeignKey(Case, on_delete=models.CASCADE, related_name='case_to_person')
     role = models.ForeignKey(Role, related_name='litigant_role')
@@ -452,7 +506,7 @@ class LandSplit(models.Model):
         return "Old Land ID %s, New Land ID %s" % (self.old_land, self.new_land)
 
 class Position(models.Model):
-    person = models.ForeignKey(Person, on_delete=models.CASCADE)
+    person = models.ForeignKey(Person, on_delete=models.CASCADE, related_name='position')
     title = models.ForeignKey(PositionType)
     # rework so this is per case not per session.
     session = models.ForeignKey(Session, on_delete=models.CASCADE)
@@ -463,8 +517,8 @@ class Position(models.Model):
 
 
 class Relationship(models.Model):
-    person_one = models.ForeignKey(Person, on_delete=models.CASCADE, related_name='person_one')
-    person_two = models.ForeignKey(Person, on_delete=models.CASCADE, related_name='person_two')
+    person_one = models.ForeignKey(Person, on_delete=models.CASCADE, related_name='relationship_person_one')
+    person_two = models.ForeignKey(Person, on_delete=models.CASCADE, related_name='relationship_person_two')
 #   need to rework so relationships are more descriptive.
     relationship = models.ForeignKey(Relation)
     definitive = models.BooleanField(default=False)

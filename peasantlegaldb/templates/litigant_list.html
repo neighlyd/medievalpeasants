@@ -1,4 +1,5 @@
-
+{% load staticfiles %}
+{% static 'css/details-control.css' %}
 {% block content %}
 
 
@@ -8,7 +9,7 @@
     </div>
     <table class="table table-bordered table-hover" id="litigants_for_case" data-page-length="25">
         <thead>
-            <th>Expand</th>
+            <th></th>
             <th>Name</th>
             <th>Role</th>
             <th>Amercement</th>
@@ -23,14 +24,16 @@
         </thead>
     </table>
 
+<br>
 
 {% endblock %}
 
 {% block scripts %}
-<script type="text/javascript" src="https://cdn.datatables.net/v/bs4/dt-1.10.16/af-2.2.2/b-1.4.2/cr-1.4.1/fc-3.2.3/fh-3.1.3/sc-1.4.3/sl-1.2.3/datatables.min.js"></script>
-<script type="text/javascript" src="https://cdn.datatables.net/buttons/1.4.2/js/buttons.colVis.min.js"></script>
+{{ block.super }}
+
 <script>
 
+    // provides format for nested table that displays when + sign is clicked.
     function format( d ){
         return "<table class='table'>" +
             "<tr>" +
@@ -42,8 +45,10 @@
             "<td>"+d.person.status+"</td>" +
             "</tr>" +
             "<tr>" +
-            "<td><b>Case Count:</b></td>" +
-            "<td>"+d.person.case_count+"</td>" +
+            "<td><b>Litigation Count:</b></td>" +
+            "<td>"+d.person.case_count_litigation+"</td>" +
+            "<td><b>Total Case Count:</b></td>" +
+            "<td>"+d.person.case_count_all+"</td>" +
             "<td><b>Earliest Case:</b></td>" +
             "<td>"+d.person.earliest_case+"</td>" +
             "<td><b>Latest Case:</b></td>" +
@@ -71,8 +76,10 @@
     $(document).ready(function(){
         var url = window.location.pathname;
         var id = url.split('/');
+        console.log("id is", id);
         var api_url = "/api/litigants/?case=";
-        var new_url = api_url.concat(id[2]);
+        var new_url = api_url + id[2] + "&expand=person__village&expand=role";
+        console.log("new_url is", new_url);
         var table = $('#litigants_for_case').DataTable({
             fixedHeader: true,
             ajax: {
@@ -157,7 +164,7 @@ function check_maker(nTd, cellData, rowData, row, col){
 
  function replace_money (nTd, cellData, rowData, row, col) {
     if (cellData) {
-        $(nTd).html("<p class='text-center'>" + cellData.in_denarius + "</p>")
+        $(nTd).html("<p class='text-center'>" + cellData.in_denarius + "d. </p>")
     } else {
         $(nTd).html("<p class='text-center'> -- </p>")
     }

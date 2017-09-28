@@ -2,7 +2,8 @@
 {% load staticfiles %}
 
 {% block content %}
-<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4/dt-1.10.16/af-2.2.2/b-1.4.2/cr-1.4.1/fc-3.2.3/fh-3.1.3/sc-1.4.3/sl-1.2.3/datatables.min.css"/>
+
+
 
 <div class="container">
     <h2>People Table</h2>
@@ -16,7 +17,8 @@
             <th>Village</th>
             <th>Gender</th>
             <th>Status</th>
-            <th>Case Count</th>
+            <th>Litigation Count</th>
+            <th>Total Case Count</th>
             <th>1332 Tax</th>
             <th>1379 Tax</th>
         </thead>
@@ -26,28 +28,28 @@
 {% endblock %}
 
 {% block scripts %}
-<script type="text/javascript" src="https://cdn.datatables.net/v/bs4/dt-1.10.16/af-2.2.2/b-1.4.2/cr-1.4.1/fc-3.2.3/fh-3.1.3/sc-1.4.3/sl-1.2.3/datatables.min.js"></script>
-<script type="text/javascript" src="https://cdn.datatables.net/buttons/1.4.2/js/buttons.colVis.min.js"></script>
+{{ block.super }}
 <script>
     $(document).ready(function(){
         var table = $('#person_list').DataTable({
             fixedHeader: true,
             ajax: {
                 processing: true,
-                url: "/api/people",
+                url: "/api/people/?expand=village",
                 type: "GET",
                 dataSrc: "",
             },
             "columns": [
                 {data: "full_name",
                     fnCreatedCell: function(nTd, cellData, rowData, row, col) {
-                        $(nTd).html("<a href='/person/"+ rowData.id +"' target='_blank'>" + rowData.full_name + "</a>");
+                        $(nTd).html("<a href='" + Urls.person(rowData.id) + "' target='_blank'>" + rowData.full_name + "</a>");
                     }
                 },
                 {data: "village.name"},
                 {data: "gender"},
                 {data: "status"},
-                {data: "case_count"},
+                {data: "case_count_litigation"},
+                {data: "case_count_all"},
                 {data: "tax_1332", visible: false},
                 {data: "tax_1379", visible: false},
             ]

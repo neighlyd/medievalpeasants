@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     'coverage',
     'rest_framework',
     'rest_framework_serializer_extensions',
-    'webpack_loader'
+    'webpack_loader',
+    'django_js_reverse'
 ]
 
 MIDDLEWARE = [

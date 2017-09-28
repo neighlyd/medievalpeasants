@@ -1,0 +1,200 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block navbar%}
+{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+    <h3 class="text-center">Pledges Given</h3>
+    <hr>
+    <div class="card">
+        <table class="table table-bordered table-hover" id="pledges_given_list" data-page-length="25">
+            <thead>
+                <th></th>
+                <th>Recipient</th>
+                <th>Status</th>
+                <th>Gender</th>
+                <th>Case</th>
+                <th>Term</th>
+                <th>Year</th>
+                <th>Court</th>
+                <th>Case Type</th>
+                <th>Verdict</th>
+                <th>Litigant Count</th>
+            </thead>
+        </table>
+    </div>
+</div>
+<br>
+<div class="container-fluid">
+    <h3 class="text-center">Pledge Received</h3>
+    <hr>
+    <div class="card">
+        <table class="table table-bordered table-hover" id="pledges_received_list" data-page-length="25">
+            <thead>
+                <th></th>
+                <th>Grantor</th>
+                <th>Status</th>
+                <th>Gender</th>
+                <th>Case</th>
+                <th>Term</th>
+                <th>Year</th>
+                <th>Court</th>
+                <th>Case Type</th>
+                <th>Verdict</th>
+                <th>Litigant Count</th>
+            </thead>
+        </table>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+    {{ block.super }}
+
+<script>
+    // provides format for nested table that displays when + sign is clicked.
+    function format( d ) {
+        return "<table class='table'>" +
+            "<tr>" +
+            "<td><b>Litigant List:</b></td>" +
+            "<td>" + d.case.litigant_list_concat + "</td>" +
+            "</tr>" +
+            "<td><b>Summary:</b></td>" +
+            "<td>"+d.case.summary+"</td>" +
+        "</table>"
+    }
+
+    $(document).ready(function () {
+        var url = window.location.pathname;
+        var id = url.split('/').reverse()[1]
+        console.log(id)
+        var api1_url = "/api/people/" + id + "/pledge_given_list/?expand=pledge_receiver&expand=case__session&expand=case__case_type&expand=case__verdict";
+        var api2_url = api1_url.replace("receiver", "giver");
+        var api2_url = api2_url.replace("given", "received")
+        console.log(api1_url);
+        console.log(api2_url);
+        var table1 = $("#pledges_given_list").DataTable({
+            fixedHeader: true,
+            order: [6, "asc"],
+            ajax: {
+                url: api1_url,
+                type: "GET",
+                dataSrc: "",
+            },
+            "columns": [
+                {
+                    "class": "details-control",
+                    "orderable": "false",
+                    "data": null,
+                    "defaultContent": "",
+                    "render": function(){
+                        return '<i class="fa fa-plus-square" aria-hidden="true"></i>';
+                    },
+                    width:"15px"
+                },
+                {data: 'pledge_receiver.full_name'},
+                {data: 'pledge_receiver.status'},
+                {data: 'pledge_receiver.gender'},
+                {data: "case.id",
+                    fnCreatedCell: function(nTd, cellData, rowData, row, col){
+                        $(nTd).html("<a href='" + Urls.case(rowData.case.id) + "'target='_blank'>" + rowData.case.id + "</a>");
+                    }
+                },
+                {data: "case.session.law_term"},
+                {data: "case.session.year"},
+                {data: "case.court_type"},
+                {data: "case.case_type.case_type"},
+                {data: "case.verdict.verdict"},
+                {data: "case.litigant_count"}
+            ]
+        })
+
+         $('#pledges_given_list tbody').on('click', 'td.details-control', function(){
+            var tr = $(this).closest('tr');
+            var tdi = tr.find("i.fa");
+            var row = table1.row( tr );
+
+            if ( row.child.isShown() ) {
+                row.child.hide();
+                tr.removeClass('shown');
+                tdi.first().removeClass('fa-minus-square');
+                tdi.first().addClass('fa-plus-square');
+            } else{
+                row.child( format( row.data() ) ).show();
+                tr.addClass('shown');
+                tdi.first().removeClass('fa-plus-square');
+                tdi.first().addClass('fa-minus-square');
+            }
+        });
+
+        var table2 = $("#pledges_received_list").DataTable({
+            fixedHeader: true,
+            order: [6, "asc"],
+            ajax: {
+                url: api2_url,
+                type: "GET",
+                dataSrc: "",
+            },
+            "columns": [
+                {
+                    "class": "details-control",
+                    "orderable": "false",
+                    "data": null,
+                    "defaultContent": "",
+                    "render": function(){
+                        return '<i class="fa fa-plus-square" aria-hidden="true"></i>';
+                    },
+                    width:"15px"
+                },
+                {data: 'pledge_giver.full_name'},
+                {data: 'pledge_giver.status'},
+                {data: 'pledge_giver.gender'},
+                {data: "case.id",
+                    fnCreatedCell: function(nTd, cellData, rowData, row, col){
+                        $(nTd).html("<a href='" + Urls.case(rowData.case.id) + "'target='_blank'>" + rowData.case.id + "</a>");
+                    }
+                },
+                {data: "case.session.law_term"},
+                {data: "case.session.year"},
+                {data: "case.court_type"},
+                {data: "case.case_type.case_type"},
+                {data: "case.verdict.verdict"},
+                {data: "case.litigant_count"}
+            ]
+        })
+         $('#pledges_received_list tbody').on('click', 'td.details-control', function(){
+            var tr = $(this).closest('tr');
+            var tdi = tr.find("i.fa");
+            var row = table2.row( tr );
+
+            if ( row.child.isShown() ) {
+                row.child.hide();
+                tr.removeClass('shown');
+                tdi.first().removeClass('fa-minus-square');
+                tdi.first().addClass('fa-plus-square');
+            } else{
+                row.child( format( row.data() ) ).show();
+                tr.addClass('shown');
+                tdi.first().removeClass('fa-plus-square');
+                tdi.first().addClass('fa-minus-square');
+            }
+        });
+    });
+
+    function list_litigants(data){
+        data.forEach(function (obj) {
+            concat = 'Name: ' + obj.name + ', Role: ' + obj.role + '; ';
+            console.log(concat);
+            return concat;
+        })
+    };
+
+
+
+</script>
+
+
+{% endblock %}

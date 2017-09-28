@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block navbar %}
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid text-center">
+    <br>
+    <h3>Position List</h3>
+</div>
+
+<table class="table table-bordered table-hover" id="person_position_list" data-page-length="25">
+    <thead>
+        <th>Title</th>
+        <th>Term</th>
+        <th>Year</th>
+        <th>Definitive</th>
+    </thead>
+</table>
+<br>
+
+{% endblock %}
+
+{% block scripts %}
+    {{ block.super }}
+
+<script>
+    // provides format for nested table that displays when + sign is clicked.
+
+    $(document).ready(function () {
+        var url = window.location.pathname;
+        var id = url.split('/').reverse()[1]
+        console.log(id)
+        var api_url = "/api/people/" + id + "/position_list/?expand=session&expand=title";
+        console.log(api_url);
+        var position_table = $("#person_position_list").DataTable({
+            fixedHeader: true,
+            ajax: {
+                url: api_url,
+                type: "GET",
+                dataSrc: "",
+            },
+            "columns": [
+                {data: "title.title"},
+                {data: "session.law_term",
+                    fnCreatedCell: function(nTd, cellData, rowData, row, col){
+                        $(nTd).html("<a href='" + Urls.person(rowData.person_id) + "'target='_blank'>" + rowData.session.law_term + " <-- Placeholder Link</a>");
+                    }
+                },
+                {data: "session.year"},
+                {data: "definitive"}
+            ]
+        })
+    });
+
+</script>
+
+
+{% endblock %}

@@ -1,19 +1,19 @@
-from django.db.models import Count
 from rest_framework import viewsets, generics
 from rest_framework_serializer_extensions.views import SerializerExtensionsAPIViewMixin
 
 from peasantlegaldb.api import serializers
 from peasantlegaldb import models
 
+
 # API views
 class ArchiveViewSet(SerializerExtensionsAPIViewMixin, viewsets.ModelViewSet):
-    '''
-        API endpoint that allows the model to be viewed or edited.
-    '''
+
+    # API endpoint that allows the model to be viewed or edited.
     queryset = models.Archive.objects.all()
     serializer_class = serializers.ArchiveSerializer
 
-class ArchiveListEndpoint(generics.ListAPIView):
+
+class ArchiveListEndpoint(SerializerExtensionsAPIViewMixin, generics.ListAPIView):
     queryset = models.Archive.objects.all()
     serializer_class = serializers.ArchiveSerializer
 
@@ -99,9 +99,9 @@ class SessionViewSet(SerializerExtensionsAPIViewMixin, viewsets.ModelViewSet):
 
 
 class CaseViewSet(SerializerExtensionsAPIViewMixin, viewsets.ModelViewSet):
-    queryset = models.Case.objects.all().prefetch_related('case_to_person').order_by('session__village__name', 'session__date', 'court_type')
+    queryset = models.Case.objects.all().prefetch_related('case_to_person').order_by('session__village__name',
+                                                                                     'session__date', 'court_type')
     serializer_class = serializers.CaseSerializer
-
 
 
 class CornbotViewSet(SerializerExtensionsAPIViewMixin, viewsets.ModelViewSet):
@@ -120,7 +120,8 @@ class MurrainViewSet(SerializerExtensionsAPIViewMixin, viewsets.ModelViewSet):
 
 
 class PlaceMentionedViewSet(SerializerExtensionsAPIViewMixin, viewsets.ModelViewSet):
-    queryset = models.PlaceMentioned.objects.all().order_by('case__session__village__name', 'case__session__date', 'village__name')
+    queryset = models.PlaceMentioned.objects.all().order_by('case__session__village__name', 'case__session__date',
+                                                            'village__name')
     serializer_class = serializers.PlaceMentionedSerializer
 
 
@@ -129,7 +130,7 @@ class LandParcelViewSet(SerializerExtensionsAPIViewMixin, viewsets.ModelViewSet)
     serializer_class = serializers.LandParcelSerializer
 
 
-class LitigantViewSet(generics.ListAPIView):
+class LitigantViewSet(SerializerExtensionsAPIViewMixin, generics.ListAPIView):
 
     serializer_class = serializers.LitigantSerializer
 
@@ -139,18 +140,19 @@ class LitigantViewSet(generics.ListAPIView):
                                                           'person__first_name')
         case = self.request.query_params.get('case', None)
         if case is not None:
-            queryset = queryset.filter(case_id = case)
+            queryset = queryset.filter(case_id=case)
         return queryset
 
+
 class CasePeopleLandViewSet(SerializerExtensionsAPIViewMixin, viewsets.ModelViewSet):
-    queryset = models.CasePeopleLand.objects.all().order_by('case__session__village__name', 'case__session__date', 'person__last_name',
-                                              'person__first_name')
+    queryset = models.CasePeopleLand.objects.all().order_by('case__session__village__name', 'case__session__date',
+                                                            'person__last_name', 'person__first_name')
     serializer_class = serializers.CasePeopleLandSerializer
 
 
 class PledgeViewSet(SerializerExtensionsAPIViewMixin, viewsets.ModelViewSet):
-    queryset = models.Pledge.objects.all().order_by('case__session__village__name', 'case__session__date', 'pledge_giver__last_name',
-                                              'pledge_giver__first_name')
+    queryset = models.Pledge.objects.all().order_by('case__session__village__name', 'case__session__date',
+                                                    'pledge_giver__last_name', 'pledge_giver__first_name')
     serializer_class = serializers.PledgeSerializer
 
 
@@ -160,10 +162,54 @@ class LandSplitViewSet(SerializerExtensionsAPIViewMixin, viewsets.ModelViewSet):
 
 
 class PositionViewSet(SerializerExtensionsAPIViewMixin, viewsets.ModelViewSet):
-    queryset = models.Position.objects.all().order_by('person__village__name', 'person__last_name', 'person__first_name')
     serializer_class = serializers.PositionSerializer
+
+    def get_queryset(self):
+        queryset = models.Position.objects.filter(person_id=self.kwargs['pk'])
+        return queryset
 
 
 class RelationshipViewSet(SerializerExtensionsAPIViewMixin, viewsets.ModelViewSet):
     queryset = models.Relationship.objects.all().order_by('person_one__last_name', 'person_one__first_name')
     serializer_class = serializers.RelationshipSerializer
+
+
+class PersonCaseListViewSet(SerializerExtensionsAPIViewMixin, viewsets.ModelViewSet):
+    serializer_class = serializers.LitigantSerializer
+
+    # create a queryset that selects the litigant through model and then filters it based on the kwargs supplied by the
+    # url router.
+    def get_queryset(self):
+        queryset = models.Case.litigants.through.objects.select_related('person')
+        queryset = queryset.filter(person_id=self.kwargs['pk'])
+        return queryset
+
+
+class PersonPledgeReceivedListViewSet(SerializerExtensionsAPIViewMixin, viewsets.ModelViewSet):
+    serializer_class = serializers.PledgeSerializer
+
+    # create a queryset that selects the litigant through model and then filters it based on the kwargs supplied by the
+    # url router.
+    def get_queryset(self):
+        queryset = models.Pledge.objects.filter(pledge_receiver=self.kwargs['pk'])
+        return queryset
+
+
+class PersonPledgeGivenListViewset(SerializerExtensionsAPIViewMixin, viewsets.ModelViewSet):
+    serializer_class = serializers.PledgeSerializer
+
+    # create a queryset that selects the litigant through model and then filters it based on the kwargs supplied by the
+    # url router.
+    def get_queryset(self):
+        queryset = models.Pledge.objects.filter(pledge_giver=self.kwargs['pk'])
+        return queryset
+
+class RelationshipListViewset(SerializerExtensionsAPIViewMixin, viewsets.ModelViewSet):
+    serializer_class = serializers.RelationshipSerializer
+
+    # create a queryset that selects the litigant through model and then filters it based on the kwargs supplied by the
+    # url router.
+    def get_queryset(self):
+        queryset = models.Relationship.objects.filter(person_one=self.kwargs['pk']) | models.Relationship.objects.filter\
+            (person_two=self.kwargs['pk'])
+        return queryset

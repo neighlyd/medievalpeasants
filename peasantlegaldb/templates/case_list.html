@@ -9,7 +9,8 @@
     <table class="table table-bordered table-hover" id="case_list" data-page-length="25">
         <thead>
             <th>Case ID</th>
-            <th>Session</th>
+            <th>Law Term</th>
+            <th>Year</th>
             <th>Village</th>
             <th>Court Type</th>
             <th>Case Type</th>
@@ -23,29 +24,31 @@
 {% endblock %}
 
 {% block scripts %}
-<script type="text/javascript" src="https://cdn.datatables.net/v/bs4/dt-1.10.16/af-2.2.2/b-1.4.2/cr-1.4.1/fc-3.2.3/fh-3.1.3/sc-1.4.3/sl-1.2.3/datatables.min.js"></script>
-<script type="text/javascript" src="https://cdn.datatables.net/buttons/1.4.2/js/buttons.colVis.min.js"></script>
+
+{{ block.super }}
+
 <script>
     $(document).ready(function(){
+        var case_api_url = Urls.case_api_list()+"?expand=session__village&expand=verdict&expand=case_type";
+        console.log(case_api_url);
         var table = $('#case_list').DataTable({
             fixedHeader: true,
             ajax: {
                 processing: true,
-                url: "/api/cases",
+                url: case_api_url,
                 type: "GET",
                 dataSrc: "",
             },
+            "order": [[2, "asc"]],
             "columns": [
                 {data: "id",
                     fnCreatedCell: function(nTd, cellData, rowData, row, col) {
-                        $(nTd).html("<a href='/case/"+ rowData.id +"' target='_blank'>" + rowData.id + "</a>");
+                        var url = Urls.case(rowData.id)
+                        $(nTd).html("<a href='"+ url +"' target='_blank'>" + rowData.id + "</a>");
                     }
                 },
-                {data: "session",
-                    fnCreatedCell: function(nTd, cellData, rowData, row, col) {
-                        $(nTd).html(rowData.session.law_term + ", " + rowData.session.year)
-                    }
-                },
+                {data: "session.law_term"},
+                {data: "session.year"},
                 {data: "session.village.name"},
                 {data: "court_type"},
                 {data: "case_type.case_type"},
