@@ -40,6 +40,7 @@ person_urls = [
     url(r'^(?P<pk>\d+)/pledge_list', web_views.PeopleListView.as_view(template_name='pledge_list.html'), name='pledge_list'),
     url(r'^(?P<pk>\d+)/relationship_list', web_views.PeopleListView.as_view(template_name='relationship_list.html'), name='relationship_list'),
     url(r'^(?P<pk>\d+)/position_list', web_views.PeopleListView.as_view(template_name='position_list.html'), name='position_list'),
+    url(r'^(?P<pk>\d+)/land_list', web_views.PeopleListView.as_view(template_name='person_land_history_list.html'), name='person_land_history'),
 ]
 
 case_urls = [
@@ -89,6 +90,7 @@ router.register(r'people_to_land', api_views.CasePeopleLandViewSet)
 router.register(r'pledges', api_views.PledgeViewSet)
 router.register(r'land_split', api_views.LandSplitViewSet)
 router.register(r'relationships', api_views.RelationshipViewSet)
+#router.register(r'cases', api_views.CaseViewSet, base_name='case_list_api')
 
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.
@@ -99,6 +101,7 @@ api_people = [
     url(r'^(?P<pk>\d+)/pledge_given_list', api_views.PersonPledgeGivenListViewset.as_view({'get':'list'}), name='person_pledge_given_list_api'),
     url(r'^(?P<pk>\d+)/relationship_list', api_views.RelationshipListViewset.as_view({'get':'list'}), name='person_relationship_list_api'),
     url(r'^(?P<pk>\d+)/position_list', api_views.PositionViewSet.as_view({'get':'list'}), name='person_position_list_api'),
+    url(r'^(?P<pk>\d+)/land_list', api_views.PersonLandHistoryViewSet.as_view({'get':'list'}), name='person_land_list_api'),
 ]
 
 urlpatterns += [
@@ -107,5 +110,5 @@ urlpatterns += [
     url(r'^api/litigants', api_views.LitigantViewSet.as_view(), name='litigant_list_api'),
     url(r'^api/litigants/(?P<case>\d+/$)', api_views.LitigantViewSet.as_view(), name='litigants_by_case_list_api'),
     url(r'^api/people/', include(api_people)),
-    url(r'^api/cases', api_views.CaseViewSet.as_view({'get':'list'}), name='case_api_list_api'),
+    url(r'^api/cases/', api_views.CaseViewSet.as_view({'get':'list'}), name='case_list_api')
 ]

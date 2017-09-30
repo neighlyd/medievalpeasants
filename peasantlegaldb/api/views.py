@@ -213,3 +213,10 @@ class RelationshipListViewset(SerializerExtensionsAPIViewMixin, viewsets.ModelVi
         queryset = models.Relationship.objects.filter(person_one=self.kwargs['pk']) | models.Relationship.objects.filter\
             (person_two=self.kwargs['pk'])
         return queryset
+
+class PersonLandHistoryViewSet(SerializerExtensionsAPIViewMixin, viewsets.ModelViewSet):
+    serializer_class = serializers.CasePeopleLandSerializer
+
+    def get_queryset(self):
+        queryset = models.CasePeopleLand.objects.filter(person=self.kwargs['pk'])
+        return queryset

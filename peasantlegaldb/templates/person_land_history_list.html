@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block navbar%}
+{% endblock %}
+{% block content %}
+
+<div class="container text-center">
+    <h2>Land History</h2>
+</div>
+<table class="table table-bordered table-hover" id="land_history_list" data-page-length="25">
+    <thead>
+        <th></th>
+        <th>Land ID</th>
+        <th>Parcels</th>
+        <th>Law Term</th>
+        <th>Year</th>
+        <th>Role</th>
+        <th>Villeinage?</th>
+        <th>Village</th>
+        <th>Notes</th>
+    </thead>
+
+</table>
+
+{% endblock %}
+
+{% block scripts %}
+
+{{ block.super }}
+
+<script>
+    // provides format for nested table that displays when + sign is clicked.
+    function format( d ) {
+        return "<table class='table'>" +
+            "<tr>" +
+            "<td><b>Case ID</b></td>" +
+            "<td><b>Village</b></td>" +
+            "<td><b>Law Term</b></td>" +
+            "<td><b>Year</b></td>" +
+            "<td><b>Court Type</b></td>" +
+            "<td><b>Case Type</b></td>" +
+            "<td><b>Verdict</b></td>" +
+            "<tr>" +
+            "<td><a href='" + Urls.case(d.case.id) + "'target='_blank'>" + d.case.id + "</a></td>" +
+            "<td>" + d.case.session.village.name + "</td>" +
+            "<td>" + d.case.session.law_term + "</td>" +
+            "<td>" + d.case.session.year + "</td>" +
+            "<td>" + d.case.court_type + "</td>" +
+            "<td>" + d.case.case_type.case_type +"</td>" +
+            "<td>" + d.case.verdict.verdict + "</td>" +
+            "</tr>" +
+            "<td><b>Summary</b></td>" +
+            "<td colspan='6'>" + d.case.summary + "</td>" +
+            "</tr>"
+    }
+
+    $(document).ready(function(){
+        var url = window.location.pathname;
+        var id = url.split('/').reverse()[1];
+        var url = "/api/people/" + id + "/land_list/?expand=case__session__village&expand=land&expand=role&expand=case__case_type&expand=land&expand=case__verdict";
+        var table = $('#land_history_list').DataTable({
+            fixedHeader: true,
+            ajax: {
+                processing: true,
+                url: url,
+                type: "GET",
+                dataSrc: "",
+            },
+            "order": [[4, "asc"]],
+            "columns": [
+                {
+                    "class": "details-control",
+                    "orderable": "false",
+                    "data": null,
+                    "defaultContent": "",
+                    "render": function(){
+                        return '<i class="fa fa-plus-square" aria-hidden="true"></i>';
+                    },
+                    width:"15px"
+                },
+                {data: "land_id",
+                    fnCreatedCell: function(nTd, cellData, rowData, row, col) {
+                        var url = Urls.case(rowData.id)
+                        $(nTd).html("<a href='"+ url +"' target='_blank'>" + rowData.land_id + " temp. link</a>");
+                    }
+                },
+                {data: "land.parcel_list_concat"},
+                {data: "case.session.law_term"},
+                {data: "case.session.year"},
+                {data: "role.role"},
+                {data: "villeinage"},
+                {data: "case.session.village.name"},
+                {data: "notes"},
+            ]
+        });
+
+
+        $('#land_history_list tbody').on('click', 'td.details-control', function(){
+            var tr = $(this).closest('tr');
+            var tdi = tr.find("i.fa");
+            var row = table.row( tr );
+
+            if ( row.child.isShown() ) {
+                row.child.hide();
+                tr.removeClass('shown');
+                tdi.first().removeClass('fa-minus-square');
+                tdi.first().addClass('fa-plus-square');
+            } else{
+                row.child( format( row.data() ) ).show();
+                tr.addClass('shown');
+                tdi.first().removeClass('fa-plus-square');
+                tdi.first().addClass('fa-minus-square');
+            }
+        });
+
+    });
+
+
+
+</script>
+{% endblock %}

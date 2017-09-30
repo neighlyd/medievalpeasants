@@ -38,8 +38,10 @@
             "<td><b>Summary:</b></td>" +
             "<td>"+data.case.summary+"</td>" +
             "</tr>" +
+            "<tr>" +
             "<td><b>Litigant List:</b></td>" +
             "<td>" + data.case.litigant_list_concat + "</td>" +
+            "</tr>" +
         "</table>"
     }
 
@@ -49,7 +51,7 @@
         console.log(id)
         var api_url = "/api/people/" + id + "/case_list/?expand=case__case_type&expand=role&expand=case__verdict&expand=case__session";
         console.log(api_url);
-        var case_table = $("#person_case_list").DataTable({
+        var table = $("#person_case_list").DataTable({
             fixedHeader: true,
             order: [3, "asc"],
             ajax: {
@@ -85,7 +87,7 @@
          $('#person_case_list tbody').on('click', 'td.details-control', function(){
             var tr = $(this).closest('tr');
             var tdi = tr.find("i.fa");
-            var row = case_table.row( tr );
+            var row = table.row( tr );
 
             if ( row.child.isShown() ) {
                 row.child.hide();
@@ -99,6 +101,7 @@
                 tdi.first().addClass('fa-minus-square');
             }
         });
+
     });
 
     function list_litigants(data){

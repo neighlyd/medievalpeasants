@@ -141,9 +141,12 @@ class SessionSerializer(SerializerExtensionsMixin, serializers.ModelSerializer):
 
 class LandSerializer(SerializerExtensionsMixin, serializers.ModelSerializer):
 
+    parcel_list = serializers.ReadOnlyField()
+    parcel_list_concat = serializers.ReadOnlyField()
+
     class Meta:
         model = models.Land
-        fields = ('id', 'notes', 'owner_chain')
+        fields = ('id', 'notes', 'owner_chain', 'parcel_list', 'parcel_list_concat')
 
 
 class PersonSerializer(SerializerExtensionsMixin, serializers.ModelSerializer):

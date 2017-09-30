@@ -97,14 +97,43 @@
 <br>
 
 <div class="container-fluid">
-    <div class="d-flex justify-content-center">
-        <a class="btn btn-success btn-large" data-toggle="collapse" id="show_litigants" data-target="#litigant_list" href="{% url 'litigant_list' case.id %}">Show Litigants</a>
+    <div class="container-fluid">
 
-        <a class="btn btn-success btn-large" data-toggle="collapse" id="add_litigants" data-target="#new_litigants" href="#">Add Litigants</a>
+        <ul class="nav nav-pills" id="infoTab">
+
+            <li class="nav-item" >
+                <a class="nav-link active" href="#show_litigants" data-toggle="tab">Show Litigants</a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" href="#add_litigants" data-toggle="tab">Add Litigants</a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" href="#add_chevage" data-toggle="tab">Add Chevage</a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" href="#add_murrain" data-toggle="tab">Add Murrain</a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" href="#add_extrahura" data-toggle="tab">Add Extrahura</a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" href="#add_cornbot" data-toggle="tab">Add cornbot</a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" href="#add_cornbot" data-toggle="tab">Add cornbot</a>
+            </li>
+
+
+
+        </ul>
 
     </div>
-    <div class="container-fluid" id="litigant_list"></div>
-    <div class="container-fluid" id="new_litigants"></div>
 </div>
 
 {% endblock %}
