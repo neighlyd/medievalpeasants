@@ -1,0 +1,74 @@
+{% extends 'layout/_l_three_col.html' %}
+
+{% block left_sidebar%}
+    <div id="selection_list">
+        <a class="list-group-item active" href="{% url 'tenant_history' land.id %}">Tenant History</a>
+        <a class="list-group-item" href="" >Case History</a>
+        <a class="list-group-item" href="{% url 'land_split_history' land.id %}" >Land Split History</a>
+    </div>
+{% endblock %}
+
+{% block center_bar %}
+<div class="card-header text-center">
+    <h2 class="card-title">Land ID: {{ land.id }}</h2>
+</div>
+
+<div class="card-body clearfix" id="person_info">
+    <div class="d-flex justify-content-between flex-wrap">
+
+        <div class="card p-0 col-4">
+
+                <div class="card-header text-center">
+                    <h3 class="card-title">Parcels</h3>
+                </div>
+
+                <div class="card-body">
+                    <table class="table table-bordered table-sm">
+                        {% for x in land.parcels.all %}
+                            <ul class="list-group">
+                                <li class="list-group-item"><h6>{{ x.amount }} {{ x.parcel_type.parcel_type }} held by {{ x.parcel_tenure.tenure }}</h6></li>
+                            </ul>
+                        {% endfor %}
+                    </table>
+                </div>
+
+        </div>
+
+        <div class="card p-0 col-6">
+             <h3 class="card-header">Notes:</h3>
+                <div class="card-body">
+
+                    <h6 class="card-text">
+                        {{ land.notes | linebreaksbr }}
+                </h6>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<br>
+
+<div id="list_info">
+
+</div>
+
+
+{% endblock %}
+
+{% block right_sidebar %}
+    <button type="button" class="btn btn-secondary float-right">Edit Land</button>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+
+<script>
+    $(document).ready(function(){
+        var url = window.location.pathname;
+        var id = url.split('/').reverse()[1]
+        $("#list_info").load(Urls.tenant_history(id))
+    })
+</script>
+
+{% endblock %}

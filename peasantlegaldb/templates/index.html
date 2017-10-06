@@ -1,4 +1,8 @@
-{% extends "base.html" %}
+{% extends "layout/__base.html" %}
+
+{% block navbar %}
+    {% include 'layout/__navbar.html' %}
+{% endblock %}
 
 {% block content %}
 <div class="jumbotron">

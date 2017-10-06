@@ -1,0 +1,132 @@
+{% extends 'layout/_l_three_col.html' %}
+
+{% block navbar %}
+{% include 'layout/__navbar.html' %}
+{% endblock %}
+
+{% block left_sidebar %}
+    <div id="selection_list">
+        <a class="list-group-item active" href="{% url 'person_stats' person.id %}">Stats</a>
+        <a class="list-group-item" href="{% url 'person_case_list' person.id %}" >Case List</a>
+        <a class="list-group-item" href="{% url 'pledge_list' person.id %}">Pledge List</a>
+        <a class="list-group-item" href="{% url 'person_land_history' person.id %}">Land List</a>
+        <a class="list-group-item" href="{% url 'relationship_list' person.id %}">Relationship List</a>
+        <a class="list-group-item" href="{% url 'position_list' person.id %}">Position List</a>
+    </div>
+{% endblock %}
+
+{% block center_bar %}
+
+<div class="card-header text-center">
+    <h2 class="card-title">{{person.full_name}}</h2>
+    <h3 class="card-subtitle mb-2 text-muted">{{ person.village.name }}</h3>
+</div>
+
+<div class="card-body clearfix" id="person_info">
+    <div class="d-flex justify-content-between flex-wrap">
+
+        <div class="p-0 col-5">
+            <table class="table table-bordered table-sm">
+                <tr class="row m-0">
+                    <td class="d-inline-block col-4"><b>First Name:</b></td>
+                    <td class="d-inline-block col-8">{{ person.first_name }}</td>
+                </tr>
+                <tr class="row m-0">
+                    <td class="d-inline-block col-4"><b>Relation Name:</b></td>
+                    <td class="d-inline-block col-8">{{ person.relation_name }}</td>
+                </tr>
+                <tr class="row m-0">
+                    <td class="d-inline-block col-4"><b>Last Name:</b></td>
+                    <td class="d-inline-block col-8">{{ person.last_name }}</td>
+                </tr>
+                <tr class="row m-0">
+                    <td class="d-inline-block col-4"><b>Status:</b></td>
+                    <td class="d-inline-block col-8">{{ person.get_status_display}}</td>
+                </tr>
+                <tr class="row m-0">
+                    <td class="d-inline-block col-4"><b>Gender:</b></td>
+                    <td class="d-inline-block col-8">{{ person.get_gender_display}}</td>
+                </tr>
+                <tr class="row m-0">
+                    <td class="d-inline-block col-4"><b>Home Village:</b></td>
+                    <td class="d-inline-block col-8">{{ person.village.name}}</td>
+                </tr>
+                <tr class="row m-0">
+                    <td class="d-inline-block col-4"><b>1332 Tax</b></td>
+                    <td class="d-inline-block col-8">{{ person.tax_1332 }}</td>
+                </tr>
+                <tr class="row m-0">
+                    <td class="d-inline-block col-4"><b>1379 Tax</b></td>
+                    <td class="d-inline-block col-8">{{ person.tax_1379 }}</td>
+                </tr>
+                <tr class="row m-0">
+                    <td class="d-inline-block col-4"><b>Earliest Case</b></td>
+                    <td class="d-inline-block col-8">{{ person.earliest_case }}</td>
+                </tr>
+                <tr class="row m-0">
+                    <td class="d-inline-block col-4"><b>Latest Case</b></td>
+                    <td class="d-inline-block col-8">{{ person.latest_case }}</td>
+                </tr>
+
+            </table>
+        </div>
+
+        <div class="card p-0 col-6">
+            <h3 class="card-header">Notes:</h3>
+                <div class="card-body">
+
+                    <h6 class="card-text">
+                        {{ person.notes | linebreaksbr }}
+                </h6>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<br>
+
+<div id="list_info">
+
+</div>
+
+{% endblock %}
+
+{% block right_sidebar %}
+    <button type="button" class="btn btn-secondary float-right">Edit Person</button>
+{% endblock %}
+
+<!-- Old script for showing tabs.
+<script>
+    $('#selection_list>a').click(function(e){
+        e.preventDefault();
+        var id=$(this).attr('href'), url=$(this).data('url');
+        console.log("id: " + id);
+        console.log("url: "+ url);
+        if(typeof url !== "undefined") {
+            $(id).load(url);
+            $(id).addClass('active').siblings().removeClass('active');
+        } else {
+            $(id).addClass('active').siblings().removeClass('active');
+        }
+    });
+
+</script>-->
+{% block scripts %}
+
+{{ block.super }}
+
+{% if  person.id == 91 %}
+    javascript for editing goes here. Change person.id to user verification.
+{% endif %}
+
+<script>
+    $(document).ready(function(){
+        var url = window.location.pathname;
+        var id = url.split('/').reverse()[1]
+        $("#list_info").load(Urls.person_stats(id))
+    })
+</script>
+
+
+{% endblock %}

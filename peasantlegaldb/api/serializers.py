@@ -161,15 +161,15 @@ class PersonSerializer(SerializerExtensionsMixin, serializers.ModelSerializer):
     case_count_all = serializers.ReadOnlyField()
     earliest_case = serializers.ReadOnlyField()
     latest_case = serializers.ReadOnlyField()
-    case_info = serializers.ReadOnlyField()
     pledges_given_count = serializers.ReadOnlyField()
     pledges_received_count = serializers.ReadOnlyField()
+    case_info = serializers.ReadOnlyField()
 
     class Meta:
         model = models.Person
         fields = ('id', 'first_name', 'relation_name', 'last_name', 'status', 'gender', 'tax_1332', 'tax_1379', 'notes',
-                  'full_name', 'case_count_litigation', 'case_count_all', 'earliest_case', 'latest_case', 'case_info',
-                  'pledges_given_count', 'pledges_received_count')
+                  'full_name', 'case_count_litigation', 'case_count_all', 'earliest_case', 'latest_case',
+                  'pledges_given_count', 'pledges_received_count', 'case_info')
         expandable_fields = dict(
             village=VillageSerializer,
         )

@@ -58,3 +58,8 @@ class LitigantListView(ListView):
 
     model = models.Litigant
     queryset = models.Litigant.objects.all()
+
+class LandDetailView(DetailView):
+
+    model = models.Land
+    queryset = models.Land.objects.prefetch_related('parcels').all()

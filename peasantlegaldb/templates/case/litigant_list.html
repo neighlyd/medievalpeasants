@@ -1,0 +1,179 @@
+{% extends 'layout/__base.html' %}
+{% load staticfiles %}
+{% block navbar %}
+{% endblock %}
+{% block content %}
+
+<div class="container-fluid">
+    <div class="card">
+        <h3 class="card-header text-center">Litigant List</h3>
+        <div class="card-body">
+            <table class="table table-bordered table-hover" id="litigants_for_case" data-page-length="25">
+                <thead>
+                    <th></th>
+                    <th>Name</th>
+                    <th>Role</th>
+                    <th>Amercement</th>
+                    <th>Fine</th>
+                    <th>Damages</th>
+                    <th>Distrain</th>
+                    <th>Attach</th>
+                    <th>Bail</th>
+                    <th>Chevage</th>
+                    <th>Heriot</th>
+                    <th>Imperc.</th>
+                </thead>
+            </table>
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+
+<script>
+
+    // provides format for nested table that displays when + sign is clicked.
+    function format( d ){
+        return "<table class='table'>" +
+            "<tr>" +
+            "<td><b>Village:</b></td>" +
+            "<td>"+d.person.village.name+"</td>" +
+            "<td><b>Gender:</b></td>" +
+            "<td>"+d.person.gender+"</td>" +
+            "<td><b>Status:</b></td>" +
+            "<td>"+d.person.status+"</td>" +
+            "</tr>" +
+            "<tr>" +
+            "<td><b>Litigation Count:</b></td>" +
+            "<td>"+d.person.case_count_litigation+"</td>" +
+            "<td><b>Total Case Count:</b></td>" +
+            "<td>"+d.person.case_count_all+"</td>" +
+            "<td><b>Earliest Case:</b></td>" +
+            "<td>"+d.person.earliest_case+"</td>" +
+            "<td><b>Latest Case:</b></td>" +
+            "<td>"+d.person.latest_case+"</td>" +
+            "</tr>" +
+            "<tr>" +
+            "<td><b>Amercement Count:</b></td>" +
+            "<td>"+d.person.case_info.amercement__count+"</td>" +
+            "<td><b>Fine Count:</b></td>" +
+            "<td>"+d.person.case_info.fine__count+"</td>" +
+            "<td><b>Damages Count:</b></td>" +
+            "<td>"+d.person.case_info.damage__count+"</td>" +
+            "</tr>" +
+            "<tr>" +
+            "<td><b>Chevage Count:</b></td>" +
+            "<td>"+d.person.case_info.chevage__count+"</td>" +
+            "<td><b>Impercamenta Count:</b></td>" +
+            "<td>"+d.person.case_info.impercamentum_amercement__count+"</td>" +
+            "<td><b>Heriot Count:</b></td>" +
+            "<td>"+d.person.case_info.heriot_assessment__count+"</td>" +
+            "</tr>"
+            "</table>"
+    }
+
+    $(document).ready(function(){
+        var url = window.location.pathname;
+        var id = url.split('/').reverse()[1];
+        console.log(id);
+        var url = Urls.litigants_api() +"/?case=" + id + "&expand=person__village&expand=role";
+        console.log(url);
+        var table = $('#litigants_for_case').DataTable({
+            scrollX: true,
+            fixedHeader:{
+              headerOffset: 50
+            },
+            ajax: {
+                processing: true,
+                url: url,
+                type: "GET",
+                dataSrc: "",
+            },
+            "columns": [
+                {
+                    "class": "details-control",
+                    "orderable": "false",
+                    "data": null,
+                    "defaultContent": "",
+                    "render": function(){
+                        return '<i class="fa fa-plus-square" aria-hidden="true"></i>';
+                    },
+                    width:"15px"
+                },
+                {data: "person.full_name",
+                    fnCreatedCell: function(nTd, cellData, rowData, row, col) {
+                        $(nTd).html("<a href='/person/"+ rowData.person.id +"' target='_blank'>" + rowData.person.full_name + "</a>");
+                    }
+                },
+                {data: "role.role"},
+                {data: "amercement",
+                    fnCreatedCell: replace_money,
+                },
+                {data: "fine",
+                    fnCreatedCell: replace_money,
+                },
+                {data: "damage",
+                    fnCreatedCell: replace_money,
+                },
+                {data: "distrained",
+                    fnCreatedCell: check_maker,
+                },
+                {data: "attached",
+                    fnCreatedCell: check_maker,
+                },
+                {data: "bail",
+                   fnCreatedCell: check_maker,
+                },
+                {data: "chevage",
+                    fnCreatedCell: replace_money,
+                },
+                {data: "heriot_assessment",
+                    fnCreatedCell: replace_money,
+                },
+                {data: "impercamentum_amercement",
+                    fnCreatedCell: replace_money,
+                },
+                ]
+        });
+
+        $('#litigants_for_case tbody').on('click', 'td.details-control', function(){
+            var tr = $(this).closest('tr');
+            var tdi = tr.find("i.fa");
+            var row = table.row( tr );
+
+            if ( row.child.isShown() ) {
+                row.child.hide();
+                tr.removeClass('shown');
+                tdi.first().removeClass('fa-minus-square');
+                tdi.first().addClass('fa-plus-square');
+            } else{
+                row.child( format( row.data() ) ).show();
+                tr.addClass('shown');
+                tdi.first().removeClass('fa-plus-square');
+                tdi.first().addClass('fa-minus-square');
+            }
+        });
+    });
+
+function check_maker(nTd, cellData, rowData, row, col){
+    if( cellData) {
+        $(nTd).html("<p class='text-center'> √ </p>");
+    } else {
+        $(nTd).html("<p class='text-center'> -- </p>")
+    }
+}
+
+ function replace_money (nTd, cellData, rowData, row, col) {
+    if (cellData) {
+        $(nTd).html("<p class='text-center'>" + cellData.in_denarius + "d. </p>")
+    } else {
+        $(nTd).html("<p class='text-center'> -- </p>")
+    }
+}
+
+</script>
+{% endblock %}

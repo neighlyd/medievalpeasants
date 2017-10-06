@@ -1,24 +1,27 @@
-{% extends "base.html" %}
-{% load staticfiles %}
+{% extends "layout/__base.html" %}
+
+{% block navbar %}
+    {% include 'layout/__navbar.html' %}
+{% endblock %}
 
 {% block content %}
 
-
+<br>
+<div class="container">
+    <hr>
+        <h2 class="text-center">People List</h2>
+    <hr>
+</div>
 
 <div class="container">
-    <h2>People Table</h2>
-    <div id="control_cols">
-        <input type="checkbox" class="hide_show" id="1332"><span>1332 Tax</span></input>
-        <input type="checkbox" class="hide_show" id="1379"><span>1379 Tax</span></input>
-    </div>
     <table class="table table-bordered table-hover" id="person_list" data-page-length="25">
         <thead>
             <th>Name</th>
             <th>Village</th>
             <th>Gender</th>
             <th>Status</th>
-            <th>Litigation Count</th>
-            <th>Total Case Count</th>
+            <th>Litigation</th>
+            <th>Total Cases</th>
             <th>1332 Tax</th>
             <th>1379 Tax</th>
         </thead>
@@ -32,7 +35,10 @@
 <script>
     $(document).ready(function(){
         var table = $('#person_list').DataTable({
-            fixedHeader: true,
+            fixedHeader: {
+                headerOffset: 50
+            },
+            scrollX: true,
             ajax: {
                 processing: true,
                 url: "/api/people/?expand=village",
@@ -50,18 +56,22 @@
                 {data: "status"},
                 {data: "case_count_litigation"},
                 {data: "case_count_all"},
-                {data: "tax_1332", visible: false},
-                {data: "tax_1379", visible: false},
-            ]
+                {data: "tax_1332"},
+                {data: "tax_1379"},
+            ],
+
         });
 
+
+        // can be used to change visibility of a column based on a checkbox.
         $('#1332').change(function(){
-            table.column(5).visible($(this).is(':checked'))
+            table.column(6).visible($(this).is(':checked'))
         });
 
         $('#1379').change(function(){
-            table.column(6).visible($(this).is(':checked'))
+            table.column(7).visible($(this).is(':checked'))
         });
+
     });
 
 

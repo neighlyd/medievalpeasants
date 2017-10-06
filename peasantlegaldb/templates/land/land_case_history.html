@@ -1,0 +1,95 @@
+{% extends 'layout/_l_single_col.html' %}
+
+{% block single_col %}
+<div class="card">
+    <h3 class="card-header text-center">Tenant History</h3>
+
+    <div class="card">
+        <table class="table table-bordered table-hover" id="table" data-page-length="25">
+            <thead>
+                <th></th>
+                <th>Case:</th>
+                <th>Old Land Parcels</th>
+                <th>Old Land Notes</th>
+                <th>New Land ID:</th>
+                <th>New Land Parcels:</th>
+                <th>New Land Notes:</th>
+            </thead>
+        </table>
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+
+<script>
+
+
+    $(document).ready(function() {
+        var url = window.location.pathname;
+        var id = url.split('/').reverse()[1];
+        var url = Urls.land_split_api() + "?land=" + id + "&expand=old_land&expand=new_land";
+        var table = $('#table').DataTable({
+            scrollX: true,
+            ajax: {
+                processing: true,
+                url: url,
+                type: "GET",
+                dataSrc: "",
+            },
+            "columns": [
+                {
+                    "class": "details-control",
+                    "orderable": "false",
+                    "data": null,
+                    "defaultContent": "",
+                    "render": function () {
+                        return '<i class="fa fa-plus-square" aria-hidden="true"></i>';
+                    },
+                    width: "15px"
+                },
+                {data: "old_land_id",
+                    fnCreatedCell: function(nTd, cellData, rowData, row, col) {
+                        var url = Urls.land(rowData.old_land_id)
+                        $(nTd).html("<a href='"+ url +"' target='_blank'>" + rowData.old_land_id+ "</a>");
+                    }
+                },
+                {data: "old_land.parcel_list_concat"},
+                {data: "old_land.notes"},
+                {data: "new_land_id",
+                    fnCreatedCell: function(nTd, cellData, rowData, row, col) {
+                        var url = Urls.land(rowData.new_land_id)
+                        $(nTd).html("<a href='"+ url +"' target='_blank'>" + rowData.new_land_id + "</a>");
+                    }
+                },
+                {data: "new_land.parcel_list_concat"},
+                {data: "new_land.notes"},
+
+            ]
+        });
+
+        $('#table tbody').on('click', 'td.details-control', function(){
+            var tr = $(this).closest('tr');
+            var tdi = tr.find("i.fa");
+            var row = table.row( tr );
+
+            if ( row.child.isShown() ) {
+                row.child.hide();
+                tr.removeClass('shown');
+                tdi.first().removeClass('fa-minus-square');
+                tdi.first().addClass('fa-plus-square');
+            } else{
+                row.child( format( row.data() ) ).show();
+                tr.addClass('shown');
+                tdi.first().removeClass('fa-plus-square');
+                tdi.first().addClass('fa-minus-square');
+            }
+        });
+
+    });
+</script>
+
+{% endblock %}

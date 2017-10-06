@@ -1,23 +1,17 @@
-{% extends 'base.html' %}
-{% load staticfiles %}
-{% block navbar %}
-{% endblock %}
+{% extends 'layout/_l_single_col.html' %}
 
-{% block content %}
-<div class="container-fluid text-center">
-    <br>
-    <h3>Relationship List</h3>
-</div>
-
-<table class="table table-bordered table-hover" id="person_relationship_list" data-page-length="25">
-    <thead>
-        <th>Person One</th>
-        <th>Person Two</th>
-        <th>Relationship</th>
-        <th>Definitive</th>
-    </thead>
-</table>
-<br>
+{% block single_col %}
+    <h3 class="card-header text-center">Relationships</h3>
+    <div class="card-body">
+            <table class="table table-bordered table-hover" id="person_relationship_list" data-page-length="25">
+                <thead>
+                    <th>Person One</th>
+                    <th>Person Two</th>
+                    <th>Relationship</th>
+                    <th>Definitive</th>
+                </thead>
+            </table>
+    </div>
 
 {% endblock %}
 
@@ -31,7 +25,7 @@
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1]
         console.log(id)
-            var api_url = "/api/people/" + id + "/relationship_list/?expand=person_one&expand=person_two&expand=relationship";
+            var api_url = Urls.relationships_api() + "?person=" + id + "&expand=person_one&expand=person_two&expand=relationship";
         console.log(api_url);
         var relationship_table = $("#person_relationship_list").DataTable({
             fixedHeader: true,

@@ -1,26 +1,22 @@
-{% extends 'base.html' %}
-{% load staticfiles %}
-{% block navbar%}
-{% endblock %}
-{% block content %}
+{% extends 'layout/_l_single_col.html' %}
+{% block single_col %}
 
-<div class="container text-center">
-    <h2>Land History</h2>
-</div>
-<table class="table table-bordered table-hover" id="land_history_list" data-page-length="25">
-    <thead>
-        <th></th>
-        <th>Land ID</th>
-        <th>Parcels</th>
-        <th>Law Term</th>
-        <th>Year</th>
-        <th>Role</th>
-        <th>Villeinage?</th>
-        <th>Village</th>
-        <th>Notes</th>
-    </thead>
-
-</table>
+    <h3 class="card-header text-center">Land History</h3>
+    <div class="card-body">
+            <table class="table table-bordered table-hover" id="land_history_list" data-page-length="25">
+                <thead>
+                    <th></th>
+                    <th>Land ID</th>
+                    <th>Parcels</th>
+                    <th>Law Term</th>
+                    <th>Year</th>
+                    <th>Role</th>
+                    <th>Villeinage?</th>
+                    <th>Village</th>
+                    <th>Notes</th>
+                </thead>
+            </table>
+    </div>
 
 {% endblock %}
 
@@ -57,9 +53,9 @@
     $(document).ready(function(){
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1];
-        var url = "/api/people/" + id + "/land_list/?expand=case__session__village&expand=land&expand=role&expand=case__case_type&expand=land&expand=case__verdict";
+        var url = Urls.case_people_land_api() + "?person=" + id + "&expand=case__session__village&expand=land&expand=role&expand=case__case_type&expand=land&expand=case__verdict";
         var table = $('#land_history_list').DataTable({
-            fixedHeader: true,
+            scrollX: true,
             ajax: {
                 processing: true,
                 url: url,
@@ -79,9 +75,8 @@
                     width:"15px"
                 },
                 {data: "land_id",
-                    fnCreatedCell: function(nTd, cellData, rowData, row, col) {
-                        var url = Urls.case(rowData.id)
-                        $(nTd).html("<a href='"+ url +"' target='_blank'>" + rowData.land_id + " temp. link</a>");
+                    fnCreatedCell: function(nTd, cellData, rowData, row, col){
+                        $(nTd).html("<a href='" + Urls.land(rowData.land_id) + "'target='_blank'>" + rowData.land_id + "</a>");
                     }
                 },
                 {data: "land.parcel_list_concat"},
@@ -112,6 +107,15 @@
                 tdi.first().addClass('fa-minus-square');
             }
         });
+
+        function concat_data(data){
+            var concat = '';
+            data.forEach(function (obj, index) {
+                concat = concat + '<div class="d-flex justify-content-end"><div class="mr-auto p-0"><u>Name:</u> ' + obj.name + '</div> <div class="p-0"><u>Role:</u> ' + obj.role + '</div></div><hr>';
+                return concat;
+                });
+            return concat;
+        };
 
     });
 

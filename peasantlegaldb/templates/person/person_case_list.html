@@ -1,29 +1,22 @@
-{% extends 'base.html' %}
-{% load staticfiles %}
-{% block navbar%}
-{% endblock %}
+{% extends 'layout/_l_single_col.html' %}
 
-{% block content %}
-
-<div class="container-fluid text-center">
-    <br>
-    <h3>Case List</h3>
-</div>
-
-<table class="table table-bordered table-hover" id="person_case_list" data-page-length="25">
-    <thead>
-        <th></th>
-        <th>ID</th>
-        <th>Term</th>
-        <th>Year</th>
-        <th>Court</th>
-        <th>Case Type</th>
-        <th>Role</th>
-        <th>Verdict</th>
-        <th>Litigant Count</th>
-    </thead>
-</table>
-<br>
+{% block single_col %}
+    <h3 class="card-header text-center">Case List</h3>
+    <div class="card-body">
+            <table class="table table-bordered table-hover" id="person_case_list" data-page-length="25">
+                <thead>
+                    <th></th>
+                    <th>ID</th>
+                    <th>Term</th>
+                    <th>Year</th>
+                    <th>Court</th>
+                    <th>Case Type</th>
+                    <th>Role</th>
+                    <th>Verdict</th>
+                    <th>Litigant Count</th>
+                </thead>
+            </table>
+    </div>
 
 {% endblock %}
 
@@ -40,7 +33,7 @@
             "</tr>" +
             "<tr>" +
             "<td><b>Litigant List:</b></td>" +
-            "<td>" + data.case.litigant_list_concat + "</td>" +
+            "<td>" + list_litigants(data.case.litigant_list) + "</td>" +
             "</tr>" +
         "</table>"
     }
@@ -49,10 +42,11 @@
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1]
         console.log(id)
-        var api_url = "/api/people/" + id + "/case_list/?expand=case__case_type&expand=role&expand=case__verdict&expand=case__session";
+        var api_url = Urls.litigants_api() + "?person=" + id + "&expand=case__case_type&expand=role&expand=case__verdict&expand=case__session";
         console.log(api_url);
         var table = $("#person_case_list").DataTable({
             fixedHeader: true,
+            scrollX: true,
             order: [3, "asc"],
             ajax: {
                 url: api_url,
@@ -62,7 +56,7 @@
             "columns": [
                 {
                     "class": "details-control",
-                    "orderable": "false",
+                    "orderable": false,
                     "data": null,
                     "defaultContent": "",
                     "render": function(){
@@ -105,12 +99,13 @@
     });
 
     function list_litigants(data){
-        data.forEach(function (obj) {
-            concat = 'Name: ' + obj.name + ', Role: ' + obj.role + '; ';
-            console.log(concat);
+        var concat = '';
+        data.forEach(function (obj, index) {
+            concat = concat + '<div class="d-flex justify-content-end"><div class="mr-auto p-0"><u>Name:</u> ' + obj.name + '</div> <div class="p-0"><u>Role:</u> ' + obj.role + '</div></div><hr>';
             return concat;
-        })
-    };
+            });
+        return concat;
+        };
 
 
 

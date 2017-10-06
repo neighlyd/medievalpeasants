@@ -1,26 +1,26 @@
-{% load staticfiles %}
-{% block content %}
+{% extends 'layout/_l_single_col.html' %}
 
-<div class="container text-center">
-    <br>
-    <h2>Litigants</h2>
+{% block single_col %}
+<div class="card">
+    <h3 class="card-header text-center">Tenant History</h3>
+
+    <div class="card">
+        <table class="table table-bordered table-hover" id="tenant_history" data-page-length="25">
+            <thead>
+                <th></th>
+                <th>Name</th>
+                <th>Village</th>
+                <th>Case</th>
+                <th>Law Term</th>
+                <th>Year</th>
+                <th>Role</th>
+                <th>Villeinage?</th>
+                <th>Notes</th>
+            </thead>
+        </table>
+    </div>
+
 </div>
-<table class="table table-bordered table-hover" id="litigants_for_case" data-page-length="25">
-    <thead>
-        <th></th>
-        <th>Name</th>
-        <th>Role</th>
-        <th>Amercement</th>
-        <th>Fine</th>
-        <th>Damages</th>
-        <th>Distrain</th>
-        <th>Attach</th>
-        <th>Bail</th>
-        <th>Chevage</th>
-        <th>Heriot</th>
-        <th>Impercamentum</th>
-    </thead>
-</table>
 
 {% endblock %}
 
@@ -29,8 +29,7 @@
 
 <script>
 
-    // provides format for nested table that displays when + sign is clicked.
-    function format( d ){
+        function format( d ){
         return "<table class='table'>" +
             "<tr>" +
             "<td><b>Village:</b></td>" +
@@ -69,68 +68,52 @@
             "</table>"
     }
 
-    $(document).ready(function(){
+    $(document).ready(function() {
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1];
-        var api_url = "/api/litigants/?case=";
-        var new_url = api_url + id + "&expand=person__village&expand=role";
-        console.log("new_url is", new_url);
-        var table = $('#litigants_for_case').DataTable({
-            fixedHeader: true,
+        var url = Urls.case_people_land_api() + "?land=" + id + "&expand=person__village&expand=case__session&expand=role&expand=case__case_type&expand=land&expand=case__verdict";
+        var table = $('#tenant_history').DataTable({
+            scrollX: true,
             ajax: {
                 processing: true,
-                url: new_url,
+                url: url,
                 type: "GET",
                 dataSrc: "",
             },
+            "order": [[5, "asc"]],
             "columns": [
                 {
                     "class": "details-control",
                     "orderable": "false",
                     "data": null,
                     "defaultContent": "",
-                    "render": function(){
+                    "render": function () {
                         return '<i class="fa fa-plus-square" aria-hidden="true"></i>';
                     },
-                    width:"15px"
+                    width: "15px"
                 },
                 {data: "person.full_name",
                     fnCreatedCell: function(nTd, cellData, rowData, row, col) {
-                        $(nTd).html("<a href='/person/"+ rowData.person.id +"' target='_blank'>" + rowData.person.full_name + "</a>");
+                        var url = Urls.person(rowData.person_id)
+                        $(nTd).html("<a href='"+ url +"' target='_blank'>" + rowData.person.full_name + "</a>");
                     }
                 },
+                {data: "person.village.name"},
+                {data: "case_id",
+                    fnCreatedCell: function(nTd, cellData, rowData, row, col) {
+                        var url = Urls.case(rowData.case_id)
+                        $(nTd).html("<a href='"+ url +"' target='_blank'>" + rowData.case_id + "</a>");
+                    }
+                },
+                {data: "case.session.law_term"},
+                {data: "case.session.year"},
                 {data: "role.role"},
-                {data: "amercement",
-                    fnCreatedCell: replace_money,
-                },
-                {data: "fine",
-                    fnCreatedCell: replace_money,
-                },
-                {data: "damage",
-                    fnCreatedCell: replace_money,
-                },
-                {data: "distrained",
-                    fnCreatedCell: check_maker,
-                },
-                {data: "attached",
-                    fnCreatedCell: check_maker,
-                },
-                {data: "bail",
-                   fnCreatedCell: check_maker,
-                },
-                {data: "chevage",
-                    fnCreatedCell: replace_money,
-                },
-                {data: "heriot_assessment",
-                    fnCreatedCell: replace_money,
-                },
-                {data: "impercamentum_amercement",
-                    fnCreatedCell: replace_money,
-                },
-                ]
+                {data: "villeinage"},
+                {data: "notes"},
+            ]
         });
 
-        $('#litigants_for_case tbody').on('click', 'td.details-control', function(){
+        $('#tenant_history tbody').on('click', 'td.details-control', function(){
             var tr = $(this).closest('tr');
             var tdi = tr.find("i.fa");
             var row = table.row( tr );
@@ -147,23 +130,8 @@
                 tdi.first().addClass('fa-minus-square');
             }
         });
+
     });
-
-function check_maker(nTd, cellData, rowData, row, col){
-    if( cellData) {
-        $(nTd).html("<p class='text-center'> √ </p>");
-    } else {
-        $(nTd).html("<p class='text-center'> -- </p>")
-    }
-}
-
- function replace_money (nTd, cellData, rowData, row, col) {
-    if (cellData) {
-        $(nTd).html("<p class='text-center'>" + cellData.in_denarius + "d. </p>")
-    } else {
-        $(nTd).html("<p class='text-center'> -- </p>")
-    }
-}
-
 </script>
+
 {% endblock %}

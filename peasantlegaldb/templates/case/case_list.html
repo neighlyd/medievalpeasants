@@ -1,11 +1,20 @@
-{% extends "base.html" %}
-{% load staticfiles %}
+{% extends "layout/__base.html" %}
+
+{% block navbar %}
+    {% include 'layout/__navbar.html' %}
+{% endblock %}
 
 {% block content %}
 
-<div class="container">
-    <h2 class="text-center">Cases Table</h2>
+<br>
+<div class="container-fluid">
+    <div class="card">
     <hr>
+        <h2 class="text-center">Cases Table</h2>
+    <hr>
+</div>
+
+<div class="container">
     <table class="table table-bordered table-hover" id="case_list" data-page-length="25">
         <thead>
             <th></th>
@@ -22,7 +31,14 @@
 
     </table>
 </div>
+</div>
 
+
+        <!--// Setup - add a text input to each footer cell
+        $('#example thead th').each( function () {
+            var title = $(this).text();
+            $(this).html( '<input type="text" placeholder="Search '+title+'" />' );
+        });-->
 {% endblock %}
 
 {% block scripts %}
@@ -42,8 +58,12 @@
 
     $(document).ready(function(){
         var url = Urls.case_list_api()+"?expand=session__village&expand=verdict&expand=case_type";
+
         var table = $('#case_list').DataTable({
-            fixedHeader: true,
+            fixedHeader: {
+                headerOffset: 50
+            },
+            scrollX: true,
             ajax: {
                 processing: true,
                 url: url,
@@ -84,17 +104,30 @@
                         }
                     }
                 }
-            ]
+            ],
+            // enable column searching using selection boxes.
+            initComplete: function() {
+                    var column = this;
+                    var select = $('<select><option value=""></option></select>')
+                        .appendTo( $(column.footer()).empty())
+                        .on( 'change', function () {
+                            var val = $.fn.datatable.util.escapeRegex(
+                                $(this).val()
+                            );
+
+                            column
+                                .search( val ? '^' + val + '$' : '', true, false )
+                                .draw();
+                        });
+
+                    column.data().unique().sort().each( function (d, j) {
+                        select.append( '<option value=' + d + '">' + d + '</option>')
+                    });
+            },
+
         });
 
-        $('#1332').change(function(){
-            table.column(4).visible($(this).is(':checked'))
-        });
-
-        $('#1379').change(function(){
-            table.column(5).visible($(this).is(':checked'))
-        });
-
+        // Used to activate the + expansion and trigger the format function.
          $('#case_list tbody').on('click', 'td.details-control', function(){
             var tr = $(this).closest('tr');
             var tdi = tr.find("i.fa");
@@ -112,6 +145,7 @@
                 tdi.first().addClass('fa-minus-square');
             }
         });
+
     });
 
 

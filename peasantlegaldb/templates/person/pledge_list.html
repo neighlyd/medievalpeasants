@@ -1,53 +1,46 @@
-{% extends 'base.html' %}
-{% load staticfiles %}
-{% block navbar%}
-{% endblock %}
+{% extends 'layout/_l_single_col.html' %}
 
-{% block content %}
+{% block single_col %}
 
-<div class="container-fluid">
-    <h3 class="text-center">Pledges Given</h3>
-    <hr>
-    <div class="card">
-        <table class="table table-bordered table-hover" id="pledges_given_list" data-page-length="25">
-            <thead>
-                <th></th>
-                <th>Recipient</th>
-                <th>Status</th>
-                <th>Gender</th>
-                <th>Case</th>
-                <th>Term</th>
-                <th>Year</th>
-                <th>Court</th>
-                <th>Case Type</th>
-                <th>Verdict</th>
-                <th>Litigant Count</th>
-            </thead>
-        </table>
-    </div>
-</div>
-<br>
-<div class="container-fluid">
-    <h3 class="text-center">Pledge Received</h3>
-    <hr>
-    <div class="card">
-        <table class="table table-bordered table-hover" id="pledges_received_list" data-page-length="25">
-            <thead>
-                <th></th>
-                <th>Grantor</th>
-                <th>Status</th>
-                <th>Gender</th>
-                <th>Case</th>
-                <th>Term</th>
-                <th>Year</th>
-                <th>Court</th>
-                <th>Case Type</th>
-                <th>Verdict</th>
-                <th>Litigant Count</th>
-            </thead>
-        </table>
-    </div>
-</div>
+        <h3 class="card-header text-center">Pledges Given</h3>
+        <div class="card-body">
+            <table class="table table-bordered table-hover" id="pledges_given_list" data-page-length="25">
+                <thead>
+                    <th></th>
+                    <th>Recipient</th>
+                    <th>Status</th>
+                    <th>Gender</th>
+                    <th>Case</th>
+                    <th>Term</th>
+                    <th>Year</th>
+                    <th>Court</th>
+                    <th>Case Type</th>
+                    <th>Verdict</th>
+                    <th>Litigants</th>
+                </thead>
+            </table>
+
+        <br>
+        </div>
+
+        <h3 class="card-header text-center">Pledges Received</h3>
+            <div class="card-body">
+            <table class="table table-bordered table-hover" id="pledges_received_list" data-page-length="25">
+                <thead>
+                    <th></th>
+                    <th>Grantor</th>
+                    <th>Status</th>
+                    <th>Gender</th>
+                    <th>Case</th>
+                    <th>Term</th>
+                    <th>Year</th>
+                    <th>Court</th>
+                    <th>Case Type</th>
+                    <th>Verdict</th>
+                    <th>Litigants</th>
+                </thead>
+            </table>
+        </div>
 
 {% endblock %}
 
@@ -60,7 +53,7 @@
         return "<table class='table'>" +
             "<tr>" +
             "<td><b>Litigant List:</b></td>" +
-            "<td>" + d.case.litigant_list_concat + "</td>" +
+            "<td>" + list_litigants(d.case.litigant_list) + "</td>" +
             "</tr>" +
             "<td><b>Summary:</b></td>" +
             "<td>"+d.case.summary+"</td>" +
@@ -69,18 +62,19 @@
 
     $(document).ready(function () {
         var url = window.location.pathname;
-        var id = url.split('/').reverse()[1]
-        console.log(id)
-        var api1_url = "/api/people/" + id + "/pledge_given_list/?expand=pledge_receiver&expand=case__session&expand=case__case_type&expand=case__verdict";
-        var api2_url = api1_url.replace("receiver", "giver");
-        var api2_url = api2_url.replace("given", "received")
-        console.log(api1_url);
-        console.log(api2_url);
+        var id = url.split('/').reverse()[1];
+        var giver_url = Urls.pledges_api() + "?giver=" + id + "&expand=pledge_receiver&expand=case__session&expand=case__case_type&expand=case__verdict";
+        var receiver_url = Urls.pledges_api() + "?receiver=" + id + "&expand=pledge_giver&expand=case__session&expand=case__case_type&expand=case__verdict";
+        console.log(giver_url);
+        console.log(receiver_url);
         var table1 = $("#pledges_given_list").DataTable({
-            fixedHeader: true,
+            scrollX: true,
+            fixedHeader: {
+                headerOffset: 50
+            },
             order: [6, "asc"],
             ajax: {
-                url: api1_url,
+                url: giver_url,
                 type: "GET",
                 dataSrc: "",
             },
@@ -110,7 +104,7 @@
                 {data: "case.verdict.verdict"},
                 {data: "case.litigant_count"}
             ]
-        })
+        });
 
          $('#pledges_given_list tbody').on('click', 'td.details-control', function(){
             var tr = $(this).closest('tr');
@@ -132,9 +126,10 @@
 
         var table2 = $("#pledges_received_list").DataTable({
             fixedHeader: true,
+            scrollX: true,
             order: [6, "asc"],
             ajax: {
-                url: api2_url,
+                url: receiver_url,
                 type: "GET",
                 dataSrc: "",
             },
@@ -185,12 +180,13 @@
     });
 
     function list_litigants(data){
-        data.forEach(function (obj) {
-            concat = 'Name: ' + obj.name + ', Role: ' + obj.role + '; ';
-            console.log(concat);
+        var concat = '';
+        data.forEach(function (obj, index) {
+            concat = concat + '<div class="d-flex justify-content-end"><div class="mr-auto p-0"><u>Name:</u> ' + obj.name + '</div> <div class="p-0"><u>Role:</u> ' + obj.role + '</div></div><hr>';
             return concat;
-        })
-    };
+            });
+        return concat;
+        };
 
 
 

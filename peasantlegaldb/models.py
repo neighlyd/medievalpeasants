@@ -1,7 +1,6 @@
 from django.db import models
 from django.db.models import Max, Min, Avg, Count
 
-
 class Archive(models.Model):
     name = models.CharField(max_length=50)
     website = models.URLField()
@@ -58,7 +57,7 @@ class Land(models.Model):
     @property
     def parcel_list(self):
         parcel_list = []
-        queryset = self.landparcel_set.all().prefetch_related('parcel_type', 'parcel_tenure')
+        queryset = self.parcels.all().prefetch_related('parcel_type', 'parcel_tenure')
         try:
             for x in queryset:
                 new_entry = {
@@ -74,17 +73,12 @@ class Land(models.Model):
     @property
     def parcel_list_concat(self):
         parcel_list = ""
-        queryset = self.landparcel_set.all().prefetch_related('parcel_type', 'parcel_tenure')
+        queryset = self.parcels.all().prefetch_related('parcel_type', 'parcel_tenure')
         try:
             first = True
             for x in queryset:
-                if first:
-                    first = False
-                    parcel_list = parcel_list + str(x.amount) + " " + x.parcel_type.parcel_type + " held by " + \
-                              x.parcel_tenure.tenure
-                else:
-                    parcel_list = parcel_list + ", " + str(x.amount) + " " + x.parcel_type.parcel_type + " held by " + \
-                                  x.parcel_tenure.tenure
+                parcel_list = parcel_list + str(x.amount) + " " + x.parcel_type.parcel_type + " held by " + \
+                              x.parcel_tenure.tenure + "<hr>"
         except:
             pass
         return parcel_list
@@ -124,7 +118,7 @@ class LandParcel(models.Model):
         verbose_name_plural = "Land Parcels"
 
     #   fix null in land_id
-    land = models.ForeignKey(Land, null=True, on_delete=models.CASCADE)
+    land = models.ForeignKey(Land, null=True, on_delete=models.CASCADE, related_name="parcels")
     amount = models.FloatField()
     parcel_type = models.ForeignKey(ParcelType)
     parcel_tenure = models.ForeignKey(ParcelTenure)
@@ -223,21 +217,113 @@ class Person(models.Model):
 
     @property
     def earliest_case(self):
-        try:
-            earliest = self.case_set.order_by('session__date')[0]
-            earliest = earliest.session.get_law_term_display() + " - " + str(earliest.session.date.year)
-        except:
-            earliest = 'None'
-        return earliest
+        # get values list of earliest case for each interaction type, using the earliest index to extract it. Add each
+        # to a dictionary and then sort on the datetime field. Once the earliest of all is found, make a new queryset
+        # that contains the earliest case example, which can then be used to display its data. This last part appears
+        # redundant, but is the only way I have found to easily extract the law term data. It's a bunch of database
+        # hits, but I can't think of an easier way to do it...
 
+        date_range = {}
+
+        try:
+            case = self.case_set.order_by('session__date').values_list('session__date', flat=True)[0]
+            date_range['case'] = case
+        except:
+            pass
+
+        try:
+            land = self.casepeopleland_set.order_by('case__session__date').values_list('case__session__date', flat=True)[0]
+            date_range['land'] = land
+        except:
+            pass
+
+
+        try:
+            pledge_give = self.pledge_giver.order_by('case__session__date').values_list('case__session__date', flat=True)[0]
+            date_range['pledge_give'] = pledge_give
+        except:
+            pass
+
+
+        try:
+            pledge_receive = self.pledge_receiver.order_by('case__session__date').values_list('case__session__date', flat=True)[0]
+            date_range['pledge_receive'] = pledge_receive
+        except:
+            pass
+
+        try:
+            sorted_date = sorted(date_range, key=date_range.get)[0]
+            if sorted_date is 'case':
+                qs = self.case_set.order_by('session__date')[0]
+                earliest_date= qs.session.get_law_term_display() + " - " + str(qs.session.date.year)
+            elif sorted_date is 'land':
+                qs = self.casepeopleland_set.order_by('case__session__date')[0]
+                earliest_date = qs.case.session.get_law_term_display() + " - " + str(qs.case.session.date.year)
+            elif sorted_date is 'pledge_give':
+                qs = self.pledge_giver.order_by('case__session__date')[0]
+                earliest_date = qs.case.session.get_law_term_display() + " - " + str(qs.case.session.date.year)
+            elif sorted_date is 'pledge_receive':
+                qs = self.pledge_receiver.order_by('case__session__date')[0]
+                earliest_date = qs.case.session.get_law_term_display() + " - " + str(qs.case.session.date.year)
+        except:
+            earliest_date = 'None'
+
+        return earliest_date
     @property
     def latest_case(self):
+        # get values list of earliest case for each interaction type, using the earliest index to extract it. Add each
+        # to a dictionary and then sort on the datetime field. Once the earliest of all is found, make a new queryset
+        # that contains the earliest case example, which can then be used to display its data. This last part appears
+        # redundant, but is the only way I have found to easily extract the law term data. It's a bunch of database
+        # hits, but I can't think of an easier way to do it...
+
+        date_range = {}
+
         try:
-            latest = self.case_set.order_by('session__date').reverse()[0]
-            latest = latest.session.get_law_term_display() + " - " + str(latest.session.date.year)
+            case = self.case_set.order_by('session__date').reverse().values_list('session__date', flat=True)[0]
+            date_range['case'] = case
         except:
-            latest = 'None'
-        return latest
+            pass
+
+        try:
+            land = self.casepeopleland_set.order_by('case__session__date').reverse().values_list('case__session__date', flat=True)[0]
+            date_range['land'] = land
+        except:
+            pass
+
+
+        try:
+            pledge_give = self.pledge_giver.order_by('case__session__date').reverse().values_list('case__session__date', flat=True)[0]
+            date_range['pledge_give'] = pledge_give
+        except:
+            pass
+
+
+        try:
+            pledge_receive = self.pledge_receiver.order_by('case__session__date').reverse().values_list('case__session__date', flat=True)[0]
+            date_range['pledge_receive'] = pledge_receive
+        except:
+            pass
+
+        try:
+            sorted_date = sorted(date_range, key=date_range.get, reverse=True)[0]
+            if sorted_date is 'case':
+                qs = self.case_set.order_by('session__date').reverse()[0]
+                latest_date= qs.session.get_law_term_display() + " - " + str(qs.session.date.year)
+            elif sorted_date is 'land':
+                qs = self.casepeopleland_set.order_by('case__session__date').reverse()[0]
+                latest_date = qs.case.session.get_law_term_display() + " - " + str(qs.case.session.date.year)
+            elif sorted_date is 'pledge_give':
+                qs = self.pledge_giver.order_by('case__session__date').reverse()[0]
+                latest_date = qs.case.session.get_law_term_display() + " - " + str(qs.case.session.date.year)
+            elif sorted_date is 'pledge_receive':
+                qs = self.pledge_receiver.order_by('case__session__date').reverse()[0]
+                latest_date = qs.case.session.get_law_term_display() + " - " + str(qs.case.session.date.year)
+        except:
+            latest_date = 'None'
+
+        return latest_date
+
 
     @property
     def pledges_given_count(self):
@@ -260,7 +346,7 @@ class Person(models.Model):
 
     @property
     def case_info(self):
-        return self.person_to_case.all().aggregate(Count('amercement'), Max('amercement__in_denarius'),
+        return self.person_to_case.aggregate(Count('amercement'), Max('amercement__in_denarius'),
                                                    Min('amercement__in_denarius'), Avg('amercement__in_denarius'),
                                                    Count('fine'), Max('fine__in_denarius'), Min('fine__in_denarius'),
                                                    Avg('fine__in_denarius'), Count('damage'),
@@ -399,7 +485,7 @@ class Case(models.Model):
         try:
             for x in queryset:
                 litigant_list = litigant_list + "<div class=d-flex justify-content-end><div class='mr-auto p-0'><u>Name:" \
-                                                "</u> " + x.person.full_name + "</div> <div class='p-0'><u>Role:</u> " + \
+                                                "</u> " + x.person.id + ")>" + x.person.full_name + "</a></div> <div class='p-0'><u>Role:</u> " + \
                                                 x.role.role + "</div></div><hr>"
         except:
             pass
@@ -536,6 +622,7 @@ class LandSplit(models.Model):
 
     old_land = models.ForeignKey(Land, on_delete=models.CASCADE, related_name='old_land_parcel')
     new_land = models.ForeignKey(Land, on_delete=models.CASCADE, related_name='new_land_parcel')
+    # add Case so I can track timing... I'm an idiot!
 
     def __str__(self):
         return "Old Land ID %s, New Land ID %s" % (self.old_land, self.new_land)
