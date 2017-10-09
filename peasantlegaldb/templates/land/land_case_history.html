@@ -2,18 +2,20 @@
 
 {% block single_col %}
 <div class="card">
-    <h3 class="card-header text-center">Tenant History</h3>
+    <h3 class="card-header text-center">Case History</h3>
 
     <div class="card">
         <table class="table table-bordered table-hover" id="table" data-page-length="25">
             <thead>
                 <th></th>
-                <th>Case:</th>
-                <th>Old Land Parcels</th>
-                <th>Old Land Notes</th>
-                <th>New Land ID:</th>
-                <th>New Land Parcels:</th>
-                <th>New Land Notes:</th>
+                <th>Case</th>
+                <th>Village</th>
+                <th>Law Term</th>
+                <th>Year</th>
+                <th>Court</th>
+                <th>Case Type</th>
+                <th>Verdict</th>
+                <th>Litigants</th>
             </thead>
         </table>
     </div>
@@ -27,13 +29,26 @@
 
 <script>
 
+    function format( data ) {
+        return "<table class='table'>" +
+            "<tr>" +
+            "<td><b>Litigant List:</b></td>" +
+            "<td>" + list_litigants(data.litigant_list) + "</td>" +
+            "</tr>" +
+            "<tr>" +
+            "<td><b>Summary:</b></td>" +
+            "<td>"+data.summary+"</td>" +
+            "</tr>" +
+        "</table>"
+    }
 
     $(document).ready(function() {
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1];
-        var url = Urls.land_split_api() + "?land=" + id + "&expand=old_land&expand=new_land";
+        var url = Urls.case_list_api() + "?land=" + id + "&expand=session__village&expand=case_type&expand=verdict";
         var table = $('#table').DataTable({
             scrollX: true,
+            order: [4, "asc"],
             ajax: {
                 processing: true,
                 url: url,
@@ -51,38 +66,35 @@
                     },
                     width: "15px"
                 },
-                {data: "old_land_id",
-                    fnCreatedCell: function(nTd, cellData, rowData, row, col) {
-                        var url = Urls.land(rowData.old_land_id)
-                        $(nTd).html("<a href='"+ url +"' target='_blank'>" + rowData.old_land_id+ "</a>");
+                {
+                    data: "id",
+                    fnCreatedCell: function (nTd, cellData, rowData, row, col) {
+                        var url = Urls.case(rowData.id)
+                        $(nTd).html("<a href='" + url + "' target='_blank'>" + rowData.id + "</a>");
                     }
                 },
-                {data: "old_land.parcel_list_concat"},
-                {data: "old_land.notes"},
-                {data: "new_land_id",
-                    fnCreatedCell: function(nTd, cellData, rowData, row, col) {
-                        var url = Urls.land(rowData.new_land_id)
-                        $(nTd).html("<a href='"+ url +"' target='_blank'>" + rowData.new_land_id + "</a>");
-                    }
-                },
-                {data: "new_land.parcel_list_concat"},
-                {data: "new_land.notes"},
-
+                {data: "session.village.name"},
+                {data: "session.law_term"},
+                {data: "session.year"},
+                {data: "court_type"},
+                {data: "case_type.case_type"},
+                {data: "verdict.verdict"},
+                {data: "litigant_count"},
             ]
         });
 
-        $('#table tbody').on('click', 'td.details-control', function(){
+        $('#table tbody').on('click', 'td.details-control', function () {
             var tr = $(this).closest('tr');
             var tdi = tr.find("i.fa");
-            var row = table.row( tr );
+            var row = table.row(tr);
 
-            if ( row.child.isShown() ) {
+            if (row.child.isShown()) {
                 row.child.hide();
                 tr.removeClass('shown');
                 tdi.first().removeClass('fa-minus-square');
                 tdi.first().addClass('fa-plus-square');
-            } else{
-                row.child( format( row.data() ) ).show();
+            } else {
+                row.child(format(row.data())).show();
                 tr.addClass('shown');
                 tdi.first().removeClass('fa-plus-square');
                 tdi.first().addClass('fa-minus-square');
@@ -90,6 +102,17 @@
         });
 
     });
+
+    function list_litigants(data){
+        var concat = '';
+        data.forEach(function (obj, index) {
+            concat = concat + '<div class="d-flex justify-content-end"><div class="mr-auto p-0"><u>Name:</u> ' + obj.name + '</div> <div class="p-0"><u>Role:</u> ' + obj.role + '</div></div><hr>';
+            return concat;
+            });
+    return concat;
+
+     };
+
 </script>
 
 {% endblock %}

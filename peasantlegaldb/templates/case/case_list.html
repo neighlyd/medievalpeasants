@@ -15,7 +15,7 @@
 </div>
 
 <div class="container">
-    <table class="table table-bordered table-hover" id="case_list" data-page-length="25">
+    <table class="table table-bordered table-hover" id="table" data-page-length="25">
         <thead>
             <th></th>
             <th>Case ID</th>
@@ -59,7 +59,7 @@
     $(document).ready(function(){
         var url = Urls.case_list_api()+"?expand=session__village&expand=verdict&expand=case_type";
 
-        var table = $('#case_list').DataTable({
+        var table = $('#table').DataTable({
             fixedHeader: {
                 headerOffset: 50
             },
@@ -128,7 +128,7 @@
         });
 
         // Used to activate the + expansion and trigger the format function.
-         $('#case_list tbody').on('click', 'td.details-control', function(){
+         $('#table tbody').on('click', 'td.details-control', function(){
             var tr = $(this).closest('tr');
             var tdi = tr.find("i.fa");
             var row = table.row( tr );

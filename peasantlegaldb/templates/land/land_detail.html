@@ -3,7 +3,7 @@
 {% block left_sidebar%}
     <div id="selection_list">
         <a class="list-group-item active" href="{% url 'tenant_history' land.id %}">Tenant History</a>
-        <a class="list-group-item" href="" >Case History</a>
+        <a class="list-group-item" href="{% url 'land_case_history' land.id %}" >Case History</a>
         <a class="list-group-item" href="{% url 'land_split_history' land.id %}" >Land Split History</a>
     </div>
 {% endblock %}
@@ -13,29 +13,25 @@
     <h2 class="card-title">Land ID: {{ land.id }}</h2>
 </div>
 
-<div class="card-body clearfix" id="person_info">
+<div class="card-body clearfix" id="main_info">
     <div class="d-flex justify-content-between flex-wrap">
 
-        <div class="card p-0 col-4">
-
-                <div class="card-header text-center">
-                    <h3 class="card-title">Parcels</h3>
-                </div>
-
+        <div class="card p-0 col-5">
+            <h4 class="card-header">Parcels:</h4>
                 <div class="card-body">
-                    <table class="table table-bordered table-sm">
+                    <table class="table table-sm">
                         {% for x in land.parcels.all %}
-                            <ul class="list-group">
-                                <li class="list-group-item"><h6>{{ x.amount }} {{ x.parcel_type.parcel_type }} held by {{ x.parcel_tenure.tenure }}</h6></li>
-                            </ul>
+                            <tr class="row m-0">
+                                <td class="d-inline-block col-4"><b>Parcel:</b></td>
+                                <td class="d-inline-block col-8">{{ x.amount }} {{ x.parcel_type.parcel_type }} held by {{ x.parcel_tenure.tenure }}</td>
+                            </tr>
                         {% endfor %}
                     </table>
                 </div>
-
         </div>
 
         <div class="card p-0 col-6">
-             <h3 class="card-header">Notes:</h3>
+             <h4 class="card-header">Notes:</h4>
                 <div class="card-body">
 
                     <h6 class="card-text">

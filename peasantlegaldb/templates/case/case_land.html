@@ -5,11 +5,9 @@
     <div class="card-body">
             <table class="table table-bordered table-hover" id="table" data-page-length="25">
                 <thead>
-                    <th>ID</th>
-                    <th>Person</th>
-                    <th>Role</th>
+                    <th></th>
+                    <th>Land ID</th>
                     <th>Parcels</th>
-                    <th>Villeinage?</th>
                     <th>Notes</th>
                 </thead>
             </table>
@@ -21,13 +19,12 @@
     {{ block.super }}
 
 <script>
-    // provides format for nested table that displays when + sign is clicked.
 
     $(document).ready(function () {
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1]
         console.log(id)
-        var api_url = Urls.land_api + "?case=" + id + "/position_list/?expand=session&expand=title";
+        var api_url = Urls.land_api() + "?case=" + id + "";
         console.log(api_url);
         var table = $("#table").DataTable({
             fixedHeader: true,
@@ -37,16 +34,43 @@
                 dataSrc: "",
             },
             "columns": [
-                {data: "title.title"},
-                {data: "session.law_term",
+                {
+                    "class": "details-control",
+                    "orderable": "false",
+                    "data": null,
+                    "defaultContent": "",
+                    "render": function(){
+                        return '<i class="fa fa-plus-square" aria-hidden="true" style="color: grey"></i>';
+                    },
+                    width:"15px"
+                },
+                {data: "id",
                     fnCreatedCell: function(nTd, cellData, rowData, row, col){
-                        $(nTd).html("<a href='" + Urls.person(rowData.person_id) + "'target='_blank'>" + rowData.session.law_term + " <-- Placeholder Link</a>");
+                        $(nTd).html("<a href='" + Urls.land(rowData.id) + "'target='_blank'>" + rowData.id + "</a>");
                     }
                 },
-                {data: "session.year"},
-                {data: "definitive"}
+                {data: "parcel_list_concat"},
+                {data: "notes"},
             ]
-        })
+        });
+
+        $('#table tbody').on('click', 'td.details-control', function(){
+            var tr = $(this).closest('tr');
+            var tdi = tr.find("i.fa");
+            var row = table.row( tr );
+
+            if ( row.child.isShown() ) {
+                row.child.hide();
+                tr.removeClass('shown');
+                tdi.first().removeClass('fa-minus-square');
+                tdi.first().addClass('fa-plus-square');
+            } else{
+                row.child( format( row.data() ) ).show();
+                tr.addClass('shown');
+                tdi.first().removeClass('fa-plus-square');
+                tdi.first().addClass('fa-minus-square');
+            }
+        });
     });
 
 </script>

@@ -149,6 +149,7 @@ class LandSerializer(SerializerExtensionsMixin, serializers.ModelSerializer):
         fields = ('id', 'notes', 'owner_chain', 'parcel_list', 'parcel_list_concat')
 
 
+
 class PersonSerializer(SerializerExtensionsMixin, serializers.ModelSerializer):
 
     # Use ReadOnlyField to pull in model functions:

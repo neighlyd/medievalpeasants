@@ -39,8 +39,31 @@ class CountyViewSet(SerializerExtensionsAPIViewMixin, viewsets.ModelViewSet):
 
 
 class LandViewSet(SerializerExtensionsAPIViewMixin, viewsets.ModelViewSet):
-    queryset = models.Land.objects.all()
     serializer_class = serializers.LandSerializer
+
+    def get_queryset(self):
+        queryset = models.Land.objects.all()
+
+        # get case param from url, then if it is not empty get instance of case object and extract value list of each
+        # distinct land associated with it. Afterwards, iterate through this queryset, ignoring blanks, and append each
+        # element to a list. Set the Land queryset filter to include all items in list. __in= is the syntax used to
+        # include all items in a filter - see:
+        #   https://stackoverflow.com/questions/36851257/general-way-of-filtering-by-ids-with-drf
+        # An alternative approach using dictionaries instead of lists is included here (perhaps could be used with
+        # .value instead of .values_list if necessary):
+        #   https://stackoverflow.com/questions/14258338/django-rest-framework-filtering
+        case = self.request.query_params.get('case', None)
+        if case is not None:
+            case_instance = models.Case.objects.get(id=case)
+            sub_queryset = case_instance.case_to_person.all().values_list('land_id', flat=True).distinct()
+            land_list = []
+            for x in sub_queryset:
+                if x is not None:
+                    land_list.append(x)
+            queryset = queryset.filter(id__in=land_list)
+        return queryset
+
+
 
 
 class ParcelTenureViewSet(SerializerExtensionsAPIViewMixin, viewsets.ModelViewSet):
@@ -99,10 +122,16 @@ class SessionViewSet(SerializerExtensionsAPIViewMixin, viewsets.ModelViewSet):
 
 
 class CaseViewSet(SerializerExtensionsAPIViewMixin, viewsets.ModelViewSet):
+
     serializer_class = serializers.CaseSerializer
 
-    queryset = models.Case.objects.all().prefetch_related('case_to_person').order_by('session__village__name',
-                                                                                     'session__date', 'court_type')
+    def get_queryset(self):
+        queryset = models.Case.objects.all().order_by('session__village__name', 'session__date', 'court_type')
+        land = self.request.query_params.get('land', None)
+        if land is not None:
+            queryset = models.Land.objects.get(id=land).case_set.all().distinct()
+
+        return queryset
 
 
 class CornbotViewSet(SerializerExtensionsAPIViewMixin, viewsets.ModelViewSet):

@@ -1,33 +1,25 @@
-{% extends 'layout/__base.html' %}
-{% load staticfiles %}
-{% block navbar %}
-{% endblock %}
-{% block content %}
+{% extends 'layout/_l_single_col.html' %}
 
-<div class="container-fluid">
-    <div class="card">
-        <h3 class="card-header text-center">Litigant List</h3>
-        <div class="card-body">
-            <table class="table table-bordered table-hover" id="litigants_for_case" data-page-length="25">
-                <thead>
-                    <th></th>
-                    <th>Name</th>
-                    <th>Role</th>
-                    <th>Amercement</th>
-                    <th>Fine</th>
-                    <th>Damages</th>
-                    <th>Distrain</th>
-                    <th>Attach</th>
-                    <th>Bail</th>
-                    <th>Chevage</th>
-                    <th>Heriot</th>
-                    <th>Imperc.</th>
-                </thead>
-            </table>
-
-        </div>
+{% block single_col %}
+    <h3 class="card-header text-center">Litigant List</h3>
+    <div class="card-body">
+        <table class="table table-bordered table-hover" id="table" data-page-length="25">
+            <thead>
+                <th></th>
+                <th>Name</th>
+                <th>Role</th>
+                <th>Amercement</th>
+                <th>Fine</th>
+                <th>Damages</th>
+                <th>Distrain</th>
+                <th>Attach</th>
+                <th>Bail</th>
+                <th>Chevage</th>
+                <th>Heriot</th>
+                <th>Imperc.</th>
+            </thead>
+        </table>
     </div>
-</div>
 
 {% endblock %}
 
@@ -82,7 +74,7 @@
         console.log(id);
         var url = Urls.litigants_api() +"/?case=" + id + "&expand=person__village&expand=role";
         console.log(url);
-        var table = $('#litigants_for_case').DataTable({
+        var table = $('#table').DataTable({
             scrollX: true,
             fixedHeader:{
               headerOffset: 50
@@ -140,7 +132,7 @@
                 ]
         });
 
-        $('#litigants_for_case tbody').on('click', 'td.details-control', function(){
+        $('#table tbody').on('click', 'td.details-control', function(){
             var tr = $(this).closest('tr');
             var tdi = tr.find("i.fa");
             var row = table.row( tr );

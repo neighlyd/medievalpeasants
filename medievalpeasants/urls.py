@@ -53,7 +53,8 @@ case_urls = [
 land_urls = [
     url(r'^$', web_views.LandDetailView.as_view(template_name='land/land_detail.html'), name='land'),
     url(r'^tenants', web_views.LandDetailView.as_view(template_name='land/tenant_history.html'), name='tenant_history'),
-    url(r'^history', web_views.LandDetailView.as_view(template_name='land/land_split_history.html'), name='land_split_history'),
+    url(r'^split_history', web_views.LandDetailView.as_view(template_name='land/land_split_history.html'), name='land_split_history'),
+    url(r'^case_history', web_views.LandDetailView.as_view(template_name='land/land_case_history.html'), name='land_case_history'),
 ]
 
 urlpatterns += [

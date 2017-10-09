@@ -11,20 +11,13 @@
     </facet>
   </component>
   <component name="NewModuleRootManager">
-    <content url="file://$MODULE_DIR$">
-      <excludeFolder url="file://$MODULE_DIR$/.idea" />
-      <excludeFolder url="file://$MODULE_DIR$/.idea_old" />
-    </content>
+    <content url="file://$MODULE_DIR$" />
     <orderEntry type="jdk" jdkName="Remote Python 3.4.3 Vagrant VM at ~/Documents/vagrant_ubuntu (/home/vagrant/.virtualenvs/medievaldb/bin/python3.4)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
-  </component>
-  <component name="TemplatesService">
-    <option name="TEMPLATE_CONFIGURATION" value="Jinja2" />
-    <option name="TEMPLATE_FOLDERS">
-      <list>
-        <option value="$MODULE_DIR$/peasantlegaldb/templates" />
-      </list>
-    </option>
+    <orderEntry type="module" module-name="medieval_peasant_db_test" />
+    <orderEntry type="module" module-name="programs" />
+    <orderEntry type="module" module-name="django-admin-autoregister" />
+    <orderEntry type="module" module-name="testsite" />
   </component>
   <component name="TestRunnerService">
     <option name="PROJECT_TEST_RUNNER" value="Unittests" />

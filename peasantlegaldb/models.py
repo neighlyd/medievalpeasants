@@ -1,5 +1,6 @@
 from django.db import models
 from django.db.models import Max, Min, Avg, Count
+from itertools import chain
 
 class Archive(models.Model):
     name = models.CharField(max_length=50)
@@ -217,108 +218,58 @@ class Person(models.Model):
 
     @property
     def earliest_case(self):
-        # get values list of earliest case for each interaction type, using the earliest index to extract it. Add each
-        # to a dictionary and then sort on the datetime field. Once the earliest of all is found, make a new queryset
-        # that contains the earliest case example, which can then be used to display its data. This last part appears
-        # redundant, but is the only way I have found to easily extract the law term data. It's a bunch of database
-        # hits, but I can't think of an easier way to do it...
+        # get queryset for each area where person interacts with cases (i.e. litigant table, casepeopleland, pledges),
+        # chain together and sort by date using a lambda if/else statement to differentiate between Case and other
+        # instances (b/c Case date is at self.session.date while all others are at self.case.session.date, b/c they use
+        # case as an FK). Pop earliest case off based on index [0]. Check instance for Case or other (again, due to
+        # difference in FK relationship w/ Session), and then render date display appropriately. Unfortunately, it
+        # isn't possible to simply pass the model to the template for rendering (and manipulation), because of the FK
+        # difference. There may be a way, but it's beyond me.
 
-        date_range = {}
-
-        try:
-            case = self.case_set.order_by('session__date').values_list('session__date', flat=True)[0]
-            date_range['case'] = case
-        except:
-            pass
-
-        try:
-            land = self.casepeopleland_set.order_by('case__session__date').values_list('case__session__date', flat=True)[0]
-            date_range['land'] = land
-        except:
-            pass
-
+        case_range = self.case_set.all()
+        land_range = self.casepeopleland_set.all()
+        pledge_giver_range= self.pledge_giver.all()
+        pledge_receiver_range = self.pledge_receiver.all()
 
         try:
-            pledge_give = self.pledge_giver.order_by('case__session__date').values_list('case__session__date', flat=True)[0]
-            date_range['pledge_give'] = pledge_give
-        except:
-            pass
-
-
-        try:
-            pledge_receive = self.pledge_receiver.order_by('case__session__date').values_list('case__session__date', flat=True)[0]
-            date_range['pledge_receive'] = pledge_receive
-        except:
-            pass
-
-        try:
-            sorted_date = sorted(date_range, key=date_range.get)[0]
-            if sorted_date is 'case':
-                qs = self.case_set.order_by('session__date')[0]
-                earliest_date= qs.session.get_law_term_display() + " - " + str(qs.session.date.year)
-            elif sorted_date is 'land':
-                qs = self.casepeopleland_set.order_by('case__session__date')[0]
-                earliest_date = qs.case.session.get_law_term_display() + " - " + str(qs.case.session.date.year)
-            elif sorted_date is 'pledge_give':
-                qs = self.pledge_giver.order_by('case__session__date')[0]
-                earliest_date = qs.case.session.get_law_term_display() + " - " + str(qs.case.session.date.year)
-            elif sorted_date is 'pledge_receive':
-                qs = self.pledge_receiver.order_by('case__session__date')[0]
-                earliest_date = qs.case.session.get_law_term_display() + " - " + str(qs.case.session.date.year)
+            earliest_case = sorted(chain(case_range, land_range, pledge_giver_range, pledge_receiver_range), key=lambda
+                x: x.session.date if isinstance(x, Case) else x.case.session.date)[0]
+            if isinstance(earliest_case, Case):
+                earliest_date = earliest_case.session.get_law_term_display() + ' - ' + str(earliest_case.session.date.
+                                                                                           year)
+            else:
+                earliest_date = earliest_case.case.session.get_law_term_display() + ' - ' + str(earliest_case.case.
+                                                                                                session.date.year)
         except:
             earliest_date = 'None'
 
         return earliest_date
     @property
     def latest_case(self):
-        # get values list of earliest case for each interaction type, using the earliest index to extract it. Add each
-        # to a dictionary and then sort on the datetime field. Once the earliest of all is found, make a new queryset
-        # that contains the earliest case example, which can then be used to display its data. This last part appears
-        # redundant, but is the only way I have found to easily extract the law term data. It's a bunch of database
-        # hits, but I can't think of an easier way to do it...
+        # get queryset for each area where person interacts with cases (i.e. litigant table, casepeopleland, pledges),
+        # chain together and sort by date using a lambda if/else statement to differentiate between Case and other
+        # instances (b/c Case date is at self.session.date while all others are at self.case.session.date, b/c they use
+        # case as an FK). Pop latest case off based on index [0]. Check instance for Case or other (again, due to
+        # difference in FK relationship w/ Session), and then render date display appropriately. Unfortunately, it
+        # isn't possible to simply pass the model to the template for rendering (and manipulation), because of the FK
+        # difference. There may be a way, but it's beyond me.
 
-        date_range = {}
-
-        try:
-            case = self.case_set.order_by('session__date').reverse().values_list('session__date', flat=True)[0]
-            date_range['case'] = case
-        except:
-            pass
-
-        try:
-            land = self.casepeopleland_set.order_by('case__session__date').reverse().values_list('case__session__date', flat=True)[0]
-            date_range['land'] = land
-        except:
-            pass
-
+        case_range = self.case_set.all()
+        land_range = self.casepeopleland_set.all()
+        pledge_giver_range= self.pledge_giver.all()
+        pledge_receiver_range = self.pledge_receiver.all()
 
         try:
-            pledge_give = self.pledge_giver.order_by('case__session__date').reverse().values_list('case__session__date', flat=True)[0]
-            date_range['pledge_give'] = pledge_give
-        except:
-            pass
+            sorted_date = sorted(chain(case_range, land_range, pledge_giver_range, pledge_receiver_range), key=lambda
+                x: x.session.date if isinstance(x, Case) else x.case.session.date, reverse=True)
 
-
-        try:
-            pledge_receive = self.pledge_receiver.order_by('case__session__date').reverse().values_list('case__session__date', flat=True)[0]
-            date_range['pledge_receive'] = pledge_receive
-        except:
-            pass
-
-        try:
-            sorted_date = sorted(date_range, key=date_range.get, reverse=True)[0]
-            if sorted_date is 'case':
-                qs = self.case_set.order_by('session__date').reverse()[0]
-                latest_date= qs.session.get_law_term_display() + " - " + str(qs.session.date.year)
-            elif sorted_date is 'land':
-                qs = self.casepeopleland_set.order_by('case__session__date').reverse()[0]
-                latest_date = qs.case.session.get_law_term_display() + " - " + str(qs.case.session.date.year)
-            elif sorted_date is 'pledge_give':
-                qs = self.pledge_giver.order_by('case__session__date').reverse()[0]
-                latest_date = qs.case.session.get_law_term_display() + " - " + str(qs.case.session.date.year)
-            elif sorted_date is 'pledge_receive':
-                qs = self.pledge_receiver.order_by('case__session__date').reverse()[0]
-                latest_date = qs.case.session.get_law_term_display() + " - " + str(qs.case.session.date.year)
+            latest_case = sorted_date[0]
+            if isinstance(latest_case, Case):
+                latest_date = latest_case.session.get_law_term_display() + ' - ' + str(latest_case.session.date.
+                                                                                           year)
+            else:
+                latest_date = latest_case.case.session.get_law_term_display() + ' - ' + str(latest_case.case.
+                                                                                                session.date.year)
         except:
             latest_date = 'None'
 
@@ -365,13 +316,15 @@ class Person(models.Model):
     @property
     def case_count_litigation(self):
         qs = self.person_to_case.exclude(chevage__isnull=False).exclude(heriot_assessment__isnull=False).\
-            exclude(impercamentum_amercement__isnull=False)
+            exclude(impercamentum_amercement__isnull=False).values_list('case').distinct()
         case_count = len(qs)
         return case_count
 
     @property
     def case_count_all(self):
-        return self.person_to_case.count()
+        qs = self.person_to_case.values_list('case').distinct()
+        case_count = len(qs)
+        return case_count
 
     @property
     def full_name(self):
@@ -460,18 +413,22 @@ class Case(models.Model):
     active_sale = models.BooleanField(default=False)
     incidental_land = models.BooleanField(default=False)
     litigants = models.ManyToManyField(Person, through='Litigant')
+    lands = models.ManyToManyField(Land, through='CasePeopleLand')
 
     @property
     def litigant_list(self):
         litigant_list = []
-        queryset = self.case_to_person.all()
+        litigant_qs = self.case_to_person.all()
+        land_qs = self.case_to_land.all()
         try:
-            for x in queryset:
+            iteration_list = list(chain(litigant_qs, land_qs))
+            for x in iteration_list:
                 new_entry = {
                     "name" : x.person.full_name,
                     "role" : x.role.role
                 }
                 litigant_list.append(new_entry)
+
         except:
             pass
         return litigant_list
@@ -589,6 +546,10 @@ class Litigant(models.Model):
     impercamentum_animal = models.ForeignKey(Chattel, null=True, related_name='impercamentum_animal')
     impercamentum_amercement = models.ForeignKey(Money, null=True, related_name='impercamentum_amercement')
     impercamentum_notes = models.TextField(null=True)
+    land = models.ForeignKey(Land, null=True, on_delete=models.CASCADE, related_name='case_to_land')
+    land_villeinage = models.NullBooleanField()
+    land_notes = models.TextField(null=True)
+
 
 
 class CasePeopleLand(models.Model):

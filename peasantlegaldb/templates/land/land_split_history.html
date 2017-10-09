@@ -2,18 +2,18 @@
 
 {% block single_col %}
 <div class="card">
-    <h3 class="card-header text-center">Tenant History</h3>
+    <h3 class="card-header text-center">Parcel Split History</h3>
 
     <div class="card">
         <table class="table table-bordered table-hover" id="table" data-page-length="25">
             <thead>
                 <th></th>
-                <th>Old Land ID:</th>
+                <th>Old Land ID</th>
                 <th>Old Land Parcels</th>
                 <th>Old Land Notes</th>
-                <th>New Land ID:</th>
-                <th>New Land Parcels:</th>
-                <th>New Land Notes:</th>
+                <th>New Land ID</th>
+                <th>New Land Parcels</th>
+                <th>New Land Notes</th>
             </thead>
         </table>
     </div>
@@ -47,7 +47,7 @@
                     "data": null,
                     "defaultContent": "",
                     "render": function () {
-                        return '<i class="fa fa-plus-square" aria-hidden="true"></i>';
+                        return '<i class="fa fa-plus-square" aria-hidden="true" style="color: grey"></i>';
                     },
                     width: "15px"
                 },
