@@ -3,4 +3,7 @@ secretsettings.py
 .coverage
 htmlcov
 node_modules
-.idea
+idea
+
+
+\.idea/
