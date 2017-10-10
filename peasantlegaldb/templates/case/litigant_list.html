@@ -61,9 +61,9 @@
             "<td><b>Chevage Count:</b></td>" +
             "<td>"+d.person.case_info.chevage__count+"</td>" +
             "<td><b>Impercamenta Count:</b></td>" +
-            "<td>"+d.person.case_info.impercamentum_amercement__count+"</td>" +
+            "<td>"+d.person.case_info.impercamentum__count+"</td>" +
             "<td><b>Heriot Count:</b></td>" +
-            "<td>"+d.person.case_info.heriot_assessment__count+"</td>" +
+            "<td>"+d.person.case_info.heriot__count+"</td>" +
             "</tr>"
             "</table>"
     }
@@ -123,10 +123,10 @@
                 {data: "chevage",
                     fnCreatedCell: replace_money,
                 },
-                {data: "heriot_assessment",
+                {data: "heriot",
                     fnCreatedCell: replace_money,
                 },
-                {data: "impercamentum_amercement",
+                {data: "impercamentum",
                     fnCreatedCell: replace_money,
                 },
                 ]

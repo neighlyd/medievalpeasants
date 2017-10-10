@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.models import Max, Min, Avg, Count
+from django.db.models import Max, Min, Avg, Count, Sum
 from itertools import chain
 
 class Archive(models.Model):
@@ -298,25 +298,23 @@ class Person(models.Model):
     @property
     def case_info(self):
         return self.person_to_case.aggregate(Count('amercement'), Max('amercement__in_denarius'),
-                                                   Min('amercement__in_denarius'), Avg('amercement__in_denarius'),
-                                                   Count('fine'), Max('fine__in_denarius'), Min('fine__in_denarius'),
-                                                   Avg('fine__in_denarius'), Count('damage'),
-                                                   Max('damage__in_denarius'), Min('damage__in_denarius'),
-                                                   Avg('damage__in_denarius'), Count('chevage'),
-                                                   Max('chevage__in_denarius'), Min('chevage__in_denarius'),
-                                                   Avg('chevage__in_denarius'), Count('heriot_assessment'),
-                                                   Max('heriot_assessment__in_denarius'),
-                                                   Min('heriot_assessment__in_denarius'),
-                                                   Avg('heriot_assessment__in_denarius'),
-                                                   Count('impercamentum_amercement'),
-                                                   Max('impercamentum_amercement__in_denarius'),
-                                                   Min('impercamentum_amercement__in_denarius'),
-                                                   Avg('impercamentum_amercement__in_denarius'), )
+                                             Min('amercement__in_denarius'), Avg('amercement__in_denarius'),
+                                             Sum('amercement__in_denarius'), Count('fine'), Max('fine__in_denarius'),
+                                             Min('fine__in_denarius'), Avg('fine__in_denarius'),
+                                             Sum('fine__in_denarius'), Count('damage'), Max('damage__in_denarius'),
+                                             Min('damage__in_denarius'), Avg('damage__in_denarius'),
+                                             Sum('damage__in_denarius'), Count('chevage'), Max('chevage__in_denarius'),
+                                             Min('chevage__in_denarius'), Avg('chevage__in_denarius'),
+                                             Sum('chevage__in_denarius'), Count('heriot'), Max('heriot__in_denarius'),
+                                             Min('heriot__in_denarius'), Avg('heriot__in_denarius'),
+                                             Sum('heriot__in_denarius'), Count('impercamentum'),
+                                             Max('impercamentum__in_denarius'), Min('impercamentum__in_denarius'),
+                                             Avg('impercamentum__in_denarius'), Sum('impercamentum__in_denarius'), )
 
     @property
     def case_count_litigation(self):
-        qs = self.person_to_case.exclude(chevage__isnull=False).exclude(heriot_assessment__isnull=False).\
-            exclude(impercamentum_amercement__isnull=False).values_list('case').distinct()
+        qs = self.person_to_case.exclude(chevage__isnull=False).exclude(heriot__isnull=False).\
+            exclude(impercamentum__isnull=False).values_list('case').distinct()
         case_count = len(qs)
         return case_count
 
@@ -541,10 +539,10 @@ class Litigant(models.Model):
     chevage_notes = models.TextField(null=True)
     heriot_quantity = models.CharField(max_length=25, null=True)
     heriot_animal = models.ForeignKey(Chattel, null=True, related_name='heriot_animal')
-    heriot_assessment = models.ForeignKey(Money, null=True, related_name='heriot_assessment')
+    heriot = models.ForeignKey(Money, null=True, related_name='heriot_assessment')
     impercamentum_quantity = models.IntegerField(null=True)
     impercamentum_animal = models.ForeignKey(Chattel, null=True, related_name='impercamentum_animal')
-    impercamentum_amercement = models.ForeignKey(Money, null=True, related_name='impercamentum_amercement')
+    impercamentum = models.ForeignKey(Money, null=True, related_name='impercamentum_amercement')
     impercamentum_notes = models.TextField(null=True)
     land = models.ForeignKey(Land, null=True, on_delete=models.CASCADE, related_name='case_to_land')
     land_villeinage = models.NullBooleanField()

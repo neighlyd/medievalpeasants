@@ -3,7 +3,7 @@
 
     <h3 class="card-header text-center">Land History</h3>
     <div class="card-body">
-            <table class="table table-bordered table-hover" id="land_history_list" data-page-length="25">
+            <table class="table table-bordered table-hover" id="table" data-page-length="25">
                 <thead>
                     <th></th>
                     <th>Land ID</th>
@@ -53,8 +53,8 @@
     $(document).ready(function(){
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1];
-        var url = Urls.case_people_land_api() + "?person=" + id + "&expand=case__session__village&expand=land&expand=role&expand=case__case_type&expand=land&expand=case__verdict";
-        var table = $('#land_history_list').DataTable({
+        var url = Urls.litigants_api() + "?person=" + id + "&land=true&expand=land&expand=role&expand=case__verdict&expand=case__case_type&expand=case__session__village";
+        var table = $('#table').DataTable({
             scrollX: true,
             ajax: {
                 processing: true,
@@ -83,14 +83,14 @@
                 {data: "case.session.law_term"},
                 {data: "case.session.year"},
                 {data: "role.role"},
-                {data: "villeinage"},
+                {data: "land_villeinage"},
                 {data: "case.session.village.name"},
-                {data: "notes"},
+                {data: "land_notes"},
             ]
         });
 
 
-        $('#land_history_list tbody').on('click', 'td.details-control', function(){
+        $('#table tbody').on('click', 'td.details-control', function(){
             var tr = $(this).closest('tr');
             var tdi = tr.find("i.fa");
             var row = table.row( tr );

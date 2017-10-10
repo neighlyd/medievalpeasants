@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_serializer_extensions',
     'webpack_loader',
-    'django_js_reverse'
+    'django_js_reverse',
+    'django_filters',
 ]
 
 MIDDLEWARE = [
@@ -125,6 +126,8 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
     ],
+    'DEFAULT_FILTER_BACKENDS':
+        ('django_filters.rest_framework.DjangoFilterBackend',)
 }
 
 # SECRET_KEY and Database information stored in secret_settings.py which is excluded from git through .gitignore.

@@ -14,15 +14,15 @@
 
         <br>
 
-        <a class="list-group-item list-group-item-action " href="{% url 'position_list' person.id %}">Amercement Cases</a>
-        <a class="list-group-item list-group-item-action " href="{% url 'position_list' person.id %}">Fine Cases</a>
-        <a class="list-group-item list-group-item-action " href="{% url 'position_list' person.id %}">Damage Cases</a>
+        <a class="list-group-item list-group-item-action " href="{% url 'person_amercement_list' person.id %}">Amercement Cases</a>
+        <a class="list-group-item list-group-item-action " href="{% url 'person_fine_list' person.id %}">Fine Cases</a>
+        <a class="list-group-item list-group-item-action " href="{% url 'person_damage_list' person.id %}">Damage Cases</a>
 
         <br>
 
-        <a class="list-group-item list-group-item-action " href="{% url 'position_list' person.id %}">Chevage Cases</a>
-        <a class="list-group-item list-group-item-action " href="{% url 'position_list' person.id %}">Impercamenta Cases</a>
-        <a class="list-group-item list-group-item-action " href="{% url 'position_list' person.id %}">Heriot Cases</a>
+        <a class="list-group-item list-group-item-action " href="{% url 'person_chevage_list' person.id %}">Chevage Cases</a>
+        <a class="list-group-item list-group-item-action " href="{% url 'person_impercamentum_list' person.id %}">Impercamenta Cases</a>
+        <a class="list-group-item list-group-item-action " href="{% url 'person_heriot_list' person.id %}">Heriot Cases</a>
 
     </div>
 {% endblock %}
@@ -118,7 +118,7 @@
         var id=$(this).attr('href'), url=$(this).data('url');
         console.log("id: " + id);
         console.log("url: "+ url);
-        if(typeof url !== "undefined") {
+        if(typeof url !== "undamaged") {
             $(id).load(url);
             $(id).addClass('active').siblings().removeClass('active');
         } else {

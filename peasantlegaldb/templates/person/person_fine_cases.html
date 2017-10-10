@@ -1,12 +1,13 @@
 {% extends 'layout/_l_single_col.html' %}
 
 {% block single_col %}
-    <h3 class="card-header text-center">Case List</h3>
+    <h3 class="card-header text-center">Fine List</h3>
     <div class="card-body">
             <table class="table table-bordered table-hover" id="table" data-page-length="25">
                 <thead>
                     <th></th>
                     <th>ID</th>
+                    <th>Fine</th>
                     <th>Term</th>
                     <th>Year</th>
                     <th>Court</th>
@@ -42,12 +43,12 @@
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1]
         console.log(id)
-        var api_url = Urls.litigants_api() + "?person=" + id + "&expand=case__case_type&expand=role&expand=case__verdict&expand=case__session";
+        var api_url = Urls.litigants_api() + "?person=" + id + "&fine=true&expand=fine&expand=role&expand=case__verdict&expand=case__case_type&expand=case__session__village";
         console.log(api_url);
         var table = $("#table").DataTable({
             fixedHeader: true,
             scrollX: true,
-            order: [3, "asc"],
+            order: [4, "asc"],
             ajax: {
                 url: api_url,
                 type: "GET",
@@ -67,6 +68,11 @@
                 {data: "case.id",
                     fnCreatedCell: function(nTd, cellData, rowData, row, col){
                         $(nTd).html("<a href='" + Urls.case(rowData.case.id) + "'target='_blank'>" + rowData.case.id + "</a>");
+                    }
+                },
+                {data: "fine.amount",
+                    fnCreatedCell: function(nTd, cellData, rowData, row, col){
+                    $(nTd).html(rowData.fine.amount + " (" + rowData.fine.in_denarius + "d.)")
                     }
                 },
                 {data: "case.session.law_term"},

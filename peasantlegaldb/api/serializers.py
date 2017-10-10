@@ -214,18 +214,16 @@ class LitigantSerializer(SerializerExtensionsMixin, serializers.ModelSerializer)
     damage = MoneySerializer()
     chevage = MoneySerializer()
     heriot_animal = ChattelSerializer
-    heriot_assessment = MoneySerializer()
+    heriot= MoneySerializer()
     impercamentum_animal = ChattelSerializer()
-    impercamentum_amercement = MoneySerializer()
-
-
+    impercamentum = MoneySerializer()
 
     class Meta:
         model = models.Litigant
         fields = ('id', 'damage_notes', 'ad_proximum', 'distrained', 'attached', 'bail', 'chevage', 'crossed',
                   'recessit', 'habet_terram', 'chevage_notes', 'heriot_quantity', 'impercamentum_quantity',
-                  'impercamentum_notes', 'amercement', 'fine', 'damage', 'chevage', 'heriot_animal', 'heriot_assessment',
-                  'impercamentum_animal', 'impercamentum_amercement')
+                  'impercamentum_notes', 'amercement', 'fine', 'damage', 'chevage', 'heriot_animal', 'heriot',
+                  'impercamentum_animal', 'impercamentum', 'land_notes', 'land_villeinage')
         expandable_fields = dict(
             case=CaseSerializer,
             person=PersonSerializer,
@@ -234,10 +232,11 @@ class LitigantSerializer(SerializerExtensionsMixin, serializers.ModelSerializer)
             amercement=MoneySerializer,
             damage=MoneySerializer,
             chevage=MoneySerializer,
-            heriot_assessment=MoneySerializer,
+            heriot=MoneySerializer,
             heriot_animal=ChattelSerializer,
-            impercamentum_amercement=MoneySerializer,
+            impercamentum=MoneySerializer,
             impercamentum_animal=ChattelSerializer,
+            land=LandSerializer,
         )
 
 

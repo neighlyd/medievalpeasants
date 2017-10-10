@@ -1,8 +1,32 @@
 from rest_framework import viewsets, generics
 from rest_framework_serializer_extensions.views import SerializerExtensionsAPIViewMixin
 
+from django_filters import rest_framework as filters
+import django_filters
+
 from peasantlegaldb.api import serializers
 from peasantlegaldb import models
+
+
+'''
+# Class created in order to be able to search for both isnull and FKs.
+# Not using at the moment due to the inability of django-filters to filter Foreign Keys by Null. Back to older 
+# filtering style (UGH!)
+class NumberInFilter(django_filters.BaseInFilter, django_filters.NumberFilter):
+    pass
+
+
+class LitigantFilter(filters.FilterSet):
+
+    land = NumberInFilter(name='land', lookup_expr='in')
+    has_land = django_filters.BooleanFilter(name='land', lookup_expr='isnull')
+    case = django_filters.NumberFilter(name='case', lookup_expr='exact')
+    person = django_filters.NumberFilter(name='person', lookup_expr='exact')
+
+    class Meta:
+        model = models.Litigant
+        fields = ['land', 'case', 'person', 'has_land']
+'''
 
 
 # API views
@@ -160,22 +184,50 @@ class LandParcelViewSet(SerializerExtensionsAPIViewMixin, viewsets.ModelViewSet)
     serializer_class = serializers.LandParcelSerializer
 
 
+
+
 class LitigantViewSet(SerializerExtensionsAPIViewMixin, viewsets.ModelViewSet):
 
     serializer_class = serializers.LitigantSerializer
+    '''
+    # Used for Django-Filter, but can't seem to search for Nulled/Unnulled Foreign Keys. May be worthless to me.
+    filter_backends = (filters.DjangoFilterBackend,)
+    filter_class = LitigantFilter
+    '''
+
 
     def get_queryset(self):
+        
+        def check_chain(check, queryset):
+            for key, value in check.items():
+                if value is not None:
+                    if value == "true":
+                        new_filter = key + "__isnull"
+                        queryset = queryset.filter(**{new_filter: False})
+                    elif value == "false":
+                        new_filter = key + "__isnull"
+                        queryset = queryset.filter(**{new_filter:True})
+                    else:
+                        queryset = queryset.filter(**{key:value})
+
+            return queryset
+
+
         queryset = models.Litigant.objects.all().order_by('case__session__village__name', 'case__session__date',
-                                                          'person__last_name',
-                                                          'person__first_name')
+                                                          'person__last_name', 'person__first_name')
 
-        case = self.request.query_params.get('case', None)
-        if case is not None:
-            queryset = queryset.filter(case_id=case)
+        chain_filter = {}
+        chain_filter['case_id'] = self.request.query_params.get('case', None)
+        chain_filter['person_id'] = self.request.query_params.get('person', None)
+        chain_filter['land_id'] = self.request.query_params.get('land', None)
+        chain_filter['amercement'] = self.request.query_params.get('amercement', None)
+        chain_filter['fine'] = self.request.query_params.get('fine', None)
+        chain_filter['damage'] = self.request.query_params.get('damage', None)
+        chain_filter['impercamentum'] = self.request.query_params.get('impercamentum', None)
+        chain_filter['heriot']= self.request.query_params.get('heriot', None)
+        chain_filter['chevage'] = self.request.query_params.get('chevage', None)
 
-        person = self.request.query_params.get('person', None)
-        if person is not None:
-            queryset = queryset.filter(person_id=person)
+        queryset = check_chain(chain_filter, queryset)
 
         return queryset
 

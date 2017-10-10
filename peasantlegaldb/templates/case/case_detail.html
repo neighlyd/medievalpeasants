@@ -18,7 +18,7 @@
 
 <div class="card-header text-center">
     <h2 class="card-title">Case {{ case.id }}</h2>
-    <h3 class="card-subtitle mb-2 text-muted">{{ case.session.village.name}} - {{case.session.get_law_term_display }} {{ case.session.date.year}}</h3>
+    <h3 class="card-subtitle mb-2 text-muted">{{ case.session.village.name}} - {{case.session.get_law_term_display }}, {{ case.session.date.year}}</h3>
 </div>
 
 <div class="card-body clearfix" id="main_info">
@@ -28,10 +28,6 @@
                         <h3 class="card-header">Case Info:</h3>
                         <div class="card-body">
                             <table class="table table-sm">
-                                <tr class="row m-0">
-                                    <td class="d-inline-block col-4"><b>Village:</b></td>
-                                    <td class="d-inline-block col-8">{{ case.session.village.name }}</td>
-                                </tr>
                                 <tr class="row m-0">
                                     <td class="d-inline-block col-4"><b>Date:</b></td>
                                     <td class="d-inline-block col-8">{{ case.session.date }}</td>

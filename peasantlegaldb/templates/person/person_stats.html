@@ -100,6 +100,16 @@
                                     <td>--</td>
                             {% endif %}
                         </tr>
+                        <tr>
+                            <td>Total (in d.)</td>
+                            {% if person.amercement_sum == 0 %}
+                                    <td>0</td>
+                            {% elif person.amercement_sum > 0 %}
+                                    <td>{{ person.amercement_sum }}</td>
+                            {% else %}
+                                    <td>--</td>
+                            {% endif %}
+                        </tr>
                     </table>
                 </div>
             </div>
@@ -142,6 +152,16 @@
                                     <td>--</td>
                             {% endif %}
                         </tr>
+                        <tr>
+                            <td>Total (in d.)</td>
+                            {% if person.fine_sum == 0 %}
+                                    <td>0</td>
+                            {% elif person.fine_sum > 0 %}
+                                    <td>{{ person.fine_sum }}</td>
+                            {% else %}
+                                    <td>--</td>
+                            {% endif %}
+                        </tr>
                     </table>
                 </div>
             </div>
@@ -180,6 +200,16 @@
                                     <td>0</td>
                             {% elif person.damage_avg > 0 %}
                                     <td>{{ person.damage_avg }}</td>
+                            {% else %}
+                                    <td>--</td>
+                            {% endif %}
+                        </tr>
+                        <tr>
+                            <td>Total (in d.)</td>
+                            {% if person.damage_sum == 0 %}
+                                    <td>0</td>
+                            {% elif person.damage_sum > 0 %}
+                                    <td>{{ person.damage_sum }}</td>
                             {% else %}
                                     <td>--</td>
                             {% endif %}
@@ -232,6 +262,16 @@
                                     <td>--</td>
                             {% endif %}
                         </tr>
+                        <tr>
+                            <td>Total (in d.)</td>
+                            {% if person.chevage_sum == 0 %}
+                                    <td>0</td>
+                            {% elif person.chevage_sum > 0 %}
+                                    <td>{{ person.chevage_sum }}</td>
+                            {% else %}
+                                    <td>--</td>
+                            {% endif %}
+                        </tr>
                     </table>
                 </div>
             </div>
@@ -274,6 +314,16 @@
                                     <td>--</td>
                             {% endif %}
                         </tr>
+                        <tr>
+                            <td>Total (in d.)</td>
+                            {% if person.impercamentum_sum == 0 %}
+                                    <td>0</td>
+                            {% elif person.impercamentum_sum > 0 %}
+                                    <td>{{ person.impercamentum_sum }}</td>
+                            {% else %}
+                                    <td>--</td>
+                            {% endif %}
+                        </tr>
                     </table>
                 </div>
             </div>
@@ -312,6 +362,16 @@
                                     <td>0</td>
                             {% elif person.heriot_avg > 0 %}
                                     <td>{{ person.heriot_avg }}</td>
+                            {% else %}
+                                    <td>--</td>
+                            {% endif %}
+                        </tr>
+                        <tr>
+                            <td>Total (in d.)</td>
+                            {% if person.heriot_sum == 0 %}
+                                    <td>0</td>
+                            {% elif person.heriot_sum > 0 %}
+                                    <td>{{ person.heriot_sum }}</td>
                             {% else %}
                                     <td>--</td>
                             {% endif %}

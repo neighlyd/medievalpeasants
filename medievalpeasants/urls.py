@@ -42,6 +42,13 @@ person_urls = [
     url(r'^position_list', web_views.PeopleListView.as_view(template_name='person/position_list.html'), name='position_list'),
     url(r'^land_list', web_views.PeopleListView.as_view(template_name='person/person_land_history_list.html'), name='person_land_history'),
     url(r'^stats', web_views.PersonDetailView.as_view(template_name='person/person_stats.html'), name='person_stats'),
+    url(r'^amercement_list', web_views.PersonDetailView.as_view(template_name='person/person_amercement_cases.html'), name='person_amercement_list'),
+    url(r'^fine_list', web_views.PersonDetailView.as_view(template_name='person/person_fine_cases.html'), name='person_fine_list'),
+    url(r'^damage_list', web_views.PersonDetailView.as_view(template_name='person/person_damage_cases.html'), name='person_damage_list'),
+    url(r'^chevage_list', web_views.PersonDetailView.as_view(template_name='person/person_chevage_cases.html'), name='person_chevage_list'),
+    url(r'^impercamentum_list', web_views.PersonDetailView.as_view(template_name='person/person_impercamentum_cases.html'), name='person_impercamentum_list'),
+    url(r'^heriot_list', web_views.PersonDetailView.as_view(template_name='person/person_heriot_cases.html'), name='person_heriot_list'),
+
 ]
 
 case_urls = [
