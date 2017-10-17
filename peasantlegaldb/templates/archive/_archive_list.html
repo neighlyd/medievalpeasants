@@ -1,0 +1,68 @@
+{% extends '_layout/_l_two_col.html' %}
+
+{% block navbar %}
+    {% include '_layout/__navbar.html' %}
+{% endblock %}
+
+{% block left_sidebar %}
+{% endblock %}
+
+{% block center_bar %}
+
+<div class="card-header text-center">
+    <h2 class="card-title">Archive List</h2>
+</div>
+
+<div class="card-body clearfix" id="main_info">
+    <table class="table table-bordered table-hover" id="table" data-page-length="25">
+        <thead>
+            <th>Name</th>
+            <th>Website</th>
+            <th>Notes</th>
+            <th>Record Count</th>
+        </thead>
+    </table>
+</div>
+
+{% endblock %}
+
+{% block right_sidebar %}
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script>
+    $(document).ready(function(){
+        var table = $('#table').DataTable({
+            fixedHeader: {
+                headerOffset: 50
+            },
+            scrollX: true,
+            ajax: {
+                processing: true,
+                url: Urls.archive_api(),
+                type: "GET",
+                dataSrc: "",
+            },
+            "columns": [
+                {data: "name",
+                    fnCreatedCell: function(nTd, cellData, rowData, row, col) {
+                        $(nTd).html("<a href='" + Urls.archive(rowData.id) + "' target='_blank'>" + rowData.name + "</a>");
+                    }
+                },
+                {data: "website",
+                    fnCreatedCell: function(nTd, cellData, rowData, row, col) {
+                        $(nTd).html("<a href='" + (rowData.website) + "' target='_blank'> Website </a>");
+                    }
+                },
+                {data: "notes"},
+                {data: "record_count"},
+            ],
+
+        });
+    });
+
+
+
+</script>
+{% endblock %}

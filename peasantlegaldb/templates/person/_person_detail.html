@@ -1,28 +1,46 @@
-{% extends 'layout/_l_three_col.html' %}
+{% extends '_layout/_l_three_col.html' %}
 
 {% block navbar %}
-{% include 'layout/__navbar.html' %}
+{% include '_layout/__navbar.html' %}
 {% endblock %}
 
 {% block left_sidebar %}
     <div id="selection_list">
         <a class="list-group-item list-group-item-action active" href="{% url 'person_stats' person.id %}">Stats</a>
+    {% if person.case_exists %}
         <a class="list-group-item list-group-item-action " href="{% url 'person_case_list' person.id %}" >Case List</a>
+    {% endif %}
+    {% if person.pledge_exists %}
         <a class="list-group-item list-group-item-action " href="{% url 'pledge_list' person.id %}">Pledge List</a>
+    {% endif %}
+    {% if person.land_exists %}
         <a class="list-group-item list-group-item-action " href="{% url 'person_land_history' person.id %}">Land List</a>
+    {% endif %}
+    {% if person.relationship_exists %}
         <a class="list-group-item list-group-item-action " href="{% url 'relationship_list' person.id %}">Relationship List</a>
+    {% endif %}
+
 
         <br>
-
+    {% if person.amercement_exists %}
         <a class="list-group-item list-group-item-action " href="{% url 'person_amercement_list' person.id %}">Amercement Cases</a>
+    {% endif %}
+    {% if person.fine_exists %}
         <a class="list-group-item list-group-item-action " href="{% url 'person_fine_list' person.id %}">Fine Cases</a>
+    {% endif %}
+    {% if person.damage_exists %}
         <a class="list-group-item list-group-item-action " href="{% url 'person_damage_list' person.id %}">Damage Cases</a>
-
+    {% endif %}
         <br>
-
+    {% if person.chevage_exists %}
         <a class="list-group-item list-group-item-action " href="{% url 'person_chevage_list' person.id %}">Chevage Cases</a>
+    {% endif %}
+    {% if person.impercamentum_exists %}
         <a class="list-group-item list-group-item-action " href="{% url 'person_impercamentum_list' person.id %}">Impercamenta Cases</a>
+    {% endif %}
+    {% if person.heriot_exists %}
         <a class="list-group-item list-group-item-action " href="{% url 'person_heriot_list' person.id %}">Heriot Cases</a>
+    {% endif %}
 
     </div>
 {% endblock %}
@@ -30,7 +48,7 @@
 {% block center_bar %}
 
 <div class="card-header text-center">
-    <h2 class="card-title">{{person.full_name}}</h2>
+    <h2 class="card-title">{{ person.full_name }}</h2>
     <h3 class="card-subtitle mb-2 text-muted">{{ person.village.name }}</h3>
 </div>
 
@@ -63,7 +81,7 @@
                     </tr>
                     <tr class="row m-0">
                         <td class="d-inline-block col-4"><b>Home Village:</b></td>
-                        <td class="d-inline-block col-8">{{ person.village.name}}</td>
+                        <td class="d-inline-block col-8"><a href="{% url 'village' person.village.id %}">{{ person.village.name }}</a></td>
                     </tr>
                     <tr class="row m-0">
                         <td class="d-inline-block col-4"><b>1332 Tax</b></td>

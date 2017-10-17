@@ -1,0 +1,38 @@
+{% extends '_layout/_l_three_col.html' %}
+
+{% block navbar %}
+    {% include '_layout/__navbar.html' %}
+{% endblock %}
+
+{% block left_sidebar %}
+    <div id="selection_list">
+        <a class="list-group-item list-group-item-action" href="{% url 'hundred_village_list' hundred.id %}">Villages</a>
+        <a class="list-group-item list-group-item-action" href="{% url 'hundred_case_list' hundred.id %}">Cases</a>
+        <a class="list-group-item list-group-item-action" href="{% url 'hundred_resident_list' hundred.id %}">Known Residents</a>
+        <a class="list-group-item list-group-item-action" href="{% url 'hundred_litigant_list' hundred.id %}">Litigants</a>
+    </div>
+{% endblock %}
+
+{% block center_bar %}
+
+<div class="card-header text-center">
+    <h2 class="card-title" id="county_name">{{ hundred.name }} </h2>
+</div>
+
+<br>
+
+<div id="list_info">
+
+</div>
+
+{% endblock %}
+
+{% block right_sidebar %}
+    <button type="button" class="btn btn-secondary float-sm-right">Edit Village</button>
+{% endblock %}
+
+{% block scripts %}
+
+    {{ block.super }}
+
+{% endblock %}

@@ -8,25 +8,30 @@ from peasantlegaldb.api import serializers
 from peasantlegaldb import models
 
 
-'''
-# Class created in order to be able to search for both isnull and FKs.
-# Not using at the moment due to the inability of django-filters to filter Foreign Keys by Null. Back to older 
-# filtering style (UGH!)
-class NumberInFilter(django_filters.BaseInFilter, django_filters.NumberFilter):
-    pass
 
+# Function created in order to be able to search for both isnull and FKs. In order to work, you need to create a
+# dictionary of key, value pairs using self.request.query_params.get(x, None) where the key is the name of the field you
+# want to filter and x is the query_param you want to use in the URL (see the get_queryset function in the
+# LitigantViewset class for examples). Pass this dictionary and the ViewSet's queryset to check_chain(), which will
+# iterate through the dictionary, checking to see if there is a value or not. If there is, it checks to see if it should
+# treat it as a boolean check or not ("true" or "false"), or whether it is a filter check. It then filters the queryset
+# based on that, and returns the queryset to the ViewSet class. Again, see the LitigantViewSet for example.
+def check_chain(check, queryset, distinct=False):
+    for key, value in check.items():
+        if value is not None:
+            if value == "true":
+                new_filter = key + "__isnull"
+                queryset = queryset.filter(**{new_filter: False})
+            elif value == "false":
+                new_filter = key + "__isnull"
+                queryset = queryset.filter(**{new_filter:True})
+            else:
+                queryset = queryset.filter(**{key:value})
 
-class LitigantFilter(filters.FilterSet):
+    if distinct == True:
+        queryset = queryset.distinct()
 
-    land = NumberInFilter(name='land', lookup_expr='in')
-    has_land = django_filters.BooleanFilter(name='land', lookup_expr='isnull')
-    case = django_filters.NumberFilter(name='case', lookup_expr='exact')
-    person = django_filters.NumberFilter(name='person', lookup_expr='exact')
-
-    class Meta:
-        model = models.Litigant
-        fields = ['land', 'case', 'person', 'has_land']
-'''
+    return queryset
 
 
 # API views
@@ -58,8 +63,16 @@ class CaseTypeViewSet(SerializerExtensionsAPIViewMixin, viewsets.ModelViewSet):
 
 
 class CountyViewSet(SerializerExtensionsAPIViewMixin, viewsets.ModelViewSet):
-    queryset = models.County.objects.all().order_by('name')
     serializer_class = serializers.CountySerializer
+
+    def get_queryset(self):
+        queryset = models.County.objects.all().order_by('name')
+
+        chain_filter={}
+        chain_filter['id'] = self.request.query_params.get('county', None)
+        queryset = check_chain(chain_filter, queryset)
+
+        return queryset
 
 
 class LandViewSet(SerializerExtensionsAPIViewMixin, viewsets.ModelViewSet):
@@ -121,28 +134,89 @@ class VerdictViewSet(SerializerExtensionsAPIViewMixin, viewsets.ModelViewSet):
 
 
 class HundredViewSet(SerializerExtensionsAPIViewMixin, viewsets.ModelViewSet):
-    queryset = models.Hundred.objects.all().order_by('county__name', 'name')
     serializer_class = serializers.HundredSerializer
+
+    def get_queryset(self):
+        queryset = models.Hundred.objects.all()
+
+        chain_filter = {}
+        chain_filter['county_id'] = self.request.query_params.get('county', None)
+        distinct = self.request.query_params.get('distinct', None)
+
+        if distinct == "true":
+            queryset = check_chain(chain_filter, queryset, distinct=True)
+        queryset = check_chain(chain_filter, queryset)
+
+        return queryset
 
 
 class VillageViewSet(SerializerExtensionsAPIViewMixin, viewsets.ModelViewSet):
-    queryset = models.Village.objects.all().order_by('county__name', 'name')
     serializer_class = serializers.VillageSerializer
+
+    def get_queryset(self):
+        queryset = models.Village.objects.all().order_by('county__name', 'name')
+
+        chain_filter = {}
+        chain_filter['id'] = self.request.query_params.get('village', None)
+        chain_filter['county_id'] = self.request.query_params.get('county', None)
+        chain_filter['hundred_id'] = self.request.query_params.get('hundred', None)
+        distinct = self.request.query_params.get('distinct', None)
+
+        if distinct == "true":
+            queryset = check_chain(chain_filter, queryset, distinct=True)
+        queryset = check_chain(chain_filter, queryset)
+
+        return queryset
+
 
 
 class PersonViewSet(SerializerExtensionsAPIViewMixin, viewsets.ModelViewSet):
-    queryset = models.Person.objects.all().order_by('village__name', 'last_name', 'first_name')
     serializer_class = serializers.PersonSerializer
 
+    def get_queryset(self):
+        queryset = models.Person.objects.all()
+
+        chain_filter = {}
+        chain_filter['id'] = self.request.query_params.get('person', None)
+        chain_filter['village_id'] = self.request.query_params.get('village', None)
+        chain_filter['village__county_id'] = self.request.query_params.get('county', None)
+        chain_filter['village__hundred_id'] = self.request.query_params.get('hundred', None)
+        chain_filter['person_to_case__case__session__village_id'] = self.request.query_params.get('village_to_litigant', None)
+        chain_filter['person_to_case__case__session__village__county_id'] = self.request.query_params.get('county_to_litigant', None)
+        chain_filter['person_to_case__case__session__village__hundred_id'] = self.request.query_params.get('hundred_to_litigant', None)
+        distinct = self.request.query_params.get('distinct', None)
+
+        if distinct == "true":
+            queryset = check_chain(chain_filter, queryset, distinct=True)
+        queryset = check_chain(chain_filter, queryset)
+
+        return queryset
 
 class RecordViewSet(SerializerExtensionsAPIViewMixin, viewsets.ModelViewSet):
-    queryset = models.Record.objects.all().order_by('archive__name', 'name')
     serializer_class = serializers.RecordSerializer
 
+    def get_queryset(self):
+        queryset = models.Record.objects.all().order_by('archive__name', 'name')
+
+        chain_filter = {}
+        chain_filter['id'] = self.request.query_params.get('record', None)
+        chain_filter['archive_id'] = self.request.query_params.get('archive', None)
+        queryset = check_chain(chain_filter, queryset)
+
+        return queryset
 
 class SessionViewSet(SerializerExtensionsAPIViewMixin, viewsets.ModelViewSet):
-    queryset = models.Session.objects.all().order_by('village__name', 'record__record_type', 'date')
     serializer_class = serializers.SessionSerializer
+
+    def get_queryset(self):
+        queryset = models.Session.objects.all().order_by('village__name', 'record__record_type', 'date')
+
+        chain_filter = {}
+        chain_filter['record_id'] = self.request.query_params.get('record', None)
+        chain_filter['id'] = self.request.query_params.get('id', None)
+        queryset=check_chain(chain_filter, queryset)
+
+        return queryset
 
 
 class CaseViewSet(SerializerExtensionsAPIViewMixin, viewsets.ModelViewSet):
@@ -151,32 +225,82 @@ class CaseViewSet(SerializerExtensionsAPIViewMixin, viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = models.Case.objects.all().order_by('session__village__name', 'session__date', 'court_type')
-        land = self.request.query_params.get('land', None)
-        if land is not None:
-            queryset = models.Land.objects.get(id=land).case_set.all().distinct()
+
+        chain_filter = {}
+        chain_filter['case_to_person__land_id'] = self.request.query_params.get('land', None)
+        chain_filter['id'] = self.request.query_params.get('case', None)
+        chain_filter['session_id'] = self.request.query_params.get('session', None)
+        chain_filter['session__village_id'] = self.request.query_params.get('village', None)
+        chain_filter['case_to_person__person_id'] = self.request.query_params.get('person', None)
+        chain_filter['session__village__county_id'] = self.request.query_params.get('county', None)
+        chain_filter['session__village__hundred_id'] = self.request.query_params.get('hundred', None)
+        distinct = self.request.query_params.get('distinct', None)
+
+        if distinct == "true":
+            queryset = check_chain(chain_filter, queryset, distinct=True)
+        else:
+            queryset = check_chain(chain_filter, queryset)
 
         return queryset
 
 
 class CornbotViewSet(SerializerExtensionsAPIViewMixin, viewsets.ModelViewSet):
-    queryset = models.Cornbot.objects.all().order_by('case__session__village__name', 'case__session__date')
     serializer_class = serializers.CornbotSerializer
+
+    def get_queryset(self):
+        queryset = models.Cornbot.objects.all().order_by('case__session__village__name', 'case__session__date')
+
+        chain_filter = {}
+        chain_filter['case_id'] = self.request.query_params.get('case', None)
+        chain_filter['crop_type_id'] = self.request.query_params.get('crop', None)
+        chain_filter['price_id'] = self.request.query_params.get('price', None)
+        queryset = check_chain(chain_filter, queryset)
+
+        return queryset
 
 
 class ExtrahuraViewSet(SerializerExtensionsAPIViewMixin, viewsets.ModelViewSet):
-    queryset = models.Extrahura.objects.all().order_by('case__session__village__name', 'case__session__date')
     serializer_class = serializers.ExtrahuraSerializer
+
+    def get_queryset(self):
+        queryset = models.Extrahura.objects.all().order_by('case__session__village__name', 'case__session__date')
+
+        chain_filter={}
+        chain_filter['case_id']=self.request.query_params.get('case', None)
+        chain_filter['animal_id']=self.request.query_params.get('animal', None)
+        chain_filter['price_id']=self.request.query_params.get('price', None)
+        queryset=check_chain(chain_filter, queryset)
+
+        return queryset
+
 
 
 class MurrainViewSet(SerializerExtensionsAPIViewMixin, viewsets.ModelViewSet):
-    queryset = models.Murrain.objects.all().order_by('case__session__village__name', 'case__session__date')
     serializer_class = serializers.MurrainSerializer
+
+    def get_queryset(self):
+        queryset = models.Murrain.objects.all().order_by('case__session__village__name', 'case__session__date')
+
+        chain_filter={}
+        chain_filter['case_id']=self.request.query_params.get('case', None)
+        chain_filter['animal_id']=self.request.query_params.get('animal', None)
+        queryset=check_chain(chain_filter, queryset)
+
+        return queryset
 
 
 class PlaceMentionedViewSet(SerializerExtensionsAPIViewMixin, viewsets.ModelViewSet):
-    queryset = models.PlaceMentioned.objects.all().order_by('case__session__village__name', 'case__session__date',
-                                                            'village__name')
     serializer_class = serializers.PlaceMentionedSerializer
+
+    def get_queryset(self):
+        queryset = models.PlaceMentioned.objects.all()
+
+        chain_filter={}
+        chain_filter['village_id'] = self.request.query_params.get('village', None)
+        chain_filter['case_id'] = self.request.query_params.get('case', None)
+        queryset = check_chain(chain_filter, queryset)
+
+        return queryset
 
 
 class LandParcelViewSet(SerializerExtensionsAPIViewMixin, viewsets.ModelViewSet):
@@ -186,35 +310,13 @@ class LandParcelViewSet(SerializerExtensionsAPIViewMixin, viewsets.ModelViewSet)
 
 
 
+
 class LitigantViewSet(SerializerExtensionsAPIViewMixin, viewsets.ModelViewSet):
 
     serializer_class = serializers.LitigantSerializer
-    '''
-    # Used for Django-Filter, but can't seem to search for Nulled/Unnulled Foreign Keys. May be worthless to me.
-    filter_backends = (filters.DjangoFilterBackend,)
-    filter_class = LitigantFilter
-    '''
-
 
     def get_queryset(self):
-        
-        def check_chain(check, queryset):
-            for key, value in check.items():
-                if value is not None:
-                    if value == "true":
-                        new_filter = key + "__isnull"
-                        queryset = queryset.filter(**{new_filter: False})
-                    elif value == "false":
-                        new_filter = key + "__isnull"
-                        queryset = queryset.filter(**{new_filter:True})
-                    else:
-                        queryset = queryset.filter(**{key:value})
-
-            return queryset
-
-
-        queryset = models.Litigant.objects.all().order_by('case__session__village__name', 'case__session__date',
-                                                          'person__last_name', 'person__first_name')
+        queryset = models.Litigant.objects.all().prefetch_related('case', 'person')
 
         chain_filter = {}
         chain_filter['case_id'] = self.request.query_params.get('case', None)
@@ -226,31 +328,11 @@ class LitigantViewSet(SerializerExtensionsAPIViewMixin, viewsets.ModelViewSet):
         chain_filter['impercamentum'] = self.request.query_params.get('impercamentum', None)
         chain_filter['heriot']= self.request.query_params.get('heriot', None)
         chain_filter['chevage'] = self.request.query_params.get('chevage', None)
+        distinct = self.request.query_params.get('distinct', None)
 
+        if distinct == "true":
+            queryset = check_chain(chain_filter, queryset, distinct=True)
         queryset = check_chain(chain_filter, queryset)
-
-        return queryset
-
-
-class CasePeopleLandViewSet(SerializerExtensionsAPIViewMixin, viewsets.ModelViewSet):
-
-    serializer_class = serializers.CasePeopleLandSerializer
-
-    def get_queryset(self):
-        queryset = models.CasePeopleLand.objects.all().order_by('case__session__village__name', 'case__session__date',
-                                                            'person__last_name', 'person__first_name')
-
-        person = self.request.query_params.get('person', None)
-        if person is not None:
-            queryset = queryset.filter(person=person)
-
-        land = self.request.query_params.get('land', None)
-        if land is not None:
-            queryset = queryset.filter(land=land)
-
-        case = self.request.query_params.get('case', None)
-        if case is not None:
-            queryset = queryset.filter(case=case)
 
         return queryset
 

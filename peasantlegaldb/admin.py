@@ -5,7 +5,7 @@ from .models import *
 # Register non-m2m models
 singularModels = [Archive, Money, Chattel, CaseType, ParcelTenure,
                   ParcelType, PositionType, Relation, Role, Verdict,
-                  Hundred, Cornbot, Extrahura, Murrain, PlaceMentioned, CasePeopleLand,
+                  Hundred, Cornbot, Extrahura, Murrain, PlaceMentioned,
                   Position, Relationship, Pledge, LandSplit, LandParcel,]
 
 admin.site.register(singularModels)
@@ -26,12 +26,6 @@ class LitigantInline(admin.TabularInline):
 
 class CaseInline(admin.TabularInline):
     model = Case
-    extra = 1
-    classes = ['collapse']
-
-
-class CasePeopleLandInline(admin.TabularInline):
-    model = CasePeopleLand
     extra = 1
     classes = ['collapse']
 
@@ -96,7 +90,6 @@ class PersonAdmin(admin.ModelAdmin):
 
 class LandAdmin(admin.ModelAdmin):
     inlines = [
-        CasePeopleLandInline,
     ]
 
 
@@ -136,7 +129,6 @@ class CaseAdmin(admin.ModelAdmin):
 
 class LandParcelAdmin(admin.ModelAdmin):
     inlines = [
-        CasePeopleLandInline,
     ]
 
 class PledgeAdmin(admin.ModelAdmin):
@@ -147,7 +139,6 @@ class PledgeAdmin(admin.ModelAdmin):
 class LandSplitAdmin(admin.ModelAdmin):
     inlines = [
         LandInline,
-        CasePeopleLandInline,
     ]
 
 class RelationshipAdmin(admin.ModelAdmin):

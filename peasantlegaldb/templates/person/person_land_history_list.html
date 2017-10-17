@@ -1,4 +1,4 @@
-{% extends 'layout/_l_single_col.html' %}
+{% extends '_layout/_l_single_col.html' %}
 {% block single_col %}
 
     <h3 class="card-header text-center">Land History</h3>
@@ -81,7 +81,11 @@
                 },
                 {data: "land.parcel_list_concat"},
                 {data: "case.session.law_term"},
-                {data: "case.session.year"},
+                {data: "case.session.date",
+                    fnCreatedCell: function(nTd, cellData, rowData, row, col) {
+                        $(nTd).html(rowData.case.session.year);
+                    }
+                },
                 {data: "role.role"},
                 {data: "land_villeinage"},
                 {data: "case.session.village.name"},

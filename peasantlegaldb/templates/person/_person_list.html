@@ -1,20 +1,20 @@
-{% extends "layout/__base.html" %}
+{% extends '_layout/_l_two_col.html' %}
 
 {% block navbar %}
-    {% include 'layout/__navbar.html' %}
+    {% include '_layout/__navbar.html' %}
 {% endblock %}
 
-{% block content %}
+{% block left_sidebar %}
+{% endblock %}
 
-<br>
-<div class="container">
-    <hr>
-        <h2 class="text-center">People List</h2>
-    <hr>
+{% block center_bar %}
+
+<div class="card-header text-center">
+    <h2 class="card-title">People List</h2>
 </div>
 
-<div class="container">
-    <table class="table table-bordered table-hover" id="person_list" data-page-length="25">
+<div class="card-body clearfix" id="main_info">
+    <table class="table table-bordered table-hover" id="table" data-page-length="25">
         <thead>
             <th>Name</th>
             <th>Village</th>
@@ -30,23 +30,28 @@
 
 {% endblock %}
 
+{% block right_sidebar %}
+{% endblock %}
+
 {% block scripts %}
 {{ block.super }}
 <script>
     $(document).ready(function(){
-        var table = $('#person_list').DataTable({
+        var url = Urls.person_api() + "?expand=village";
+        var table = $('#table').DataTable({
+            order: [0, "asc"],
             fixedHeader: {
                 headerOffset: 50
             },
             scrollX: true,
             ajax: {
                 processing: true,
-                url: "/api/people/?expand=village",
+                url: url,
                 type: "GET",
                 dataSrc: "",
             },
             "columns": [
-                {data: "full_name",
+                {data: "first_name",
                     fnCreatedCell: function(nTd, cellData, rowData, row, col) {
                         $(nTd).html("<a href='" + Urls.person(rowData.id) + "' target='_blank'>" + rowData.full_name + "</a>");
                     }

@@ -20849,7 +20849,7 @@ if (process.env.NODE_ENV !== 'production') {
  * Future:
  * - Restore document/overflow scroll positions that were unintentionally
  *   modified via DOM insertions above the top viewport boundary.
- * - Implement/integrate with customized constraint based layout system and keep
+ * - Implement/integrate with customized constraint based _layout system and keep
  *   track of which dimensions must be remeasured.
  *
  * @class ReactReconcileTransaction
@@ -22236,8 +22236,8 @@ var KeyboardEventInterface = {
     // `keyCode` is the result of a KeyDown/Up event and represents the value of
     // physical keyboard key.
 
-    // The actual meaning of the value depends on the users' keyboard layout
-    // which cannot be detected. Assuming that it is a US keyboard layout
+    // The actual meaning of the value depends on the users' keyboard _layout
+    // which cannot be detected. Assuming that it is a US keyboard _layout
     // provides a surprisingly accurate mapping for US and European users.
     // Due to this, it is left to the user to implement at this time.
     if (event.type === 'keydown' || event.type === 'keyup') {
@@ -22312,7 +22312,7 @@ var normalizeKey = {
 
 /**
  * Translation from legacy `keyCode` to HTML5 `key`
- * Only special keys supported, all others depend on keyboard layout or browser
+ * Only special keys supported, all others depend on keyboard _layout or browser
  * @see https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent#Key_names
  */
 var translateToKey = {
@@ -22380,7 +22380,7 @@ function getEventKey(nativeEvent) {
     return charCode === 13 ? 'Enter' : String.fromCharCode(charCode);
   }
   if (nativeEvent.type === 'keydown' || nativeEvent.type === 'keyup') {
-    // While user keyboard layout determines the actual meaning of each
+    // While user keyboard _layout determines the actual meaning of each
     // `keyCode` value, almost all function keys have a universal value.
     return translateToKey[nativeEvent.keyCode] || 'Unidentified';
   }
@@ -24135,7 +24135,7 @@ var RecordList = function (_React$Component) {
 
             console.log("Sending axios API request");
             console.log(this.state);
-            _axios2.default.get("/api/records").then(function (res) {
+            _axios2.default.get("/api/record").then(function (res) {
                 console.log("Received axios API request");
                 console.log(res.data);
                 _this2.setState({ records: res.data });

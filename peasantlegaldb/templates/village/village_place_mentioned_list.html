@@ -1,21 +1,23 @@
 {% extends '_layout/_l_single_col.html' %}
 
 {% block single_col %}
-    <h3 class="card-header text-center">Heriot List</h3>
+    <h3 class="card-header text-center">Case List</h3>
     <div class="card-body">
             <table class="table table-bordered table-hover" id="table" data-page-length="25">
                 <thead>
                     <th></th>
-                    <th>ID</th>
-                    <th>Animal</th>
-                    <th>Assessment</th>
-                    <th>Term</th>
+                    <th>Case</th>
+                    <th>Village</th>
+                    <th>Law Term</th>
                     <th>Year</th>
-                    <th>Court</th>
+                    <th>Court Type</th>
                     <th>Case Type</th>
-                    <th>Role</th>
                     <th>Verdict</th>
                     <th>Litigant Count</th>
+                    <th>Of Note</th>
+                    <th>Villein</th>
+                    <th>Active Sale</th>
+                    <th>Incidental Land</th>
                 </thead>
             </table>
     </div>
@@ -26,30 +28,26 @@
     {{ block.super }}
 
 <script>
-    // provides format for nested table that displays when + sign is clicked.
-    function format( data ) {
+
+ function format( data ){
         return "<table class='table'>" +
             "<tr>" +
-            "<td><b>Summary:</b></td>" +
-            "<td>"+data.case.summary+"</td>" +
+            "<td><b>Summary</b></td>" +
+            "<td>" + data.case.summary + "</td>" +
             "</tr>" +
-            "<tr>" +
-            "<td><b>Litigant List:</b></td>" +
-            "<td>" + list_litigants(data.case.litigant_list) + "</td>" +
-            "</tr>" +
-        "</table>"
+            "</table>"
+
     }
 
     $(document).ready(function () {
         var url = window.location.pathname;
-        var id = url.split('/').reverse()[1]
-        console.log(id)
-        var api_url = Urls.litigants_api() + "?person=" + id + "&heriot=true&expand=heriot&expand=role&expand=case__verdict&expand=case__case_type&expand=case__session__village&expand=heriot_animal";
+        var id = url.split('/').reverse()[1];
+        var api_url = Urls.place_mentioned_api() + "?village=" + id + "&expand=case&expand=case__case_type&expand=case__verdict&expand=case__session&expand=case__session__village";
         console.log(api_url);
         var table = $("#table").DataTable({
             fixedHeader:{ headerOffset: 50 },
             scrollX: true,
-            order: [4, "asc"],
+            order: [3, "asc"],
             ajax: {
                 url: api_url,
                 type: "GET",
@@ -58,8 +56,8 @@
             "columns": [
                 {
                     "class": "details-control",
-                    "orderable": false,
-                    "data": null,
+                    "orderable": "false",
+                    "data": 'case.summary',
                     "defaultContent": "",
                     "render": function(){
                         return '<i class="fa fa-plus-square" aria-hidden="true"></i>';
@@ -67,31 +65,35 @@
                     width:"15px"
                 },
                 {data: "case.id",
-                    fnCreatedCell: function(nTd, cellData, rowData, row, col){
-                        $(nTd).html("<a href='" + Urls.case(rowData.case.id) + "'target='_blank'>" + rowData.case.id + "</a>");
+                    fnCreatedCell: function(nTd, cellData, rowData, row, col) {
+                        url = Urls.case(rowData.case.id);
+                        $(nTd).html("<a href='"+ url +"' target='_blank'>" + rowData.case.id + "</a>");
                     }
                 },
-                {data: "heriot_animal",
-                    fnCreatedCell: function(nTd, cellData, rowData, row, col){
-                    $(nTd).html(rowData.heriot_quantity + " " + rowData.heriot_animal.name + "d.)")
-                    }
-                },
-                {data: "heriot.in_denarius",
-                    fnCreatedCell: function(nTd, cellData, rowData, row, col){
-                    $(nTd).html(rowData.heriot.amount + " (" + rowData.heriot.in_denarius + "d.)")
-                    }
-                },
+                {data: "case.session.village.name"},
                 {data: "case.session.law_term"},
                 {data: "case.session.date",
                     fnCreatedCell: function(nTd, cellData, rowData, row, col) {
-                        $(nTd).html(rowData.case.session.year);
+                        url = Urls.session(rowData.case.session.id);
+                        $(nTd).html("<a href='"+ url +"' target='_blank'>" + rowData.case.session.year + "</a>");
                     }
                 },
                 {data: "case.court_type"},
                 {data: "case.case_type.case_type"},
-                {data: "role.role"},
                 {data: "case.verdict.verdict"},
-                {data: "case.litigant_count"}
+                {data: "case.litigant_count"},
+                {data: "case.of_interest",
+                    fnCreatedCell: checkmaker
+                },
+                {data: "case.villeinage_mention",
+                fnCreatedCell: checkmaker
+            },
+                {data: "case.active_sale",
+                fnCreatedCell: checkmaker
+            },
+                {data: "case.incidental_land",
+                fnCreatedCell: checkmaker
+        },
             ]
         });
 
@@ -115,16 +117,13 @@
 
     });
 
-    function list_litigants(data){
-        var concat = '';
-        data.forEach(function (obj, index) {
-            concat = concat + '<div class="d-flex justify-content-end"><div class="mr-auto p-0"><u>Name:</u> ' + obj.name + '</div> <div class="p-0"><u>Role:</u> ' + obj.role + '</div></div><hr>';
-            return concat;
-            });
-        return concat;
-
-    };
-
+function checkmaker(nTd, cellData, rowData, row, col) {
+    if (cellData === true){
+        $(nTd).html("<i class='fa fa-check' style='color:forestgreen'></i>")
+    } else {
+        $(nTd).html("")
+    }
+}
 
 
 </script>

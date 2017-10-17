@@ -1,19 +1,21 @@
 {% extends '_layout/_l_single_col.html' %}
 
 {% block single_col %}
-    <h3 class="card-header text-center">Case List</h3>
+    <h3 class="card-header text-center">Litigant List</h3>
     <div class="card-body">
             <table class="table table-bordered table-hover" id="table" data-page-length="25">
                 <thead>
                     <th></th>
-                    <th>ID</th>
-                    <th>Term</th>
-                    <th>Year</th>
-                    <th>Court</th>
-                    <th>Case Type</th>
-                    <th>Role</th>
-                    <th>Verdict</th>
-                    <th>Litigant Count</th>
+                    <th>Name</th>
+                    <th>Status</th>
+                    <th>Gender</th>
+                    <th>1332 Tax</th>
+                    <th>1379 Tax</th>
+                    <th>Case Count</th>
+                    <th>Earliest Case</th>
+                    <th>Latest Case</th>
+                    <th>Pledges Given</th>
+                    <th>Pledges Received</th>
                 </thead>
             </table>
     </div>
@@ -24,30 +26,26 @@
     {{ block.super }}
 
 <script>
-    // provides format for nested table that displays when + sign is clicked.
-    function format( data ) {
+
+ function format( data ){
         return "<table class='table'>" +
             "<tr>" +
-            "<td><b>Summary:</b></td>" +
-            "<td>"+data.case.summary+"</td>" +
+            "<td><b>Notes</b></td>" +
+            "<td>" + data.person.notes + "</td>" +
             "</tr>" +
-            "<tr>" +
-            "<td><b>Litigant List:</b></td>" +
-            "<td>" + list_litigants(data.case.litigant_list) + "</td>" +
-            "</tr>" +
-        "</table>"
+            "</table>"
+
     }
 
     $(document).ready(function () {
         var url = window.location.pathname;
-        var id = url.split('/').reverse()[1]
-        console.log(id)
-        var api_url = Urls.litigants_api() + "?person=" + id + "&expand=case__case_type&expand=role&expand=case__verdict&expand=case__session";
+        var id = url.split('/').reverse()[1];
+        var api_url = Urls.person_api() + "?village_to_litigant=" + id + "&distinct=true";
         console.log(api_url);
         var table = $("#table").DataTable({
             fixedHeader:{ headerOffset: 50 },
             scrollX: true,
-            order: [3, "asc"],
+            order: [1, "asc"],
             ajax: {
                 url: api_url,
                 type: "GET",
@@ -56,28 +54,29 @@
             "columns": [
                 {
                     "class": "details-control",
-                    "orderable": false,
-                    "data": "case.summary",
+                    "orderable": "false",
+                    "data": null,
                     "defaultContent": "",
-                    "render": checkNotes,
+                    "render": function(){
+                        return '<i class="fa fa-plus-square" aria-hidden="true"></i>';
+                    },
                     width:"15px"
                 },
-                {data: "case.id",
-                    fnCreatedCell: function(nTd, cellData, rowData, row, col){
-                        $(nTd).html("<a href='" + Urls.case(rowData.case.id) + "'target='_blank'>" + rowData.case.id + "</a>");
-                    }
-                },
-                {data: "case.session.law_term"},
-                {data: "case.session.date",
+                {data: "full_name",
                     fnCreatedCell: function(nTd, cellData, rowData, row, col) {
-                        $(nTd).html(rowData.case.session.year);
+                        url = Urls.person(rowData.id);
+                        $(nTd).html("<a href='"+ url +"' target='_blank'>" + rowData.full_name + "</a>");
                     }
                 },
-                {data: "case.court_type"},
-                {data: "case.case_type.case_type"},
-                {data: "role.role"},
-                {data: "case.verdict.verdict"},
-                {data: "case.litigant_count"}
+                {data: "status"},
+                {data: "gender"},
+                {data: "tax_1332"},
+                {data: "tax_1379"},
+                {data: "case_count_all"},
+                {data: "earliest_case"},
+                {data: "latest_case"},
+                {data: "pledges_given_count"},
+                {data: "pledges_received_count"},
             ]
         });
 
@@ -100,6 +99,7 @@
         });
 
     });
+
 </script>
 
 

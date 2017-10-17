@@ -1,4 +1,4 @@
-{% extends 'layout/_l_single_col.html' %}
+{% extends '_layout/_l_single_col.html' %}
 
 {% block single_col %}
     <h3 class="card-header text-center">Chevage List</h3>
@@ -7,18 +7,13 @@
                 <thead>
                     <th></th>
                     <th>ID</th>
+                    <th>Term</th>
+                    <th>Year</th>
                     <th>Chevage</th>
                     <th>Notes</th>
                     <th>Recessit</th>
                     <th>Crossed</th>
                     <th>Habet Terram</th>
-                    <th>Term</th>
-                    <th>Year</th>
-                    <th>Court</th>
-                    <th>Case Type</th>
-                    <th>Role</th>
-                    <th>Verdict</th>
-                    <th>Litigant Count</th>
                 </thead>
             </table>
     </div>
@@ -33,12 +28,14 @@
     function format( data ) {
         return "<table class='table'>" +
             "<tr>" +
+            "<td><b>Litigant Count:</b></td>" +
+            "<td>" + data.case.litigant_count + "</td>" +
             "<td><b>Summary:</b></td>" +
             "<td>"+data.case.summary+"</td>" +
             "</tr>" +
             "<tr>" +
             "<td><b>Litigant List:</b></td>" +
-            "<td>" + list_litigants(data.case.litigant_list) + "</td>" +
+            "<td colspan='3'>" + list_litigants(data.case.litigant_list) + "</td>" +
             "</tr>" +
         "</table>"
     }
@@ -50,9 +47,9 @@
         var api_url = Urls.litigants_api() + "?person=" + id + "&chevage=true&expand=chevage&expand=role&expand=case__verdict&expand=case__case_type&expand=case__session__village";
         console.log(api_url);
         var table = $("#table").DataTable({
-            fixedHeader: true,
+            fixedHeader:{ headerOffset: 50 },
             scrollX: true,
-            order: [4, "asc"],
+            order: [3, "asc"],
             ajax: {
                 url: api_url,
                 type: "GET",
@@ -74,7 +71,13 @@
                         $(nTd).html("<a href='" + Urls.case(rowData.case.id) + "'target='_blank'>" + rowData.case.id + "</a>");
                     }
                 },
-                {data: "chevage.amount",
+                {data: "case.session.law_term"},
+                {data: "case.session.date",
+                    fnCreatedCell: function(nTd, cellData, rowData, row, col) {
+                        $(nTd).html(rowData.case.session.year);
+                    }
+                },
+                {data: "chevage.in_denarius",
                     fnCreatedCell: function(nTd, cellData, rowData, row, col){
                     $(nTd).html(rowData.chevage.amount + " (" + rowData.chevage.in_denarius + "d.)")
                     }
@@ -107,13 +110,6 @@
                         }
                     }
                 },
-                {data: "case.session.law_term"},
-                {data: "case.session.year"},
-                {data: "case.court_type"},
-                {data: "case.case_type.case_type"},
-                {data: "role.role"},
-                {data: "case.verdict.verdict"},
-                {data: "case.litigant_count"}
             ]
         });
 

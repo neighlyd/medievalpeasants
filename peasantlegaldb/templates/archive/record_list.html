@@ -1,0 +1,80 @@
+{% extends '_layout/_l_single_col.html' %}
+
+{% block single_col %}
+    <h3 class="card-header text-center">Record List</h3>
+    <div class="card-body">
+            <table class="table table-bordered table-hover" id="table" data-page-length="25">
+                <thead>
+                    <th>Name</th>
+                    <th>Record Type</th>
+                    <th>Reel</th>
+                    <th>Earliest Session</th>
+                    <th>Latest Session</th>
+                    <th>Notes</th>
+                </thead>
+            </table>
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+    {{ block.super }}
+
+<script>
+
+
+    $(document).ready(function () {
+        var url = window.location.pathname;
+        var id = url.split('/').reverse()[1]
+        console.log(id)
+        var api_url = Urls.record_api() + "?archive=" + id + "&expand=session_set&expand=earliest_session&expand=latest_session";
+        console.log(api_url);
+        var table = $("#table").DataTable({
+            fixedHeader:{                headerOffset: 50            },
+            scrollX: true,
+            order: [4, "asc"],
+            ajax: {
+                url: api_url,
+                type: "GET",
+                dataSrc: "",
+            },
+            "columns": [
+                {data: "name",
+                    fnCreatedCell: function(nTd, cellData, rowData, row, col) {
+                        url = Urls.record(rowData.id);
+                        $(nTd).html("<a href='"+ url +"' target='_blank'>" + rowData.name + "</a>");
+                    }
+                },
+                {data: "record_type"},
+                {data: "reel"},
+                {data: "earliest_session",
+                    fnCreatedCell: function(nTd, cellData, rowData, row, col) {
+                        if (rowData.earliest_session){
+                            $(nTd).html( rowData.earliest_session.village.name +" " + rowData.earliest_session.law_term + ", " + rowData.earliest_session.year);
+                        } else {
+                            $(nTd).html( "None");
+                            
+                        }
+                    }
+                },
+                {data: "latest_session",
+                    fnCreatedCell: function(nTd, cellData, rowData, row, col) {
+                        if (rowData.latest_session) {
+                            $(nTd).html( rowData.latest_session.village.name +" " + rowData.latest_session.law_term + ", " + rowData.latest_session.year);
+                        } else {
+                            $(nTd).html( "None");
+
+                        }
+                    }
+                },
+                {data: "notes"},
+            ]
+        });
+
+    });
+
+
+</script>
+
+
+{% endblock %}

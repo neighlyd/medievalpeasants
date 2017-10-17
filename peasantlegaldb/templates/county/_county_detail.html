@@ -1,0 +1,187 @@
+{% extends '_layout/_l_three_col.html' %}
+
+{% block navbar %}
+    {% include '_layout/__navbar.html' %}
+{% endblock %}
+
+{% block left_sidebar %}
+    <div id="selection_list">
+        <a class="list-group-item list-group-item-action" href="{% url 'county_village_list' county.id %}">Villages</a>
+        <a class="list-group-item list-group-item-action" href="{% url 'county_case_list' county.id %}">Cases</a>
+        <a class="list-group-item list-group-item-action" href="{% url 'county_resident_list' county.id %}">Known Residents</a>
+        <a class="list-group-item list-group-item-action" href="{% url 'county_litigant_list' county.id %}">Litigants</a>
+        <a class="list-group-item list-group-item-action" href="{% url 'county_hundred_list' county.id %}">Hundreds</a>
+    </div>
+{% endblock %}
+
+{% block center_bar %}
+
+<div class="card-header text-center">
+    <h2 class="card-title" id="county_name">{{ county.name }} </h2>
+</div>
+
+<div class="card-body clearfix" id="main_info">
+    <div class="d-flex justify-content-between flex-wrap">
+        <div class="card p-0 col-12">
+            <h3 class="card-header">Map:</h3>
+
+            <div class="card-body">
+                <div id="map"></div>
+                <footer class="blockquote-footer text-right">Historical maps from <cite title="NLS Maps API"><a href="http://maps.nls.uk/projects/api/">NLS Maps API</a></cite></footer>
+            </div>
+        </div>
+    </div>
+</div>
+
+<br>
+
+<div id="list_info">
+
+</div>
+
+{% endblock %}
+
+{% block right_sidebar %}
+    <button type="button" class="btn btn-secondary float-sm-right">Edit Village</button>
+{% endblock %}
+
+{% block scripts %}
+
+    <script type="text/javascript" src="http://nls.tileserver.com/api.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB51yaYfTmJNUIlZCpIr0HU4m11Hmd7Y9E"></script>
+    {{ block.super }}
+
+    <script>
+    // for information on Ordnance Survey API: http://maps.nls.uk/projects/api/
+
+      // In this example, we center the map, and add a marker, using a LatLng object
+      // literal instead of a google.maps.LatLng object. LatLng object literals are
+      // a convenient way to add a LatLng coordinate and, in most cases, can be used
+      // in place of a google.maps.LatLng object.
+      // https://developers.google.com/maps/documentation/javascript/examples/map-latlng-literal
+        var map;
+
+        var nlsmap = new google.maps.ImageMapType({
+		getTileUrl:function(tile,zoom) {
+		return NLSTileUrlOS(tile.x,tile.y,zoom);
+		},
+	        tileSize:new google.maps.Size(256,256),
+	        isPng:false
+        });
+
+        function initialize(){
+            // get lat and lng from API, since accessing django models through JS is not possible (that I'm aware).
+            var url = window.location.pathname;
+            var id = url.split('/').reverse()[1];
+            var api_url = Urls.village_api() + "?county=" + id + "&expand=counts";
+
+            var locationObject = $.ajax({
+                url: api_url,
+                type: "GET",
+                async: false,
+                dataType: '',
+            }).responseJSON;
+
+            var countyName = $("#county_name").text();
+
+            var county_api_url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + countyName + "&key=AIzaSyB51yaYfTmJNUIlZCpIr0HU4m11Hmd7Y9E"
+
+            var countyLocation = $.ajax({
+                url: county_api_url,
+                type: "GET",
+                async: false,
+                dataType: '',
+            }).responseJSON;
+
+
+            // use .map to iterate through array of objects returned by API and map key-value pairs to variable. Because
+            // the Latitude and Longitude are stored as strings, convert them to floats which the Google API can read as
+            // appropriate coordinates. Also grab the village name for the label.
+            var locationArray = locationObject.map(f => [f.name, parseFloat(f.latitude), parseFloat(f.longitude), f.counts.session, f.counts.case, f.counts.resident, f.counts.litigant, ] );
+            var county_results = countyLocation.results;
+
+            var countyLat = county_results.map(f => f.geometry.location.lat);
+            var countyLng = county_results.map(f => f.geometry.location.lng);
+
+            countyLat = parseFloat(countyLat);
+            countyLng = parseFloat(countyLng)
+
+            console.log("lat: " + countyLat + " & long: " + countyLng);
+
+            var mapOptions = {
+                zoom: 9,
+                center: {lat: countyLat, lng: countyLng}
+            };
+
+            map = new google.maps.Map(document.getElementById('map'),
+                mapOptions);
+
+            map.overlayMapTypes.insertAt(0, nlsmap);
+
+            var infoWindow = new google.maps.InfoWindow();
+
+            var marker, i;
+
+            for(i = 0; i < locationArray.length; i++){
+                marker = new google.maps.Marker({
+                    position: new google.maps.LatLng(locationArray[i][1], locationArray[i][2]),
+                    map: map
+                });
+
+                // attempted to create a variable and assign html to it for setContent; however, this would only work for the first iteration of i for some reason.
+                google.maps.event.addListener(marker, 'click', (function(marker, i) {
+                    return function() {
+                        infoWindow.setContent(
+                            "<div class='container'>" +
+                                "<div class='card'>" +
+                                    "<h6 class='card-header'>" + locationArray[i][0] + "</h6>" +
+                                    "<div class='card-body'> " +
+                                        "<table class='table table-sm' style='width: 200px'>" +
+                                            "<tr class='row m-0>" +
+                                                "<td class='d-inline-block col-8'></td>" +
+                                            "</tr>" +
+                                            "<tr>" + // For some reason this first row is showing up as the header of the table. I hate computers.
+                                                "<td class='d-inline-block col-8'><b>Sessions:</b></td>" +
+                                                "<td class='d-inline-block col-4'>" + locationArray[i][3] + "<td>" +
+                                            "</tr>" +
+                                            "<tr>" +
+                                                "<td class='d-inline-block col-8'><b>Cases:</b></td>" +
+                                                "<td class='d-inline-block col-4'>" + locationArray[i][4] + "<td>" +
+                                            "</tr>" +
+                                            "<tr>" +
+                                                "<td class='d-inline-block col-8'><b>Residents:</b></td>" +
+                                                "<td class='d-inline-block col-4'>" + locationArray[i][5] + "<td>" +
+                                            "</tr>" +
+                                            "<tr>" +
+                                                "<td class='d-inline-block col-8'><b>Litigants:</b></td>" +
+                                                "<td class='d-inline-block col-4'>" + locationArray[i][6] + "<td>" +
+                                            "</tr>" +
+                                        "</table>" +
+                                    "</div>" +
+                                "</div>" +
+                            "</div>"
+                        );
+                        infoWindow.open(map, marker);
+                    }
+                })(marker, i));
+
+            }
+
+
+
+        }
+
+        google.maps.event.addDomListener(window, 'load', initialize);
+    </script>
+
+
+    <!--
+    <script>
+        $(document).ready(function(){
+             var url = window.location.pathname;
+            var id = url.split('/').reverse()[1]
+            $("#list_info").load(Urls.session_case_list(id))
+        })
+    </script>
+    -->
+{% endblock %}

@@ -1,0 +1,115 @@
+{% extends '_layout/_l_single_col.html' %}
+
+{% block single_col %}
+    <h3 class="card-header text-center">Places Mentioned List</h3>
+    <div class="card-body">
+            <table class="table table-bordered table-hover" id="table" data-page-length="25">
+                <thead>
+                    <th>Notes</th>
+                    <th>Village</th>
+                    <th>Hundred</th>
+                    <th>Great Rumor</th>
+                    <th>Ancient Demesne</th>
+                    <th>Sessions</th>
+                    <th>Cases</th>
+                    <th>Residents</th>
+                    <th>Litigants</th>
+                </thead>
+            </table>
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+    {{ block.super }}
+
+<script>
+
+
+        function format( data ){
+            return "<table class='table'>" +
+                "<tr>" +
+                "<td><b>Notes</b></td>" +
+                "<td>" + data.village.notes + "</td>" +
+                "</tr>" +
+                "</table>"
+        }
+
+
+    $(document).ready(function () {
+        var url = window.location.pathname;
+        var id = url.split('/').reverse()[1];
+        var api_url = Urls.place_mentioned_api() + "?case=" + id + "&expand=village&expand=village__counts&expand=village__hundred";
+        console.log(api_url);
+        var table = $("#table").DataTable({
+            fixedHeader:{
+                headerOffset: 50
+            },
+            scrollX: true,
+            order: [1, "asc"],
+            ajax: {
+                url: api_url,
+                type: "GET",
+                dataSrc: "",
+            },
+            "columns": [
+                {
+                    "class": "details-control",
+                    "orderable": "false",
+                    "data": "village.notes",
+                    "defaultContent": "",
+                    "render": checkNotes,
+                    width:"15px"
+                },
+                {data: "village.name",
+                    fnCreatedCell: function(nTd, cellData, rowData, row, col) {
+                        url = Urls.village(rowData.village.id);
+                        $(nTd).html("<a href='"+ url +"' target='_blank'>" + rowData.village.name + "</a>");
+                    }
+                },
+                {data: "village.id",
+                    fnCreatedCell: function(nTd, cellData, rowData, row, col){
+                        if (rowData.village.hundred_id){
+                            url = Urls.hundred(rowData.village.hundred_id);
+                            $(nTd).html("<a href='"+ url + "' target='_blank'>" + rowData.village.hundred.name + "</a>");
+                        } else {
+                            $(nTd).html("N/A")
+                        }
+                    }
+                },
+                {data: "village.great_rumor",
+                    fnCreatedCell: checkmaker
+                },
+                {data: "village.ancient_demesne",
+                    fnCreatedCell: checkmaker
+                },
+                {data: "village.counts.session"},
+                {data: "village.counts.case"},
+                {data: "village.counts.resident"},
+                {data: "village.counts.litigant"},
+            ]
+        });
+
+        $('#table tbody').on('click', 'td.details-control', function(){
+            var tr = $(this).closest('tr');
+            var tdi = tr.find("i.fa");
+            var row = table.row( tr );
+
+            if ( row.child.isShown() ) {
+                row.child.hide();
+                tr.removeClass('shown');
+                tdi.first().removeClass('fa-minus-square');
+                tdi.first().addClass('fa-plus-square');
+            } else{
+                row.child( format( row.data() ) ).show();
+                tr.addClass('shown');
+                tdi.first().removeClass('fa-plus-square');
+                tdi.first().addClass('fa-minus-square');
+            }
+        });
+
+    });
+
+</script>
+
+{% endblock %}

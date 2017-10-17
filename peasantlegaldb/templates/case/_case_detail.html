@@ -1,16 +1,29 @@
-{% extends 'layout/_l_three_col.html' %}
+{% extends '_layout/_l_three_col.html' %}
 
 {% block navbar %}
-    {% include 'layout/__navbar.html' %}
+    {% include '_layout/__navbar.html' %}
 {% endblock %}
 
 {% block left_sidebar %}
     <div id="selection_list">
-        <a class="list-group-item list-group-item-action active" href="{% url 'case_litigants' case.id %}">Show Litigants</a>
-        <a class="list-group-item list-group-item-action" href="{% url 'case_land' case.id %}">Show Land</a>
-        <a class="list-group-item list-group-item-action" href="">Show Extrahura</a>
-        <a class="list-group-item list-group-item-action" href="">Show Cornbot</a>
-        <a class="list-group-item list-group-item-action" href="">Show Murrain</a>
+    {% if case.litigant_exist %}
+        <a class="list-group-item list-group-item-action" href="{% url 'case_litigant_list' case.id %}">Show Litigants</a>
+    {% endif %}
+    {% if case.land_exist %}
+        <a class="list-group-item list-group-item-action" href="{% url 'case_land_list' case.id %}">Show Land</a>
+    {% endif %}
+    {% if case.extrahura_exist %}
+        <a class="list-group-item list-group-item-action" href="{% url 'case_extrahura_list' case.id %}">Show Extrahura</a>
+    {% endif %}
+    {% if case.cornbot_exist %}
+        <a class="list-group-item list-group-item-action" href="{% url 'case_cornbot_list' case.id %}">Show Cornbot</a>
+    {% endif %}
+    {% if case.murrain_exist %}
+        <a class="list-group-item list-group-item-action" href="{% url 'case_murrain_list' case.id %}">Show Murrain</a>
+    {% endif %}
+    {% if case.mentioned_exists %}
+        <a class="list-group-item list-group-item-action" href="{% url 'case_place_mentioned_list' case.id %}">Show Places Mentioned</a>
+    {% endif %}
     </div>
 {% endblock %}
 
@@ -124,17 +137,9 @@
 {% endblock %}
 
 {% block right_sidebar %}
-    <button type="button" class="btn btn-secondary float-sm-right">Edit Person</button>
+    <button type="button" class="btn btn-secondary float-sm-right">Edit Case</button>
 {% endblock %}
 
 {% block scripts %}
     {{ block.super }}
-
-<script>
-    $(document).ready(function(){
-         var url = window.location.pathname;
-        var id = url.split('/').reverse()[1]
-        $("#list_info").load(Urls.case_litigants(id))
-    })
-</script>
 {% endblock %}

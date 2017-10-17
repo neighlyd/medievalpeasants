@@ -1,4 +1,4 @@
-{% extends 'layout/_l_single_col.html' %}
+{% extends '_layout/_l_single_col.html' %}
 
 {% block single_col %}
 <div class="card">
@@ -73,7 +73,7 @@
     $(document).ready(function() {
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1];
-        var url = Urls.litigants_api() + "?land=" + id + "&expand=person__village&expand=case__session&expand=role&expand=case__case_type&expand=land&expand=case__verdict&expand=fine&expand=heriot";
+        var url = Urls.litigants_api() + "?land=" + id + "&expand=person__village&expand=case__session&expand=role&expand=case__case_type&expand=land&expand=case__verdict&expand=fine&expand=heriot&expand=person__case_info";
         var table = $('#tenant_history').DataTable({
             scrollX: true,
             ajax: {

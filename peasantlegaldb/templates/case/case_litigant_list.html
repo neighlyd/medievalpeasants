@@ -1,4 +1,4 @@
-{% extends 'layout/_l_single_col.html' %}
+{% extends '_layout/_l_single_col.html' %}
 
 {% block single_col %}
     <h3 class="card-header text-center">Litigant List</h3>
@@ -72,9 +72,10 @@
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1];
         console.log(id);
-        var url = Urls.litigants_api() +"/?case=" + id + "&expand=person__village&expand=role";
+        var url = Urls.litigants_api() +"/?case=" + id + "&expand=person__village&expand=role&expand=person__case_info";
         console.log(url);
         var table = $('#table').DataTable({
+            order:[1, "asc"],
             scrollX: true,
             fixedHeader:{
               headerOffset: 50
@@ -89,16 +90,15 @@
                 {
                     "class": "details-control",
                     "orderable": "false",
-                    "data": null,
+                    "data": "person",
                     "defaultContent": "",
-                    "render": function(){
-                        return '<i class="fa fa-plus-square" aria-hidden="true"></i>';
-                    },
+                    "render": checkNotes,
                     width:"15px"
                 },
-                {data: "person.full_name",
+                {data: "person.first_name",
                     fnCreatedCell: function(nTd, cellData, rowData, row, col) {
-                        $(nTd).html("<a href='/person/"+ rowData.person.id +"' target='_blank'>" + rowData.person.full_name + "</a>");
+                        url = Urls.person(rowData.person.id);
+                        $(nTd).html("<a href='"+ url +"' target='_blank'>" + rowData.person.full_name + "</a>");
                     }
                 },
                 {data: "role.role"},
@@ -159,13 +159,7 @@ function check_maker(nTd, cellData, rowData, row, col){
     }
 }
 
- function replace_money (nTd, cellData, rowData, row, col) {
-    if (cellData) {
-        $(nTd).html("<p class='text-center'>" + cellData.in_denarius + "d. </p>")
-    } else {
-        $(nTd).html("<p class='text-center'> -- </p>")
-    }
-}
+
 
 </script>
 {% endblock %}

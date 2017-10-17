@@ -1,4 +1,4 @@
-{% extends 'layout/_l_single_col.html' %}
+{% extends '_layout/_l_single_col.html' %}
 
 {% block single_col %}
 
@@ -98,7 +98,11 @@
                     }
                 },
                 {data: "case.session.law_term"},
-                {data: "case.session.year"},
+                {data: "case.session.date",
+                    fnCreatedCell: function(nTd, cellData, rowData, row, col) {
+                        $(nTd).html(rowData.case.session.year);
+                    }
+                },
                 {data: "case.court_type"},
                 {data: "case.case_type.case_type"},
                 {data: "case.verdict.verdict"},
@@ -125,7 +129,7 @@
         });
 
         var table2 = $("#pledges_received_list").DataTable({
-            fixedHeader: true,
+            fixedHeader:{ headerOffset: 50 },
             scrollX: true,
             order: [6, "asc"],
             ajax: {
@@ -153,7 +157,11 @@
                     }
                 },
                 {data: "case.session.law_term"},
-                {data: "case.session.year"},
+                {data: "case.session.date",
+                    fnCreatedCell: function(nTd, cellData, rowData, row, col) {
+                        $(nTd).html(rowData.case.session.year);
+                    }
+                },
                 {data: "case.court_type"},
                 {data: "case.case_type.case_type"},
                 {data: "case.verdict.verdict"},

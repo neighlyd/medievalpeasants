@@ -1,3 +1,5 @@
+from django.db.models import Count, Max, Min, Avg, Sum
+
 from rest_framework import serializers
 from rest_framework_serializer_extensions.serializers import SerializerExtensionsMixin
 from peasantlegaldb import models
@@ -71,24 +73,75 @@ class CaseTypeSerializer(SerializerExtensionsMixin, serializers.ModelSerializer)
 
 class ArchiveSerializer(SerializerExtensionsMixin, serializers.ModelSerializer):
 
+    record_count = serializers.ReadOnlyField()
+
     class Meta:
         model = models.Archive
-        fields = ('id', 'name', 'website', 'notes')
+        fields = ('id', 'name', 'website', 'notes', 'record_count')
+
+
+class SessionsForRecordsSerializer(SerializerExtensionsMixin, serializers.ModelSerializer):
+
+    law_term = serializers.SerializerMethodField()
+    year = serializers.SerializerMethodField()
+
+    class Meta:
+        model = models.Session
+        fields = ('id', 'date', 'folio', 'notes', 'law_term', 'year', 'village')
+        depth = 2
+
+    def get_law_term(self, obj):
+        return obj.get_law_term_display()
+
+    def get_year(self, obj):
+        return obj.date.year
 
 
 class RecordSerializer(SerializerExtensionsMixin, serializers.ModelSerializer):
 
     record_type = serializers.SerializerMethodField()
+    date_range = serializers.ReadOnlyField()
 
     class Meta:
         model = models.Record
-        fields = ('id', 'name', 'record_type', 'reel', 'notes')
+        fields = ('id', 'name', 'record_type', 'reel', 'notes', 'date_range',)
         expandable_fields = dict(
             archive=ArchiveSerializer,
+            session_set = dict(
+                serializer = SessionsForRecordsSerializer,
+                many = True,
+                id_source = 'record_id'
+            ),
+            earliest_session=serializers.SerializerMethodField,
+            latest_session=serializers.SerializerMethodField,
         )
+
+    def get_earliest_session(self, record):
+        try:
+            earliest_session = record.session_set.filter(date__isnull=False).earliest('date')
+            return self.represent_child(
+                name='earliest',
+                serializer=SessionsForRecordsSerializer,
+                instance=earliest_session
+            )
+        except:
+            return None
+
+    def get_latest_session(self, record):
+        try:
+            latest_session = record.session_set.filter(date__isnull=False).latest('date')
+            return self.represent_child(
+                name='latest',
+                serializer=SessionsForRecordsSerializer,
+                instance=latest_session
+            )
+        except:
+            return None
+
 
     def get_record_type(self, obj):
         return obj.get_record_type_display()
+
 
 
 class CountySerializer(SerializerExtensionsMixin, serializers.ModelSerializer):
@@ -96,6 +149,21 @@ class CountySerializer(SerializerExtensionsMixin, serializers.ModelSerializer):
     class Meta:
         model = models.County
         fields = ('id', 'name', 'abbreviation')
+        expandable_fields = dict(
+            counts=serializers.SerializerMethodField,
+        )
+
+    def get_counts(self, obj):
+        counts={}
+        counts['hundred']=obj.hundred_set.count()
+        counts['village']=obj.village_set.count()
+        counts['great_rumor']=obj.village_set.filter(great_rumor=True).count()
+        counts['ancient_demesne']=obj.village_set.filter(ancient_demesne=True).count()
+        counts['session']=models.Session.objects.all().filter(village__county_id=obj.id).distinct().count()
+        counts['case']=models.Case.objects.all().filter(session__village__county_id=obj.id).distinct().count()
+        counts['resident']=models.Person.objects.all().filter(village__county_id=obj.id).distinct().count()
+        counts['litigant']=len(set(models.Litigant.objects.all().filter(case__session__village__county_id=obj.id).values_list('person', flat=True)))
+        return counts
 
 
 class HundredSerializer(SerializerExtensionsMixin, serializers.ModelSerializer):
@@ -105,7 +173,13 @@ class HundredSerializer(SerializerExtensionsMixin, serializers.ModelSerializer):
         fields = ('id', 'name')
         expandable_fields = dict(
             county=CountySerializer,
+            counts=serializers.SerializerMethodField,
         )
+
+    def get_counts(self, obj):
+        counts={}
+        counts['village']=obj.village_set.count()
+        return counts
 
 
 class VillageSerializer(SerializerExtensionsMixin, serializers.ModelSerializer):
@@ -116,27 +190,45 @@ class VillageSerializer(SerializerExtensionsMixin, serializers.ModelSerializer):
         expandable_fields = dict(
             hundred=HundredSerializer,
             county=CountySerializer,
+            counts=serializers.SerializerMethodField,
         )
+
+    # Because SerializerExtensionsMixin doesn't serialize ReadOnlyFields (i.e. calculated fields in models, but only in
+    # serializers themselves, enabling the calculation to occur in both serializer and model requires breaking DRY. To
+    # get around this would either require calculating the field every time the serializer is called (way too many db
+    # hits for something as common as models.Village and models.Case), or simply just having the calculation in both
+    # model and serializer as I have chosen here. There HAS to be a better way, but short of adding a
+    # serializers.SerializerReadOnlyField definition to the SerializersExtensionMixin, I can't think of one.
+    def get_counts(self, obj):
+        counts={}
+        counts['case']=models.Case.objects.all().filter(session__village_id=obj.id).distinct().count()
+        counts['resident']=obj.person_set.filter(village=obj).distinct().count()
+        counts['litigant']=len(set(models.Litigant.objects.all().filter(case__session__village_id=obj.id).values_list('person', flat=True)))
+        counts['session']=obj.session_set.count()
+
+        return counts
+
 
 
 class SessionSerializer(SerializerExtensionsMixin, serializers.ModelSerializer):
 
     law_term = serializers.SerializerMethodField()
-    year = serializers.SerializerMethodField()
+    year = serializers.ReadOnlyField()
+    case_count = serializers.ReadOnlyField()
+    human_date = serializers.ReadOnlyField()
 
     class Meta:
         model = models.Session
-        fields = ('id', 'date', 'folio', 'notes', 'law_term', 'year')
+        fields = ('id', 'date', 'folio', 'notes', 'law_term', 'year', 'case_count', 'human_date')
         expandable_fields = dict(
             village=VillageSerializer,
             record=RecordSerializer,
         )
 
+
+
     def get_law_term(self, obj):
         return obj.get_law_term_display()
-
-    def get_year(self, obj):
-        return obj.date.year
 
 
 class LandSerializer(SerializerExtensionsMixin, serializers.ModelSerializer):
@@ -164,15 +256,15 @@ class PersonSerializer(SerializerExtensionsMixin, serializers.ModelSerializer):
     latest_case = serializers.ReadOnlyField()
     pledges_given_count = serializers.ReadOnlyField()
     pledges_received_count = serializers.ReadOnlyField()
-    case_info = serializers.ReadOnlyField()
 
     class Meta:
         model = models.Person
         fields = ('id', 'first_name', 'relation_name', 'last_name', 'status', 'gender', 'tax_1332', 'tax_1379', 'notes',
                   'full_name', 'case_count_litigation', 'case_count_all', 'earliest_case', 'latest_case',
-                  'pledges_given_count', 'pledges_received_count', 'case_info')
+                  'pledges_given_count', 'pledges_received_count',)
         expandable_fields = dict(
             village=VillageSerializer,
+            case_info=serializers.SerializerMethodField
         )
 
     def get_gender(self, obj):
@@ -180,6 +272,21 @@ class PersonSerializer(SerializerExtensionsMixin, serializers.ModelSerializer):
 
     def get_status(self, obj):
         return obj.get_status_display()
+
+    def get_case_info(self, obj):
+        return obj.person_to_case.aggregate(Count('amercement'), Max('amercement__in_denarius'),
+                                             Min('amercement__in_denarius'), Avg('amercement__in_denarius'),
+                                             Sum('amercement__in_denarius'), Count('fine'), Max('fine__in_denarius'),
+                                             Min('fine__in_denarius'), Avg('fine__in_denarius'),
+                                             Sum('fine__in_denarius'), Count('damage'), Max('damage__in_denarius'),
+                                             Min('damage__in_denarius'), Avg('damage__in_denarius'),
+                                             Sum('damage__in_denarius'), Count('chevage'), Max('chevage__in_denarius'),
+                                             Min('chevage__in_denarius'), Avg('chevage__in_denarius'),
+                                             Sum('chevage__in_denarius'), Count('heriot'), Max('heriot__in_denarius'),
+                                             Min('heriot__in_denarius'), Avg('heriot__in_denarius'),
+                                             Sum('heriot__in_denarius'), Count('impercamentum'),
+                                             Max('impercamentum__in_denarius'), Min('impercamentum__in_denarius'),
+                                             Avg('impercamentum__in_denarius'), Sum('impercamentum__in_denarius'), )
 
 
 class CaseSerializer(SerializerExtensionsMixin, serializers.ModelSerializer):
@@ -237,19 +344,6 @@ class LitigantSerializer(SerializerExtensionsMixin, serializers.ModelSerializer)
             impercamentum=MoneySerializer,
             impercamentum_animal=ChattelSerializer,
             land=LandSerializer,
-        )
-
-
-class CasePeopleLandSerializer(SerializerExtensionsMixin, serializers.ModelSerializer):
-
-    class Meta:
-        model = models.CasePeopleLand
-        fields = ('id', 'villeinage', 'notes', 'person', 'case', 'land', 'role')
-        expandable_fields = dict(
-            person=PersonSerializer,
-            case=CaseSerializer,
-            land=LandSerializer,
-            role=RoleSerializer
         )
 
 

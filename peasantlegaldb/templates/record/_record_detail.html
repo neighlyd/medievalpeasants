@@ -1,0 +1,94 @@
+{% extends '_layout/_l_three_col.html' %}
+
+{% block navbar %}
+    {% include '_layout/__navbar.html' %}
+{% endblock %}
+
+{% block left_sidebar %}
+    <div id="selection_list">
+        <a class="list-group-item list-group-item-action active" href="{% url 'record_session_list' record.id %}">Sessions</a>
+    </div>
+{% endblock %}
+
+{% block center_bar %}
+
+<div class="card-header text-center">
+    <h2 class="card-title">Record - {{ record.name }}</h2>
+</div>
+
+<div class="card-body clearfix" id="main_info">
+    <div class="d-flex justify-content-between flex-wrap">
+
+                    <div class="card p-0 col-5">
+                        <h3 class="card-header">Info:</h3>
+                        <div class="card-body">
+                            <table class="table table-sm">
+                                <tr class="row m-0">
+                                    <td class="d-inline-block col-4"><b>Record Type:</b></td>
+                                    <td class="d-inline-block col-8">{{ record.get_record_type_display }}</td>
+                                </tr>
+                                <tr class="row m-0">
+                                    <td class="d-inline-block col-4"><b>Reel:</b></td>
+                                    <td class="d-inline-block col-8">{{ record.reel }}</td>
+                                </tr>
+                                <tr class="row m-0">
+                                    <td class="d-inline-block col-4"><b>Archive:</b></td>
+                                    <td class="d-inline-block col-8">{{ record.archive.name }}</td>
+                                </tr>
+                                <tr class="row m-0">
+                                    <td class="d-inline-block col-4"><b>Earliest Record:</b></td>
+                                    {% if record.session_set.earliest.date.year %}
+                                        <td class="d-inline-block col-8">{{ record.session_set.earliest.village.name }} - {{ record.session_set.earliest.get_law_term_display }}, {{ record.session_set.earliest.date.year }}</td>
+                                    {% else %}
+                                        <td class="d-inline-block col-8">None</td>
+                                    {% endif %}
+                                </tr>
+                                <tr class="row m-0">
+                                    <td class="d-inline-block col-4"><b>Latest Record:</b></td>
+                                    {% if record.session_set.latest.date.year %}
+                                        <td class="d-inline-block col-8">{{ record.session_set.latest.village.name}} - {{ record.session_set.latest.get_law_term_display }}, {{ record.session_set.latest.date.year }}</td>
+                                    {% else %}
+                                        <td class="d-inline-block col-8">None</td>
+                                    {% endif %}
+                                </tr>
+
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="card p-0 col-6">
+                        <h3 class="card-header">Notes:</h3>
+                            <div class="card-body">
+
+                            <h6 class="card-text">
+                                    {{ record.notes | linebreaksbr }}
+                            </h6>
+                        </div>
+                    </div>
+                </div>
+</div>
+
+<br>
+
+<div id="list_info">
+
+</div>
+
+{% endblock %}
+
+{% block right_sidebar %}
+    <button type="button" class="btn btn-secondary float-sm-right">Edit Record</button>
+{% endblock %}
+
+{% block scripts %}
+    {{ block.super }}
+
+    <script>
+        $(document).ready(function(){
+             var url = window.location.pathname;
+            var id = url.split('/').reverse()[1]
+            $("#list_info").load(Urls.record_session_list(id))
+        })
+    </script>
+
+{% endblock %}

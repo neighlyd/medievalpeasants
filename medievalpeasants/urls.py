@@ -34,42 +34,130 @@ urlpatterns = [
 
 # Map web views to URL Patterns
 
-person_urls = [
-    url(r'^$', web_views.PersonDetailView.as_view(template_name='person/person_detail.html'), name='person'),
-    url(r'^case_list', web_views.PeopleListView.as_view(template_name='person/person_case_list.html'), name='person_case_list'),
-    url(r'^pledge_list', web_views.PeopleListView.as_view(template_name='person/pledge_list.html'), name='pledge_list'),
-    url(r'^relationship_list', web_views.PeopleListView.as_view(template_name='person/relationship_list.html'), name='relationship_list'),
-    url(r'^position_list', web_views.PeopleListView.as_view(template_name='person/position_list.html'), name='position_list'),
-    url(r'^land_list', web_views.PeopleListView.as_view(template_name='person/person_land_history_list.html'), name='person_land_history'),
-    url(r'^stats', web_views.PersonDetailView.as_view(template_name='person/person_stats.html'), name='person_stats'),
-    url(r'^amercement_list', web_views.PersonDetailView.as_view(template_name='person/person_amercement_cases.html'), name='person_amercement_list'),
-    url(r'^fine_list', web_views.PersonDetailView.as_view(template_name='person/person_fine_cases.html'), name='person_fine_list'),
-    url(r'^damage_list', web_views.PersonDetailView.as_view(template_name='person/person_damage_cases.html'), name='person_damage_list'),
-    url(r'^chevage_list', web_views.PersonDetailView.as_view(template_name='person/person_chevage_cases.html'), name='person_chevage_list'),
-    url(r'^impercamentum_list', web_views.PersonDetailView.as_view(template_name='person/person_impercamentum_cases.html'), name='person_impercamentum_list'),
-    url(r'^heriot_list', web_views.PersonDetailView.as_view(template_name='person/person_heriot_cases.html'), name='person_heriot_list'),
-
+archive_urls = [
+    url(r'^$', web_views.ArchiveDetailView.as_view(template_name='archive/_archive_detail.html'), name='archive'),
+    url(r'^record_list$', web_views.ArchiveDetailView.as_view(template_name='archive/record_list.html'),
+        name='record_list'),
 ]
 
 case_urls = [
-    url(r'^$', web_views.CaseDetailView.as_view(template_name='case/case_detail.html'), name='case'),
-    url(r'^litigants', web_views.LitigantListView.as_view(template_name='case/litigant_list.html'), name='case_litigants'),
-    url(r'^land', web_views.CaseListView.as_view(template_name='case/case_land.html'), name='case_land')
+    url(r'^$', web_views.CaseDetailView.as_view(template_name='case/_case_detail.html'), name='case'),
+    url(r'^litigant_list', web_views.LitigantListView.as_view(template_name='case/case_litigant_list.html'),
+        name='case_litigant_list'),
+    url(r'^land_list', web_views.CaseListView.as_view(template_name='case/case_land_list.html'), name='case_land_list'),
+    url(r'^extrahura_list', web_views.CaseListView.as_view(template_name='case/case_extrahura_list.html'),
+        name='case_extrahura_list'),
+    url(r'^cornbot_list', web_views.CaseListView.as_view(template_name='case/case_cornbot_list.html'),
+        name='case_cornbot_list'),
+    url(r'^murrain_list', web_views.CaseListView.as_view(template_name='case/case_murrain_list.html'),
+        name='case_murrain_list'),
+    url(r'^place_mentioned_list', web_views.CaseListView.as_view(template_name='case/case_place_mentioned_list.html'),
+        name='case_place_mentioned_list'),
+]
+
+county_urls = [
+    url(r'^$', web_views.CountyDetailView.as_view(template_name='county/_county_detail.html'), name='county'),
+    url(r'^village_list$', web_views.CountyDetailView.as_view(template_name='county/county_village_list.html'),
+        name='county_village_list'),
+    url(r'^case_list$', web_views.CaseListView.as_view(template_name='county/county_case_list.html'),
+        name='county_case_list'),
+    url(r'^resident_list$', web_views.CaseListView.as_view(template_name='county/county_resident_list.html'),
+        name='county_resident_list'),
+    url(r'^litigant_list$', web_views.CaseListView.as_view(template_name='county/county_litigant_list.html'),
+        name='county_litigant_list'),
+    url(r'^hundred_list$', web_views.CaseListView.as_view(template_name='county/county_hundred_list.html'),
+        name='county_hundred_list'),
+]
+
+hundred_urls = [
+    url(r'^$', web_views.HundredDetailView.as_view(template_name='hundred/_hundred_detail.html'), name='hundred'),
+    url(r'^case_list$', web_views.HundredListView.as_view(template_name='hundred/hundred_case_list.html'),
+        name='hundred_case_list'),
+    url(r'^resident_list$', web_views.CaseListView.as_view(template_name='hundred/hundred_resident_list.html'),
+        name='hundred_resident_list'),
+    url(r'^litigant_list$', web_views.CaseListView.as_view(template_name='hundred/hundred_litigant_list.html'),
+        name='hundred_litigant_list'),
+    url(r'^village_list$', web_views.CaseListView.as_view(template_name='hundred/hundred_village_list.html'),
+        name='hundred_village_list'),
 ]
 
 land_urls = [
-    url(r'^$', web_views.LandDetailView.as_view(template_name='land/land_detail.html'), name='land'),
+    url(r'^$', web_views.LandDetailView.as_view(template_name='land/_land_detail.html'), name='land'),
     url(r'^tenants', web_views.LandDetailView.as_view(template_name='land/tenant_history.html'), name='tenant_history'),
-    url(r'^split_history', web_views.LandDetailView.as_view(template_name='land/land_split_history.html'), name='land_split_history'),
-    url(r'^case_history', web_views.LandDetailView.as_view(template_name='land/land_case_history.html'), name='land_case_history'),
+    url(r'^split_history', web_views.LandDetailView.as_view(template_name='land/land_split_history.html'),
+        name='land_split_history'),
+    url(r'^case_history', web_views.LandDetailView.as_view(template_name='land/land_case_history.html'),
+        name='land_case_history'),
 ]
 
+person_urls = [
+    url(r'^$', web_views.PersonDetailView.as_view(template_name='person/_person_detail.html'), name='person'),
+    url(r'^case_list', web_views.PeopleListView.as_view(template_name='person/person_case_list.html'),
+        name='person_case_list'),
+    url(r'^pledge_list', web_views.PeopleListView.as_view(template_name='person/pledge_list.html'), name='pledge_list'),
+    url(r'^relationship_list', web_views.PeopleListView.as_view(template_name='person/relationship_list.html'),
+        name='relationship_list'),
+    url(r'^position_list', web_views.PeopleListView.as_view(template_name='person/position_list.html'), name='position_list'),
+    url(r'^land_list', web_views.PeopleListView.as_view(template_name='person/person_land_history_list.html'),
+        name='person_land_history'),
+    url(r'^stats', web_views.PersonDetailView.as_view(template_name='person/person_stats.html'), name='person_stats'),
+    url(r'^amercement_list', web_views.PersonDetailView.as_view(template_name='person/person_amercement_cases.html'),
+        name='person_amercement_list'),
+    url(r'^fine_list', web_views.PersonDetailView.as_view(template_name='person/person_fine_cases.html'),
+        name='person_fine_list'),
+    url(r'^damage_list', web_views.PersonDetailView.as_view(template_name='person/person_damage_cases.html'),
+        name='person_damage_list'),
+    url(r'^chevage_list', web_views.PersonDetailView.as_view(template_name='person/person_chevage_cases.html'),
+        name='person_chevage_list'),
+    url(r'^impercamentum_list', web_views.PersonDetailView.as_view(
+        template_name='person/person_impercamentum_cases.html'), name='person_impercamentum_list'),
+    url(r'^heriot_list', web_views.PersonDetailView.as_view(template_name='person/person_heriot_cases.html'),
+        name='person_heriot_list'),
+]
+
+record_urls = [
+    url(r'^$', web_views.RecordDetailView.as_view(template_name='record/_record_detail.html'), name='record'),
+    url(r'^session_list$', web_views.RecordDetailView.as_view(template_name='record/record_session_list.html'),
+        name='record_session_list'),
+]
+
+session_urls = [
+    url(r'^$', web_views.SessionDetailView.as_view(template_name='session/_session_detail.html'), name='session'),
+    url(r'^case_list$', web_views.CaseListView.as_view(template_name='session/session_case_list.html'),
+        name='session_case_list'),
+]
+
+village_urls = [
+    url(r'^$', web_views.VillageDetailView.as_view(template_name='village/_village_detail.html'), name='village'),
+    url(r'^case_list$', web_views.CaseListView.as_view(template_name='village/village_case_list.html'),
+        name='village_case_list'),
+    url(r'^resident_list$', web_views.PersonDetailView.as_view(template_name='village/village_resident_list.html'),
+        name='village_resident_list'),
+    url(r'^litigant_list$', web_views.PersonDetailView.as_view(template_name='village/village_litigant_list.html'),
+        name='village_litigant_list'),
+]
+
+
 urlpatterns += [
-    url(r'^person/(?P<pk>\d+)/', include(person_urls)),
+    url(r'^archive/(?P<pk>\d+)/', include(archive_urls)),
     url(r'^case/(?P<pk>\d+)/', include(case_urls)),
+    url(r'^county/(?P<pk>\d+)/', include(county_urls)),
+    url(r'^hundred/(?P<pk>\d+)/', include(hundred_urls)),
     url(r'^land/(?P<pk>\d+)/', include(land_urls)),
-    url(r'^people/$', web_views.PeopleListView.as_view(template_name='person/person_list.html'), name='person_list'),
-    url(r'^cases/$', web_views.CaseListView.as_view(template_name='case/case_list.html'), name='case_list'),
+    url(r'^person/(?P<pk>\d+)/', include(person_urls)),
+    url(r'^record/(?P<pk>\d+)/', include(record_urls)),
+    url(r'^session/(?P<pk>\d+)/', include(session_urls)),
+    url(r'^village/(?P<pk>\d+)/', include(village_urls)),
+    url(r'^archives/$', web_views.ArchiveListView.as_view(template_name='archive/_archive_list.html'), name='archive_list'),
+    url(r'^cases/$', web_views.CaseListView.as_view(template_name='case/_case_list.html'), name='case_list'),
+    url(r'^counties/$', web_views.CountyListView.as_view(template_name='county/_county_list.html'), name='county_list'),
+    url(r'^hundreds/$', web_views.HundredListView.as_view(template_name='hundred/_hundred_list.html'), name='hundred_list'),
+    url(r'^people/$', web_views.PeopleListView.as_view(template_name='person/_person_list.html'), name='person_list'),
+    url(r'^villages/$', web_views.VillageListView.as_view(template_name='village/_village_list.html'), name='village_list'),
+    url(r'^archives/$', web_views.VillageListView.as_view(template_name='archive/_archive_list.html'), name='archive_list'),
+    url(r'^records/$', web_views.VillageListView.as_view(template_name='record/_record_list.html'), name='record_list'),
+    url(r'^sessions/$', web_views.VillageListView.as_view(template_name='session/_session_list.html'), name='session_list'),
+    
 ]
 
 # JS Reverse to make Django URL routing available in JS - https://github.com/ierror/django-js-reverse
@@ -95,26 +183,25 @@ api_urls = [
     url(r'^parcel_types', api_views.ParcelTypeViewSet.as_view({'get':'list'}), name='parcel_types_api'),
     url(r'^position_titles', api_views.PositionTypeViewSet.as_view({'get':'list'}), name='position_titles_api'),
     url(r'^relation_types', api_views.RelationViewSet.as_view({'get':'list'}), name='relation_types_api'),
-    url(r'^role_types', api_views.RoleViewSet.as_view({'get':'list'}), name='role_types_api'),
-    url(r'^verdicts', api_views.VerdictViewSet.as_view({'get':'list'}), name='verdicts_api'),
-    url(r'^hundreds', api_views.HundredViewSet.as_view({'get':'list'}), name='hundreds_api'),
-    url(r'^villages', api_views.VillageViewSet.as_view({'get':'list'}), name='villages_api'),
-    url(r'^people', api_views.PersonViewSet.as_view({'get':'list'}), name='people_api'),
-    url(r'^records', api_views.RecordViewSet.as_view({'get':'list'}), name='records_api'),
-    url(r'^sessions', api_views.SessionViewSet.as_view({'get':'list'}), name='sessions_api'),
-    url(r'^cornbots', api_views.CornbotViewSet.as_view({'get':'list'}), name='cornbots_api'),
+    url(r'^role_types', api_views.RoleViewSet.as_view({'get':'list'}), name='role_type_api'),
+    url(r'^verdicts', api_views.VerdictViewSet.as_view({'get':'list'}), name='verdict_api'),
+    url(r'^hundreds', api_views.HundredViewSet.as_view({'get':'list'}), name='hundred_api'),
+    url(r'^villages', api_views.VillageViewSet.as_view({'get':'list'}), name='village_api'),
+    url(r'^people', api_views.PersonViewSet.as_view({'get':'list'}), name='person_api'),
+    url(r'^record', api_views.RecordViewSet.as_view({'get':'list'}), name='record_api'),
+    url(r'^sessions', api_views.SessionViewSet.as_view({'get':'list'}), name='session_api'),
+    url(r'^cornbots', api_views.CornbotViewSet.as_view({'get':'list'}), name='cornbot_api'),
     url(r'^extrahura', api_views.ExtrahuraViewSet.as_view({'get':'list'}), name='extrahura_api'),
-    url(r'^murrains', api_views.MurrainViewSet.as_view({'get':'list'}), name='murrains_api'),
-    url(r'^places_mentioned', api_views.PlaceMentionedViewSet.as_view({'get':'list'}), name='places_mentioned_api'),
+    url(r'^murrains', api_views.MurrainViewSet.as_view({'get':'list'}), name='murrain_api'),
+    url(r'^places_mentioned', api_views.PlaceMentionedViewSet.as_view({'get':'list'}), name='place_mentioned_api'),
     url(r'^land_parcels', api_views.LandParcelViewSet.as_view({'get':'list'}), name='land_parcels_api'),
     url(r'^pledges', api_views.PledgeViewSet.as_view({'get':'list'}), name='pledges_api'),
     url(r'^land_split', api_views.LandSplitViewSet.as_view({'get':'list'}), name='land_split_api'),
     url(r'^relationships', api_views.RelationshipViewSet.as_view({'get':'list'}), name='relationships_api'),
-    url(r'^cases', api_views.CaseViewSet.as_view({'get':'list'}), name='case_list_api'),
+    url(r'^cases', api_views.CaseViewSet.as_view({'get':'list'}), name='case_api'),
     url(r'^positions', api_views.PositionViewSet.as_view({'get':'list'}), name='positions_api'),
     url(r'^litigants', api_views.LitigantViewSet.as_view({'get': 'list'}), name='litigants_api'),
     url(r'^relationships', api_views.RelationshipViewSet.as_view({'get':'list'}), name='relationships_api'),
-    url(r'^case_people_land', api_views.CasePeopleLandViewSet.as_view({'get':'list'}), name='case_people_land_api')
 ]
 
 urlpatterns += [

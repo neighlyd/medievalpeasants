@@ -1,4 +1,4 @@
-{% extends 'layout/_l_single_col.html' %}
+{% extends '_layout/_l_single_col.html' %}
 
 {% block single_col %}
     <h3 class="card-header text-center">Impercamentum List</h3>
@@ -47,7 +47,7 @@
         var api_url = Urls.litigants_api() + "?person=" + id + "&impercamentum=true&expand=impercamentum&expand=role&expand=case__verdict&expand=case__case_type&expand=case__session__village&expand=impercamentum_animal";
         console.log(api_url);
         var table = $("#table").DataTable({
-            fixedHeader: true,
+            fixedHeader:{ headerOffset: 50 },
             scrollX: true,
             order: [4, "asc"],
             ajax: {
@@ -76,13 +76,17 @@
                     $(nTd).html(rowData.impercamentum_quantity + " " + rowData.impercamentum_animal.name + "d.)")
                     }
                 },
-                {data: "impercamentum.amount",
+                {data: "impercamentum.in_denarius",
                     fnCreatedCell: function(nTd, cellData, rowData, row, col){
                     $(nTd).html(rowData.impercamentum.amount + " (" + rowData.impercamentum.in_denarius + "d.)")
                     }
                 },
                 {data: "case.session.law_term"},
-                {data: "case.session.year"},
+                {data: "case.session.date",
+                    fnCreatedCell: function(nTd, cellData, rowData, row, col) {
+                        $(nTd).html(rowData.case.session.year);
+                    }
+                },
                 {data: "case.court_type"},
                 {data: "case.case_type.case_type"},
                 {data: "role.role"},

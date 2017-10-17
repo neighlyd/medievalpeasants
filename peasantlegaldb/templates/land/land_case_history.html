@@ -1,4 +1,4 @@
-{% extends 'layout/_l_single_col.html' %}
+{% extends '_layout/_l_single_col.html' %}
 
 {% block single_col %}
 <div class="card">
@@ -45,7 +45,7 @@
     $(document).ready(function() {
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1];
-        var url = Urls.case_list_api() + "?land=" + id + "&expand=session__village&expand=case_type&expand=verdict";
+        var url = Urls.case_api() + "?land=" + id + "&distinct=true&expand=session__village&expand=case_type&expand=verdict";
         var table = $('#table').DataTable({
             scrollX: true,
             order: [4, "asc"],

@@ -1,0 +1,171 @@
+{% extends '_layout/_l_three_col.html' %}
+
+{% block navbar %}
+    {% include '_layout/__navbar.html' %}
+{% endblock %}
+
+{% block left_sidebar %}
+    <div id="selection_list">
+        <a class="list-group-item list-group-item-action" href="{% url 'village_case_list' village.id %}">Cases</a>
+        <a class="list-group-item list-group-item-action" href="{% url 'village_resident_list' village.id %}">Known Residents</a>
+        <a class="list-group-item list-group-item-action" href="{% url 'village_litigant_list' village.id %}">Litigants</a>
+    </div>
+{% endblock %}
+
+{% block center_bar %}
+
+<div class="card-header text-center">
+    <h2 class="card-title">{{ village.name }}</h2>
+</div>
+
+<div class="card-body clearfix" id="main_info">
+    <div class="d-flex justify-content-between flex-wrap">
+
+                    <div class="card p-0 col-5">
+                        <h3 class="card-header">Info:</h3>
+                        <div class="card-body">
+                            <table class="table table-sm">
+                                <tr class="row m-0">
+                                    <td class="d-inline-block col-4"><b>County:</b></td>
+                                    <td class="d-inline-block col-8"><a href="{% url 'county' village.county.id %}">{{ village.county.name}}</a></td>
+                                </tr>
+                                {% if village.hundred_id %}
+                                <tr class="row m-0">
+                                    <td class="d-inline-block col-4"><b>Hundred:</b></td>
+                                    <td class="d-inline-block col-8"><a href="{% url 'hundred' village.hundred.id %}">{{ village.hundred.name}}</a></td>
+                                </tr>
+                                {% endif %}
+                                <tr class="row m-0">
+                                    <td class="d-inline-block col-4"><b>Great Rumor:</b></td>
+                                    <td class="d-inline-block col-8">{{ village.great_rumor }}</td>
+                                </tr>
+                                <tr class="row m-0">
+                                    <td class="d-inline-block col-4"><b>Ancient Demesne:</b></td>
+                                    <td class="d-inline-block col-8">{{ village.ancient_demesne }}</td>
+                                </tr>
+                                <tr class="row m-0">
+                                    <td class="d-inline-block col-4"><b>Notes:</b></td>
+                                    <td class="d-inline-block col-8">{{ village.notes | linebreaksbr }}</td>
+                                </tr>
+
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="card p-0 col-6">
+                        <h3 class="card-header">Map:</h3>
+                            <div class="card-body">
+                                <div id="map"></div>
+                                <footer class="blockquote-footer text-right">Historical maps from <cite title="NLS Maps API"><a href="http://maps.nls.uk/projects/api/">NLS Maps API</a></cite></footer>
+                            </h6>
+                        </div>
+                    </div>
+                </div>
+</div>
+
+<br>
+
+<div id="list_info">
+
+</div>
+
+{% endblock %}
+
+{% block right_sidebar %}
+    <button type="button" class="btn btn-secondary float-sm-right">Edit Village</button>
+{% endblock %}
+
+{% block scripts %}
+
+    <script type="text/javascript" src="http://nls.tileserver.com/api.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB51yaYfTmJNUIlZCpIr0HU4m11Hmd7Y9E"></script>
+    {{ block.super }}
+
+    <script>
+    // for information on Ordnance Survey API: http://maps.nls.uk/projects/api/
+
+      // In this example, we center the map, and add a marker, using a LatLng object
+      // literal instead of a google.maps.LatLng object. LatLng object literals are
+      // a convenient way to add a LatLng coordinate and, in most cases, can be used
+      // in place of a google.maps.LatLng object.
+      // https://developers.google.com/maps/documentation/javascript/examples/map-latlng-literal
+        var map;
+
+        var nlsmap = new google.maps.ImageMapType({
+		getTileUrl:function(tile,zoom) {
+		return NLSTileUrlOS(tile.x,tile.y,zoom);
+		},
+	        tileSize:new google.maps.Size(256,256),
+	        isPng:false
+        });
+
+        function initialize(){
+            // get lat and lng from API, since accessing django models through JS is not possible (that I'm aware).
+            var url = window.location.pathname;
+            var id = url.split('/').reverse()[1];
+            var api_url = Urls.village_api() + "?village=" + id;
+
+            var location = $.ajax({
+                url: api_url,
+                type: "GET",
+                async: false,
+                dataType: '',
+            }).responseJSON;
+
+            // use .map to iterate through array of objects returned by API and map key-value pairs to variable. Because
+            // the Latitude and Longitude are stored as strings, convert them to floats which the Google API can read as
+            // appropriate coordinates. Also grab the village name for the label.
+            var lng = location.map(f => f.longitude);
+            lng = parseFloat(lng);
+            var lat = location.map(f => f.latitude);
+            lat = parseFloat(lat)
+            var villName = location.map(f => f.name);
+
+            if(lng == null){
+                lng = 0
+            };
+
+            if (lat == null){
+                lat = 0
+            };
+
+            var mapOptions = {
+                zoom: 13,
+                center: {lat: lat, lng: lng}
+            };
+
+            map = new google.maps.Map(document.getElementById('map'),
+                mapOptions);
+
+            map.overlayMapTypes.insertAt(0, nlsmap);
+            map.overlayMapTypes.insertAt(0, nlsmap);
+
+            var marker = new google.maps.Marker({
+                position: {lat: lat, lng: lng},
+                map: map
+            });
+
+            var infoWindow = new google.maps.InfoWindow({
+                content: '<p>' + villName + '</p>'
+            });
+
+            google.maps.event.addListener(marker, 'click', function(){
+                infoWindow.open(map, marker)
+            });
+
+        }
+
+        google.maps.event.addDomListener(window, 'load', initialize);
+    </script>
+
+
+    <!--
+    <script>
+        $(document).ready(function(){
+             var url = window.location.pathname;
+            var id = url.split('/').reverse()[1]
+            $("#list_info").load(Urls.session_case_list(id))
+        })
+    </script>
+    -->
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends '_layout/__base.html' %}
+
+{% block navbar %}
+    {% include '_layout/__navbar.html' %}
+{% endblock %}
+
+{% block content %}
+    <div class="container-fluid d-flex justify-content-between pt-2">
+        <div class="p-0 col-md-2">
+            <div class="list-group" style="position: fixed">
+                {% block left_sidebar %}
+                {% endblock %}
+            </div>
+        </div>
+        <div class="p-0 col-md-9">
+            <div class="card">
+                {% block center_bar %}
+                {% endblock %}
+            </div>
+        </div>
+        <div class="p-0 col-md-1">
+            {% block right_sidebar %}
+            {% endblock %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+
+{{ block.super }}
+
+<script>
+    $('#selection_list>a').click(function(e){
+        e.preventDefault();
+        var url = $(this).attr('href');
+        $(this).addClass('active').siblings().removeClass('active');
+        if (typeof url !== "undefined") {
+            $("#list_info").load(url);
+        } else {
+        }
+    });
+
+</script>
+
+{% endblock %}

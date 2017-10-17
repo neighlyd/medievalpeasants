@@ -1,4 +1,4 @@
-{% extends 'layout/_l_single_col.html' %}
+{% extends '_layout/_l_single_col.html' %}
 {% block single_col %}
 
     <h3 class="card-header text-center">Positions</h3>
@@ -28,7 +28,7 @@
         var api_url = Urls.positions_api() + "?person=" + id + "&expand=session&expand=title";
         console.log(api_url);
         var position_table = $("#person_position_list").DataTable({
-            fixedHeader: true,
+            fixedHeader:{ headerOffset: 50 },
             ajax: {
                 url: api_url,
                 type: "GET",
@@ -41,7 +41,11 @@
                         $(nTd).html("<a href='" + Urls.person(rowData.person_id) + "'target='_blank'>" + rowData.session.law_term + " <-- Placeholder Link</a>");
                     }
                 },
-                {data: "session.year"},
+                {data: "session.date",
+                    fnCreatedCell: function(nTd, cellData, rowData, row, col) {
+                        $(nTd).html(rowData.session.year);
+                    }
+                },
                 {data: "definitive"}
             ]
         })

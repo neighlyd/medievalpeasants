@@ -1,4 +1,4 @@
-{% extends 'layout/_l_single_col.html' %}
+{% extends '_layout/_l_single_col.html' %}
 
 {% block single_col %}
     <h3 class="card-header text-center">Relationships</h3>
@@ -28,7 +28,7 @@
             var api_url = Urls.relationships_api() + "?person=" + id + "&expand=person_one&expand=person_two&expand=relationship";
         console.log(api_url);
         var relationship_table = $("#person_relationship_list").DataTable({
-            fixedHeader: true,
+            fixedHeader:{ headerOffset: 50 },
             ajax: {
                 url: api_url,
                 type: "GET",

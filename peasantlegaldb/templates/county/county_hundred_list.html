@@ -1,14 +1,12 @@
-{% extends 'layout/_l_single_col.html' %}
-{% block single_col %}
+{% extends '_layout/_l_single_col.html' %}
 
-    <h3 class="card-header text-center">Land</h3>
+{% block single_col %}
+    <h3 class="card-header text-center">Hundred List</h3>
     <div class="card-body">
             <table class="table table-bordered table-hover" id="table" data-page-length="25">
                 <thead>
-                    <th></th>
-                    <th>Land ID</th>
-                    <th>Parcels</th>
-                    <th>Notes</th>
+                    <th>Hundred</th>
+                    <th>Village Count</th>
                 </thead>
             </table>
     </div>
@@ -22,35 +20,25 @@
 
     $(document).ready(function () {
         var url = window.location.pathname;
-        var id = url.split('/').reverse()[1]
-        console.log(id)
-        var api_url = Urls.land_api() + "?case=" + id + "";
+        var id = url.split('/').reverse()[1];
+        var api_url = Urls.hundred_api() + "?county=" + id + "&expand=counts";
         console.log(api_url);
         var table = $("#table").DataTable({
-            fixedHeader: true,
+            fixedHeader:{ headerOffset: 50 },
+            scrollX: true,
             ajax: {
                 url: api_url,
                 type: "GET",
                 dataSrc: "",
             },
             "columns": [
-                {
-                    "class": "details-control",
-                    "orderable": "false",
-                    "data": null,
-                    "defaultContent": "",
-                    "render": function(){
-                        return '<i class="fa fa-plus-square" aria-hidden="true" style="color: grey"></i>';
-                    },
-                    width:"15px"
-                },
-                {data: "id",
+                {data: "name",
                     fnCreatedCell: function(nTd, cellData, rowData, row, col){
-                        $(nTd).html("<a href='" + Urls.land(rowData.id) + "'target='_blank'>" + rowData.id + "</a>");
+                        url = Urls.hundred(rowData.id);
+                        $(nTd).html("<a href='"+ url +"' target='_blank'>" + rowData.name + "</a>");
                     }
                 },
-                {data: "parcel_list_concat"},
-                {data: "notes"},
+                {data: "counts.village"}
             ]
         });
 
@@ -71,7 +59,17 @@
                 tdi.first().addClass('fa-minus-square');
             }
         });
+
     });
+
+function checkmaker(nTd, cellData, rowData, row, col) {
+    if (cellData === true){
+        $(nTd).html("<i class='fa fa-check' style='color:forestgreen'></i>")
+    } else {
+        $(nTd).html("")
+    }
+}
+
 
 </script>
 

@@ -1,9 +1,74 @@
 from django.views.generic.detail import DetailView
 from django.views.generic import ListView
 from django.db.models import Count, Max, Min, Avg, Sum
-from django.shortcuts import get_object_or_404
+
+from rest_framework.renderers import TemplateHTMLRenderer
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from . import models
+
+
+class ArchiveDetailView(DetailView):
+
+    model = models.Archive
+    queryset = models.Archive.objects.all()
+
+
+class ArchiveListView(ListView):
+
+    model = models.Archive
+    queryset = models.Archive.objects.all()
+
+
+class CaseListView(ListView):
+
+    model = models.Case
+    queryset = models.Case.objects.all().select_related('session').order_by('session__village__name', 'session__date',
+                                                                            'court_type')
+    context_object_name = 'case_list'
+
+
+class CaseDetailView(DetailView):
+
+    model = models.Case
+    queryset = models.Case.objects.all()
+
+
+class CountyDetailView(DetailView):
+
+    model = models.County
+    queryset = models.County.objects.all()
+
+
+class CountyListView(ListView):
+
+    model = models.County
+    queryset = models.County.objects.all()
+
+
+class HundredDetailView(DetailView):
+
+    model = models.Hundred
+    queryset = models.Hundred.objects.all()
+
+
+class HundredListView(ListView):
+
+    model = models.Hundred
+    queryset = models.Hundred.objects.all()
+
+
+class LitigantListView(ListView):
+
+    model = models.Litigant
+    queryset = models.Litigant.objects.all()
+
+
+class LandDetailView(DetailView):
+
+    model = models.Land
+    queryset = models.Land.objects.prefetch_related('parcels').all()
 
 
 class PeopleListView(ListView):
@@ -25,7 +90,7 @@ class PersonDetailView(DetailView):
                                                     fine_max=Max('person_to_case__fine__in_denarius'),
                                                     fine_min=Min('person_to_case__fine__in_denarius'),
                                                     fine_avg=Avg('person_to_case__fine__in_denarius'),
-                                                    fine_sum=Sum('person_to_case__fine__in_denarius'),                                   
+                                                    fine_sum=Sum('person_to_case__fine__in_denarius'),
                                                     damage_count=Count('person_to_case__damage'),
                                                     damage_max=Max('person_to_case__damage__in_denarius'),
                                                     damage_min=Min('person_to_case__damage__in_denarius'),
@@ -48,24 +113,28 @@ class PersonDetailView(DetailView):
                                                     impercamentum_sum=Sum('person_to_case__impercamentum__in_denarius'))
 
 
-class CaseListView(ListView):
+class RecordDetailView(DetailView):
 
-    model = models.Case
-    queryset = models.Case.objects.all().select_related('session').order_by('session__village__name', 'session__date', 'court_type')
-    context_object_name = 'case_list'
+    model = models.Record
+    queryset = models.Record.objects.all().prefetch_related('session_set')
 
 
-class CaseDetailView(DetailView):
+class SessionDetailView(DetailView):
 
-    model = models.Case
-    queryset = models.Case.objects.all()
+    model = models.Session
+    queryset = models.Session.objects.all().select_related('village')
+    
 
-class LitigantListView(ListView):
+class VillageDetailView(DetailView):
 
-    model = models.Litigant
-    queryset = models.Litigant.objects.all()
+    model = models.Village
+    queryset = models.Village.objects.all()
+    
 
-class LandDetailView(DetailView):
+class VillageListView(ListView):
 
-    model = models.Land
-    queryset = models.Land.objects.prefetch_related('parcels').all()
+    model = models.Village
+    queryset = models.Village.objects.all()
+
+
+    

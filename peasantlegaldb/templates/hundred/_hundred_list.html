@@ -1,0 +1,77 @@
+{% extends '_layout/_l_two_col.html' %}
+
+{% block navbar %}
+    {% include '_layout/__navbar.html' %}
+{% endblock %}
+
+{% block left_sidebar %}
+{% endblock %}
+
+{% block center_bar %}
+
+<div class="card-header text-center">
+    <h2 class="card-title">Hundred List</h2>
+</div>
+
+<div class="card-body clearfix" id="main_info">
+    <table class="table table-bordered table-hover" id="table" data-page-length="25">
+        <thead>
+            <th>Hundred</th>
+            <th>County</th>
+            <th>Village Count</th>
+        </thead>
+    </table>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+    {{ block.super }}
+
+<script>
+
+    $(document).ready(function () {
+        var url = window.location.pathname;
+        var id = url.split('/').reverse()[1];
+        var api_url = Urls.hundred_api() + "?expand=county&expand=counts";
+        console.log(api_url);
+        var table = $("#table").DataTable({
+            fixedHeader:{ headerOffset: 50 },
+            scrollX: true,
+            ajax: {
+                url: api_url,
+                type: "GET",
+                dataSrc: "",
+            },
+            "columns": [
+                {data: "name",
+                    fnCreatedCell: function(nTd, cellData, rowData, row, col){
+                        url = Urls.hundred(rowData.id);
+                        $(nTd).html("<a href='"+ url +"' target='_blank'>" + rowData.name + "</a>");
+                    }
+                },
+                {data: "county_id",
+                    fnCreatedCell: function(nTd, cellData, rowData, row, col){
+                        url = Urls.county(rowData.county_id);
+                        $(nTd).html("<a href='"+ url +"' target='_blank'>" + rowData.county.name + "</a>");
+                    }
+                },
+                {data: "counts.village"}
+            ]
+        });
+
+    });
+
+function checkmaker(nTd, cellData, rowData, row, col) {
+    if (cellData === true){
+        $(nTd).html("<i class='fa fa-check' style='color:forestgreen'></i>")
+    } else {
+        $(nTd).html("")
+    }
+}
+
+
+</script>
+
+
+{% endblock %}

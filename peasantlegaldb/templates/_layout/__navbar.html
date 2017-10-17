@@ -1,0 +1,54 @@
+<nav class="navbar sticky-top navbar-expand-lg navbar-dark" style="background-color: #245602">
+    <a class="navbar-brand" href="{% url 'index' %}">Medieval Peasant Database</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" id="navbarPeopleDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    People
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarPeopleDropdown" style="background-color: #245602">
+                    <a class="nav-link" href="{% url 'person_list' %}">List All</a>
+                </div>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" id="navbarCaseDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Cases
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarPeopleDropdown" style="background-color: #245602">
+                    <a class="nav-link" href="{% url 'case_list' %}">List All</a>
+                </div>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" id="navbarCaseDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Places
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarPeopleDropdown" style="background-color: #245602">
+                    <a class="nav-link" href="{% url 'village_list' %}">Villages</a>
+                    <a class="nav-link" href="{% url 'hundred_list' %}">Hundreds</a>
+                    <a class="nav-link" href="{% url 'county_list' %}">Counties</a>
+                </div>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" id="navbarCaseDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Sources
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarPeopleDropdown" style="background-color: #245602">
+                    <a class="nav-link" href="{% url 'archive_list' %}">Archives</a>
+                    <a class="nav-link" href="{% url 'record_list' %}">Records</a>
+                </div>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" href="#">About</a>
+            </li>
+        </ul>
+    </div>
+
+</nav>

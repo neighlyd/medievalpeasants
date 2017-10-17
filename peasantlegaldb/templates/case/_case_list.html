@@ -1,23 +1,22 @@
-{% extends "layout/__base.html" %}
+{% extends '_layout/_l_two_col.html' %}
 
 {% block navbar %}
-    {% include 'layout/__navbar.html' %}
+    {% include '_layout/__navbar.html' %}
 {% endblock %}
 
-{% block content %}
+{% block left_sidebar %}
+{% endblock %}
 
-<br>
-<div class="container-fluid">
-    <div class="card">
-    <hr>
-        <h2 class="text-center">Cases Table</h2>
-    <hr>
+{% block center_bar %}
+
+<div class="card-header text-center">
+    <h2 class="card-title">Cases List</h2>
 </div>
 
-<div class="container">
+<div class="card-body clearfix" id="main_info">
     <table class="table table-bordered table-hover" id="table" data-page-length="25">
         <thead>
-            <th></th>
+            <th>Notes</th>
             <th>Case ID</th>
             <th>Village</th>
             <th>Law Term</th>
@@ -26,11 +25,9 @@
             <th>Case Type</th>
             <th>Verdict</th>
             <th>Litigant Count</th>
-            <th>Interest?</th>
+            <th>of Note?</th>
         </thead>
-
     </table>
-</div>
 </div>
 
 
@@ -39,6 +36,9 @@
             var title = $(this).text();
             $(this).html( '<input type="text" placeholder="Search '+title+'" />' );
         });-->
+{% endblock %}
+
+{% block right_sidebar %}
 {% endblock %}
 
 {% block scripts %}
@@ -57,7 +57,7 @@
 
 
     $(document).ready(function(){
-        var url = Urls.case_list_api()+"?expand=session__village&expand=verdict&expand=case_type";
+        var url = Urls.case_api()+"?expand=session__village&expand=verdict&expand=case_type";
 
         var table = $('#table').DataTable({
             fixedHeader: {
@@ -70,15 +70,19 @@
                 type: "GET",
                 dataSrc: "",
             },
-            "order": [[3, "asc"]],
+            order: [[4, "asc"], [1, "asc"]],
             "columns": [
                 {
                     "class": "details-control",
                     "orderable": "false",
-                    "data": null,
+                    "data": "summary",
                     "defaultContent": "",
-                    "render": function(){
-                        return '<i class="fa fa-plus-square" aria-hidden="true"></i>';
+                    "render": function(cellData){
+                        if (cellData) {
+                            return '<i class="fa fa-plus-square" aria-hidden="true"></i>';
+                        } else {
+                            return '<i class="fa fa-plus-square" aria-hidden="true" style="color: gray"></i>';
+                        }
                     },
                     width:"15px"
                 },
@@ -88,9 +92,18 @@
                         $(nTd).html("<a href='"+ url +"' target='_blank'>" + rowData.id + "</a>");
                     }
                 },
-                {data: "session.village.name"},
+                {data: "session.village",
+                    fnCreatedCell: function(nTd, cellData, rowData, row, col) {
+                        var url = Urls.village(rowData.session.village.id)
+                        $(nTd).html("<a href='"+ url +"' target='_blank'>" + rowData.session.village.name + "</a>");
+                    }
+                },
                 {data: "session.law_term"},
-                {data: "session.year"},
+                {data: "session.date",
+                    fnCreatedCell: function(nTd, cellData, rowData, row, col) {
+                        $(nTd).html(rowData.session.year);
+                    }
+                },
                 {data: "court_type"},
                 {data: "case_type.case_type"},
                 {data: "verdict.verdict"},
@@ -105,25 +118,6 @@
                     }
                 }
             ],
-            // enable column searching using selection boxes.
-            initComplete: function() {
-                    var column = this;
-                    var select = $('<select><option value=""></option></select>')
-                        .appendTo( $(column.footer()).empty())
-                        .on( 'change', function () {
-                            var val = $.fn.datatable.util.escapeRegex(
-                                $(this).val()
-                            );
-
-                            column
-                                .search( val ? '^' + val + '$' : '', true, false )
-                                .draw();
-                        });
-
-                    column.data().unique().sort().each( function (d, j) {
-                        select.append( '<option value=' + d + '">' + d + '</option>')
-                    });
-            },
 
         });
 
@@ -133,12 +127,12 @@
             var tdi = tr.find("i.fa");
             var row = table.row( tr );
 
-            if ( row.child.isShown() ) {
+            if ( row.child.isShown()) {
                 row.child.hide();
                 tr.removeClass('shown');
                 tdi.first().removeClass('fa-minus-square');
                 tdi.first().addClass('fa-plus-square');
-            } else{
+            } else {
                 row.child( format( row.data() ) ).show();
                 tr.addClass('shown');
                 tdi.first().removeClass('fa-plus-square');

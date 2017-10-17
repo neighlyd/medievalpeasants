@@ -1,11 +1,18 @@
+import datetime
+
 from django.db import models
-from django.db.models import Max, Min, Avg, Count, Sum
 from itertools import chain
+
 
 class Archive(models.Model):
     name = models.CharField(max_length=50)
     website = models.URLField()
     notes = models.TextField()
+
+    @property
+    def record_count(self):
+        count = self.record_set.all().distinct().count()
+        return count
 
     def __str__(self):
         return self.name
@@ -51,7 +58,7 @@ class County(models.Model):
 
 
 class Land(models.Model):
-    #   Change save condition to automagically update notes field w/ land owners from CasePeopleLand?
+    #   Change save condition to automagically update notes field w/ land owners from Litigants?
     notes = models.TextField()
     owner_chain = models.TextField()
 
@@ -69,7 +76,8 @@ class Land(models.Model):
                 parcel_list.append(new_entry)
         except:
             pass
-        return parcel_list    \
+
+        return parcel_list
 
     @property
     def parcel_list_concat(self):
@@ -165,6 +173,10 @@ class Hundred(models.Model):
     name = models.CharField(max_length=50)
     county = models.ForeignKey(County)
 
+    @property
+    def village_count(self):
+        return self.village_set.count()
+
     def __str__(self):
         return '%s, %s' % (self.name, self.county)
 
@@ -181,6 +193,24 @@ class Village(models.Model):
     # Part of the "Great Rumor" petition of 1377.
     great_rumor = models.BooleanField(default=False)
     notes = models.TextField()
+
+    @property
+    def get_case_count(self):
+        return Case.objects.all().filter(session__village_id=self.id).distinct().count()
+
+    @property
+    def litigant_count(self):
+        # retrieve a list of all people who are in Litigant table associated with a particular village, use set() to
+        # remove duplicates, and len() to find length.
+        return len(set(Litigant.objects.all().filter(case__session__village_id=self.id).values_list('person', flat=True)))
+
+    @property
+    def resident_count(self):
+        return self.person_set.count()
+
+    @property
+    def session_count(self):
+        return self.session_set.count()
 
     def __str__(self):
         return '%s | %s' % (self.name, self.county)
@@ -218,7 +248,7 @@ class Person(models.Model):
 
     @property
     def earliest_case(self):
-        # get queryset for each area where person interacts with cases (i.e. litigant table, casepeopleland, pledges),
+        # get queryset for each area where person interacts with cases (i.e. litigant table, pledges),
         # chain together and sort by date using a lambda if/else statement to differentiate between Case and other
         # instances (b/c Case date is at self.session.date while all others are at self.case.session.date, b/c they use
         # case as an FK). Pop earliest case off based on index [0]. Check instance for Case or other (again, due to
@@ -227,12 +257,11 @@ class Person(models.Model):
         # difference. There may be a way, but it's beyond me.
 
         case_range = self.case_set.all()
-        land_range = self.casepeopleland_set.all()
         pledge_giver_range= self.pledge_giver.all()
         pledge_receiver_range = self.pledge_receiver.all()
 
         try:
-            earliest_case = sorted(chain(case_range, land_range, pledge_giver_range, pledge_receiver_range), key=lambda
+            earliest_case = sorted(chain(case_range, pledge_giver_range, pledge_receiver_range), key=lambda
                 x: x.session.date if isinstance(x, Case) else x.case.session.date)[0]
             if isinstance(earliest_case, Case):
                 earliest_date = earliest_case.session.get_law_term_display() + ' - ' + str(earliest_case.session.date.
@@ -244,23 +273,17 @@ class Person(models.Model):
             earliest_date = 'None'
 
         return earliest_date
+
     @property
     def latest_case(self):
-        # get queryset for each area where person interacts with cases (i.e. litigant table, casepeopleland, pledges),
-        # chain together and sort by date using a lambda if/else statement to differentiate between Case and other
-        # instances (b/c Case date is at self.session.date while all others are at self.case.session.date, b/c they use
-        # case as an FK). Pop latest case off based on index [0]. Check instance for Case or other (again, due to
-        # difference in FK relationship w/ Session), and then render date display appropriately. Unfortunately, it
-        # isn't possible to simply pass the model to the template for rendering (and manipulation), because of the FK
-        # difference. There may be a way, but it's beyond me.
+        # see earliest_case for explanation.
 
         case_range = self.case_set.all()
-        land_range = self.casepeopleland_set.all()
         pledge_giver_range= self.pledge_giver.all()
         pledge_receiver_range = self.pledge_receiver.all()
 
         try:
-            sorted_date = sorted(chain(case_range, land_range, pledge_giver_range, pledge_receiver_range), key=lambda
+            sorted_date = sorted(chain(case_range, pledge_giver_range, pledge_receiver_range), key=lambda
                 x: x.session.date if isinstance(x, Case) else x.case.session.date, reverse=True)
 
             latest_case = sorted_date[0]
@@ -294,34 +317,64 @@ class Person(models.Model):
     def position_count(self):
         return self.position.all().count()
 
+    @property
+    def case_exists(self):
+        return self.person_to_case.exists()
 
     @property
-    def case_info(self):
-        return self.person_to_case.aggregate(Count('amercement'), Max('amercement__in_denarius'),
-                                             Min('amercement__in_denarius'), Avg('amercement__in_denarius'),
-                                             Sum('amercement__in_denarius'), Count('fine'), Max('fine__in_denarius'),
-                                             Min('fine__in_denarius'), Avg('fine__in_denarius'),
-                                             Sum('fine__in_denarius'), Count('damage'), Max('damage__in_denarius'),
-                                             Min('damage__in_denarius'), Avg('damage__in_denarius'),
-                                             Sum('damage__in_denarius'), Count('chevage'), Max('chevage__in_denarius'),
-                                             Min('chevage__in_denarius'), Avg('chevage__in_denarius'),
-                                             Sum('chevage__in_denarius'), Count('heriot'), Max('heriot__in_denarius'),
-                                             Min('heriot__in_denarius'), Avg('heriot__in_denarius'),
-                                             Sum('heriot__in_denarius'), Count('impercamentum'),
-                                             Max('impercamentum__in_denarius'), Min('impercamentum__in_denarius'),
-                                             Avg('impercamentum__in_denarius'), Sum('impercamentum__in_denarius'), )
+    def land_exists(self):
+        return self.person_to_case.filter(land__isnull=False).exists()
+
+    @property
+    def relationship_exists(self):
+        relation_one = self.relationship_person_one.exists()
+        relation_two = self.relationship_person_two.exists()
+        if relation_one or relation_two:
+            return True
+        else:
+            return False
+
+    @property
+    def pledge_exists(self):
+        pledge_given = self.pledge_giver.exists()
+        pledge_received = self.pledge_receiver.exists()
+        if pledge_given or pledge_received:
+            return True
+        else:
+            return False
+
+    @property
+    def amercement_exists(self):
+        return self.person_to_case.filter(amercement__isnull=False).exists()
+
+    @property
+    def fine_exists(self):
+        return self.person_to_case.filter(fine__isnull=False).exists()
+
+    @property
+    def damage_exists(self):
+        return self.person_to_case.filter(damage__isnull=False).exists()
+
+    @property
+    def chevage_exists(self):
+        return self.person_to_case.filter(chevage__isnull=False).exists()
+
+    @property
+    def impercamentum_exists(self):
+        return self.person_to_case.filter(impercamentum__isnull=False).exists()
+
+    @property
+    def heriot_exists(self):
+        return self.person_to_case.filter(heriot__isnull=False).exists()
 
     @property
     def case_count_litigation(self):
-        qs = self.person_to_case.exclude(chevage__isnull=False).exclude(heriot__isnull=False).\
-            exclude(impercamentum__isnull=False).values_list('case').distinct()
-        case_count = len(qs)
+        case_count = self.person_to_case.exclude(chevage__isnull=False).values_list('case').distinct().count()
         return case_count
 
     @property
     def case_count_all(self):
-        qs = self.person_to_case.values_list('case').distinct()
-        case_count = len(qs)
+        case_count = len(set(self.person_to_case.values_list('case')))
         return case_count
 
     @property
@@ -363,11 +416,23 @@ class Record(models.Model):
     reel = models.IntegerField()
     notes = models.TextField()
 
+    @property
+    def earliest_session(self):
+        return self.session_set.earliest('date')
+
+    @property
+    def latest_session(self):
+        return self.session_set.latest('date')
+
     def __str__(self):
         return self.name
 
 
 class Session(models.Model):
+
+    class Meta:
+        get_latest_by = 'date'
+
     TERM_CHOICES = {
         (1, 'Hilary'),
         (2, 'Easter'),
@@ -385,6 +450,21 @@ class Session(models.Model):
     village = models.ForeignKey(Village)
     notes = models.TextField()
 
+    @property
+    def case_count(self):
+        return self.cases.count()
+
+    @property
+    def human_date(self):
+        date = self.date
+        date = date.strftime('%b %d, %Y')
+        return date
+
+    @property
+    def year(self):
+        year = self.date.year
+        return year
+
     def __str__(self):
         return '%s %s %s Session.' % (self.village.name, self.get_law_term_display(), self.date.year)
 
@@ -400,7 +480,7 @@ class Case(models.Model):
     }
 
     summary = models.TextField()
-    session = models.ForeignKey(Session, on_delete=models.CASCADE)
+    session = models.ForeignKey(Session, on_delete=models.CASCADE, related_name='cases')
     case_type = models.ForeignKey(CaseType)
     court_type = models.IntegerField(choices=COURT_TYPES)
     verdict = models.ForeignKey(Verdict)
@@ -411,24 +491,17 @@ class Case(models.Model):
     active_sale = models.BooleanField(default=False)
     incidental_land = models.BooleanField(default=False)
     litigants = models.ManyToManyField(Person, through='Litigant')
-    lands = models.ManyToManyField(Land, through='CasePeopleLand')
 
     @property
     def litigant_list(self):
         litigant_list = []
         litigant_qs = self.case_to_person.all()
-        land_qs = self.case_to_land.all()
-        try:
-            iteration_list = list(chain(litigant_qs, land_qs))
-            for x in iteration_list:
-                new_entry = {
-                    "name" : x.person.full_name,
-                    "role" : x.role.role
-                }
-                litigant_list.append(new_entry)
-
-        except:
-            pass
+        for x in litigant_qs:
+            new_entry = {
+                "name" : x.person.full_name,
+                "role" : x.role.role
+            }
+            litigant_list.append(new_entry)
         return litigant_list
 
     @property
@@ -448,10 +521,10 @@ class Case(models.Model):
 
     @property
     def litigant_count(self):
-        # create a list of all litigants across all types of litigation tables (litigants, chevage, heriot, land, etc.)
-        # and check for duplicates to get an accurate count of unique litigants. This technique is required because Django
-        # only allows for Count Distinct in queryset creation, which is called with the view. Since SPA doesn't call views,
-        # this approach would clearly not work.
+        # create a list of all litigants across all types of litigation tables (litigants, pledge receiver & giver)
+        # and check for duplicates to get an accurate count of unique litigants. This technique is required because
+        # Django only allows for Count Distinct in queryset creation, which is called with the view. Since SPA doesn't
+        # call views, this approach would clearly not work.
         litigants = []
         qs1 = self.case_to_person.values_list('person_id', flat=True)
         try:
@@ -459,27 +532,44 @@ class Case(models.Model):
                 litigants.append(x)
         except:
             pass
-        qs2 = self.case_to_land.values_list('person_id', flat=True)
+        qs2 = self.case_to_pledge.values_list('pledge_giver_id', flat=True)
         try:
             for x in qs2:
                 litigants.append(x)
         except:
             pass
-        qs3 = self.case_to_pledge.values_list('pledge_giver_id', flat=True)
+        qs3 = self.case_to_pledge.values_list('pledge_receiver_id', flat=True)
         try:
             for x in qs3:
                 litigants.append(x)
         except:
             pass
-        qs4 = self.case_to_pledge.values_list('pledge_receiver_id', flat=True)
-        try:
-            for x in qs4:
-                litigants.append(x)
-        except:
-            pass
-        litigants = set(litigants)
-        num = len(litigants)
-        return num
+        number_of_litigants = len(set(litigants))
+        return number_of_litigants
+
+    @property
+    def litigant_exist(self):
+        return self.case_to_person.filter(person__isnull=False).exists()
+
+    @property
+    def land_exist(self):
+        return self.case_to_person.filter(land__isnull=False).exists()
+
+    @property
+    def cornbot_exist(self):
+        return self.cornbot.filter(case=self).exists()
+
+    @property
+    def extrahura_exist(self):
+        return self.extrahura.filter(case=self).exists()
+
+    @property
+    def murrain_exist(self):
+        return self.murrain.filter(case=self).exists()
+
+    @property
+    def mentioned_exists(self):
+        return self.placementioned_set.filter(case=self).exists()
 
     def __str__(self):
         return 'Case %s | %s (%s / %s)' % (self.id, self.session.village.name, self.session.get_law_term_display(), self.session.date.year)
@@ -489,7 +579,7 @@ class Cornbot(models.Model):
     amount = models.CharField(max_length=50)
     crop_type = models.ForeignKey(Chattel)
     price = models.ForeignKey(Money)
-    case = models.ForeignKey(Case, on_delete=models.CASCADE)
+    case = models.ForeignKey(Case, on_delete=models.CASCADE, related_name='cornbot')
     notes = models.TextField()
 
 
@@ -497,13 +587,13 @@ class Extrahura(models.Model):
     amount = models.IntegerField()
     animal = models.ForeignKey(Chattel)
     price = models.ForeignKey(Money)
-    case = models.ForeignKey(Case, on_delete=models.CASCADE)
+    case = models.ForeignKey(Case, on_delete=models.CASCADE, related_name='extrahura')
 
 
 class Murrain(models.Model):
     amount = models.IntegerField()
     animal = models.ForeignKey(Chattel)
-    case = models.ForeignKey(Case, on_delete=models.CASCADE)
+    case = models.ForeignKey(Case, on_delete=models.CASCADE, related_name='murrain')
     notes = models.TextField()
 
 
@@ -528,9 +618,9 @@ class Litigant(models.Model):
     damage_notes = models.TextField(null=True)
     ad_proximum = models.NullBooleanField()
     distrained = models.NullBooleanField()
-#   Added at Case 1189.
+    # Added at Case 1189.
     attached = models.NullBooleanField()
-#   Added at Case 1424
+    # Added at Case 1424
     bail = models.NullBooleanField()
     chevage = models.ForeignKey(Money, null=True, related_name='litigant_chevage')
     crossed = models.NullBooleanField()
@@ -547,21 +637,6 @@ class Litigant(models.Model):
     land = models.ForeignKey(Land, null=True, on_delete=models.CASCADE, related_name='case_to_land')
     land_villeinage = models.NullBooleanField()
     land_notes = models.TextField(null=True)
-
-
-
-class CasePeopleLand(models.Model):
-
-    class Meta:
-        verbose_name = "Case to Person to Land"
-        verbose_name_plural = "Cases to People to Land"
-
-    person = models.ForeignKey(Person, on_delete=models.CASCADE)
-    case = models.ForeignKey(Case, on_delete=models.CASCADE, related_name='case_to_land')
-    land = models.ForeignKey(Land, on_delete=models.CASCADE)
-    role = models.ForeignKey(Role)
-    villeinage = models.NullBooleanField()
-    notes = models.TextField()
 
 
 class Pledge(models.Model):
@@ -586,6 +661,7 @@ class LandSplit(models.Model):
     def __str__(self):
         return "Old Land ID %s, New Land ID %s" % (self.old_land, self.new_land)
 
+
 class Position(models.Model):
     person = models.ForeignKey(Person, on_delete=models.CASCADE, related_name='position')
     title = models.ForeignKey(PositionType)
@@ -600,6 +676,6 @@ class Position(models.Model):
 class Relationship(models.Model):
     person_one = models.ForeignKey(Person, on_delete=models.CASCADE, related_name='relationship_person_one')
     person_two = models.ForeignKey(Person, on_delete=models.CASCADE, related_name='relationship_person_two')
-#   need to rework so relationships are more descriptive.
+    # need to rework so relationships are more descriptive.
     relationship = models.ForeignKey(Relation)
     definitive = models.BooleanField(default=False)
