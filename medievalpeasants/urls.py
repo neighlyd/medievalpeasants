@@ -154,10 +154,11 @@ urlpatterns += [
     url(r'^hundreds/$', web_views.HundredListView.as_view(template_name='hundred/_hundred_list.html'), name='hundred_list'),
     url(r'^people/$', web_views.PeopleListView.as_view(template_name='person/_person_list.html'), name='person_list'),
     url(r'^villages/$', web_views.VillageListView.as_view(template_name='village/_village_list.html'), name='village_list'),
-    url(r'^archives/$', web_views.VillageListView.as_view(template_name='archive/_archive_list.html'), name='archive_list'),
-    url(r'^records/$', web_views.VillageListView.as_view(template_name='record/_record_list.html'), name='record_list'),
-    url(r'^sessions/$', web_views.VillageListView.as_view(template_name='session/_session_list.html'), name='session_list'),
-    
+    url(r'^archives/$', web_views.ArchiveListView.as_view(template_name='archive/_archive_list.html'), name='archive_list'),
+    url(r'^records/$', web_views.RecordListView.as_view(template_name='record/_record_list.html'), name='record_list'),
+    url(r'^sessions/$', web_views.SessionListView.as_view(template_name='session/_session_list.html'), name='session_list'),
+    url(r'^lands/$', web_views.LandListView.as_view(template_name='land/_land_list.html'), name='land_list'),
+
 ]
 
 # JS Reverse to make Django URL routing available in JS - https://github.com/ierror/django-js-reverse

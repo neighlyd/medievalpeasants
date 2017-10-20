@@ -4,14 +4,9 @@
     {% include '_layout/__navbar.html' %}
 {% endblock %}
 
-{% block left_sidebar %}
-{% endblock %}
-
 {% block center_bar %}
 
-<div class="card-header text-center">
-    <h2 class="card-title">County List</h2>
-</div>
+    {{ block.super }}
 
 <div class="card-body clearfix" id="main_info">
     <table class="table table-bordered table-hover" id="table" data-page-length="25">
@@ -31,9 +26,12 @@
 
 {% endblock %}
 
+{% block right_sidebar %}
+    {{ block.super }}
+{% endblock %}
+
 {% block scripts %}
     {{ block.super }}
-
 <script>
 
     $(document).ready(function () {
@@ -54,7 +52,7 @@
                 {data: "name",
                     fnCreatedCell: function(nTd, cellData, rowData, row, col) {
                         url = Urls.county(rowData.id);
-                        $(nTd).html("<a href='"+ url +"' target='_blank'>" + rowData.name + "</a>");
+                        $(nTd).html("<a href='"+ url +"'>" + rowData.name + "</a>");
                     }
                 },
                 {data: "counts.hundred"},

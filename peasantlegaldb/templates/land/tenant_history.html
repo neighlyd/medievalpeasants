@@ -97,14 +97,14 @@
                 {data: "person.full_name",
                     fnCreatedCell: function(nTd, cellData, rowData, row, col) {
                         var url = Urls.person(rowData.person_id)
-                        $(nTd).html("<a href='"+ url +"' target='_blank'>" + rowData.person.full_name + "</a>");
+                        $(nTd).html("<a href='"+ url +"'>" + rowData.person.full_name + "</a>");
                     }
                 },
                 {data: "person.village.name"},
                 {data: "case_id",
                     fnCreatedCell: function(nTd, cellData, rowData, row, col) {
                         var url = Urls.case(rowData.case_id)
-                        $(nTd).html("<a href='"+ url +"' target='_blank'>" + rowData.case_id + "</a>");
+                        $(nTd).html("<a href='"+ url +"'>" + rowData.case_id + "</a>");
                     }
                 },
                 {data: "case.session.law_term"},

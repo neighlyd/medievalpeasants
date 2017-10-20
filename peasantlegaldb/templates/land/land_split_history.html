@@ -54,18 +54,22 @@
                 {data: "old_land_id",
                     fnCreatedCell: function(nTd, cellData, rowData, row, col) {
                         var url = Urls.land(rowData.old_land_id)
-                        $(nTd).html("<a href='"+ url +"' target='_blank'>" + rowData.old_land_id+ "</a>");
+                        $(nTd).html("<a href='"+ url +"'>" + rowData.old_land_id+ "</a>");
                     }
                 },
-                {data: "old_land.parcel_list_concat"},
+                {data: "old_land.parcel_list",
+                    fnCreatedCell: list_parcels,
+                },
                 {data: "old_land.notes"},
                 {data: "new_land_id",
                     fnCreatedCell: function(nTd, cellData, rowData, row, col) {
                         var url = Urls.land(rowData.new_land_id)
-                        $(nTd).html("<a href='"+ url +"' target='_blank'>" + rowData.new_land_id + "</a>");
+                        $(nTd).html("<a href='"+ url +"'>" + rowData.new_land_id + "</a>");
                     }
                 },
-                {data: "new_land.parcel_list_concat"},
+                {data: "new_land.parcel_list",
+                    fnCreatedCell: list_parcels,
+                },
                 {data: "new_land.notes"},
 
             ]

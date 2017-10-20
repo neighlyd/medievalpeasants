@@ -64,14 +64,14 @@
                 {data: "village.name",
                     fnCreatedCell: function(nTd, cellData, rowData, row, col) {
                         url = Urls.village(rowData.village.id);
-                        $(nTd).html("<a href='"+ url +"' target='_blank'>" + rowData.village.name + "</a>");
+                        $(nTd).html("<a href='"+ url +"'>" + rowData.village.name + "</a>");
                     }
                 },
                 {data: "village.id",
                     fnCreatedCell: function(nTd, cellData, rowData, row, col){
                         if (rowData.village.hundred_id){
                             url = Urls.hundred(rowData.village.hundred_id);
-                            $(nTd).html("<a href='"+ url + "' target='_blank'>" + rowData.village.hundred.name + "</a>");
+                            $(nTd).html("<a href='"+ url + "'>" + rowData.village.hundred.name + "</a>");
                         } else {
                             $(nTd).html("N/A")
                         }

@@ -49,7 +49,9 @@
                         $(nTd).html("<a href='" + Urls.land(rowData.id) + "'target='_blank'>" + rowData.id + "</a>");
                     }
                 },
-                {data: "parcel_list_concat"},
+                {data: "parcel_list",
+                    fnCreatedCell: list_parcels,
+                },
                 {data: "notes"},
             ]
         });

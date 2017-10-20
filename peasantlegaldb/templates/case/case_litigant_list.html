@@ -98,7 +98,7 @@
                 {data: "person.first_name",
                     fnCreatedCell: function(nTd, cellData, rowData, row, col) {
                         url = Urls.person(rowData.person.id);
-                        $(nTd).html("<a href='"+ url +"' target='_blank'>" + rowData.person.full_name + "</a>");
+                        $(nTd).html("<a href='"+ url +"'>" + rowData.person.full_name + "</a>");
                     }
                 },
                 {data: "role.role"},

@@ -71,7 +71,7 @@
                 {data: "id",
                     fnCreatedCell: function(nTd, cellData, rowData, row, col) {
                         url = Urls.case(rowData.id);
-                        $(nTd).html("<a href='"+ url +"' target='_blank'>" + rowData.id + "</a>");
+                        $(nTd).html("<a href='"+ url +"'>" + rowData.id + "</a>");
                     }
                 },
                 {data: "session.village.name"},
@@ -79,7 +79,7 @@
                 {data: "session.date",
                     fnCreatedCell: function(nTd, cellData, rowData, row, col) {
                         url = Urls.session(rowData.session.id);
-                        $(nTd).html("<a href='"+ url +"' target='_blank'>" + rowData.session.year + "</a>");
+                        $(nTd).html("<a href='"+ url +"'>" + rowData.session.year + "</a>");
                     }
                 },
                 {data: "court_type"},

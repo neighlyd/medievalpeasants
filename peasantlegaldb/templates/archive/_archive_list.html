@@ -4,14 +4,9 @@
     {% include '_layout/__navbar.html' %}
 {% endblock %}
 
-{% block left_sidebar %}
-{% endblock %}
-
 {% block center_bar %}
 
-<div class="card-header text-center">
-    <h2 class="card-title">Archive List</h2>
-</div>
+    {{ block.super }}
 
 <div class="card-body clearfix" id="main_info">
     <table class="table table-bordered table-hover" id="table" data-page-length="25">
@@ -19,7 +14,9 @@
             <th>Name</th>
             <th>Website</th>
             <th>Notes</th>
-            <th>Record Count</th>
+            <th>Records</th>
+            <th>Sessions</th>
+            <th>Cases</th>
         </thead>
     </table>
 </div>
@@ -27,6 +24,7 @@
 {% endblock %}
 
 {% block right_sidebar %}
+    {{ block.super }}
 {% endblock %}
 
 {% block scripts %}
@@ -40,23 +38,25 @@
             scrollX: true,
             ajax: {
                 processing: true,
-                url: Urls.archive_api(),
+                url: Urls.archive_api() + "?expand=info",
                 type: "GET",
                 dataSrc: "",
             },
             "columns": [
                 {data: "name",
                     fnCreatedCell: function(nTd, cellData, rowData, row, col) {
-                        $(nTd).html("<a href='" + Urls.archive(rowData.id) + "' target='_blank'>" + rowData.name + "</a>");
+                        $(nTd).html("<a href='" + Urls.archive(rowData.id) + "'>" + rowData.name + "</a>");
                     }
                 },
                 {data: "website",
                     fnCreatedCell: function(nTd, cellData, rowData, row, col) {
-                        $(nTd).html("<a href='" + (rowData.website) + "' target='_blank'> Website </a>");
+                        $(nTd).html("<a href='" + (rowData.website) + "'> Website </a>");
                     }
                 },
                 {data: "notes"},
-                {data: "record_count"},
+                {data: "info.record_count"},
+                {data: "info.session_count"},
+                {data: "info.case_count"}
             ],
 
         });

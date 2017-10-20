@@ -70,7 +70,7 @@
                     data: "id",
                     fnCreatedCell: function (nTd, cellData, rowData, row, col) {
                         var url = Urls.case(rowData.id)
-                        $(nTd).html("<a href='" + url + "' target='_blank'>" + rowData.id + "</a>");
+                        $(nTd).html("<a href='" + url + "'>" + rowData.id + "</a>");
                     }
                 },
                 {data: "session.village.name"},
@@ -102,16 +102,6 @@
         });
 
     });
-
-    function list_litigants(data){
-        var concat = '';
-        data.forEach(function (obj, index) {
-            concat = concat + '<div class="d-flex justify-content-end"><div class="mr-auto p-0"><u>Name:</u> ' + obj.name + '</div> <div class="p-0"><u>Role:</u> ' + obj.role + '</div></div><hr>';
-            return concat;
-            });
-    return concat;
-
-     };
 
 </script>
 

@@ -1,0 +1,92 @@
+{% extends '_layout/_l_two_col.html' %}
+
+{% block navbar %}
+    {% include '_layout/__navbar.html' %}
+{% endblock %}
+
+{% block center_bar %}
+
+    {{ block.super }}
+
+<div class="card-body clearfix" id="main_info">
+    <table class="table table-bordered table-hover" id="table" data-page-length="25">
+        <thead>
+            <th>Name</th>
+            <th>Hundreds</th>
+            <th>Villages</th>
+            <th>Great Rumor</th>
+            <th>Ancient Demesne</th>
+            <th>Sessions</th>
+            <th>Cases</th>
+            <th>Residents</th>
+            <th>Litigants</th>
+        </thead>
+    </table>
+</div>
+
+{% endblock %}
+
+{% block right_sidebar %}
+    {{ block.super }}
+{% endblock %}
+
+{% block scripts %}
+    {{ block.super }}
+<script>
+
+    $(document).ready(function () {
+        var url = window.location.pathname;
+        var id = url.split('/').reverse()[1];
+        var api_url = Urls.counties_api() + "?expand=counts";
+        console.log(api_url);
+        var table = $("#table").DataTable({
+            fixedHeader:{ headerOffset: 50 },
+            scrollX: true,
+            order: [0, "asc"],
+            ajax: {
+                url: api_url,
+                type: "GET",
+                dataSrc: "",
+            },
+            "columns": [
+                {data: "name",
+                    fnCreatedCell: function(nTd, cellData, rowData, row, col) {
+                        url = Urls.county(rowData.id);
+                        $(nTd).html("<a href='"+ url +"'>" + rowData.name + "</a>");
+                    }
+                },
+                {data: "counts.hundred"},
+                {data: "counts.village"},
+                {data: "counts.great_rumor"},
+                {data: "counts.ancient_demesne"},
+                {data: "counts.session"},
+                {data: "counts.case"},
+                {data: "counts.resident"},
+                {data: "counts.litigant"},
+            ]
+        });
+
+        $('#table tbody').on('click', 'td.details-control', function(){
+            var tr = $(this).closest('tr');
+            var tdi = tr.find("i.fa");
+            var row = table.row( tr );
+
+            if ( row.child.isShown() ) {
+                row.child.hide();
+                tr.removeClass('shown');
+                tdi.first().removeClass('fa-minus-square');
+                tdi.first().addClass('fa-plus-square');
+            } else{
+                row.child( format( row.data() ) ).show();
+                tr.addClass('shown');
+                tdi.first().removeClass('fa-plus-square');
+                tdi.first().addClass('fa-minus-square');
+            }
+        });
+
+    });
+
+</script>
+
+
+{% endblock %}

@@ -70,6 +70,11 @@ class LandDetailView(DetailView):
     model = models.Land
     queryset = models.Land.objects.prefetch_related('parcels').all()
 
+class LandListView(ListView):
+
+    model = models.Land
+    queryset = models.Land.objects.all()
+
 
 class PeopleListView(ListView):
 
@@ -119,10 +124,22 @@ class RecordDetailView(DetailView):
     queryset = models.Record.objects.all().prefetch_related('session_set')
 
 
+class RecordListView(ListView):
+
+    model = models.Record
+    queryset = models.Record.objects.all()
+
+
 class SessionDetailView(DetailView):
 
     model = models.Session
     queryset = models.Session.objects.all().select_related('village')
+
+
+class SessionListView(ListView):
+
+    model = models.Session
+    queryset = models.Session.objects.all()
     
 
 class VillageDetailView(DetailView):

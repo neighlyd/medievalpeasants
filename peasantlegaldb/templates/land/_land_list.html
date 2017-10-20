@@ -11,15 +11,12 @@
 <div class="card-body clearfix" id="main_info">
     <table class="table table-bordered table-hover" id="table" data-page-length="25">
         <thead>
-            <th></th>
-            <th>Name</th>
-            <th>Type</th>
-            <th>Archive</th>
-            <th>Reel</th>
-            <th>Earliest Session</th>
-            <th>Latest Session</th>
-            <th>Sessions</th>
-            <th>Cases</th>
+            <th>Tenant History</th>
+            <th>Land ID</th>
+            <th>Parcels</th>
+            <th>Notes</th>
+            <th>Earliest Case</th>
+            <th>Latest Case</th>
         </thead>
     </table>
 </div>
@@ -37,19 +34,18 @@
     function format( d ) {
         return "<table class='table'>" +
             "<thead>" +
-            "<th>Session ID</th>" +
-            "<th>Village:</th>" +
-            "<th>Date:</th>" +
-            "<th>Notes</th>" +
-            "<th>Cases:</th>" +
+            "<th>Person:</th>" +
+            "<th>Residency:</th>" +
+            "<th>Case:</th>" +
+            "<th>Role:</th>" +
+            "<th>Law Term:</th>" +
+            "<th>Year:" +
             "</thead>" +
-            session_history(d)
+            tenant_history(d)
     }
 
     $(document).ready(function () {
-        var url = window.location.pathname;
-        var id = url.split('/').reverse()[1];
-        var api_url = Urls.record_api() + "?expand=session_info&expand=archive&expand=session_set";
+        var api_url = Urls.land_api() + "?expand=tenant_history&expand=case_info";
         var table = $("#table").DataTable({
             fixedHeader:{ headerOffset: 50 },
             scrollX: true,
@@ -63,7 +59,7 @@
                 {
                     "class": "details-control",
                     "orderable": "false",
-                    "data": "session_set",
+                    "data": "tenant_history",
                     "defaultContent": "",
                     "render": function(cellData){
                         if (cellData != '') {
@@ -74,51 +70,34 @@
                     },
                     width:"15px"
                 },
-                {data: "name",
+                {data: "id",
                     fnCreatedCell: function(nTd, cellData, rowData, row, col) {
-                        url = Urls.record(rowData.id);
-                        $(nTd).html("<a href='"+ url +"'>" + rowData.name + "</a>");
+                        url = Urls.land(rowData.id);
+                        $(nTd).html("<a href='"+ url +"'>" + rowData.id + "</a>");
                     }
                 },
-                {data: "record_type"},
-                {data: "archive.name"},
-                {data: "reel"},
-                {data: "session_info",
-                    fnCreatedCell: function(nTd, cellData, rowData, row, col){
+                {data: "parcel_list",
+                    fnCreatedCell: list_parcels,
+                },
+                {data: "notes"},
+                {data: "case_info",
+                    fnCreatedCell: function (nTd, cellData, rowData, row, col) {
                         if(cellData){
-                            $(nTd).html("<a href='" + Urls.session(cellData.earliest.id) + "'>" + cellData.earliest.law_term + ", " + cellData.earliest.year + "</a>")
-                        } else {
-                            $(nTd).html("N/A")
-                        }
-                    }
-                },
-                {data: "session_info",
-                    fnCreatedCell: function (nTd, cellData, rowData, row, col) {
-                        if(cellData) {
-                            $(nTd).html("<a href='" + Urls.session(cellData.latest.id) + "'>" + cellData.latest.law_term + ", " + cellData.latest.year + "</a>")
+                            $(nTd).html(cellData.earliest.session.law_term + ", " + cellData.earliest.session.year)
                         } else {
                             $(nTd).html("N/A")
                         }
                     },
                 },
-                {data: "session_info",
+                {data: "case_info",
                     fnCreatedCell: function (nTd, cellData, rowData, row, col) {
-                        if(cellData) {
-                            $(nTd).html(cellData.session_count)
+                        if (cellData) {
+                            $(nTd).html(cellData.latest.session.law_term + ", " + cellData.latest.session.year)
                         } else {
                             $(nTd).html("N/A")
                         }
                     },
-                },
-                {data: "session_info",
-                    fnCreatedCell: function (nTd, cellData, rowData, row, col) {
-                        if(cellData) {
-                            $(nTd).html(cellData.case_count)
-                        } else {
-                            $(nTd).html("N/A")
-                        }
-                    },
-                },
+                }
             ]
         });
 
@@ -142,15 +121,16 @@
 
     });
 
-    function session_history(data){
-       var concat = '';
-       data.session_set.forEach(function(session){
-           concat = concat + "<tr>" +
-                "<td><a href='" + Urls.session(session.id) + "'>" + session.id + "</a></td>" +
-                "<td><a href='" + Urls.village(session.village.id) + "'>" + session.village.name + "</a></td>" +
-                "<td>" + session.human_date + "</td>" +
-                "<td>" + session.notes + "</td>" +
-                "<td>" + session.case_count + "</td>" +
+    function tenant_history(data){
+        var concat = '';
+        data.tenant_history.forEach(function(litigant){
+            concat = concat + "<tr>" +
+                "<td><a href='" + Urls.person(litigant.person.id) + "'>" + litigant.person.full_name + "</a></td>" +
+                "<td><a href='" + Urls.village(litigant.person.village.id) + "'>" + litigant.person.village.name + "</a></td>" +
+                "<td><a href='" + Urls.case(litigant.case.id) + "'>" + litigant.case.id + "</a></td>" +
+                "<td>" + litigant.role.role + "</td>" +
+                "<td>" + litigant.case.session.law_term + "</td>" +
+                "<td>" + litigant.case.session.year + "</td>" +
                 "</tr>";
             return concat
         });

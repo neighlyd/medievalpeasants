@@ -1,6 +1,7 @@
 import datetime
 
 from django.db import models
+from django.db.models import Count
 from itertools import chain
 
 
@@ -11,8 +12,15 @@ class Archive(models.Model):
 
     @property
     def record_count(self):
-        count = self.record_set.all().distinct().count()
-        return count
+        return self.record_set.count()
+
+    @property
+    def session_count(self):
+        return self.record_set.aggregate(Count('session')).get('session__count')
+
+    @property
+    def case_count(self):
+        return self.record_set.aggregate(Count('session__cases')).get('session__cases__count')
 
     def __str__(self):
         return self.name
@@ -53,6 +61,38 @@ class County(models.Model):
     name = models.CharField(max_length=20)
     abbreviation = models.CharField(max_length=15)
 
+    @property
+    def hundred_count(self):
+        return self.hundred_set.count()
+
+    @property
+    def village_count(self):
+        return self.village_set.count()
+
+    @property
+    def great_rumor_count(self):
+        return self.village_set.filter(great_rumor=True).count()
+
+    @property
+    def ancient_demesne_count(self):
+        return self.village_set.filter(ancient_demesne=True).count()
+
+    @property
+    def session_count(self):
+        return self.village_set.aggregate(Count('session')).get('session__count')
+
+    @property
+    def case_count(self):
+        return self.village_set.aggregate(Count('session__cases')).get('session__cases__count')
+
+    @property
+    def resident_count(self):
+        return self.village_set.aggregate(Count('person')).get('person__count')
+
+    @property
+    def litigant_count(self):
+        return len(set(Litigant.objects.all().filter(case__session__village__county_id=self).values_list('person', flat=True)))
+
     def __str__(self):
         return self.name
 
@@ -80,18 +120,17 @@ class Land(models.Model):
         return parcel_list
 
     @property
-    def parcel_list_concat(self):
-        parcel_list = ""
-        queryset = self.parcels.all().prefetch_related('parcel_type', 'parcel_tenure')
-        try:
-            first = True
-            for x in queryset:
-                parcel_list = parcel_list + str(x.amount) + " " + x.parcel_type.parcel_type + " held by " + \
-                              x.parcel_tenure.tenure + "<hr>"
-        except:
-            pass
-        return parcel_list
+    def earliest_case(self):
+        return Case.objects.filter(case_to_person__land=self).earliest('session__date')
 
+    
+    @property
+    def latest_case(self):
+        return Case.objects.filter(case_to_person__land=self).latest('session__date')
+
+    @property
+    def tenant_history(self):
+        return self.case_to_land.order_by('case__session__date')
 
     def __str__(self):
         return "Land ID: %s" % (self.id)
@@ -129,8 +168,8 @@ class LandParcel(models.Model):
     #   fix null in land_id
     land = models.ForeignKey(Land, null=True, on_delete=models.CASCADE, related_name="parcels")
     amount = models.FloatField()
-    parcel_type = models.ForeignKey(ParcelType)
-    parcel_tenure = models.ForeignKey(ParcelTenure)
+    parcel_type = models.ForeignKey(ParcelType, verbose_name='type')
+    parcel_tenure = models.ForeignKey(ParcelTenure, verbose_name='tenure')
 
 
 class PositionType(models.Model):
@@ -182,6 +221,7 @@ class Hundred(models.Model):
 
 
 class Village(models.Model):
+
     name = models.CharField(max_length=50)
     latitude = models.DecimalField(max_digits=10, decimal_places=7)
     longitude = models.DecimalField(max_digits=10, decimal_places=7)
@@ -254,7 +294,8 @@ class Person(models.Model):
         # case as an FK). Pop earliest case off based on index [0]. Check instance for Case or other (again, due to
         # difference in FK relationship w/ Session), and then render date display appropriately. Unfortunately, it
         # isn't possible to simply pass the model to the template for rendering (and manipulation), because of the FK
-        # difference. There may be a way, but it's beyond me.
+        # difference. There may be a way, but it's beyond me [ADDENDUM: there is, using 'get_context_data', however,
+        # this would not give additional data to DRF would it?]
 
         case_range = self.case_set.all()
         pledge_giver_range= self.pledge_giver.all()
@@ -378,6 +419,10 @@ class Person(models.Model):
         return case_count
 
     @property
+    def residency(self):
+        return self.village.name
+
+    @property
     def full_name(self):
         if self.relation_name:
             concated_name = self.first_name + ' ' + self.relation_name + ' ' + self.last_name
@@ -418,11 +463,22 @@ class Record(models.Model):
 
     @property
     def earliest_session(self):
-        return self.session_set.earliest('date')
+        try:
+            return self.session_set.filter(date__isnull=False).earliest('date')
+        except:
+            return None
 
     @property
     def latest_session(self):
-        return self.session_set.latest('date')
+        return self.session_set.filter(date__isnull=False).latest('date')
+
+    @property
+    def session_count(self):
+        return self.session_set.count()
+
+    @property
+    def case_count(self):
+        return self.session_set.aggregate(Count('cases')).get('cases__count')
 
     def __str__(self):
         return self.name
@@ -502,21 +558,6 @@ class Case(models.Model):
                 "role" : x.role.role
             }
             litigant_list.append(new_entry)
-        return litigant_list
-
-    @property
-    def litigant_list_concat(self):
-        litigant_list = ""
-        queryset = self.case_to_person.all().order_by('person__last_name')
-        # need to include the HTML for the list in the function, so it will be served through the Datatables child row
-        # correctly. Looking for solution - https://datatables.net/forums/discussion/44919?
-        try:
-            for x in queryset:
-                litigant_list = litigant_list + "<div class=d-flex justify-content-end><div class='mr-auto p-0'><u>Name:" \
-                                                "</u> " + x.person.id + ")>" + x.person.full_name + "</a></div> <div class='p-0'><u>Role:</u> " + \
-                                                x.role.role + "</div></div><hr>"
-        except:
-            pass
         return litigant_list
 
     @property

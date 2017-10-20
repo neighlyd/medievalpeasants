@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'webpack_loader',
     'django_js_reverse',
     'django_filters',
+    'peasantlegaldb.templatetags',
 ]
 
 MIDDLEWARE = [

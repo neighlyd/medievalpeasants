@@ -79,7 +79,7 @@ class LandViewSet(SerializerExtensionsAPIViewMixin, viewsets.ModelViewSet):
     serializer_class = serializers.LandSerializer
 
     def get_queryset(self):
-        queryset = models.Land.objects.all()
+        queryset = models.Land.objects.all().prefetch_related('case_to_land', 'case_to_land__person')
 
         # get case param from url, then if it is not empty get instance of case object and extract value list of each
         # distinct land associated with it. Afterwards, iterate through this queryset, ignoring blanks, and append each

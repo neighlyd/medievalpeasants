@@ -4,14 +4,9 @@
     {% include '_layout/__navbar.html' %}
 {% endblock %}
 
-{% block left_sidebar %}
-{% endblock %}
-
 {% block center_bar %}
 
-<div class="card-header text-center">
-    <h2 class="card-title">People List</h2>
-</div>
+    {{ block.super }}
 
 <div class="card-body clearfix" id="main_info">
     <table class="table table-bordered table-hover" id="table" data-page-length="25">
@@ -31,6 +26,7 @@
 {% endblock %}
 
 {% block right_sidebar %}
+    {{ block.super }}
 {% endblock %}
 
 {% block scripts %}
@@ -53,7 +49,7 @@
             "columns": [
                 {data: "first_name",
                     fnCreatedCell: function(nTd, cellData, rowData, row, col) {
-                        $(nTd).html("<a href='" + Urls.person(rowData.id) + "' target='_blank'>" + rowData.full_name + "</a>");
+                        $(nTd).html("<a href='" + Urls.person(rowData.id) + "'>" + rowData.full_name + "</a>");
                     }
                 },
                 {data: "village.name"},

@@ -42,13 +42,13 @@
                 {data: "id",
                     fnCreatedCell: function(nTd, cellData, rowData, row, col) {
                         url = Urls.session(rowData.id);
-                        $(nTd).html("<a href='"+ url +"' target='_blank'>" + rowData.id + "</a>");
+                        $(nTd).html("<a href='"+ url +"'>" + rowData.id + "</a>");
                     }
                 },
                 {data: "village.name",
                     fnCreatedCell: function(nTd, cellData, rowData, row, col) {
                         url = Urls.village(rowData.id);
-                        $(nTd).html("<a href='"+ url +"' target='_blank'>" + rowData.village.name + "</a>");
+                        $(nTd).html("<a href='"+ url +"'>" + rowData.village.name + "</a>");
                     }
                 },
                 {data: "law_term"},

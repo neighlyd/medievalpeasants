@@ -1,5 +1,6 @@
 {% load staticfiles %}
 {% load render_bundle from webpack_loader %}
+{% load additionaltags %}
 
 <!DOCTYPE html>
 
@@ -53,7 +54,7 @@
                 } else {
                     $(nTd).html("")
                 }
-            };
+            }
 
             function checkNotes(cellData) {
                 if (cellData === "") {
@@ -61,7 +62,7 @@
                 } else {
                     return '<i class="fa fa-plus-square" aria-hidden="true"></i>';
                 }
-            };
+            }
 
             function list_litigants(data){
                 var concat = '';
@@ -79,7 +80,18 @@
                     });
                 return concat;
 
-            };
+            }
+
+            function list_parcels(nTd, cellData){
+                var concat = '';
+                cellData.forEach(function (obj, index) {
+                    concat = concat + obj.amount + ' ' + obj.type + ' held by ' + obj.tenure +
+                                        '<hr>';
+                    return concat;
+                    });
+                $(nTd).html(concat);
+
+            }
 
             function replace_money (nTd, cellData, rowData, row, col) {
                 if (cellData) {
@@ -87,7 +99,7 @@
                 } else {
                     $(nTd).html("<p class='text-center'> -- </p>")
                 }
-            };
+            }
 
         </script>
 
