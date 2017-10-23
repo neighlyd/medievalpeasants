@@ -169,6 +169,34 @@ urlpatterns += [
 
 # Use DRF router to easily direct API traffic.
 router = routers.DefaultRouter()
+router.register(r'lands', api_views.LandViewSet, base_name='land_api')
+router.register(r'archives', api_views.ArchiveViewSet, base_name='archive_api')
+router.register(r'money', api_views.MoneyViewSet, base_name='money_api')
+router.register(r'chattels', api_views.ChattelViewSet, base_name='chattel_api')
+router.register(r'case_types', api_views.CaseTypeViewSet, base_name='case_type_api')
+router.register(r'counties', api_views.CountyViewSet, base_name='county_api')
+router.register(r'parcel_tenures', api_views.ParcelTenureViewSet, base_name='parcel_tenure_api')
+router.register(r'parcel_types', api_views.ParcelTypeViewSet, base_name='parcel_type_api')
+router.register(r'position_titles', api_views.PositionTypeViewSet, base_name='position_title_api')
+router.register(r'relation_types', api_views.RelationshipViewSet, base_name='relation_type_api')
+router.register(r'role_types', api_views.RoleViewSet, base_name='role_type_api')
+router.register(r'verdicts', api_views.VerdictViewSet, base_name='verdict_api')
+router.register(r'hundreds', api_views.HundredViewSet, base_name='hundred_api')
+router.register(r'villages', api_views.VillageViewSet, base_name='village_api')
+router.register(r'people', api_views.PersonViewSet, base_name='person_api')
+router.register(r'records', api_views.RecordViewSet, base_name='record_api')
+router.register(r'sessions', api_views.SessionViewSet, base_name='session_api')
+router.register(r'cornbot', api_views.CornbotViewSet, base_name='cornbot_api')
+router.register(r'extrahura', api_views.ExtrahuraViewSet, base_name='extrahura_api')
+router.register(r'murrains', api_views.MurrainViewSet, base_name='murrain_api')
+router.register(r'places_mentioned', api_views.PlaceMentionedViewSet, base_name='place_mentioned_api')
+router.register(r'land_parcels', api_views.PlaceMentionedViewSet, base_name='place_mentioned_api')
+router.register(r'pledges', api_views.PledgeViewSet, base_name='pledge_api')
+router.register(r'land_splits', api_views.LandSplitViewSet, base_name='land_split_api')
+router.register(r'relationships', api_views.RelationshipViewSet, base_name='relationship_api')
+router.register(r'cases', api_views.CaseViewSet, base_name='case_api')
+router.register(r'positions', api_views.PositionViewSet, base_name='position_api')
+router.register(r'litigants', api_views.LitigantViewSet, base_name='litigant_api')
 
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.
@@ -202,9 +230,8 @@ api_urls = [
     url(r'^cases', api_views.CaseViewSet.as_view({'get':'list'}), name='case_api'),
     url(r'^positions', api_views.PositionViewSet.as_view({'get':'list'}), name='positions_api'),
     url(r'^litigants', api_views.LitigantViewSet.as_view({'get': 'list'}), name='litigants_api'),
-    url(r'^relationships', api_views.RelationshipViewSet.as_view({'get':'list'}), name='relationships_api'),
 ]
 
 urlpatterns += [
-    url(r'^api/', include(api_urls)),
+    url(r'^api/', include(router.urls)),
 ]

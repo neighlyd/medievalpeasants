@@ -31,6 +31,7 @@
 {{ block.super }}
 <script>
     $(document).ready(function(){
+        var url = '/api/archives';
         var table = $('#table').DataTable({
             fixedHeader: {
                 headerOffset: 50
@@ -38,14 +39,15 @@
             scrollX: true,
             ajax: {
                 processing: true,
-                url: Urls.archive_api() + "?expand=info",
+                url: url,
                 type: "GET",
-                dataSrc: "",
+                dataSrc: "archives.",
             },
             "columns": [
                 {data: "name",
                     fnCreatedCell: function(nTd, cellData, rowData, row, col) {
-                        $(nTd).html("<a href='" + Urls.archive(rowData.id) + "'>" + rowData.name + "</a>");
+                        console.log(cellData);
+                        $(nTd).html("<a href='" + '/archive/' + rowData.id + "'>" + rowData.name + "</a>");
                     }
                 },
                 {data: "website",
@@ -54,9 +56,9 @@
                     }
                 },
                 {data: "notes"},
-                {data: "info.record_count"},
-                {data: "info.session_count"},
-                {data: "info.case_count"}
+                {data: "counts.record"},
+                {data: "counts.session"},
+                {data: "counts.case"},
             ],
 
         });

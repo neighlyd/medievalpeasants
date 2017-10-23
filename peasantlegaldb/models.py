@@ -1,7 +1,7 @@
 import datetime
 
 from django.db import models
-from django.db.models import Count
+from django.db.models import Count, Max, Min, Avg, Sum
 from itertools import chain
 
 
@@ -121,12 +121,21 @@ class Land(models.Model):
 
     @property
     def earliest_case(self):
-        return Case.objects.filter(case_to_person__land=self).earliest('session__date')
+        try:
+            earliest = self.case_to_land.earliest('case__session__date')
+            earliest = earliest.case.session.get_law_term_display() + ', ' + str(earliest.case.session.date.year)
+        except:
+            earliest = None
+        return earliest
 
-    
     @property
     def latest_case(self):
-        return Case.objects.filter(case_to_person__land=self).latest('session__date')
+        try:
+            latest = self.case_to_land.latest('case__session__date')
+            latest = latest.case.session.get_law_term_display() + ', ' + str(latest.case.session.date.year)
+        except:
+            latest = None
+        return latest
 
     @property
     def tenant_history(self):
@@ -235,8 +244,8 @@ class Village(models.Model):
     notes = models.TextField()
 
     @property
-    def get_case_count(self):
-        return Case.objects.all().filter(session__village_id=self.id).distinct().count()
+    def case_count(self):
+        return self.session_set.aggregate(Count('cases')).get('cases__count')
 
     @property
     def litigant_count(self):
@@ -289,55 +298,36 @@ class Person(models.Model):
     @property
     def earliest_case(self):
         # get queryset for each area where person interacts with cases (i.e. litigant table, pledges),
-        # chain together and sort by date using a lambda if/else statement to differentiate between Case and other
-        # instances (b/c Case date is at self.session.date while all others are at self.case.session.date, b/c they use
-        # case as an FK). Pop earliest case off based on index [0]. Check instance for Case or other (again, due to
-        # difference in FK relationship w/ Session), and then render date display appropriately. Unfortunately, it
-        # isn't possible to simply pass the model to the template for rendering (and manipulation), because of the FK
-        # difference. There may be a way, but it's beyond me [ADDENDUM: there is, using 'get_context_data', however,
-        # this would not give additional data to DRF would it?]
-
-        case_range = self.case_set.all()
-        pledge_giver_range= self.pledge_giver.all()
-        pledge_receiver_range = self.pledge_receiver.all()
-
+        # append together in a list and sort by date using a lambda. Pop earliest case off based on index [0].
         try:
-            earliest_case = sorted(chain(case_range, pledge_giver_range, pledge_receiver_range), key=lambda
-                x: x.session.date if isinstance(x, Case) else x.case.session.date)[0]
-            if isinstance(earliest_case, Case):
-                earliest_date = earliest_case.session.get_law_term_display() + ' - ' + str(earliest_case.session.date.
-                                                                                           year)
-            else:
-                earliest_date = earliest_case.case.session.get_law_term_display() + ' - ' + str(earliest_case.case.
-                                                                                                session.date.year)
-        except:
-            earliest_date = 'None'
+            case_list = []
+            case_list.append(self.person_to_case.earliest('case__session__date'))
+            case_list.append(self.pledge_giver.earliest('case__session__date'))
+            case_list.append(self.pledge_receiver.earliest('case__session__date'))
+            earliest = sorted(case_list, key=lambda x: x.case.session.date)[0]
+            earliest = earliest.case.session.get_law_term_display() + ', ' + str(earliest.case.session.date.year)
 
-        return earliest_date
+        except:
+            earliest = None
+
+        return earliest
+
 
     @property
     def latest_case(self):
         # see earliest_case for explanation.
 
-        case_range = self.case_set.all()
-        pledge_giver_range= self.pledge_giver.all()
-        pledge_receiver_range = self.pledge_receiver.all()
-
         try:
-            sorted_date = sorted(chain(case_range, pledge_giver_range, pledge_receiver_range), key=lambda
-                x: x.session.date if isinstance(x, Case) else x.case.session.date, reverse=True)
-
-            latest_case = sorted_date[0]
-            if isinstance(latest_case, Case):
-                latest_date = latest_case.session.get_law_term_display() + ' - ' + str(latest_case.session.date.
-                                                                                           year)
-            else:
-                latest_date = latest_case.case.session.get_law_term_display() + ' - ' + str(latest_case.case.
-                                                                                                session.date.year)
+            case_list = []
+            case_list.append(self.person_to_case.latest('case__session__date'))
+            case_list.append(self.pledge_giver.latest('case__session__date'))
+            case_list.append(self.pledge_receiver.latest('case__session__date'))
+            latest = sorted(case_list, key=lambda x: x.case.session.date, reverse=True)[0]
+            latest = latest.case.session.get_law_term_display() + ' - ' + str(latest.case.session.date.year)
         except:
-            latest_date = 'None'
+            latest = None
 
-        return latest_date
+        return latest
 
 
     @property
@@ -383,6 +373,33 @@ class Person(models.Model):
             return True
         else:
             return False
+
+    @property
+    def monetary_counts(self):
+        return self.person_to_case.aggregate(amercement_count=Count('amercement'),
+                                             amercement_max=Max('amercement__in_denarius'),
+                                             amercement_min=Min('amercement__in_denarius'),
+                                             amercement_avg=Avg('amercement__in_denarius'),
+                                             amercement_sum=Sum('amercement__in_denarius'), fine_count=Count('fine'),
+                                             fine_max=Max('fine__in_denarius'), fine_min=Min('fine__in_denarius'),
+                                             fine_avg=Avg('fine__in_denarius'), fine_sum=Sum('fine__in_denarius'),
+                                             damage_count=Count('damage'), damage_max=Max('damage__in_denarius'),
+                                             damage_min=Min('damage__in_denarius'),
+                                             damage_avg=Avg('damage__in_denarius'),
+                                             damage_sum=Sum('damage__in_denarius'), chevage_count=Count('chevage'),
+                                             chevage_max=Max('chevage__in_denarius'),
+                                             chevage_min=Min('chevage__in_denarius'),
+                                             chevage_avg=Avg('chevage__in_denarius'),
+                                             chevage_sum=Sum('chevage__in_denarius'), heriot_count=Count('heriot'),
+                                             heriot_max=Max('heriot__in_denarius'),
+                                             heriot_min=Min('heriot__in_denarius'),
+                                             heriot_avg=Avg('heriot__in_denarius'),
+                                             heriot_sum=Sum('heriot__in_denarius'),
+                                             impercamentum_count=Count('impercamentum'),
+                                             impercamentum_max=Max('impercamentum__in_denarius'),
+                                             impercamentum_min=Min('impercamentum__in_denarius'),
+                                             impercamentum_avg=Avg('impercamentum__in_denarius'),
+                                             impercamentum_sum=Sum('impercamentum__in_denarius') )
 
     @property
     def amercement_exists(self):
@@ -462,11 +479,27 @@ class Record(models.Model):
     notes = models.TextField()
 
     @property
+    def earliest_session_info(self):
+        try:
+            earliest = self.session_set.filter(date__isnull=False).earliest('date')
+            return '%s %s, %s' % (earliest.village.name, earliest.get_law_term_display(), earliest.year)
+        except:
+            return None
+
+    @property
     def earliest_session(self):
         try:
             return self.session_set.filter(date__isnull=False).earliest('date')
         except:
             return None
+
+    @property
+    def latest_session_info(self):
+        try:
+            latest = self.session_set.filter(date__isnull=False).latest('date')
+            return '%s %s, %s' % (latest.village.name, latest.get_law_term_display(), latest.year)
+        except:
+            None
 
     @property
     def latest_session(self):
@@ -479,6 +512,7 @@ class Record(models.Model):
     @property
     def case_count(self):
         return self.session_set.aggregate(Count('cases')).get('cases__count')
+
 
     def __str__(self):
         return self.name
@@ -509,6 +543,23 @@ class Session(models.Model):
     @property
     def case_count(self):
         return self.cases.count()
+
+    @property
+    def litigant_count(self):
+        return len(set(Litigant.objects.filter(case__session=self.id)))
+
+    @property
+    def land_case_count(self):
+        return len(set(Litigant.objects.filter(case__session=self.id, land__isnull=False).values_list('case', flat=True)))
+
+    @property
+    def chevage_case_count(self):
+        return len(set(Litigant.objects.filter(case__session=self.id, chevage__isnull=False).values_list('case', flat=True)))
+
+    @property
+    def impercamentum_case_count(self):
+        return len(set(Litigant.objects.filter(case__session=self.id, impercamentum__isnull=False).values_list('case', flat=True)))
+
 
     @property
     def human_date(self):

@@ -53,7 +53,7 @@
 
 
     $(document).ready(function(){
-        var url = Urls.case_api()+"?expand=session__village&expand=verdict&expand=case_type";
+        var url = "/api/cases/?include[]=session.village.name&include[]=session.law_term&include[]=session.date&include=session.year&exclude[]=session.village.*&exclude[]=session.*&include[]=verdict&include[]=case_type";
 
         var table = $('#table').DataTable({
             fixedHeader: {
@@ -64,7 +64,7 @@
                 processing: true,
                 url: url,
                 type: "GET",
-                dataSrc: "",
+                dataSrc: "cases.",
             },
             order: [[4, "asc"], [1, "asc"]],
             "columns": [
