@@ -73,13 +73,7 @@
                     "orderable": "false",
                     "data": "summary",
                     "defaultContent": "",
-                    "render": function(cellData){
-                        if (cellData) {
-                            return '<i class="fa fa-plus-square" aria-hidden="true"></i>';
-                        } else {
-                            return '<i class="fa fa-plus-square" aria-hidden="true" style="color: gray"></i>';
-                        }
-                    },
+                    "render": checkNotes,
                     width:"15px"
                 },
                 {data: "id",

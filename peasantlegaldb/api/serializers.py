@@ -255,7 +255,7 @@ class PersonSerializer(DynamicModelSerializer):
         ],
         deferred=True
     )
-    village = DynamicRelationField('VillageSerializer', deferred=True)
+    village = DynamicRelationField('VillageSerializer', embed=True, deferred=True)
 
     class Meta:
         model = models.Person

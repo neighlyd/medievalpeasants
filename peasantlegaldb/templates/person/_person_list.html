@@ -11,14 +11,11 @@
 <div class="card-body clearfix" id="main_info">
     <table class="table table-bordered table-hover" id="table" data-page-length="25">
         <thead>
+            <th>Details</th>
             <th>Name</th>
             <th>Village</th>
             <th>Gender</th>
             <th>Status</th>
-            <th>Litigation</th>
-            <th>Total Cases</th>
-            <th>1332 Tax</th>
-            <th>1379 Tax</th>
         </thead>
     </table>
 </div>
@@ -32,8 +29,33 @@
 {% block scripts %}
 {{ block.super }}
 <script>
+    function format( data ) {
+        return "<table class='table'>" +
+            "<tr>" +
+            "<td><b>Litigation</b></td>" +
+            "<td><b>Cases</b></td>" +
+            "<td><b>Earliest Case</b></td>" +
+            "<td><b>Latest Case</b></td>" +
+            "<td><b>Pledges Given</b></td>" +
+            "<td><b>Pledges Received</b></td>" +
+            "<td><b>Relationships</b></td>" +
+            "<td><b>Positions</b></td>" +
+            "</tr>" +
+            "<tr>" +
+            "<td>"+ data.counts.litigation +"</td>" +
+            "<td>" + data.counts.all_cases + "</td>" +
+            "<td>" + data.counts.earliest_case + "</td>" +
+            "<td>" + data.counts.latest_case + "</td>" +
+            "<td>" + data.counts.pledge.given + "</td>" +
+            "<td>" + data.counts.pledge.received + "</td>" +
+            "<td>" + data.counts.relationship + "</td>" +
+            "<td>" + data.counts.position + "</td>" +
+            "</tr>" +
+        "</table>"
+    }
+
     $(document).ready(function(){
-        var url = Urls.person_api() + "?expand=village";
+        var url = '/api/people/?exclude[]=village.*&include[]=village.name&include[]=counts';
         var table = $('#table').DataTable({
             order: [0, "asc"],
             fixedHeader: {
@@ -44,9 +66,17 @@
                 processing: true,
                 url: url,
                 type: "GET",
-                dataSrc: "",
+                dataSrc: "people.",
             },
             "columns": [
+                {
+                    "class": "details-control",
+                    "orderable": false,
+                    "data": "counts",
+                    "defaultContent": "",
+                    "render": checkNotes,
+                    width:"15px"
+                },
                 {data: "first_name",
                     fnCreatedCell: function(nTd, cellData, rowData, row, col) {
                         $(nTd).html("<a href='" + Urls.person(rowData.id) + "'>" + rowData.full_name + "</a>");
@@ -55,14 +85,28 @@
                 {data: "village.name"},
                 {data: "gender"},
                 {data: "status"},
-                {data: "case_count_litigation"},
-                {data: "case_count_all"},
-                {data: "tax_1332"},
-                {data: "tax_1379"},
             ],
 
         });
 
+        // Used to activate the + expansion and trigger the format function.
+         $('#table tbody').on('click', 'td.details-control', function(){
+            var tr = $(this).closest('tr');
+            var tdi = tr.find("i.fa");
+            var row = table.row( tr );
+
+            if ( row.child.isShown()) {
+                row.child.hide();
+                tr.removeClass('shown');
+                tdi.first().removeClass('fa-minus-square');
+                tdi.first().addClass('fa-plus-square');
+            } else {
+                row.child( format( row.data() ) ).show();
+                tr.addClass('shown');
+                tdi.first().removeClass('fa-plus-square');
+                tdi.first().addClass('fa-minus-square');
+            }
+        });
 
         // can be used to change visibility of a column based on a checkbox.
         $('#1332').change(function(){
