@@ -123,19 +123,50 @@ class Land(models.Model):
     def earliest_case(self):
         try:
             earliest = self.case_to_land.earliest('case__session__date')
-            earliest = earliest.case.session.get_law_term_display() + ', ' + str(earliest.case.session.date.year)
         except:
             earliest = None
-        return earliest
+        if not earliest:
+            earliest_case = {
+                'id': None,
+                'village': None,
+                'law_term': None,
+                'date': None,
+                'year': None,
+            }
+        else:
+            earliest_case = {
+                'id': earliest.case.session.id,
+                'village': earliest.case.session.village.name,
+                'law_term': earliest.case.session.get_law_term_display(),
+                'date': earliest.case.session.date,
+                'year': earliest.case.session.date.year,
+                }
+        return earliest_case
 
     @property
     def latest_case(self):
         try:
             latest = self.case_to_land.latest('case__session__date')
-            latest = latest.case.session.get_law_term_display() + ', ' + str(latest.case.session.date.year)
         except:
             latest = None
-        return latest
+        if not latest:
+            latest_case = {
+                'id': None,
+                'village': None,
+                'law_term': None,
+                'date': None,
+                'year': None,
+            }
+        else:
+            latest_case = {
+                'id': latest.case.session.id,
+                'village': latest.case.session.village.name,
+                'law_term': latest.case.session.get_law_term_display(),
+                'date': latest.case.session.date,
+                'year': latest.case.session.date.year,
+            }
+
+        return latest_case
 
     @property
     def tenant_history(self):
@@ -293,42 +324,109 @@ class Person(models.Model):
     # both taxes are to be input in denari.
     tax_1332 = models.FloatField()
     tax_1379 = models.FloatField()
+
+    class Meta:
+        verbose_name_plural = "People"
+
+    STATUS_CHOICES = {
+        (1, 'Villein'),
+        (2, 'Free'),
+        (3, 'Unknown'),
+        (4, 'Institution')
+    }
+
+    GENDER_CHOICES = {
+        ('M', 'Male'),
+        ('F', 'Female'),
+        ('I', 'Institution'),
+        ('U', 'Unknown')
+    }
+
+    first_name = models.CharField(max_length=250)
+    relation_name = models.CharField(max_length=250)
+    last_name = models.CharField(max_length=250)
+    status = models.IntegerField(choices=STATUS_CHOICES)
+    village = models.ForeignKey(Village)
+    gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
+    # both taxes are to be input in denari.
+    tax_1332 = models.FloatField()
+    tax_1379 = models.FloatField()
+    notes = models.TextField()
     notes = models.TextField()
 
     @property
     def earliest_case(self):
         # get queryset for each area where person interacts with cases (i.e. litigant table, pledges),
         # append together in a list and sort by date using a lambda. Pop earliest case off based on index [0].
+        case_list = []
         try:
-            case_list = []
             case_list.append(self.person_to_case.earliest('case__session__date'))
-            case_list.append(self.pledge_giver.earliest('case__session__date'))
-            case_list.append(self.pledge_receiver.earliest('case__session__date'))
-            earliest = sorted(case_list, key=lambda x: x.case.session.date)[0]
-            earliest = earliest.case.session.get_law_term_display() + ', ' + str(earliest.case.session.date.year)
-
         except:
-            earliest = None
-
+            pass
+        try:
+            case_list.append(self.pledge_giver.earliest('case__session__date'))
+        except:
+            pass
+        try:
+            case_list.append(self.pledge_receiver.earliest('case__session__date'))
+        except:
+            pass
+        if not case_list:
+            earliest = {
+                'id': None,
+                'village': None,
+                'law_term': None,
+                'year': None,
+                'date': None,
+            }
+        else:
+            earliest = sorted(case_list, key=lambda x: x.case.session.date)[0]
+            earliest = {
+                'id': earliest.case.id,
+                'village': earliest.case.session.village.name,
+                'law_term': earliest.case.session.get_law_term_display(),
+                'year': earliest.case.session.year,
+                'date': earliest.case.session.date,
+                
+            }
         return earliest
 
 
     @property
     def latest_case(self):
         # see earliest_case for explanation.
-
+        case_list = []
         try:
-            case_list = []
             case_list.append(self.person_to_case.latest('case__session__date'))
-            case_list.append(self.pledge_giver.latest('case__session__date'))
-            case_list.append(self.pledge_receiver.latest('case__session__date'))
-            latest = sorted(case_list, key=lambda x: x.case.session.date, reverse=True)[0]
-            latest = latest.case.session.get_law_term_display() + ' - ' + str(latest.case.session.date.year)
         except:
-            latest = None
+            pass
+        try:
+            case_list.append(self.pledge_giver.latest('case__session__date'))
+        except:
+            pass
+        try:
+            case_list.append(self.pledge_receiver.latest('case__session__date'))
+        except:
+            pass
+        if not case_list:
+            latest = {
+                'id': None,
+                'village': None,
+                'law_term': None,
+                'year': None,
+                'date': None,
+            }
+        else:
+            latest = sorted(case_list, key=lambda x: x.case.session.date, reverse=True)[0]
+            latest = {
+                'id': latest.case.id,
+                'village': latest.case.session.village.name,
+                'law_term': latest.case.session.get_law_term_display(),
+                'year': latest.case.session.year,
+                'date': latest.case.session.date,
 
+            }
         return latest
-
 
     @property
     def pledges_given_count(self):
@@ -364,6 +462,10 @@ class Person(models.Model):
             return True
         else:
             return False
+
+    @property
+    def position_exists(self):
+        return self.position.exists()
 
     @property
     def pledge_exists(self):
@@ -440,6 +542,22 @@ class Person(models.Model):
         return self.village.name
 
     @property
+    def relationships(self):
+        queryset_1 = self.relationship_person_one.all()
+        queryset_2 = self.relationship_person_two.all()
+        union = (queryset_1 | queryset_2).distinct()
+        data = []
+        for x in union:
+            new_entry={
+                'id': x.id,
+                'person_one': str(x.person_one),
+                'person_two': str(x.person_two),
+                'relationship': str(x.relationship),
+            }
+            data.append(new_entry)
+        return data
+
+    @property
     def full_name(self):
         if self.relation_name:
             concated_name = self.first_name + ' ' + self.relation_name + ' ' + self.last_name
@@ -479,31 +597,52 @@ class Record(models.Model):
     notes = models.TextField()
 
     @property
-    def earliest_session_info(self):
-        try:
-            earliest = self.session_set.filter(date__isnull=False).earliest('date')
-            return '%s %s, %s' % (earliest.village.name, earliest.get_law_term_display(), earliest.year)
-        except:
-            return None
-
-    @property
     def earliest_session(self):
         try:
-            return self.session_set.filter(date__isnull=False).earliest('date')
+            earliest = self.session_set.filter(date__isnull=False).earliest('date')
         except:
-            return None
-
-    @property
-    def latest_session_info(self):
-        try:
-            latest = self.session_set.filter(date__isnull=False).latest('date')
-            return '%s %s, %s' % (latest.village.name, latest.get_law_term_display(), latest.year)
-        except:
-            None
+            earliest = None
+        if not earliest:
+            earliest_session = {
+                'id': None,
+                'village': None,
+                'law_term': None,
+                'year': None,
+                'date': None,
+            }
+        else:
+            earliest_session = {
+                'id': earliest.id,
+                'village': earliest.village.name,
+                'law_term': earliest.get_law_term_display(),
+                'year': earliest.year,
+                'date': earliest.date,
+            }
+        return earliest_session
 
     @property
     def latest_session(self):
-        return self.session_set.filter(date__isnull=False).latest('date')
+        try:
+            latest = self.session_set.filter(date__isnull=False).latest('date')
+        except:
+            latest = None
+        if not latest:
+            latest_session = {
+                'id': None,
+                'village': None,
+                'law_term': None,
+                'year': None,
+                'date': None,
+            }
+        else:
+            latest_session = {
+                'id': latest.id,
+                'village': latest.village.name,
+                'law_term': latest.get_law_term_display(),
+                'year': latest.year,
+                'date': latest.date,
+            }
+        return latest_session
 
     @property
     def session_count(self):
@@ -553,12 +692,12 @@ class Session(models.Model):
         return len(set(Litigant.objects.filter(case__session=self.id, land__isnull=False).values_list('case', flat=True)))
 
     @property
-    def chevage_case_count(self):
-        return len(set(Litigant.objects.filter(case__session=self.id, chevage__isnull=False).values_list('case', flat=True)))
+    def chevage_payer_count(self):
+        return len(set(Litigant.objects.filter(case__session=self.id, chevage__isnull=False).values_list('person', flat=True)))
 
     @property
-    def impercamentum_case_count(self):
-        return len(set(Litigant.objects.filter(case__session=self.id, impercamentum__isnull=False).values_list('case', flat=True)))
+    def impercamentum_payer_count(self):
+        return len(set(Litigant.objects.filter(case__session=self.id, impercamentum__isnull=False).values_list('person', flat=True)))
 
 
     @property
@@ -768,6 +907,6 @@ class Position(models.Model):
 class Relationship(models.Model):
     person_one = models.ForeignKey(Person, on_delete=models.CASCADE, related_name='relationship_person_one')
     person_two = models.ForeignKey(Person, on_delete=models.CASCADE, related_name='relationship_person_two')
-    # need to rework so relationships are more descriptive.
+    # need to rework so relationships are more descriptive, including when (which case) it was revealed..
     relationship = models.ForeignKey(Relation)
     definitive = models.BooleanField(default=False)

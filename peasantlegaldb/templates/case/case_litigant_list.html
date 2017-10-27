@@ -32,48 +32,46 @@
     function format( d ){
         return "<table class='table'>" +
             "<tr>" +
-            "<td><b>Village:</b></td>" +
-            "<td>"+d.person.village.name+"</td>" +
-            "<td><b>Gender:</b></td>" +
-            "<td>"+d.person.gender+"</td>" +
-            "<td><b>Status:</b></td>" +
-            "<td>"+d.person.status+"</td>" +
+            "<td><b>Village</b></td>" +
+            "<td>" + d.person.village.name + "</td>" +
+            "<td><b>Gender</b></td>" +
+            "<td>" + d.person.gender_display + "</td>" +
+            "<td><b>Status</b></td>" +
+            "<td>" + d.person.status_display + "</td>" +
             "</tr>" +
             "<tr>" +
-            "<td><b>Litigation Count:</b></td>" +
-            "<td>"+d.person.case_count_litigation+"</td>" +
-            "<td><b>Total Case Count:</b></td>" +
-            "<td>"+d.person.case_count_all+"</td>" +
-            "<td><b>Earliest Case:</b></td>" +
-            "<td>"+d.person.earliest_case+"</td>" +
-            "<td><b>Latest Case:</b></td>" +
-            "<td>"+d.person.latest_case+"</td>" +
+            "<td><b>Litigation</b></td>" +
+            "<td>" + d.person.counts.litigant + "</td>" +
+            "<td><b>All Cases</b></td>" +
+            "<td>" + d.person.counts.case + "</td>" +
+            "<td><b>Earliest Case</b></td>" +
+            "<td>" + d.person.case_dates.earliest_case.law_term + ", " + d.person.case_dates.earliest_case.year + "</td>" +
+            "<td><b>Latest Case</b></td>" +
+            "<td>" + d.person.case_dates.latest_case.law_term + ", " + d.person.case_dates.latest_case.year + "</td>" +
             "</tr>" +
             "<tr>" +
-            "<td><b>Amercement Count:</b></td>" +
-            "<td>"+d.person.case_info.amercement__count+"</td>" +
-            "<td><b>Fine Count:</b></td>" +
-            "<td>"+d.person.case_info.fine__count+"</td>" +
-            "<td><b>Damages Count:</b></td>" +
-            "<td>"+d.person.case_info.damage__count+"</td>" +
+            "<td><b>Amercements</b></td>" +
+            "<td>" + d.person.counts.amercement_count + "</td>" +
+            "<td><b>Fines</b></td>" +
+            "<td>" + d.person.counts.fine_count + "</td>" +
+            "<td><b>Damages</b></td>" +
+            "<td>" + d.person.counts.damage_count + "</td>" +
             "</tr>" +
             "<tr>" +
-            "<td><b>Chevage Count:</b></td>" +
-            "<td>"+d.person.case_info.chevage__count+"</td>" +
-            "<td><b>Impercamenta Count:</b></td>" +
-            "<td>"+d.person.case_info.impercamentum__count+"</td>" +
-            "<td><b>Heriot Count:</b></td>" +
-            "<td>"+d.person.case_info.heriot__count+"</td>" +
-            "</tr>"
+            "<td><b> Chevages</b></td>" +
+            "<td>" + d.person.counts.chevage_count + "</td>" +
+            "<td><b>Impercamenta</b></td>" +
+            "<td>" + d.person.counts.impercamentum_count + "</td>" +
+            "<td><b>Heriot</b></td>" +
+            "<td>" + d.person.counts.heriot_count + "</td>" +
+            "</tr>" +
             "</table>"
     }
 
     $(document).ready(function(){
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1];
-        console.log(id);
-        var url = Urls.litigants_api() +"/?case=" + id + "&expand=person__village&expand=role&expand=person__case_info";
-        console.log(url);
+        var url = "/api/cases/" + id + "?include[]=litigants.person.village.name&exclude[]=litigants.person.village.*&include[]=litigants.person.counts&include[]=litigants.person.case_dates";
         var table = $('#table').DataTable({
             order:[1, "asc"],
             scrollX: true,
@@ -84,7 +82,7 @@
                 processing: true,
                 url: url,
                 type: "GET",
-                dataSrc: "",
+                dataSrc: "case.litigants.",
             },
             "columns": [
                 {

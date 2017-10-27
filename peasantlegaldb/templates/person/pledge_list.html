@@ -63,10 +63,8 @@
     $(document).ready(function () {
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1];
-        var giver_url = Urls.pledges_api() + "?giver=" + id + "&expand=pledge_receiver&expand=case__session&expand=case__case_type&expand=case__verdict";
-        var receiver_url = Urls.pledges_api() + "?receiver=" + id + "&expand=pledge_giver&expand=case__session&expand=case__case_type&expand=case__verdict";
-        console.log(giver_url);
-        console.log(receiver_url);
+        var giver_url = "/api/people/" + id + "?include[]=pledges_given.case";
+        var receiver_url = "/api/people/" + id + "?include[]=pledges_received.case";
         var table1 = $("#pledges_given_list").DataTable({
             scrollX: true,
             fixedHeader: {
@@ -76,7 +74,7 @@
             ajax: {
                 url: giver_url,
                 type: "GET",
-                dataSrc: "",
+                dataSrc: "person.pledges_given.",
             },
             "columns": [
                 {
@@ -89,9 +87,13 @@
                     },
                     width:"15px"
                 },
-                {data: 'pledge_receiver.full_name'},
-                {data: 'pledge_receiver.status'},
-                {data: 'pledge_receiver.gender'},
+                {data: 'pledge_receiver',
+                    fnCreatedCell: function(nTd, cellData, rowData, row, col) {
+                        $(nTd).html("<a href='" + Urls.person(cellData.id) + "'>" + cellData.full_name + "</a>");
+                    }
+                },
+                {data: 'pledge_receiver.status_display'},
+                {data: 'pledge_receiver.gender_display'},
                 {data: "case.id",
                     fnCreatedCell: function(nTd, cellData, rowData, row, col){
                         $(nTd).html("<a href='" + Urls.case(rowData.case.id) + "'target='_blank'>" + rowData.case.id + "</a>");
@@ -135,7 +137,7 @@
             ajax: {
                 url: receiver_url,
                 type: "GET",
-                dataSrc: "",
+                dataSrc: "person.pledges_received.",
             },
             "columns": [
                 {
@@ -148,9 +150,13 @@
                     },
                     width:"15px"
                 },
-                {data: 'pledge_giver.full_name'},
-                {data: 'pledge_giver.status'},
-                {data: 'pledge_giver.gender'},
+                {data: 'pledge_giver',
+                    fnCreatedCell: function(nTd, cellData, rowData, row, col) {
+                        $(nTd).html("<a href='" + Urls.person(cellData.id) + "'>" + cellData.full_name + "</a>");
+                    }
+                },
+                {data: 'pledge_giver.status_display'},
+                {data: 'pledge_giver.gender_display'},
                 {data: "case.id",
                     fnCreatedCell: function(nTd, cellData, rowData, row, col){
                         $(nTd).html("<a href='" + Urls.case(rowData.case.id) + "'target='_blank'>" + rowData.case.id + "</a>");

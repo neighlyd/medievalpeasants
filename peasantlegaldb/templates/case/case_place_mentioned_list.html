@@ -6,8 +6,8 @@
             <table class="table table-bordered table-hover" id="table" data-page-length="25">
                 <thead>
                     <th>Notes</th>
-                    <th>Village</th>
-                    <th>Hundred</th>
+                    <th>Village</th></th>
+                    <th>County</th>
                     <th>Great Rumor</th>
                     <th>Ancient Demesne</th>
                     <th>Sessions</th>
@@ -39,8 +39,7 @@
     $(document).ready(function () {
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1];
-        var api_url = Urls.place_mentioned_api() + "?case=" + id + "&expand=village&expand=village__counts&expand=village__hundred";
-        console.log(api_url);
+        var api_url = "/api/cases/" + id + "?include[]=places_mentioned.village.county";
         var table = $("#table").DataTable({
             fixedHeader:{
                 headerOffset: 50
@@ -50,7 +49,7 @@
             ajax: {
                 url: api_url,
                 type: "GET",
-                dataSrc: "",
+                dataSrc: "case.places_mentioned",
             },
             "columns": [
                 {
@@ -69,9 +68,9 @@
                 },
                 {data: "village.id",
                     fnCreatedCell: function(nTd, cellData, rowData, row, col){
-                        if (rowData.village.hundred_id){
-                            url = Urls.hundred(rowData.village.hundred_id);
-                            $(nTd).html("<a href='"+ url + "'>" + rowData.village.hundred.name + "</a>");
+                        if (rowData.village.county_id){
+                            url = Urls.county(rowData.village.county.id);
+                            $(nTd).html("<a href='"+ url + "'>" + rowData.village.county.name + "</a>");
                         } else {
                             $(nTd).html("N/A")
                         }

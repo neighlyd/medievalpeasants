@@ -10,8 +10,7 @@
                 <th></th>
                 <th>Case</th>
                 <th>Village</th>
-                <th>Law Term</th>
-                <th>Year</th>
+                <th>Session</th>
                 <th>Court</th>
                 <th>Case Type</th>
                 <th>Verdict</th>
@@ -45,7 +44,7 @@
     $(document).ready(function() {
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1];
-        var url = Urls.case_api() + "?land=" + id + "&distinct=true&expand=session__village&expand=case_type&expand=verdict";
+        var url = "/api/cases/?land=" + id + "&include[]=session.village&include[]=litigant_list&include[]=litigant_count";
         var table = $('#table').DataTable({
             scrollX: true,
             order: [4, "asc"],
@@ -53,17 +52,15 @@
                 processing: true,
                 url: url,
                 type: "GET",
-                dataSrc: "",
+                dataSrc: "cases.",
             },
             "columns": [
                 {
                     "class": "details-control",
                     "orderable": "false",
-                    "data": null,
+                    "data": "litigant_list",
                     "defaultContent": "",
-                    "render": function () {
-                        return '<i class="fa fa-plus-square" aria-hidden="true"></i>';
-                    },
+                    "render": checkNotes,
                     width: "15px"
                 },
                 {
@@ -74,8 +71,12 @@
                     }
                 },
                 {data: "session.village.name"},
-                {data: "session.law_term"},
-                {data: "session.year"},
+                {data: "session",
+                    render: {
+                        display: formatSessionDateNoVillage,
+                        sort: "date"
+                    }
+                },
                 {data: "court_type"},
                 {data: "case_type.case_type"},
                 {data: "verdict.verdict"},

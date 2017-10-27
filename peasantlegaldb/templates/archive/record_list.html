@@ -5,6 +5,7 @@
     <div class="card-body">
             <table class="table table-bordered table-hover" id="table" data-page-length="25">
                 <thead>
+                    <th>Notes</th>
                     <th>Name</th>
                     <th>Record Type</th>
                     <th>Reel</th>
@@ -12,7 +13,6 @@
                     <th>Latest Session</th>
                     <th>Sessions</th>
                     <th>Cases</th>
-                    <th>Notes</th>
                 </thead>
             </table>
     </div>
@@ -24,13 +24,19 @@
 
 <script>
 
+    function format( data ) {
+        return "<table class='table'>" +
+            "<tr>" +
+            "<td><b>Notes</b></td>" +
+            "<td>"+data.notes+"</td>" +
+            "</tr>" +
+        "</table>"
+    }
 
     $(document).ready(function () {
         var url = window.location.pathname;
-        var id = url.split('/').reverse()[1]
-        console.log(id)
-        var api_url = "/api/records/?filter{archive}=" + id + "&include[]=sessions&include[]=counts";
-        console.log(api_url);
+        var id = url.split('/').reverse()[1];
+        var api_url = "/api/archives/" + id + "?include[]=records.session_dates&include[]=records.counts";
         var table = $("#table").DataTable({
             fixedHeader:{                headerOffset: 50            },
             scrollX: true,
@@ -38,9 +44,17 @@
             ajax: {
                 url: api_url,
                 type: "GET",
-                dataSrc: "records.",
+                dataSrc: "archive.records.",
             },
             "columns": [
+                {
+                    "class": "details-control",
+                    "orderable": false,
+                    "data": "notes",
+                    "defaultContent": "",
+                    "render": checkNotes,
+                    width:"15px"
+                },
                 {data: "name",
                     fnCreatedCell: function(nTd, cellData, rowData, row, col) {
                         url = Urls.record(rowData.id);
@@ -49,14 +63,40 @@
                 },
                 {data: "record_type"},
                 {data: "reel"},
-                {data: "counts.earliest_session"},
-                {data: "counts.latest_session"},
+                {data: "session_dates.earliest_session",
+                    render: {
+                        display: formatSessionDate,
+                        sort: "date",
+                    }
+                },
+                {data: "session_dates.latest_session",
+                    render: {
+                        display: formatSessionDate,
+                        sort: "date",
+                    }
+                },
                 {data: "counts.session"},
                 {data: "counts.case"},
-                {data: "notes"},
             ]
         });
 
+        $('#table tbody').on('click', 'td.details-control', function(){
+            var tr = $(this).closest('tr');
+            var tdi = tr.find("i.fa");
+            var row = table.row( tr );
+
+            if ( row.child.isShown() ) {
+                row.child.hide();
+                tr.removeClass('shown');
+                tdi.first().removeClass('fa-minus-square');
+                tdi.first().addClass('fa-plus-square');
+            } else{
+                row.child( format( row.data() ) ).show();
+                tr.addClass('shown');
+                tdi.first().removeClass('fa-plus-square');
+                tdi.first().addClass('fa-minus-square');
+            }
+        });
     });
 
 

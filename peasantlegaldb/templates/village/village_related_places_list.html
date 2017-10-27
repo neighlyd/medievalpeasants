@@ -1,12 +1,14 @@
 {% extends '_layout/_l_single_col.html' %}
 
 {% block single_col %}
-    <h3 class="card-header text-center">Case List</h3>
+    <h3 class="card-header text-center">Related Places</h3>
     <div class="card-body">
             <table class="table table-bordered table-hover" id="table" data-page-length="25">
                 <thead>
                     <th></th>
+                    <th>Village</th>
                     <th>Case</th>
+                    <th>Session</th>
                     <th>Court Type</th>
                     <th>Case Type</th>
                     <th>Verdict</th>
@@ -30,7 +32,7 @@
         return "<table class='table'>" +
             "<tr>" +
             "<td><b>Summary</b></td>" +
-            "<td>" + data.summary + "</td>" +
+            "<td>" + data.case.summary + "</td>" +
             "</tr>" +
             "</table>"
 
@@ -39,7 +41,8 @@
     $(document).ready(function () {
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1];
-        var api_url = "/api/sessions/" + id + "?include[]=cases.litigant_count";
+        var api_url = "/api/places_mentioned/?related_to=" + id + "&include[]=case.session&include[]=case.litigant_count&include[]=village";
+        console.log(api_url);
         var table = $("#table").DataTable({
             fixedHeader:{ headerOffset: 50 },
             scrollX: true,
@@ -47,37 +50,55 @@
             ajax: {
                 url: api_url,
                 type: "GET",
-                dataSrc: "session.cases.",
+                dataSrc: "place_mentioneds.",
             },
             "columns": [
                 {
                     "class": "details-control",
                     "orderable": "false",
-                    "data": "summary",
+                    "data": 'case.summary',
                     "defaultContent": "",
                     "render": checkNotes,
                     width:"15px"
                 },
-                {data: "id",
-                    fnCreatedCell: function(nTd, cellData, rowData, row, col) {
-                        url = Urls.case(rowData.id);
-                        $(nTd).html("<a href='"+ url +"'>" + rowData.id + "</a>");
+                {data: "village",
+                    render: {
+                        display: function(data, type, row, meta){
+                            url = Urls.village(data.id);
+                            return "<a href='" + url + "'>" + data.name +"</a>";
+                        },
+                        sort: "name"
                     }
                 },
-                {data: "court_type"},
-                {data: "case_type.case_type"},
-                {data: "verdict.verdict"},
-                {data: "litigant_count"},
-                {data: "of_interest",
+                {data: "case",
+                    render: {
+                        display: function(data, type, row, col) {
+                            url = Urls.case(data.id);
+                            return "<a href='"+ url +"'>" + data.id + "</a>";
+                        },
+                        sort: "id"
+                    }
+                },
+                {data: "case.session",
+                    render: {
+                        display: formatSessionDateNoVillage,
+                        sort: "date"
+                    }
+                },
+                {data: "case.court_type"},
+                {data: "case.case_type.case_type"},
+                {data: "case.verdict.verdict"},
+                {data: "case.litigant_count"},
+                {data: "case.of_interest",
                     fnCreatedCell: checkmaker
                 },
-                {data: "villeinage_mention",
+                {data: "case.villeinage_mention",
                 fnCreatedCell: checkmaker
             },
-                {data: "active_sale",
+                {data: "case.active_sale",
                 fnCreatedCell: checkmaker
             },
-                {data: "incidental_land",
+                {data: "case.incidental_land",
                 fnCreatedCell: checkmaker
         },
             ]
@@ -102,7 +123,6 @@
         });
 
     });
-
 
 </script>
 

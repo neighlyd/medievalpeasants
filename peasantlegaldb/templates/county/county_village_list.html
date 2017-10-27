@@ -39,16 +39,16 @@
     $(document).ready(function () {
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1];
-        var api_url = Urls.village_api() + "?county=" + id + "&expand=hundred&expand=counts";
+        var api_url = "/api/counties/" + id + "/?include[]=villages.counts&include[]=villages.hundred";
         console.log(api_url);
         var table = $("#table").DataTable({
             fixedHeader:{ headerOffset: 50 },
             scrollX: true,
-            order: [3, "asc"],
+            order: [1, "asc"],
             ajax: {
                 url: api_url,
                 type: "GET",
-                dataSrc: "",
+                dataSrc: "county.villages.",
             },
             "columns": [
                 {
@@ -56,13 +56,7 @@
                     "orderable": "false",
                     "data": "notes",
                     "defaultContent": "",
-                    "render": function(cellData){
-                        if(cellData === "") {
-                            return '<i class="fa fa-plus-square" aria-hidden="true" style="color: gray"></i>';
-                        } else {
-                            return '<i class="fa fa-plus-square" aria-hidden="true"></i>';
-                        }
-                    },
+                    "render": checkNotes,
                     width:"15px"
                 },
                 {data: "name",
@@ -113,14 +107,6 @@
         });
 
     });
-
-function checkmaker(nTd, cellData, rowData, row, col) {
-    if (cellData === true){
-        $(nTd).html("<i class='fa fa-check' style='color:forestgreen'></i>")
-    } else {
-        $(nTd).html("")
-    }
-}
 
 
 </script>

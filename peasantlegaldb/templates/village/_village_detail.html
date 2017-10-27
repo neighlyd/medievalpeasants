@@ -9,6 +9,8 @@
         <a class="list-group-item list-group-item-action" href="{% url 'village_case_list' village.id %}">Cases</a>
         <a class="list-group-item list-group-item-action" href="{% url 'village_resident_list' village.id %}">Known Residents</a>
         <a class="list-group-item list-group-item-action" href="{% url 'village_litigant_list' village.id %}">Litigants</a>
+        <a class="list-group-item list-group-item-action" href="{% url 'village_related_places_list' village.id %}">Places Mentioned Here</a>
+        <a class="list-group-item list-group-item-action" href="{% url 'village_places_mentioned_list' village.id %}">Mentioned Elsewhere</a>
     </div>
 {% endblock %}
 
@@ -44,6 +46,23 @@
                                     <td class="d-inline-block col-8">{{ village.ancient_demesne }}</td>
                                 </tr>
                                 <tr class="row m-0">
+                                    <td class="d-inline-block col-4"><b>Sessions:</b></td>
+                                    <td class="d-inline-block col-8">{{ village.session_count }}</td>
+                                </tr>
+                                <tr class="row m-0">
+                                    <td class="d-inline-block col-4"><b>Cases:</b></td>
+                                    <td class="d-inline-block col-8">{{ village.case_count }}</td>
+                                </tr>
+                                <tr class="row m-0">
+                                    <td class="d-inline-block col-4"><b>Known Residents:</b></td>
+                                    <td class="d-inline-block col-8">{{ village.resident_count }}</td>
+                                </tr>
+                                <tr class="row m-0">
+                                    <td class="d-inline-block col-4"><b>Litigants:</b></td>
+                                    <td class="d-inline-block col-8">{{ village.litigant_count }}</td>
+                                </tr>
+
+                                <tr class="row m-0">
                                     <td class="d-inline-block col-4"><b>Notes:</b></td>
                                     <td class="d-inline-block col-8">{{ village.notes | linebreaksbr }}</td>
                                 </tr>
@@ -72,7 +91,9 @@
 {% endblock %}
 
 {% block right_sidebar %}
-    <button type="button" class="btn btn-secondary float-sm-right">Edit Village</button>
+
+    {{ block.super }}
+
 {% endblock %}
 
 {% block scripts %}
@@ -103,24 +124,24 @@
             // get lat and lng from API, since accessing django models through JS is not possible (that I'm aware).
             var url = window.location.pathname;
             var id = url.split('/').reverse()[1];
-            var api_url = Urls.village_api() + "?village=" + id;
+            var village_url = "/api/villages/" + id;
 
-            var location = $.ajax({
-                url: api_url,
+            var locationObject = $.ajax({
+                url: village_url,
                 type: "GET",
                 async: false,
                 dataType: '',
             }).responseJSON;
 
-            // use .map to iterate through array of objects returned by API and map key-value pairs to variable. Because
-            // the Latitude and Longitude are stored as strings, convert them to floats which the Google API can read as
-            // appropriate coordinates. Also grab the village name for the label.
-            var lng = location.map(f => f.longitude);
-            lng = parseFloat(lng);
-            var lat = location.map(f => f.latitude);
-            lat = parseFloat(lat)
-            var villName = location.map(f => f.name);
+            // because Dynamic-Rest nests the data one-level deep, strip out the '{ villages:{' layer.
+            locationObject = locationObject.village;
 
+            // assign lat and lng to variables and convert to floats that google maps api can understand.
+            var lng = parseFloat(locationObject.longitude);
+            var lat = parseFloat(locationObject.latitude);
+            var villName = locationObject.name;
+
+            // ensure that lat and lng are not null, otherwise google maps api freaks out.
             if(lng == null){
                 lng = 0
             };
@@ -137,6 +158,7 @@
             map = new google.maps.Map(document.getElementById('map'),
                 mapOptions);
 
+            // overlay the ordnance survey maps.
             map.overlayMapTypes.insertAt(0, nlsmap);
             map.overlayMapTypes.insertAt(0, nlsmap);
 

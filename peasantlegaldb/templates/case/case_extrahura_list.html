@@ -20,9 +20,8 @@
 
     $(document).ready(function () {
         var url = window.location.pathname;
-        var id = url.split('/').reverse()[1]
-        console.log(id)
-        var api_url = Urls.extrahura_api() + "?case=" + id + "&expand=price&expand=animal";
+        var id = url.split('/').reverse()[1];
+        var api_url = "/api/cases/" + id + "?include[]=extrahura";
         console.log(api_url);
         var table = $("#table").DataTable({
             fixedHeader:{                headerOffset: 50            },
@@ -30,7 +29,7 @@
             ajax: {
                 url: api_url,
                 type: "GET",
-                dataSrc: "",
+                dataSrc: "case.extrahura.",
             },
             "columns": [
                 {data: "animal",
@@ -44,24 +43,6 @@
                     }
                 },
             ]
-        });
-
-        $('#table tbody').on('click', 'td.details-control', function(){
-            var tr = $(this).closest('tr');
-            var tdi = tr.find("i.fa");
-            var row = table.row( tr );
-
-            if ( row.child.isShown() ) {
-                row.child.hide();
-                tr.removeClass('shown');
-                tdi.first().removeClass('fa-minus-square');
-                tdi.first().addClass('fa-plus-square');
-            } else{
-                row.child( format( row.data() ) ).show();
-                tr.addClass('shown');
-                tdi.first().removeClass('fa-plus-square');
-                tdi.first().addClass('fa-minus-square');
-            }
         });
     });
 

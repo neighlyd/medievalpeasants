@@ -44,7 +44,7 @@
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1]
         console.log(id)
-        var api_url = Urls.litigants_api() + "?person=" + id + "&chevage=true&expand=chevage&expand=role&expand=case__verdict&expand=case__case_type&expand=case__session__village";
+        var api_url = "/api/people/" + id + "?include[]=cases.case.session.village&filter{cases|chevage.isnull}=false";
         console.log(api_url);
         var table = $("#table").DataTable({
             fixedHeader:{ headerOffset: 50 },
@@ -53,17 +53,15 @@
             ajax: {
                 url: api_url,
                 type: "GET",
-                dataSrc: "",
+                dataSrc: "person.cases.",
             },
             "columns": [
                 {
                     "class": "details-control",
                     "orderable": false,
                     "data": null,
-                    "defaultContent": "",
-                    "render": function(){
-                        return '<i class="fa fa-plus-square" aria-hidden="true"></i>';
-                    },
+                    "defaultContent": "case",
+                    "render": checkNotes,
                     width:"15px"
                 },
                 {data: "case.id",
@@ -79,36 +77,18 @@
                 },
                 {data: "chevage.in_denarius",
                     fnCreatedCell: function(nTd, cellData, rowData, row, col){
-                    $(nTd).html(rowData.chevage.amount + " (" + rowData.chevage.in_denarius + "d.)")
+                        $(nTd).html(rowData.fine.amount + " (" + rowData.fine.in_denarius + "d.)")
                     }
                 },
                 {data: "chevage_notes"},
                 {data: "recessit",
-                    fnCreatedCell: function(nTd, cellData, rowData, row, col) {
-                        if (rowData.recessit === true){
-                            $(nTd).html("<i class='fa fa-check' style='color:forestgreen'></i>")
-                        } else {
-                            $(nTd).html("")
-                        }
-                    }
+                    fnCreatedCell: checkmaker,
                 },
                 {data: "crossed",
-                    fnCreatedCell: function(nTd, cellData, rowData, row, col) {
-                        if (rowData.crossed === true){
-                            $(nTd).html("<i class='fa fa-check' style='color:forestgreen'></i>")
-                        } else {
-                            $(nTd).html("")
-                        }
-                    }
+                    fnCreatedCell: checkmaker,
                 },
                 {data: "habet_terram",
-                    fnCreatedCell: function(nTd, cellData, rowData, row, col) {
-                        if (rowData.habet_terram === true){
-                            $(nTd).html("<i class='fa fa-check' style='color:forestgreen'></i>")
-                        } else {
-                            $(nTd).html("")
-                        }
-                    }
+                    fnCreatedCell: checkmaker,
                 },
             ]
         });

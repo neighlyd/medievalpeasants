@@ -135,6 +135,11 @@ village_urls = [
         name='village_resident_list'),
     url(r'^litigant_list$', web_views.PersonDetailView.as_view(template_name='village/village_litigant_list.html'),
         name='village_litigant_list'),
+    url(r'^places_mentioned_list$', web_views.VillageListView.as_view(template_name='village/village_place_mentioned_list.html'),
+        name='village_places_mentioned_list'),
+    url(r'^related_places$', web_views.VillageListView.as_view(template_name='village/village_related_places_list.html'),
+        name='village_related_places_list'),
+
 ]
 
 

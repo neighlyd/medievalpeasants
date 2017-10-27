@@ -23,22 +23,22 @@
 
     $(document).ready(function () {
         var url = window.location.pathname;
-        var id = url.split('/').reverse()[1]
-        console.log(id)
-        var api_url = Urls.positions_api() + "?person=" + id + "&expand=session&expand=title";
+        var id = url.split('/').reverse()[1];
+        var api_url = "/api/people/" + id + "?include[]=positions";
         console.log(api_url);
         var position_table = $("#person_position_list").DataTable({
             fixedHeader:{ headerOffset: 50 },
+            order: [2, "asc"],
             ajax: {
                 url: api_url,
                 type: "GET",
-                dataSrc: "",
+                dataSrc: "person.positions.",
             },
             "columns": [
                 {data: "title.title"},
                 {data: "session.law_term",
                     fnCreatedCell: function(nTd, cellData, rowData, row, col){
-                        $(nTd).html("<a href='" + Urls.person(rowData.person_id) + "'target='_blank'>" + rowData.session.law_term + " <-- Placeholder Link</a>");
+                        $(nTd).html("<a href='" + Urls.session(rowData.session.id) + "'target='_blank'>" + rowData.session.law_term + "</a>");
                     }
                 },
                 {data: "session.date",
@@ -46,7 +46,9 @@
                         $(nTd).html(rowData.session.year);
                     }
                 },
-                {data: "definitive"}
+                {data: "definitive",
+                    fnCreatedCell: checkmaker
+                }
             ]
         })
     });

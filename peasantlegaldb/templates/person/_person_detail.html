@@ -19,6 +19,9 @@
     {% if person.relationship_exists %}
         <a class="list-group-item list-group-item-action " href="{% url 'relationship_list' person.id %}">Relationship List</a>
     {% endif %}
+    {% if person.position_exists %}
+        <a class="list-group-item list-group-item-action " href="{% url 'position_list' person.id %}">Position List</a>
+    {% endif %}
 
 
         <br>
@@ -93,11 +96,19 @@
                     </tr>
                     <tr class="row m-0">
                         <td class="d-inline-block col-4"><b>Earliest Case</b></td>
-                        <td class="d-inline-block col-8">{{ person.earliest_case }}</td>
+                        {% if person.earliest_case.id is not None %}
+                        <td class="d-inline-block col-8"><a href="{% url 'case' person.earliest_case.id %}">{{ person.earliest_case.village }} | {{ person.earliest_case.law_term }}, {{ person.earliest_case.year }}</a></td>
+                        {% else %}
+                        <td class="d-inline-block col-8">None</td>
+                        {% endif %}
                     </tr>
                     <tr class="row m-0">
                         <td class="d-inline-block col-4"><b>Latest Case</b></td>
-                        <td class="d-inline-block col-8">{{ person.latest_case }}</td>
+                        {% if person.latest_case.id is not None %}
+                        <td class="d-inline-block col-8"><a href="{% url 'case' person.latest_case.id %}">{{ person.latest_case.village }} | {{ person.latest_case.law_term }}, {{ person.latest_case.year }}</a></td>
+                        {% else %}
+                        <td class="d-inline-block col-8">None</td>
+                        {% endif %}
                     </tr>
 
                 </table>
@@ -126,7 +137,9 @@
 {% endblock %}
 
 {% block right_sidebar %}
+
     {{ block.super }}
+
 {% endblock %}
 
 <!-- Old script for showing tabs.

@@ -48,6 +48,39 @@
         <script src="{% url 'js_reverse' %}" type="text/javascript"></script>
 
         <script>
+
+            function formatCaseDate(data, type, row, meta) {
+                if (data.id) {
+                    return "<a href='" + Urls.case(data.id) + "'>" + data.village + " | " + data.law_term + ", " + data.year + "</a>";
+                } else {
+                    return "N/A";
+                }
+            }
+
+            function formatCaseDateNoVillage(data, type, row, meta) {
+                if (data.id) {
+                    return "<a href='" + Urls.case(data.id) + "'>" + data.law_term + ", " + data.year + "</a>";
+                } else {
+                    return "N/A";
+                }
+            }
+
+            function formatSessionDate(data, type, row, meta) {
+                if (data.id) {
+                    return "<a href='" + Urls.session(data.id) + "'>" + data.village + " | " + data.law_term + ", " + data.year + "</a>";
+                } else {
+                    return "N/A";
+                }
+            }
+
+            function formatSessionDateNoVillage(data, type, row, meta) {
+                if (data.id) {
+                    return "<a href='" + Urls.session(data.id) + "'>" + data.law_term + ", " + data.year + "</a>";
+                } else {
+                    return "N/A";
+                }
+            }
+
             function checkmaker(nTd, cellData, rowData, row, col) {
                 if (cellData === true){
                     $(nTd).html("<i class='fa fa-check' style='color:forestgreen'></i>")

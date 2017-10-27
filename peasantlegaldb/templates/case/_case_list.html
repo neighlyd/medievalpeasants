@@ -53,7 +53,7 @@
 
 
     $(document).ready(function(){
-        var url = "/api/cases/?include[]=session.village.name&include[]=session.law_term&include[]=session.date&include=session.year&exclude[]=session.village.*&exclude[]=session.*&include[]=verdict&include[]=case_type";
+        var url = "/api/cases/?exclude[]=session.village.*&exclude[]=session.*&include[]=litigant_count&include[]=session.village.name&include[]=session.law_term&include[]=session.date&include[]=session.human_date";
 
         var table = $('#table').DataTable({
             fixedHeader: {
@@ -84,14 +84,14 @@
                 },
                 {data: "session.village",
                     fnCreatedCell: function(nTd, cellData, rowData, row, col) {
-                        var url = Urls.village(rowData.session.village.id)
+                        var url = Urls.village(rowData.session.village.id);
                         $(nTd).html("<a href='"+ url +"'>" + rowData.session.village.name + "</a>");
                     }
                 },
                 {data: "session.law_term"},
                 {data: "session.date",
                     fnCreatedCell: function(nTd, cellData, rowData, row, col) {
-                        $(nTd).html(rowData.session.year);
+                        $(nTd).html(rowData.session.human_date);
                     }
                 },
                 {data: "court_type"},

@@ -42,8 +42,7 @@
     $(document).ready(function () {
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1];
-        var api_url = Urls.case_api() + "?county=" + id + "&expand=case_type&expand=verdict&expand=session__village";
-        console.log(api_url);
+        var api_url = "/api/counties/" + id + "?include[]=villages.sessions.cases.session.village&filter{villages|sessions.isnull}=false";
         var table = $("#table").DataTable({
             fixedHeader:{ headerOffset: 50 },
             scrollX: true,
@@ -51,7 +50,7 @@
             ajax: {
                 url: api_url,
                 type: "GET",
-                dataSrc: "",
+                dataSrc: "county.villages.sessions.",
             },
             "columns": [
                 {
@@ -59,27 +58,22 @@
                     "orderable": "false",
                     "data": "summary",
                     "defaultContent": "",
-                    "render": function(cellData){
-                        if (cellData) {
-                            return '<i class="fa fa-plus-square" aria-hidden="true"></i>';
-                        } else {
-                            return '<i class="fa fa-plus-square" aria-hidden="true" style="color: gray"></i>';
-                        }
-                    },
+                    "render": checkNotes,
                     width:"15px"
                 },
-                {data: "id",
+                {data: "cases.id",
                     fnCreatedCell: function(nTd, cellData, rowData, row, col) {
-                        url = Urls.case(rowData.id);
-                        $(nTd).html("<a href='"+ url +"'>" + rowData.id + "</a>");
+                        console.log(rowData);
+                        url = Urls.case(rowData.cases.id);
+                        $(nTd).html("<a href='"+ url +"'>" + rowData.cases.id + "</a>");
                     }
                 },
-                {data: "session.village.name"},
-                {data: "session.law_term"},
+                {data: "cases.session.village.name"},
+                {data: "cases.session.law_term"},
                 {data: "session.date",
                     fnCreatedCell: function(nTd, cellData, rowData, row, col) {
                         url = Urls.session(rowData.session.id);
-                        $(nTd).html("<a href='"+ url +"'>" + rowData.session.year + "</a>");
+                        $(nTd).html("<a href='"+ url +"'>" + rowData.session.law_term + ", " + rowData.session.year + "</a>");
                     }
                 },
                 {data: "court_type"},
@@ -120,14 +114,6 @@
         });
 
     });
-
-function checkmaker(nTd, cellData, rowData, row, col) {
-    if (cellData === true){
-        $(nTd).html("<i class='fa fa-check' style='color:forestgreen'></i>")
-    } else {
-        $(nTd).html("")
-    }
-}
 
 
 </script>

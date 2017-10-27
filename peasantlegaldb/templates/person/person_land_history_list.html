@@ -5,7 +5,7 @@
     <div class="card-body">
             <table class="table table-bordered table-hover" id="table" data-page-length="25">
                 <thead>
-                    <th></th>
+                    <th>Info</th>
                     <th>Land ID</th>
                     <th>Parcels</th>
                     <th>Law Term</th>
@@ -53,14 +53,14 @@
     $(document).ready(function(){
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1];
-        var url = Urls.litigants_api() + "?person=" + id + "&land=true&expand=land&expand=role&expand=case__verdict&expand=case__case_type&expand=case__session__village";
+        var url = "/api/people/" + id + "?include[]=cases.land&&include[]=cases.case.session.village&filter{cases|land.isnull}=false";
         var table = $('#table').DataTable({
             scrollX: true,
             ajax: {
                 processing: true,
                 url: url,
                 type: "GET",
-                dataSrc: "",
+                dataSrc: "person.cases.",
             },
             "order": [[4, "asc"]],
             "columns": [
@@ -68,15 +68,13 @@
                     "class": "details-control",
                     "orderable": "false",
                     "data": null,
-                    "defaultContent": "",
-                    "render": function(){
-                        return '<i class="fa fa-plus-square" aria-hidden="true"></i>';
-                    },
+                    "defaultContent": "case",
+                    "render": checkNotes,
                     width:"15px"
                 },
-                {data: "land_id",
+                {data: "land",
                     fnCreatedCell: function(nTd, cellData, rowData, row, col){
-                        $(nTd).html("<a href='" + Urls.land(rowData.land_id) + "'target='_blank'>" + rowData.land_id + "</a>");
+                        $(nTd).html("<a href='" + Urls.land(cellData.id) + "'target='_blank'>" + cellData.id + "</a>");
                     }
                 },
                 {data: "land.parcel_list",

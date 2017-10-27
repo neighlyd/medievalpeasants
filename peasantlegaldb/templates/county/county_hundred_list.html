@@ -6,7 +6,7 @@
             <table class="table table-bordered table-hover" id="table" data-page-length="25">
                 <thead>
                     <th>Hundred</th>
-                    <th>Village Count</th>
+                    <th>Villages</th>
                 </thead>
             </table>
     </div>
@@ -21,15 +21,14 @@
     $(document).ready(function () {
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1];
-        var api_url = Urls.hundred_api() + "?county=" + id + "&expand=counts";
-        console.log(api_url);
+        var api_url = "/api/counties/" + id + "/?include[]=hundreds.counts";
         var table = $("#table").DataTable({
             fixedHeader:{ headerOffset: 50 },
             scrollX: true,
             ajax: {
                 url: api_url,
                 type: "GET",
-                dataSrc: "",
+                dataSrc: "county.hundreds.",
             },
             "columns": [
                 {data: "name",
@@ -61,14 +60,6 @@
         });
 
     });
-
-function checkmaker(nTd, cellData, rowData, row, col) {
-    if (cellData === true){
-        $(nTd).html("<i class='fa fa-check' style='color:forestgreen'></i>")
-    } else {
-        $(nTd).html("")
-    }
-}
 
 
 </script>

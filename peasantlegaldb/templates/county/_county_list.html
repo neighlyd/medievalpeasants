@@ -37,7 +37,7 @@
     $(document).ready(function () {
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1];
-        var api_url = Urls.counties_api() + "?expand=counts";
+        var api_url = "/api/counties/?include[]=counts";
         console.log(api_url);
         var table = $("#table").DataTable({
             fixedHeader:{ headerOffset: 50 },
@@ -46,7 +46,7 @@
             ajax: {
                 url: api_url,
                 type: "GET",
-                dataSrc: "",
+                dataSrc: "counties.",
             },
             "columns": [
                 {data: "name",

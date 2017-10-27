@@ -25,27 +25,30 @@
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1]
         console.log(id)
-            var api_url = Urls.relationships_api() + "?person=" + id + "&expand=person_one&expand=person_two&expand=relationship";
+            var api_url = "/api/relationships/?relations=" + id + "&include[]=person_one.village&include[]=person_two.village";
         console.log(api_url);
         var relationship_table = $("#person_relationship_list").DataTable({
             fixedHeader:{ headerOffset: 50 },
             ajax: {
                 url: api_url,
                 type: "GET",
-                dataSrc: "",
+                dataSrc: "relationships.",
             },
             "columns": [
                 {data: "person_one.full_name",
                     fnCreatedCell: function(nTd, cellData, rowData, row, col){
-                        $(nTd).html("<a href='" + Urls.person(rowData.person_one.id) + "'target='_blank'>" + rowData.person_one.full_name+ "</a>");
+                        $(nTd).html("<a href='" + Urls.person(rowData.person_one.id) + "'target='_blank'>" + rowData.person_one.full_name + " (" + rowData.person_one.village.name + ")</a>");
                     }
                 },
                 {data: "person_two.full_name",
                     fnCreatedCell: function(nTd, cellData, rowData, row, col){
-                        $(nTd).html("<a href='" + Urls.person(rowData.person_two.id) + "'target='_blank'>" + rowData.person_two.full_name + "</a>");
+                        $(nTd).html("<a href='" + Urls.person(rowData.person_two.id) + "'target='_blank'>" + rowData.person_two.full_name + " (" + rowData.person_two.village.name + ")</a>");
                     }
                 },
                 {data: "relationship.relation"},
+                {data: "definitive",
+                    fnCreatedCell: checkmaker,
+                }
             ]
         })
     });

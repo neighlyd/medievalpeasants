@@ -11,15 +11,14 @@
 <div class="card-body clearfix" id="main_info">
     <table class="table table-bordered table-hover" id="table" data-page-length="25">
         <thead>
-            <th>Name</th>
-            <th>Hundreds</th>
-            <th>Villages</th>
-            <th>Great Rumor</th>
-            <th>Ancient Demesne</th>
-            <th>Sessions</th>
+            <th>ID</th>
+            <th>Date</th>
+            <th>Law Term</th>
             <th>Cases</th>
-            <th>Residents</th>
             <th>Litigants</th>
+            <th>Chevages</th>
+            <th>Impercamenta</th>
+            <th>Land Cases</th>
         </thead>
     </table>
 </div>
@@ -37,7 +36,7 @@
     $(document).ready(function () {
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1];
-        var api_url = Urls.counties_api() + "?expand=counts";
+        var api_url = "/api/sessions/?include[]=counts";
         console.log(api_url);
         var table = $("#table").DataTable({
             fixedHeader:{ headerOffset: 50 },
@@ -46,23 +45,26 @@
             ajax: {
                 url: api_url,
                 type: "GET",
-                dataSrc: "",
+                dataSrc: "sessions.",
             },
             "columns": [
-                {data: "name",
+                {data: "id",
                     fnCreatedCell: function(nTd, cellData, rowData, row, col) {
-                        url = Urls.county(rowData.id);
-                        $(nTd).html("<a href='"+ url +"'>" + rowData.name + "</a>");
+                        url = Urls.session(rowData.id);
+                        $(nTd).html("<a href='"+ url +"'>" + rowData.id + "</a>");
                     }
                 },
-                {data: "counts.hundred"},
-                {data: "counts.village"},
-                {data: "counts.great_rumor"},
-                {data: "counts.ancient_demesne"},
-                {data: "counts.session"},
+                {data: "date",
+                    fnCreatedCell: function(nTd, cellData, rowData, row, col) {
+                        $(nTd).html(rowData.human_date);
+                    }
+                },
+                {data: "law_term"},
                 {data: "counts.case"},
-                {data: "counts.resident"},
                 {data: "counts.litigant"},
+                {data: "counts.chevage_payer"},
+                {data: "counts.impercamentum_payer"},
+                {data: "counts.land"},
             ]
         });
 

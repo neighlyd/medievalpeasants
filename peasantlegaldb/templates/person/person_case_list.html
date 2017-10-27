@@ -40,9 +40,8 @@
 
     $(document).ready(function () {
         var url = window.location.pathname;
-        var id = url.split('/').reverse()[1]
-        console.log(id)
-        var api_url = Urls.litigants_api() + "?person=" + id + "&expand=case__case_type&expand=role&expand=case__verdict&expand=case__session";
+        var id = url.split('/').reverse()[1];
+        var api_url =  "/api/people/" + id + "/?include[]=cases.case";
         console.log(api_url);
         var table = $("#table").DataTable({
             fixedHeader:{ headerOffset: 50 },
@@ -51,7 +50,7 @@
             ajax: {
                 url: api_url,
                 type: "GET",
-                dataSrc: "",
+                dataSrc: "person.cases.",
             },
             "columns": [
                 {

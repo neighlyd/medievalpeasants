@@ -8,8 +8,7 @@
                     <th>Notes</th>
                     <th>Case</th>
                     <th>Village</th>
-                    <th>Law Term</th>
-                    <th>Year</th>
+                    <th>Session</th>
                     <th>Court Type</th>
                     <th>Case Type</th>
                     <th>Verdict</th>
@@ -42,8 +41,7 @@
     $(document).ready(function () {
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1];
-        var api_url = Urls.case_api() + "?hundred=" + id + "&expand=case_type&expand=verdict&expand=session__village";
-        console.log(api_url);
+        var api_url = "/api/cases/?hundred=" + id + "&include[]=session.village&include[]=litigant_count";
         var table = $("#table").DataTable({
             fixedHeader:{ headerOffset: 50 },
             scrollX: true,
@@ -51,7 +49,7 @@
             ajax: {
                 url: api_url,
                 type: "GET",
-                dataSrc: "",
+                dataSrc: "cases.",
             },
             "columns": [
                 {
@@ -59,13 +57,7 @@
                     "orderable": "false",
                     "data": "summary",
                     "defaultContent": "",
-                    "render": function(cellData){
-                        if (cellData) {
-                            return '<i class="fa fa-plus-square" aria-hidden="true"></i>';
-                        } else {
-                            return '<i class="fa fa-plus-square" aria-hidden="true" style="color: gray"></i>';
-                        }
-                    },
+                    "render": checkNotes,
                     width:"15px"
                 },
                 {data: "id",
@@ -74,12 +66,19 @@
                         $(nTd).html("<a href='"+ url +"'>" + rowData.id + "</a>");
                     }
                 },
-                {data: "session.village.name"},
-                {data: "session.law_term"},
-                {data: "session.date",
-                    fnCreatedCell: function(nTd, cellData, rowData, row, col) {
-                        url = Urls.session(rowData.session.id);
-                        $(nTd).html("<a href='"+ url +"'>" + rowData.session.year + "</a>");
+                {data: "session.village",
+                    render: {
+                        display: function(data, type, row, col){
+                            url = Urls.village(data.id);
+                            return "<a href='" + url + "'>" + data.name + "</a>"
+                        },
+                    sort: "name"
+                    }
+                },
+                {data: "session",
+                    render: {
+                        display: formatSessionDateNoVillage,
+                        sort: "date"
                     }
                 },
                 {data: "court_type"},
@@ -120,14 +119,6 @@
         });
 
     });
-
-function checkmaker(nTd, cellData, rowData, row, col) {
-    if (cellData === true){
-        $(nTd).html("<i class='fa fa-check' style='color:forestgreen'></i>")
-    } else {
-        $(nTd).html("")
-    }
-}
 
 
 </script>

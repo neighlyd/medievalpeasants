@@ -38,32 +38,31 @@
         return "<table class='table'>" +
             "<thead>" +
             "<th>Session ID</th>" +
-            "<th>Village:</th>" +
-            "<th>Date:</th>" +
+            "<th>Village</th>" +
+            "<th>Date</th>" +
             "<th>Notes</th>" +
-            "<th>Cases:</th>" +
+            "<th>Cases</th>" +
+            "<th>Litigants</th>" +
             "</thead>" +
             session_history(d)
     }
 
     $(document).ready(function () {
-        var url = window.location.pathname;
-        var id = url.split('/').reverse()[1];
-        var api_url = Urls.record_api() + "?expand=session_info&expand=archive&expand=session_set";
+        var api_url = "/api/records/?include[]=counts&include[]=session_dates&include[]=archive&include[]=sessions.village";
         var table = $("#table").DataTable({
             fixedHeader:{ headerOffset: 50 },
             scrollX: true,
-            order: [1, "asc"],
+            order: [5, "asc"],
             ajax: {
                 url: api_url,
                 type: "GET",
-                dataSrc: "",
+                dataSrc: "records.",
             },
             "columns": [
                 {
                     "class": "details-control",
                     "orderable": "false",
-                    "data": "session_set",
+                    "data": "sessions",
                     "defaultContent": "",
                     "render": function(cellData){
                         if (cellData != '') {
@@ -83,41 +82,41 @@
                 {data: "record_type"},
                 {data: "archive.name"},
                 {data: "reel"},
-                {data: "session_info",
-                    fnCreatedCell: function(nTd, cellData, rowData, row, col){
-                        if(cellData){
-                            $(nTd).html("<a href='" + Urls.session(cellData.earliest.id) + "'>" + cellData.earliest.law_term + ", " + cellData.earliest.year + "</a>")
-                        } else {
-                            $(nTd).html("N/A")
-                        }
+                {data: "session_dates.earliest_session",
+                    render: {
+                        display: formatSessionDate,
+                        sort: "date",
                     }
                 },
-                {data: "session_info",
-                    fnCreatedCell: function (nTd, cellData, rowData, row, col) {
-                        if(cellData) {
-                            $(nTd).html("<a href='" + Urls.session(cellData.latest.id) + "'>" + cellData.latest.law_term + ", " + cellData.latest.year + "</a>")
-                        } else {
-                            $(nTd).html("N/A")
-                        }
-                    },
+                {data: "session_dates.latest_session",
+                    render: {
+                        display: formatSessionDate,
+                        sort: "date",
+                    }
                 },
-                {data: "session_info",
-                    fnCreatedCell: function (nTd, cellData, rowData, row, col) {
-                        if(cellData) {
-                            $(nTd).html(cellData.session_count)
-                        } else {
-                            $(nTd).html("N/A")
-                        }
-                    },
+                {data: "counts",
+                    render: {
+                        display: function (data, type, row, meta) {
+                                if (data.session) {
+                                    return data.session;
+                                } else {
+                                    return "N/A";
+                                }
+                            },
+                        sort: "session",
+                    }
                 },
-                {data: "session_info",
-                    fnCreatedCell: function (nTd, cellData, rowData, row, col) {
-                        if(cellData) {
-                            $(nTd).html(cellData.case_count)
-                        } else {
-                            $(nTd).html("N/A")
-                        }
-                    },
+                {data: "counts",
+                    render: {
+                        display: function (data, type, row, meta) {
+                                if (data.case) {
+                                    return data.case;
+                                } else {
+                                    return "N/A";
+                                }
+                            },
+                        sort: "case",
+                    }
                 },
             ]
         });
@@ -144,13 +143,15 @@
 
     function session_history(data){
        var concat = '';
-       data.session_set.forEach(function(session){
+       data.sessions.forEach(function(session){
+           console.log(session);
            concat = concat + "<tr>" +
                 "<td><a href='" + Urls.session(session.id) + "'>" + session.id + "</a></td>" +
                 "<td><a href='" + Urls.village(session.village.id) + "'>" + session.village.name + "</a></td>" +
                 "<td>" + session.human_date + "</td>" +
                 "<td>" + session.notes + "</td>" +
-                "<td>" + session.case_count + "</td>" +
+                "<td>" + session.counts.case + "</td>" +
+                "<td>" + session.counts.litigant + "</td>" +
                 "</tr>";
             return concat
         });

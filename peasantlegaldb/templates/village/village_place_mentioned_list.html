@@ -1,15 +1,14 @@
 {% extends '_layout/_l_single_col.html' %}
 
 {% block single_col %}
-    <h3 class="card-header text-center">Case List</h3>
+    <h3 class="card-header text-center">Mentioned Elsewhere</h3>
     <div class="card-body">
             <table class="table table-bordered table-hover" id="table" data-page-length="25">
                 <thead>
                     <th></th>
-                    <th>Case</th>
                     <th>Village</th>
-                    <th>Law Term</th>
-                    <th>Year</th>
+                    <th>Case</th>
+                    <th>Session</th>
                     <th>Court Type</th>
                     <th>Case Type</th>
                     <th>Verdict</th>
@@ -42,16 +41,15 @@
     $(document).ready(function () {
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1];
-        var api_url = Urls.place_mentioned_api() + "?village=" + id + "&expand=case&expand=case__case_type&expand=case__verdict&expand=case__session&expand=case__session__village";
-        console.log(api_url);
+        var api_url = "/api/places_mentioned/?village=" + id + "&include[]=case.session.village&include[]=case.litigant_count";
         var table = $("#table").DataTable({
             fixedHeader:{ headerOffset: 50 },
             scrollX: true,
-            order: [3, "asc"],
+            order: [1, "asc"],
             ajax: {
                 url: api_url,
                 type: "GET",
-                dataSrc: "",
+                dataSrc: "place_mentioneds.",
             },
             "columns": [
                 {
@@ -64,18 +62,28 @@
                     },
                     width:"15px"
                 },
-                {data: "case.id",
-                    fnCreatedCell: function(nTd, cellData, rowData, row, col) {
-                        url = Urls.case(rowData.case.id);
-                        $(nTd).html("<a href='"+ url +"'>" + rowData.case.id + "</a>");
+                {data: "case.session.village",
+                    render: {
+                        display: function(data, type, row, col){
+                            url = Urls.village(data.id);
+                            return "<a href='" + url + "'>" + data.name  + "</a>";
+                        },
+                        sort: "name"
                     }
                 },
-                {data: "case.session.village.name"},
-                {data: "case.session.law_term"},
-                {data: "case.session.date",
-                    fnCreatedCell: function(nTd, cellData, rowData, row, col) {
-                        url = Urls.session(rowData.case.session.id);
-                        $(nTd).html("<a href='"+ url +"'>" + rowData.case.session.year + "</a>");
+                {data: "case",
+                    render: {
+                        display: function(data, type, row, col) {
+                            url = Urls.case(data.id);
+                            return "<a href='"+ url +"'>" + data.id + "</a>";
+                        },
+                        sort: "id"
+                    }
+                 },
+                {data: "case.session",
+                    render: {
+                        display: formatSessionDateNoVillage,
+                        sort: "date"
                     }
                 },
                 {data: "case.court_type"},
@@ -116,15 +124,6 @@
         });
 
     });
-
-function checkmaker(nTd, cellData, rowData, row, col) {
-    if (cellData === true){
-        $(nTd).html("<i class='fa fa-check' style='color:forestgreen'></i>")
-    } else {
-        $(nTd).html("")
-    }
-}
-
 
 </script>
 

@@ -1,5 +1,7 @@
 from rest_framework import viewsets, generics
 
+from django.db.models import Q
+
 from dynamic_rest.viewsets import DynamicModelViewSet
 
 from rest_framework.reverse import reverse
@@ -79,6 +81,28 @@ class LandViewSet(DynamicModelViewSet):
     queryset = models.Land.objects.all()
     serializer_class = serializers.LandSerializer
 
+    def get_queryset(self, *args, **kwargs):
+
+        # get case param from url, then if it is not empty get instance of case object and extract value list of each
+        # distinct land associated with it. Afterwards, iterate through this queryset, ignoring blanks, and append each
+        # element to a list. Set the Land queryset filter to include all items in list. __in= is the syntax used to
+        # include all items in a filter - see:
+        #   https://stackoverflow.com/questions/36851257/general-way-of-filtering-by-ids-with-drf
+        # An alternative approach using dictionaries instead of lists is included here (perhaps could be used with
+        # .value instead of .values_list if necessary):
+        #   https://stackoverflow.com/questions/14258338/django-rest-framework-filtering
+
+        case = self.request.query_params.get('case')
+        if not case:
+            return models.Land.objects.all()
+        else:
+            case_instance = models.Case.objects.get(id=case)
+            sub_queryset = case_instance.case_to_person.all().values_list('land_id', flat=True).distinct()
+            land_list=[]
+            for x in sub_queryset:
+                if x is not None:
+                    land_list.append(x)
+            return models.Land.objects.filter(id__in=land_list)
 
 class ParcelTenureViewSet(DynamicModelViewSet):
     queryset = models.ParcelTenure.objects.all().order_by('tenure')
@@ -122,7 +146,19 @@ class VillageViewSet(DynamicModelViewSet):
 
 class PersonViewSet(DynamicModelViewSet):
     serializer_class = serializers.PersonSerializer
-    queryset = models.Person.objects.all()
+
+    def get_queryset(self, queryset=models.Person.objects.all()):
+        chain_filter = {}
+        chain_filter['person_to_case__case__session__village__county_id'] = self.request.query_params.get('county_to_litigant')
+        chain_filter['village__county_id'] = self.request.query_params.get('county_to_resident')
+        chain_filter['person_to_case__case__session__village_id'] = self.request.query_params.get('village_to_litigant')
+        chain_filter['person_to_case__case__session__village__hundred_id'] = self.request.query_params.get('hundred_to_litigant')
+        chain_filter['village__hundred_id'] = self.request.query_params.get('hundred')
+        if not chain_filter:
+            return queryset
+        else:
+            queryset = check_chain(chain_filter, queryset)
+            return queryset
 
 
 class RecordViewSet(DynamicModelViewSet):
@@ -137,7 +173,22 @@ class SessionViewSet(DynamicModelViewSet):
 
 class CaseViewSet(DynamicModelViewSet):
     serializer_class = serializers.CaseSerializer
-    queryset = models.Case.objects.all().order_by('session__village__name', 'session__date', 'court_type')
+
+    def get_queryset(self, queryset=models.Case.objects.all()):
+        chain_filter={}
+        chain_filter['session__village_id'] =self.request.query_params.get('village')
+        chain_filter['session__village__hundred_id'] = self.request.query_params.get('hundred')
+        chain_filter['case_to_person__land_id'] = self.request.query_params.get('land')
+        distinct = self.request.query_params.get('distinct')
+
+        if not chain_filter:
+            return queryset
+        else:
+            if distinct == "true":
+                queryset = check_chain(chain_filter, queryset, True)
+            else:
+                queryset = check_chain(chain_filter, queryset)
+            return queryset
 
 
 class CornbotViewSet(DynamicModelViewSet):
@@ -159,6 +210,16 @@ class PlaceMentionedViewSet(DynamicModelViewSet):
     serializer_class = serializers.PlaceMentionedSerializer
     queryset = models.PlaceMentioned.objects.all()
 
+    def get_queryset(self, queryset=models.PlaceMentioned.objects.all()):
+        chain_filter={}
+        chain_filter['village_id'] = self.request.query_params.get('village')
+        chain_filter['case__session__village_id'] = self.request.query_params.get('related_to')
+        if not chain_filter:
+            return queryset
+        else:
+            queryset = check_chain(chain_filter, queryset)
+            return queryset
+
 
 class LandParcelViewSet(DynamicModelViewSet):
     queryset = models.LandParcel.objects.all().order_by('land', 'parcel_type__parcel_type')
@@ -167,7 +228,7 @@ class LandParcelViewSet(DynamicModelViewSet):
 
 class LitigantViewSet(DynamicModelViewSet):
     serializer_class = serializers.LitigantSerializer
-    queryset = models.Litigant.objects.all().prefetch_related('case', 'person')
+    queryset = models.Litigant.objects.all()
 
 
 class PledgeViewSet(DynamicModelViewSet):
@@ -178,7 +239,14 @@ class PledgeViewSet(DynamicModelViewSet):
 
 class LandSplitViewSet(DynamicModelViewSet):
     serializer_class = serializers.LandSplitSerializer
-    queryset = models.LandSplit.objects.all().order_by('old_land')
+
+    def get_queryset(self, queryset=models.LandSplit.objects.all()):
+        land = self.request.query_params.get('land')
+        if not land:
+            return queryset
+        else:
+            queryset = queryset.filter(Q(new_land_id=land) | Q(old_land_id=land))
+            return queryset
 
 
 class PositionViewSet(DynamicModelViewSet):
@@ -188,4 +256,10 @@ class PositionViewSet(DynamicModelViewSet):
 
 class RelationshipViewSet(DynamicModelViewSet):
     serializer_class = serializers.RelationshipSerializer
-    queryset = models.Relationship.objects.all().order_by('person_one__last_name', 'person_one__first_name')
+
+    def get_queryset(self, *args, **kwargs):
+        relations = self.request.query_params.get('relations')
+        if not relations:
+             return models.Relationship.objects.all()
+        else:
+            return models.Relationship.objects.filter(Q(person_one=relations) | Q(person_two=relations))

@@ -7,7 +7,6 @@
                 <thead>
                     <th>Notes</th>
                     <th>Village</th>
-                    <th>Hundred</th>
                     <th>Great Rumor</th>
                     <th>Ancient Demesne</th>
                     <th>Sessions</th>
@@ -39,7 +38,7 @@
     $(document).ready(function () {
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1];
-        var api_url = Urls.village_api() + "?hundred=" + id + "&expand=hundred&expand=case_count&expand=session_count&expand=resident_count&expand=litigant_count";
+        var api_url = "/api/hundreds/" + id + "?include[]=villages.counts";
         console.log(api_url);
         var table = $("#table").DataTable({
             fixedHeader:{ headerOffset: 50 },
@@ -48,7 +47,7 @@
             ajax: {
                 url: api_url,
                 type: "GET",
-                dataSrc: "",
+                dataSrc: "hundred.villages.",
             },
             "columns": [
                 {
@@ -60,19 +59,12 @@
                     width:"15px"
                 },
                 {data: "name",
-                    fnCreatedCell: function(nTd, cellData, rowData, row, col) {
-                        url = Urls.village(rowData.id);
-                        $(nTd).html("<a href='"+ url +"'>" + rowData.name + "</a>");
-                    }
-                },
-                {data: "id",
-                    fnCreatedCell: function(nTd, cellData, rowData, row, col){
-                        if (rowData.hundred_id){
-                            url = Urls.hundred(rowData.hundred_id);
-                            $(nTd).html("<a href='"+ url + "'>" + rowData.hundred.name + "</a>");
-                        } else {
-                            $(nTd).html("N/A")
-                        }
+                    render: {
+                        display: function(data, type, row, col){
+                            url = Urls.village(row.id);
+                            return "<a href='"+ url +"'>" + data + "</a>";
+                        },
+                        sort: "name"
                     }
                 },
                 {data: "great_rumor",
@@ -81,10 +73,10 @@
                 {data: "ancient_demesne",
                     fnCreatedCell: checkmaker
                 },
-                {data: "session_count"},
-                {data: "case_count"},
-                {data: "resident_count"},
-                {data: "litigant_count"},
+                {data: "counts.session"},
+                {data: "counts.case"},
+                {data: "counts.resident"},
+                {data: "counts.litigant"},
             ]
         });
 
