@@ -71,16 +71,21 @@
                     }
                 },
                 {data: "parcel_list",
-                    fnCreatedCell: list_parcels,
+                    defaultContent: '',
+                    render: {
+                        display: list_parcels,
+                    }
                 },
                 {data: "notes"},
                 {data: "case_dates.earliest",
+                    defaultContent: '',
                     render: {
                         display: formatCaseDate,
                         sort: "date"
                     }
                 },
                 {data: "case_dates.latest",
+                    defaultContent: '',
                     render: {
                         display: formatCaseDate,
                         sort: "date"

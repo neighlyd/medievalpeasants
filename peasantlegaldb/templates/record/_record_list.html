@@ -83,18 +83,21 @@
                 {data: "archive.name"},
                 {data: "reel"},
                 {data: "session_dates.earliest_session",
+                    defaultContent: '',
                     render: {
                         display: formatSessionDate,
                         sort: "date",
                     }
                 },
                 {data: "session_dates.latest_session",
+                    defaultContent: '',
                     render: {
                         display: formatSessionDate,
                         sort: "date",
                     }
                 },
                 {data: "counts",
+                    defaultContent: '',
                     render: {
                         display: function (data, type, row, meta) {
                                 if (data.session) {
@@ -107,6 +110,7 @@
                     }
                 },
                 {data: "counts",
+                    defaultContent: '',
                     render: {
                         display: function (data, type, row, meta) {
                                 if (data.case) {

@@ -76,6 +76,7 @@
                     }
                 },
                 {data: "session",
+                    defaultContent: '',
                     render: {
                         display: formatSessionDateNoVillage,
                         sort: "date"
@@ -86,17 +87,29 @@
                 {data: "verdict.verdict"},
                 {data: "litigant_count"},
                 {data: "of_interest",
-                    fnCreatedCell: checkmaker
+                    defaultContent: '',
+                    render: {
+                        display: checkMaker,
+                    }
                 },
                 {data: "villeinage_mention",
-                fnCreatedCell: checkmaker
-            },
+                    defaultContent: '',
+                    render: {
+                        display: checkMaker,
+                    }
+                },
                 {data: "active_sale",
-                fnCreatedCell: checkmaker
-            },
+                    defaultContent: '',
+                    render: {
+                        display: checkMaker,
+                    }
+                },
                 {data: "incidental_land",
-                fnCreatedCell: checkmaker
-        },
+                    defaultContent: '',
+                    render: {
+                        display: checkMaker,
+                    }
+                },
             ]
         });
 

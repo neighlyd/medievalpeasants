@@ -6,9 +6,8 @@
             <table class="table table-bordered table-hover" id="table" data-page-length="25">
                 <thead>
                     <th></th>
-                    <th>ID</th>
-                    <th>Term</th>
-                    <th>Year</th>
+                    <th>Case</th>
+                    <th>Session</th>
                     <th>Court</th>
                     <th>Case Type</th>
                     <th>Role</th>
@@ -41,7 +40,7 @@
     $(document).ready(function () {
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1];
-        var api_url =  "/api/people/" + id + "/?include[]=cases.case";
+        var api_url =  "/api/people/" + id + "/?include[]=cases.case.session.village&include[]=cases.case.litigant_count";
         console.log(api_url);
         var table = $("#table").DataTable({
             fixedHeader:{ headerOffset: 50 },
@@ -61,15 +60,20 @@
                     "render": checkNotes,
                     width:"15px"
                 },
-                {data: "case.id",
-                    fnCreatedCell: function(nTd, cellData, rowData, row, col){
-                        $(nTd).html("<a href='" + Urls.case(rowData.case.id) + "'target='_blank'>" + rowData.case.id + "</a>");
+                {data: "case",
+                    render: {
+                        display: function (data, type, row, col) {
+                            url = Urls.case(data.id);
+                            return "<a href='" + url + "'target='_blank'>" + data.id + "</a>";
+                        },
+                        sort: "id"
                     }
                 },
-                {data: "case.session.law_term"},
-                {data: "case.session.date",
-                    fnCreatedCell: function(nTd, cellData, rowData, row, col) {
-                        $(nTd).html(rowData.case.session.year);
+                {data: "case.session",
+                    defaultContent: '',
+                    render:{
+                        display: formatSessionDate,
+                        sort: ".date"
                     }
                 },
                 {data: "case.court_type"},

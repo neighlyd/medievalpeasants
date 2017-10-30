@@ -6,7 +6,7 @@
 
 {% block left_sidebar %}
     <div id="selection_list">
-        <a class="list-group-item list-group-item-action active" href="">Cases</a>
+        <a class="list-group-item list-group-item-action active" href="{% url 'session_case_list' session.id %}">Cases</a>
     </div>
 {% endblock %}
 

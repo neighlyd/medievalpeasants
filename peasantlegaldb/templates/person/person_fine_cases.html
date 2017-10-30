@@ -6,10 +6,9 @@
             <table class="table table-bordered table-hover" id="table" data-page-length="25">
                 <thead>
                     <th></th>
-                    <th>ID</th>
+                    <th>Case</th>
                     <th>Fine</th>
-                    <th>Term</th>
-                    <th>Year</th>
+                    <th>Session</th>
                     <th>Court</th>
                     <th>Case Type</th>
                     <th>Role</th>
@@ -68,15 +67,18 @@
                         $(nTd).html("<a href='" + Urls.case(rowData.case.id) + "'target='_blank'>" + rowData.case.id + "</a>");
                     }
                 },
-                {data: "fine.in_denarius",
-                    fnCreatedCell: function(nTd, cellData, rowData, row, col){
-                    $(nTd).html(rowData.fine.amount + " (" + rowData.fine.in_denarius + "d.)")
+                {data: "fine",
+                    defaultContent: '',
+                    render: {
+                        display: formatMoney,
+                        sort: "in_denarius"
                     }
                 },
-                {data: "case.session.law_term"},
-                {data: "case.session.date",
-                    fnCreatedCell: function(nTd, cellData, rowData, row, col) {
-                        $(nTd).html(rowData.case.session.year);
+                {data: "case.session",
+                    defaultContent: '',
+                    render: {
+                        display: formatSessionDate,
+                        sort: "date"
                     }
                 },
                 {data: "case.court_type"},

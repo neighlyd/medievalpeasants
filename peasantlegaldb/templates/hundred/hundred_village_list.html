@@ -59,6 +59,7 @@
                     width:"15px"
                 },
                 {data: "name",
+                    defaultContent: '',
                     render: {
                         display: function(data, type, row, col){
                             url = Urls.village(row.id);
@@ -68,10 +69,16 @@
                     }
                 },
                 {data: "great_rumor",
-                    fnCreatedCell: checkmaker
+                    defaultContent: '',
+                    render: {
+                        display: checkMaker,
+                    }
                 },
                 {data: "ancient_demesne",
-                    fnCreatedCell: checkmaker
+                    defaultContent: '',
+                    render: {
+                        display: checkMaker,
+                    }
                 },
                 {data: "counts.session"},
                 {data: "counts.case"},

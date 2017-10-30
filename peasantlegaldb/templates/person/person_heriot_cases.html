@@ -6,11 +6,10 @@
             <table class="table table-bordered table-hover" id="table" data-page-length="25">
                 <thead>
                     <th></th>
-                    <th>ID</th>
+                    <th>Case</th>
                     <th>Animal</th>
                     <th>Assessment</th>
-                    <th>Term</th>
-                    <th>Year</th>
+                    <th>Session</th>
                     <th>Court</th>
                     <th>Case Type</th>
                     <th>Role</th>
@@ -72,26 +71,33 @@
                     }
                 },
                 {data: "heriot_animal",
-                    fnCreatedCell: function(nTd, cellData, rowData, row, col){
-                    $(nTd).html(rowData.heriot_quantity + " " + rowData.heriot_animal.name + "d.)")
+                    defaultContent: '',
+                    render: {
+                        display: function(data, type, row, col){
+                            return data.heriot_quantity + " " + data.heriot_animal.name + "d.)"
+                        },
+                        sort: "heriot_quantity"
                     }
                 },
                 {data: "heriot",
-                    fnCreatedCell: function(nTd, cellData, rowData, row, col){
-                    $(nTd).html(rowData.heriot.amount + " (" + rowData.heriot.in_denarius + "d.)")
+                    defaultContent: '',
+                    render: {
+                        display: formatMoney
+                        sort: "in_denarius"
                     }
                 },
-                {data: "case.session.law_term"},
-                {data: "case.session.date",
-                    fnCreatedCell: function(nTd, cellData, rowData, row, col) {
-                        $(nTd).html(rowData.case.session.year);
+                {data: "case.session",
+                    defaultContent: '',
+                    render: {
+                        display: formatSessionDate,
+                        sort: "date"
                     }
                 },
                 {data: "case.court_type"},
                 {data: "case.case_type.case_type"},
                 {data: "role.role"},
                 {data: "case.verdict.verdict"},
-                {data: "case.litigant_count"}
+                {data: "case.litigant_count"},
             ]
         });
 

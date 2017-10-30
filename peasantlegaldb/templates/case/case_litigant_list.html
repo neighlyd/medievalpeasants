@@ -29,43 +29,8 @@
 <script>
 
     // provides format for nested table that displays when + sign is clicked.
-    function format( d ){
-        return "<table class='table'>" +
-            "<tr>" +
-            "<td><b>Village</b></td>" +
-            "<td>" + d.person.village.name + "</td>" +
-            "<td><b>Gender</b></td>" +
-            "<td>" + d.person.gender_display + "</td>" +
-            "<td><b>Status</b></td>" +
-            "<td>" + d.person.status_display + "</td>" +
-            "</tr>" +
-            "<tr>" +
-            "<td><b>Litigation</b></td>" +
-            "<td>" + d.person.counts.litigant + "</td>" +
-            "<td><b>All Cases</b></td>" +
-            "<td>" + d.person.counts.case + "</td>" +
-            "<td><b>Earliest Case</b></td>" +
-            "<td>" + d.person.case_dates.earliest_case.law_term + ", " + d.person.case_dates.earliest_case.year + "</td>" +
-            "<td><b>Latest Case</b></td>" +
-            "<td>" + d.person.case_dates.latest_case.law_term + ", " + d.person.case_dates.latest_case.year + "</td>" +
-            "</tr>" +
-            "<tr>" +
-            "<td><b>Amercements</b></td>" +
-            "<td>" + d.person.counts.amercement_count + "</td>" +
-            "<td><b>Fines</b></td>" +
-            "<td>" + d.person.counts.fine_count + "</td>" +
-            "<td><b>Damages</b></td>" +
-            "<td>" + d.person.counts.damage_count + "</td>" +
-            "</tr>" +
-            "<tr>" +
-            "<td><b> Chevages</b></td>" +
-            "<td>" + d.person.counts.chevage_count + "</td>" +
-            "<td><b>Impercamenta</b></td>" +
-            "<td>" + d.person.counts.impercamentum_count + "</td>" +
-            "<td><b>Heriot</b></td>" +
-            "<td>" + d.person.counts.heriot_count + "</td>" +
-            "</tr>" +
-            "</table>"
+    function format( data ){
+        return format_person_subdata(data)
     }
 
     $(document).ready(function(){
@@ -74,6 +39,7 @@
         var url = "/api/cases/" + id + "?include[]=litigants.person.village.name&exclude[]=litigants.person.village.*&include[]=litigants.person.counts&include[]=litigants.person.case_dates";
         var table = $('#table').DataTable({
             order:[1, "asc"],
+            hideEmptyCols: true,
             scrollX: true,
             fixedHeader:{
               headerOffset: 50
@@ -101,32 +67,65 @@
                 },
                 {data: "role.role"},
                 {data: "amercement",
-                    fnCreatedCell: replace_money,
+                    defaultContent: '',
+                    render: {
+                        display: formatMoney,
+                        sort: 'in_denarius'
+                    },
                 },
                 {data: "fine",
-                    fnCreatedCell: replace_money,
+                    defaultContent: '',
+                    render: {
+                        display: formatMoney,
+                        sort: 'in_denarius'
+                    },
                 },
                 {data: "damage",
-                    fnCreatedCell: replace_money,
+                    defaultContent: '',
+                    render: {
+                        display: formatMoney,
+                        sort: 'in_denarius'
+                    },
                 },
                 {data: "distrained",
-                    fnCreatedCell: check_maker,
+                    defaultContent: '',
+                    render: {
+                        display: checkMaker,
+                    },
                 },
                 {data: "attached",
-                    fnCreatedCell: check_maker,
+                    defaultContent: '',
+                    render: {
+                        display: checkMaker,
+                    },
                 },
                 {data: "bail",
-                   fnCreatedCell: check_maker,
+                    defaultContent: '',
+                    render: {
+                        display: checkMaker,
+                    },
                 },
                 {data: "chevage",
-                    fnCreatedCell: replace_money,
+                    defaultContent: '',
+                    render: {
+                        display: formatMoney,
+                        sort: 'in_denarius'
+                    },
                 },
                 {data: "heriot",
-                    fnCreatedCell: replace_money,
+                    defaultContent: '',
+                    render: {
+                        display: formatMoney,
+                        sort: 'in_denarius'
+                    },
                 },
                 {data: "impercamentum",
-                    fnCreatedCell: replace_money,
-                },
+                    defaultContent: '',
+                    render: {
+                        display: formatMoney,
+                        sort: 'in_denarius'
+                    },
+                }
                 ]
         });
 
@@ -148,15 +147,6 @@
             }
         });
     });
-
-function check_maker(nTd, cellData, rowData, row, col){
-    if( cellData) {
-        $(nTd).html("<p class='text-center'> √ </p>");
-    } else {
-        $(nTd).html("<p class='text-center'> -- </p>")
-    }
-}
-
 
 
 </script>

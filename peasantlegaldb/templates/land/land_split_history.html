@@ -41,6 +41,7 @@
             },
             "columns": [
                 {data: "old_land",
+                    defaultContent: '',
                     render: {
                         display: function(data, type, row, col){
                             url = Urls.land(data.id);
@@ -50,10 +51,14 @@
                     }
                 },
                 {data: "old_land.parcel_list",
-                    fnCreatedCell: list_parcels,
+                    defaultContent: '',
+                    render{
+                        display: list_parcels,
+                    }
                 },
                 {data: "old_land.notes"},
                 {data: "new_land",
+                    defaultContent: '',
                     render: {
                         display: function(data, type, row, col){
                             url = Urls.land(data.id);
@@ -63,7 +68,10 @@
                     }
                 },
                 {data: "new_land.parcel_list",
-                    fnCreatedCell: list_parcels,
+                    defaultContent: '',
+                    render: {
+                        display: list_parcels,
+                    }
                 },
                 {data: "new_land.notes"},
 

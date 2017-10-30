@@ -28,10 +28,13 @@ class Archive(models.Model):
 
 class Money(models.Model):
     amount = models.CharField(max_length=150)
-    in_denarius = models.IntegerField()
+    in_denarius = models.IntegerField(null=True)
 
     def __str__(self):
-        return '%s (%s d.)' % (self.amount, self.in_denarius)
+        if not self.in_denarius:
+            return '%s (no price)' % (self.amount)
+        else:
+            return '%s (%s d.)' % (self.amount, self.in_denarius)
 
 
 class Chattel(models.Model):
@@ -128,7 +131,7 @@ class Land(models.Model):
         if not earliest:
             earliest_case = {
                 'id': None,
-                'village': None,
+                'village': {'name': None},
                 'law_term': None,
                 'date': None,
                 'year': None,
@@ -136,7 +139,7 @@ class Land(models.Model):
         else:
             earliest_case = {
                 'id': earliest.case.session.id,
-                'village': earliest.case.session.village.name,
+                'village': {'name': earliest.case.session.village.name},
                 'law_term': earliest.case.session.get_law_term_display(),
                 'date': earliest.case.session.date,
                 'year': earliest.case.session.date.year,
@@ -152,7 +155,7 @@ class Land(models.Model):
         if not latest:
             latest_case = {
                 'id': None,
-                'village': None,
+                'village': {'name': None},
                 'law_term': None,
                 'date': None,
                 'year': None,
@@ -160,7 +163,7 @@ class Land(models.Model):
         else:
             latest_case = {
                 'id': latest.case.session.id,
-                'village': latest.case.session.village.name,
+                'village': {'name': latest.case.session.village.name},
                 'law_term': latest.case.session.get_law_term_display(),
                 'date': latest.case.session.date,
                 'year': latest.case.session.date.year,
@@ -291,6 +294,26 @@ class Village(models.Model):
     @property
     def session_count(self):
         return self.session_set.count()
+    
+    @property
+    def chevage_payer_count(self):
+        return len(set(Litigant.objects.all().filter(chevage__isnull=False, case__session__village_id=self.id).values_list('person', flat=True)))
+
+    @property
+    def fine_payer_count(self):
+        return len(set(Litigant.objects.all().filter(fine__isnull=False, case__session__village_id=self.id).values_list('person', flat=True)))
+
+    @property
+    def impercamentum_payer_count(self):
+        return len(set(Litigant.objects.all().filter(impercamentum__isnull=False, case__session__village_id=self.id).values_list('person', flat=True)))
+
+    @property
+    def heriot_payer_count(self):
+        return len(set(Litigant.objects.all().filter(heriot__isnull=False, case__session__village_id=self.id).values_list('person', flat=True)))
+
+    @property
+    def damaged_party_count(self):
+        return len(set(Litigant.objects.all().filter(damage__isnull=False, case__session__village_id=self.id).values_list('person', flat=True)))
 
     def __str__(self):
         return '%s | %s' % (self.name, self.county)
@@ -374,7 +397,7 @@ class Person(models.Model):
         if not case_list:
             earliest = {
                 'id': None,
-                'village': None,
+                'village': {'name': None},
                 'law_term': None,
                 'year': None,
                 'date': None,
@@ -383,7 +406,7 @@ class Person(models.Model):
             earliest = sorted(case_list, key=lambda x: x.case.session.date)[0]
             earliest = {
                 'id': earliest.case.id,
-                'village': earliest.case.session.village.name,
+                'village': {'name': earliest.case.session.village.name},
                 'law_term': earliest.case.session.get_law_term_display(),
                 'year': earliest.case.session.year,
                 'date': earliest.case.session.date,
@@ -411,7 +434,7 @@ class Person(models.Model):
         if not case_list:
             latest = {
                 'id': None,
-                'village': None,
+                'village': {'name': None},
                 'law_term': None,
                 'year': None,
                 'date': None,
@@ -420,7 +443,7 @@ class Person(models.Model):
             latest = sorted(case_list, key=lambda x: x.case.session.date, reverse=True)[0]
             latest = {
                 'id': latest.case.id,
-                'village': latest.case.session.village.name,
+                'village': {'name': latest.case.session.village.name},
                 'law_term': latest.case.session.get_law_term_display(),
                 'year': latest.case.session.year,
                 'date': latest.case.session.date,
@@ -605,7 +628,7 @@ class Record(models.Model):
         if not earliest:
             earliest_session = {
                 'id': None,
-                'village': None,
+                'village': {'name': None},
                 'law_term': None,
                 'year': None,
                 'date': None,
@@ -613,7 +636,7 @@ class Record(models.Model):
         else:
             earliest_session = {
                 'id': earliest.id,
-                'village': earliest.village.name,
+                'village': {'name': earliest.village.name},
                 'law_term': earliest.get_law_term_display(),
                 'year': earliest.year,
                 'date': earliest.date,
@@ -629,7 +652,7 @@ class Record(models.Model):
         if not latest:
             latest_session = {
                 'id': None,
-                'village': None,
+                'village': {'name': None},
                 'law_term': None,
                 'year': None,
                 'date': None,
@@ -637,7 +660,7 @@ class Record(models.Model):
         else:
             latest_session = {
                 'id': latest.id,
-                'village': latest.village.name,
+                'village': {'name': latest.village.name},
                 'law_term': latest.get_law_term_display(),
                 'year': latest.year,
                 'date': latest.date,

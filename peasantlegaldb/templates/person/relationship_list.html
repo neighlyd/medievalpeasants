@@ -23,10 +23,8 @@
 
     $(document).ready(function () {
         var url = window.location.pathname;
-        var id = url.split('/').reverse()[1]
-        console.log(id)
-            var api_url = "/api/relationships/?relations=" + id + "&include[]=person_one.village&include[]=person_two.village";
-        console.log(api_url);
+        var id = url.split('/').reverse()[1];
+        var api_url = "/api/relationships/?relations=" + id + "&include[]=person_one.village&include[]=person_two.village";
         var relationship_table = $("#person_relationship_list").DataTable({
             fixedHeader:{ headerOffset: 50 },
             ajax: {
@@ -47,7 +45,10 @@
                 },
                 {data: "relationship.relation"},
                 {data: "definitive",
-                    fnCreatedCell: checkmaker,
+                    defaultContent: '',
+                    render: {
+                        display: checkMaker,
+                    },
                 }
             ]
         })

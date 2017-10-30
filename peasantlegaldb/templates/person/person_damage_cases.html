@@ -6,11 +6,10 @@
             <table class="table table-bordered table-hover" id="table" data-page-length="25">
                 <thead>
                     <th></th>
-                    <th>ID</th>
+                    <th>Case</th>
                     <th>Damages</th>
                     <th>Damage Notes</th>
-                    <th>Term</th>
-                    <th>Year</th>
+                    <th>Session</th>
                     <th>Court</th>
                     <th>Case Type</th>
                     <th>Role</th>
@@ -71,16 +70,19 @@
                         $(nTd).html("<a href='" + Urls.case(rowData.case.id) + "'target='_blank'>" + rowData.case.id + "</a>");
                     }
                 },
-                {data: "damage.in_denarius",
-                    fnCreatedCell: function(nTd, cellData, rowData, row, col){
-                    $(nTd).html(rowData.damage.amount + " (" + rowData.damage.in_denarius + "d.)")
+                {data: "damage",
+                    defaultContent: '',
+                    render: {
+                        display: formatMoney,
+                        sort: "in_denarius"
                     }
                 },
                 {data: "damage_notes"},
-                {data: "case.session.law_term"},
-                {data: "case.session.date",
-                    fnCreatedCell: function(nTd, cellData, rowData, row, col) {
-                        $(nTd).html(rowData.case.session.year);
+                {data: "case.session",
+                    defaultContent: '',
+                    render: {
+                        display: formatSessionDate,
+                        sort: "date"
                     }
                 },
                 {data: "case.court_type"},

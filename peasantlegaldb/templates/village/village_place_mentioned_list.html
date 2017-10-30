@@ -63,6 +63,7 @@
                     width:"15px"
                 },
                 {data: "case.session.village",
+                    defaultContent: '',
                     render: {
                         display: function(data, type, row, col){
                             url = Urls.village(data.id);
@@ -72,6 +73,7 @@
                     }
                 },
                 {data: "case",
+                    defaultContent: '',
                     render: {
                         display: function(data, type, row, col) {
                             url = Urls.case(data.id);
@@ -81,6 +83,7 @@
                     }
                  },
                 {data: "case.session",
+                    defaultContent: '',
                     render: {
                         display: formatSessionDateNoVillage,
                         sort: "date"
@@ -91,17 +94,29 @@
                 {data: "case.verdict.verdict"},
                 {data: "case.litigant_count"},
                 {data: "case.of_interest",
-                    fnCreatedCell: checkmaker
+                    defaultContent: '',
+                    render: {
+                        display: checkMaker,
+                    }
                 },
                 {data: "case.villeinage_mention",
-                fnCreatedCell: checkmaker
-            },
+                    defaultContent: '',
+                    render: {
+                        display: checkMaker,
+                    }
+                },
                 {data: "case.active_sale",
-                fnCreatedCell: checkmaker
-            },
+                    defaultContent: '',
+                    render: {
+                        display: checkMaker,
+                    }
+                },
                 {data: "case.incidental_land",
-                fnCreatedCell: checkmaker
-        },
+                    defaultContent: '',
+                    render: {
+                        display: checkMaker,
+                    }
+                },
             ]
         });
 

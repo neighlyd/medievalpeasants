@@ -1,6 +1,8 @@
 from django.views.generic.detail import DetailView
 from django.views.generic import ListView
 from django.db.models import Count, Max, Min, Avg, Sum
+from django.core.urlresolvers import resolve
+from django.shortcuts import get_object_or_404
 
 from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework.response import Response
@@ -79,8 +81,14 @@ class LandListView(ListView):
 class PeopleListView(ListView):
 
     model = models.Person
-    queryset = models.Person.objects.all().select_related('village').order_by('first_name')
+    queryset = models.Person.objects.all()
     context_object_name = 'person_list'
+
+    def get_context_data(self, **kwargs):
+        context = super(PeopleListView, self).get_context_data(**kwargs)
+        context['current_url'] = resolve(self.request.path_info).url_name
+        context['title'] = self.kwargs.get('title')
+        return context
 
 
 class PersonDetailView(DetailView):

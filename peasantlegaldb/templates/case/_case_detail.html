@@ -43,7 +43,7 @@
                             <table class="table table-sm">
                                 <tr class="row m-0">
                                     <td class="d-inline-block col-4"><b>Date:</b></td>
-                                    <td class="d-inline-block col-8">{{ case.session.date }}</td>
+                                    <td class="d-inline-block col-8"><a href="{% url 'session' case.session.id %}">{{ case.session.date }}</a></td>
                                 </tr>
                                 <tr class="row m-0">
                                     <td class="d-inline-block col-4"><b>Court Type:</b></td>

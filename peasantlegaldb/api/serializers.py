@@ -215,11 +215,32 @@ class VillageSerializer(DynamicModelSerializer):
         ],
         deferred=True,
     )
+    chevage_payer_count = DynamicMethodField(deferred=True)
+    fine_payer_count = DynamicMethodField(deferred=True)
+    impercamentum_payer_count = DynamicMethodField(deferred=True)
+    heriot_payer_count = DynamicMethodField(deferred=True)
+    damaged_party_count = DynamicMethodField(deferred=True)
 
     class Meta:
         model = models.Village
         fields = ('id', 'name', 'latitude', 'longitude', 'ancient_demesne', 'great_rumor', 'notes', 'counts', 'county',
-                  'hundred', 'sessions')
+                  'hundred', 'sessions', 'chevage_payer_count', 'fine_payer_count', 'impercamentum_payer_count', 
+                  'heriot_payer_count', 'damaged_party_count')
+
+    def get_chevage_payer_count(self, record):
+        return record.chevage_payer_count
+
+    def get_fine_payer_count(self, record):
+        return record.fine_payer_count
+
+    def get_impercamentum_payer_count(self, record):
+        return record.impercamentum_payer_count
+
+    def get_heriot_payer_count(self, record):
+        return record.heriot_payer_count
+
+    def get_damaged_party_count(self, record):
+        return record.damaged_party_count
 
     def get_counts(self, record):
         counts = {}

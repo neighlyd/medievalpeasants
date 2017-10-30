@@ -97,7 +97,7 @@
                     <tr class="row m-0">
                         <td class="d-inline-block col-4"><b>Earliest Case</b></td>
                         {% if person.earliest_case.id is not None %}
-                        <td class="d-inline-block col-8"><a href="{% url 'case' person.earliest_case.id %}">{{ person.earliest_case.village }} | {{ person.earliest_case.law_term }}, {{ person.earliest_case.year }}</a></td>
+                        <td class="d-inline-block col-8"><a href="{% url 'case' person.earliest_case.id %}">{{ person.earliest_case.village.name }} | {{ person.earliest_case.law_term }}, {{ person.earliest_case.year }}</a></td>
                         {% else %}
                         <td class="d-inline-block col-8">None</td>
                         {% endif %}
@@ -105,7 +105,7 @@
                     <tr class="row m-0">
                         <td class="d-inline-block col-4"><b>Latest Case</b></td>
                         {% if person.latest_case.id is not None %}
-                        <td class="d-inline-block col-8"><a href="{% url 'case' person.latest_case.id %}">{{ person.latest_case.village }} | {{ person.latest_case.law_term }}, {{ person.latest_case.year }}</a></td>
+                        <td class="d-inline-block col-8"><a href="{% url 'case' person.latest_case.id %}">{{ person.latest_case.village.name }} | {{ person.latest_case.law_term }}, {{ person.latest_case.year }}</a></td>
                         {% else %}
                         <td class="d-inline-block col-8">None</td>
                         {% endif %}

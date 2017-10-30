@@ -15,6 +15,14 @@
                 </a>
                 <div class="dropdown-menu" aria-labelledby="navbarPeopleDropdown" style="background-color: #245602">
                     <a class="nav-link" href="{% url 'person_list' %}">List All</a>
+                    <div class="dropdown-divider"></div>
+                    <a class="nav-link" href="{% url 'chevage_payer_list' %}">Chevage Payers</a>
+                    <a class="nav-link" href="{% url 'impercamentum_payer_list' %}">Impercamentum Payers</a>
+                    <a class="nav-link" href="{% url 'fine_payer_list' %}">Fine Payers</a>
+                    <a class="nav-link" href="{% url 'heriot_payer_list' %}">Heriot Payers</a>
+                    <div class="dropdown-divider"></div>
+                    <a class="nav-link" href="{% url 'damaged_party_list' %}">Damaged Parties</a>
+
                 </div>
             </li>
             <li class="nav-item dropdown">

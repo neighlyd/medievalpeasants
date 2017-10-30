@@ -6,11 +6,10 @@
             <table class="table table-bordered table-hover" id="table" data-page-length="25">
                 <thead>
                     <th></th>
-                    <th>ID</th>
+                    <th>Court</th>
                     <th>Animal</th>
                     <th>Amercement</th>
-                    <th>Term</th>
-                    <th>Year</th>
+                    <th>Session</th>
                     <th>Court</th>
                     <th>Verdict</th>
                     <th>Litigant Count</th>
@@ -67,19 +66,26 @@
                     }
                 },
                 {data: "impercamentum_animal",
-                    fnCreatedCell: function(nTd, cellData, rowData, row, col){
-                    $(nTd).html(rowData.impercamentum_quantity + " " + rowData.impercamentum_animal.name + "d.)")
+                    defaultContent: '',
+                    render: {
+                        display: function(data, type, row, col){
+                            return data.impercamentum_quantity + " " + data.impercamentum_animal.name + "d.)"
+                        },
+                        sort: "impercamentum_animal.name"
                     }
                 },
-                {data: "impercamentum.in_denarius",
-                    fnCreatedCell: function(nTd, cellData, rowData, row, col){
-                    $(nTd).html(rowData.impercamentum.amount + " (" + rowData.impercamentum.in_denarius + "d.)")
+                {data: "impercamentum",
+                    defaultContent: '',
+                    render: {
+                        display: formatMoney,
+                        sort: "in_denarius"
                     }
                 },
-                {data: "case.session.law_term"},
-                {data: "case.session.date",
-                    fnCreatedCell: function(nTd, cellData, rowData, row, col) {
-                        $(nTd).html(rowData.case.session.year);
+                {data: "case.session",
+                    defaultContent: '',
+                    render: {
+                        display: formatSessionDate,
+                        sort: "date"
                     }
                 },
                 {data: "case.court_type"},
