@@ -49,8 +49,8 @@
     $(document).ready(function () {
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1];
-        var api_url = Urls.village_api() + "?expand=hundred&expand=counts";
-        console.log(api_url);
+        url = Urls["api:village-list"]();
+        var api_url = url + "?include[]=hundred&include[]=counts";
         var table = $("#table").DataTable({
             fixedHeader:{ headerOffset: 50 },
             scrollX: true,
@@ -58,7 +58,7 @@
             ajax: {
                 url: api_url,
                 type: "GET",
-                dataSrc: "",
+                dataSrc: "villages.",
             },
             "columns": [
                 {
@@ -75,21 +75,27 @@
                         $(nTd).html("<a href='"+ url +"'>" + rowData.name + "</a>");
                     }
                 },
-                {data: "id",
+                {data: "hundred",
                     fnCreatedCell: function(nTd, cellData, rowData, row, col){
-                        if (rowData.hundred_id){
-                            url = Urls.hundred(rowData.hundred_id);
-                            $(nTd).html("<a href='"+ url + "'>" + rowData.hundred.name + "</a>");
+                        if (cellData){
+                            url = Urls.hundred(cellData.id);
+                            $(nTd).html("<a href='"+ url + "'>" + cellData.name + "</a>");
                         } else {
                             $(nTd).html("N/A")
                         }
                     }
                 },
                 {data: "great_rumor",
-                    fnCreatedCell: checkmaker
+                    defaultContent: '',
+                    render: {
+                        display: checkMaker,
+                    }
                 },
                 {data: "ancient_demesne",
-                    fnCreatedCell: checkmaker
+                    defaultContent: '',
+                    render: {
+                        display: checkMaker,
+                    }
                 },
                 {data: "counts.session"},
                 {data: "counts.case"},

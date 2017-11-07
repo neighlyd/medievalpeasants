@@ -5,12 +5,14 @@
     <div class="card-body">
             <table class="table table-bordered table-hover" id="table" data-page-length="25">
                 <thead>
+                    <th>Notes</th>
                     <th>Name</th>
                     <th>Record Type</th>
                     <th>Reel</th>
                     <th>Earliest Session</th>
                     <th>Latest Session</th>
-                    <th>Notes</th>
+                    <th>Sessions</th>
+                    <th>Cases</th>
                 </thead>
             </table>
     </div>
@@ -22,13 +24,20 @@
 
 <script>
 
+    function format( data ) {
+        return "<table class='table'>" +
+            "<tr>" +
+            "<td><b>Notes</b></td>" +
+            "<td>"+data.notes+"</td>" +
+            "</tr>" +
+        "</table>"
+    }
 
     $(document).ready(function () {
         var url = window.location.pathname;
-        var id = url.split('/').reverse()[1]
-        console.log(id)
-        var api_url = Urls.record_api() + "?archive=" + id + "&expand=session_set&expand=earliest_session&expand=latest_session";
-        console.log(api_url);
+        var id = url.split('/').reverse()[1];
+        url = Urls['api:archive-detail'](id);
+        var api_url = url + "?include[]=records.session_dates&include[]=records.counts";
         var table = $("#table").DataTable({
             fixedHeader:{                headerOffset: 50            },
             scrollX: true,
@@ -36,9 +45,17 @@
             ajax: {
                 url: api_url,
                 type: "GET",
-                dataSrc: "",
+                dataSrc: "archive.records.",
             },
             "columns": [
+                {
+                    "class": "details-control",
+                    "orderable": false,
+                    "data": "notes",
+                    "defaultContent": "",
+                    "render": checkNotes,
+                    width:"15px"
+                },
                 {data: "name",
                     fnCreatedCell: function(nTd, cellData, rowData, row, col) {
                         url = Urls.record(rowData.id);
@@ -47,30 +64,40 @@
                 },
                 {data: "record_type"},
                 {data: "reel"},
-                {data: "earliest_session",
-                    fnCreatedCell: function(nTd, cellData, rowData, row, col) {
-                        if (rowData.earliest_session){
-                            $(nTd).html( rowData.earliest_session.village.name +" " + rowData.earliest_session.law_term + ", " + rowData.earliest_session.year);
-                        } else {
-                            $(nTd).html( "None");
-                            
-                        }
+                {data: "session_dates.earliest_session",
+                    render: {
+                        display: formatSessionDate,
+                        sort: "date",
                     }
                 },
-                {data: "latest_session",
-                    fnCreatedCell: function(nTd, cellData, rowData, row, col) {
-                        if (rowData.latest_session) {
-                            $(nTd).html( rowData.latest_session.village.name +" " + rowData.latest_session.law_term + ", " + rowData.latest_session.year);
-                        } else {
-                            $(nTd).html( "None");
-
-                        }
+                {data: "session_dates.latest_session",
+                    render: {
+                        display: formatSessionDate,
+                        sort: "date",
                     }
                 },
-                {data: "notes"},
+                {data: "counts.session"},
+                {data: "counts.case"},
             ]
         });
 
+        $('#table tbody').on('click', 'td.details-control', function(){
+            var tr = $(this).closest('tr');
+            var tdi = tr.find("i.fa");
+            var row = table.row( tr );
+
+            if ( row.child.isShown() ) {
+                row.child.hide();
+                tr.removeClass('shown');
+                tdi.first().removeClass('fa-minus-square');
+                tdi.first().addClass('fa-plus-square');
+            } else{
+                row.child( format( row.data() ) ).show();
+                tr.addClass('shown');
+                tdi.first().removeClass('fa-plus-square');
+                tdi.first().addClass('fa-minus-square');
+            }
+        });
     });
 
 

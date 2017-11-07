@@ -12,11 +12,8 @@
                     <th>Gender</th>
                     <th>1332 Tax</th>
                     <th>1379 Tax</th>
-                    <th>Case Count</th>
                     <th>Earliest Case</th>
                     <th>Latest Case</th>
-                    <th>Pledges Given</th>
-                    <th>Pledges Received</th>
                 </thead>
             </table>
     </div>
@@ -41,8 +38,8 @@
     $(document).ready(function () {
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1];
-        var api_url = Urls.person_api() + "?county=" + id + "&expand=village";
-        console.log(api_url);
+        url = Urls["api:people-list"]();
+        var api_url = url + "?county_to_resident=" + id + "&include[]=case_dates&include[]=village";
         var table = $("#table").DataTable({
             fixedHeader:{ headerOffset: 50 },
             scrollX: true,
@@ -50,7 +47,7 @@
             ajax: {
                 url: api_url,
                 type: "GET",
-                dataSrc: "",
+                dataSrc: "people.",
             },
             "columns": [
                 {
@@ -58,31 +55,34 @@
                     "orderable": "false",
                     "data": "notes",
                     "defaultContent": "",
-                    "render": function(cellData){
-                        if (cellData) {
-                            return '<i class="fa fa-plus-square" aria-hidden="true"></i>';
-                        } else {
-                            return '<i class="fa fa-plus-square" aria-hidden="true" style="color: gray"></i>';
-                        }
-                    },
+                    "render": checkNotes,
                     width:"15px"
                 },
                 {data: "full_name",
                     fnCreatedCell: function(nTd, cellData, rowData, row, col) {
                         url = Urls.person(rowData.id);
-                        $(nTd).html("<a href='"+ url +"'>" + rowData.full_name + "</a>");
+                        $(nTd).html("<a href='"+ url +"'>" + cellData + "</a>");
                     }
                 },
                 {data: "village.name"},
-                {data: "status"},
-                {data: "gender"},
+                {data: "status_display"},
+                {data: "gender_display"},
                 {data: "tax_1332"},
                 {data: "tax_1379"},
-                {data: "case_count_all"},
-                {data: "earliest_case"},
-                {data: "latest_case"},
-                {data: "pledges_given_count"},
-                {data: "pledges_received_count"},
+                {data: "case_dates.earliest_case",
+                    defaultContent: '',
+                    render: {
+                        display: formatCaseDate,
+                        sort: "date",
+                    }
+                },
+                {data: "case_dates.latest_case", 
+                    defaultContent: '',
+                    render: {
+                        display: formatCaseDate,
+                        sort: "date",
+                    }
+                },
             ]
         });
 

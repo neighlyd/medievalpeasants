@@ -2,7 +2,7 @@
 
 {% block left_sidebar%}
     <div id="selection_list">
-        <a class="list-group-item" href="{% url 'tenant_history' land.id %}">Tenant History</a>
+        <a class="list-group-item active" href="{% url 'tenant_history' land.id %}">Tenant History</a>
         <a class="list-group-item" href="{% url 'land_case_history' land.id %}" >Case History</a>
         <a class="list-group-item" href="{% url 'land_split_history' land.id %}" >Land Split History</a>
     </div>
@@ -53,7 +53,9 @@
 {% endblock %}
 
 {% block right_sidebar %}
-    <button type="button" class="btn btn-secondary float-right">Edit Land</button>
+
+    {{ block.super }}
+
 {% endblock %}
 
 {% block scripts %}
@@ -62,7 +64,7 @@
 <script>
     $(document).ready(function(){
         var url = window.location.pathname;
-        var id = url.split('/').reverse()[1]
+        var id = url.split('/').reverse()[1];
         $("#list_info").load(Urls.tenant_history(id))
     })
 </script>

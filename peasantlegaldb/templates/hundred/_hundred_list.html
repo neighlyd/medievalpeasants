@@ -31,15 +31,15 @@
     $(document).ready(function () {
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1];
-        var api_url = Urls.hundred_api() + "?expand=county&expand=counts";
-        console.log(api_url);
+        url = Urls['api:hundred-list']();
+        var api_url = url + "?include[]=county&include[]=counts";
         var table = $("#table").DataTable({
             fixedHeader:{ headerOffset: 50 },
             scrollX: true,
             ajax: {
                 url: api_url,
                 type: "GET",
-                dataSrc: "",
+                dataSrc: "hundreds.",
             },
             "columns": [
                 {data: "name",
@@ -48,9 +48,9 @@
                         $(nTd).html("<a href='"+ url +"'>" + rowData.name + "</a>");
                     }
                 },
-                {data: "county_id",
+                {data: "county.id",
                     fnCreatedCell: function(nTd, cellData, rowData, row, col){
-                        url = Urls.county(rowData.county_id);
+                        url = Urls.county(rowData.county.id);
                         $(nTd).html("<a href='"+ url +"'>" + rowData.county.name + "</a>");
                     }
                 },
@@ -59,15 +59,6 @@
         });
 
     });
-
-function checkmaker(nTd, cellData, rowData, row, col) {
-    if (cellData === true){
-        $(nTd).html("<i class='fa fa-check' style='color:forestgreen'></i>")
-    } else {
-        $(nTd).html("")
-    }
-}
-
 
 </script>
 

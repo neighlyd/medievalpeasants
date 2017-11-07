@@ -6,9 +6,8 @@
             <table class="table table-bordered table-hover" id="table" data-page-length="25">
                 <thead>
                     <th></th>
-                    <th>ID</th>
-                    <th>Term</th>
-                    <th>Year</th>
+                    <th>Case</th>
+                    <th>Session</th>
                     <th>Chevage</th>
                     <th>Notes</th>
                     <th>Recessit</th>
@@ -42,10 +41,9 @@
 
     $(document).ready(function () {
         var url = window.location.pathname;
-        var id = url.split('/').reverse()[1]
-        console.log(id)
-        var api_url = Urls.litigants_api() + "?person=" + id + "&chevage=true&expand=chevage&expand=role&expand=case__verdict&expand=case__case_type&expand=case__session__village";
-        console.log(api_url);
+        var id = url.split('/').reverse()[1];
+        url = Urls['api:person-detail'](id);
+        var api_url = url + "?include[]=cases.case.session.village&include[]=cases.case.litigant_list&include[]=cases.case.litigant_count&filter{cases|chevage.isnull}=false";
         var table = $("#table").DataTable({
             fixedHeader:{ headerOffset: 50 },
             scrollX: true,
@@ -53,17 +51,15 @@
             ajax: {
                 url: api_url,
                 type: "GET",
-                dataSrc: "",
+                dataSrc: "person.cases.",
             },
             "columns": [
                 {
                     "class": "details-control",
                     "orderable": false,
                     "data": null,
-                    "defaultContent": "",
-                    "render": function(){
-                        return '<i class="fa fa-plus-square" aria-hidden="true"></i>';
-                    },
+                    "defaultContent": "case",
+                    "render": checkNotes,
                     width:"15px"
                 },
                 {data: "case.id",
@@ -71,44 +67,38 @@
                         $(nTd).html("<a href='" + Urls.case(rowData.case.id) + "'target='_blank'>" + rowData.case.id + "</a>");
                     }
                 },
-                {data: "case.session.law_term"},
-                {data: "case.session.date",
-                    fnCreatedCell: function(nTd, cellData, rowData, row, col) {
-                        $(nTd).html(rowData.case.session.year);
+                {data: "case.session",
+                    defaultContent: '',
+                    render: {
+                        display: formatSessionDate,
+                        sort: "date"
                     }
                 },
-                {data: "chevage.in_denarius",
-                    fnCreatedCell: function(nTd, cellData, rowData, row, col){
-                    $(nTd).html(rowData.chevage.amount + " (" + rowData.chevage.in_denarius + "d.)")
+                {data: "chevage",
+                    defaultContent: '',
+                    render: {
+                        display: formatMoney,
+                        sort: "in_denarius"
                     }
                 },
                 {data: "chevage_notes"},
                 {data: "recessit",
-                    fnCreatedCell: function(nTd, cellData, rowData, row, col) {
-                        if (rowData.recessit === true){
-                            $(nTd).html("<i class='fa fa-check' style='color:forestgreen'></i>")
-                        } else {
-                            $(nTd).html("")
-                        }
+                    defaultContent: '',
+                    render: {
+                        display: checkMaker,
                     }
                 },
                 {data: "crossed",
-                    fnCreatedCell: function(nTd, cellData, rowData, row, col) {
-                        if (rowData.crossed === true){
-                            $(nTd).html("<i class='fa fa-check' style='color:forestgreen'></i>")
-                        } else {
-                            $(nTd).html("")
-                        }
-                    }
+                    defaultContent: '',
+                    render: {
+                        display: checkMaker,
+                    },
                 },
                 {data: "habet_terram",
-                    fnCreatedCell: function(nTd, cellData, rowData, row, col) {
-                        if (rowData.habet_terram === true){
-                            $(nTd).html("<i class='fa fa-check' style='color:forestgreen'></i>")
-                        } else {
-                            $(nTd).html("")
-                        }
-                    }
+                    defaultContent: '',
+                    render: {
+                        display: checkMaker,
+                    },
                 },
             ]
         });
@@ -132,18 +122,6 @@
         });
 
     });
-
-    function list_litigants(data){
-        var concat = '';
-        data.forEach(function (obj, index) {
-            concat = concat + '<div class="d-flex justify-content-end"><div class="mr-auto p-0"><u>Name:</u> ' + obj.name + '</div> <div class="p-0"><u>Role:</u> ' + obj.role + '</div></div><hr>';
-            return concat;
-            });
-        return concat;
-
-    };
-
-
 
 </script>
 

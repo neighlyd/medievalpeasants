@@ -7,8 +7,7 @@
                 <thead>
                     <th></th>
                     <th>Case</th>
-                    <th>Law Term</th>
-                    <th>Year</th>
+                    <th>Session</th>
                     <th>Court Type</th>
                     <th>Case Type</th>
                     <th>Verdict</th>
@@ -41,22 +40,22 @@
     $(document).ready(function () {
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1];
-        var api_url = Urls.case_api() + "?village=" + id + "&expand=case_type&expand=verdict&expand=session";
-        console.log(api_url);
+        url = Urls['api:case-list']();
+        var api_url = url + "?village=" + id + "&include[]=session.village&include[]=litigant_count";
         var table = $("#table").DataTable({
             fixedHeader:{ headerOffset: 50 },
             scrollX: true,
-            order: [3, "asc"],
+            order: [2, "asc"],
             ajax: {
                 url: api_url,
                 type: "GET",
-                dataSrc: "",
+                dataSrc: "cases.",
             },
             "columns": [
                 {
                     "class": "details-control",
                     "orderable": "false",
-                    "data": null,
+                    "data": "summary",
                     "defaultContent": "",
                     "render": checkNotes,
                     width:"15px"
@@ -67,11 +66,11 @@
                         $(nTd).html("<a href='"+ url +"'>" + rowData.id + "</a>");
                     }
                 },
-                {data: "session.law_term"},
-                {data: "session.date",
-                    fnCreatedCell: function(nTd, cellData, rowData, row, col) {
-                        url = Urls.session(rowData.session.id);
-                        $(nTd).html("<a href='"+ url +"'>" + rowData.session.year + "</a>");
+                {data: "session",
+                    defaultContent: '',
+                    render: {
+                        display: formatSessionDateNoVillage,
+                        sort: 'date'
                     }
                 },
                 {data: "court_type"},
@@ -79,17 +78,29 @@
                 {data: "verdict.verdict"},
                 {data: "litigant_count"},
                 {data: "of_interest",
-                    fnCreatedCell: checkmaker
+                    defaultContent: '',
+                    render: {
+                        display: checkMaker,
+                    }
                 },
                 {data: "villeinage_mention",
-                fnCreatedCell: checkmaker
-            },
+                    defaultContent: '',
+                    render: {
+                        display: checkMaker,
+                    }
+                },
                 {data: "active_sale",
-                fnCreatedCell: checkmaker
-            },
+                    defaultContent: '',
+                    render: {
+                        display: checkMaker,
+                    }
+                },
                 {data: "incidental_land",
-                fnCreatedCell: checkmaker
-        },
+                    defaultContent: '',
+                    render: {
+                        display: checkMaker,
+                    }
+                },
             ]
         });
 

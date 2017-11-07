@@ -45,7 +45,8 @@
     }
 
     $(document).ready(function () {
-        var api_url = Urls.land_api() + "?expand=tenant_history&expand=case_info";
+        var url = Urls['api:land-list']();
+        var api_url = url + "?include[]=tenant_history.person.village&include[]=tenant_history.case.session&include[]=case_dates";
         var table = $("#table").DataTable({
             fixedHeader:{ headerOffset: 50 },
             scrollX: true,
@@ -53,7 +54,7 @@
             ajax: {
                 url: api_url,
                 type: "GET",
-                dataSrc: "",
+                dataSrc: "lands.",
             },
             "columns": [
                 {
@@ -61,13 +62,7 @@
                     "orderable": "false",
                     "data": "tenant_history",
                     "defaultContent": "",
-                    "render": function(cellData){
-                        if (cellData != '') {
-                            return '<i class="fa fa-plus-square" aria-hidden="true"></i>';
-                        } else {
-                            return '<i class="fa fa-plus-square" aria-hidden="true" style="color: gray"></i>';
-                        }
-                    },
+                    "render": checkNotes,
                     width:"15px"
                 },
                 {data: "id",
@@ -77,26 +72,25 @@
                     }
                 },
                 {data: "parcel_list",
-                    fnCreatedCell: list_parcels,
+                    defaultContent: '',
+                    render: {
+                        display: list_parcels,
+                    }
                 },
                 {data: "notes"},
-                {data: "case_info",
-                    fnCreatedCell: function (nTd, cellData, rowData, row, col) {
-                        if(cellData){
-                            $(nTd).html(cellData.earliest.session.law_term + ", " + cellData.earliest.session.year)
-                        } else {
-                            $(nTd).html("N/A")
-                        }
-                    },
+                {data: "case_dates.earliest",
+                    defaultContent: '',
+                    render: {
+                        display: formatCaseDate,
+                        sort: "date"
+                    }
                 },
-                {data: "case_info",
-                    fnCreatedCell: function (nTd, cellData, rowData, row, col) {
-                        if (cellData) {
-                            $(nTd).html(cellData.latest.session.law_term + ", " + cellData.latest.session.year)
-                        } else {
-                            $(nTd).html("N/A")
-                        }
-                    },
+                {data: "case_dates.latest",
+                    defaultContent: '',
+                    render: {
+                        display: formatCaseDate,
+                        sort: "date"
+                    }
                 }
             ]
         });

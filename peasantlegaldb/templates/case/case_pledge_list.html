@@ -1,0 +1,88 @@
+{% extends '_layout/_l_single_col.html' %}
+
+{% block single_col %}
+
+        <h3 class="card-header text-center">Pledges</h3>
+        <div class="card-body">
+            <table class="table table-bordered table-hover" id="pledges_list" data-page-length="25">
+                <thead>
+                    <th>Grantor</th>
+                    <th>Grantor Status</th>
+                    <th>Grantor Gender</th>
+                    <th>Recipient</th>
+                    <th>Recipient Status</th>
+                    <th>Recipient Gender</th>
+                </thead>
+            </table>
+
+        <br>
+        </div>
+
+{% endblock %}
+
+{% block scripts %}
+    {{ block.super }}
+
+<script>
+
+    $(document).ready(function () {
+        var url = window.location.pathname;
+        var id = url.split('/').reverse()[1];
+        url = Urls['api:case-detail'](id);
+        var pledges_url = url + "?include[]=pledges";
+        var table = $("#pledges_list").DataTable({
+            scrollX: true,
+            fixedHeader: {
+                headerOffset: 50
+            },
+            ajax: {
+                url: pledges_url,
+                type: "GET",
+                dataSrc: "case.pledges.",
+            },
+            "columns": [
+                {data: 'pledge_giver',
+                    defaultContent: '',
+                    render:{
+                        display: formatPerson,
+                        sort: 'full_name'
+                    }
+                },
+                {data: 'pledge_giver.status_display'},
+                {data: 'pledge_giver.gender_display'},
+                {data: 'pledge_receiver',
+                    defaultContent: '',
+                    render:{
+                        display: formatPerson,
+                        sort: 'full_name'
+                    }
+                },
+                {data: 'pledge_receiver.status_display'},
+                {data: 'pledge_receiver.gender_display'},
+            ]
+        });
+
+         $('#pledges_list tbody').on('click', 'td.details-control', function(){
+            var tr = $(this).closest('tr');
+            var tdi = tr.find("i.fa");
+            var row = table1.row( tr );
+
+            if ( row.child.isShown() ) {
+                row.child.hide();
+                tr.removeClass('shown');
+                tdi.first().removeClass('fa-minus-square');
+                tdi.first().addClass('fa-plus-square');
+            } else{
+                row.child( format( row.data() ) ).show();
+                tr.addClass('shown');
+                tdi.first().removeClass('fa-plus-square');
+                tdi.first().addClass('fa-minus-square');
+            }
+        });
+    });
+
+
+</script>
+
+
+{% endblock %}

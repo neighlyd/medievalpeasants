@@ -42,14 +42,16 @@
 {% endblock %}
 
 {% block right_sidebar %}
-    <button type="button" class="btn btn-secondary float-sm-right">Edit Village</button>
+
+    {{ block.super }}
+
 {% endblock %}
 
 {% block scripts %}
 
+    {{ block.super }}
     <script type="text/javascript" src="http://nls.tileserver.com/api.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB51yaYfTmJNUIlZCpIr0HU4m11Hmd7Y9E"></script>
-    {{ block.super }}
 
     <script>
     // for information on Ordnance Survey API: http://maps.nls.uk/projects/api/
@@ -70,21 +72,25 @@
         });
 
         function initialize(){
-            // get lat and lng from API, since accessing django models through JS is not possible (that I'm aware).
+            // get lat and lng from API.
             var url = window.location.pathname;
             var id = url.split('/').reverse()[1];
-            var api_url = Urls.village_api() + "?county=" + id + "&expand=counts";
+            url = Urls["api:village-list"]();
+            var villages_url = url + "?&include[]=counts&filter{county.id}=" + id;
 
             var locationObject = $.ajax({
-                url: api_url,
+                url: villages_url,
                 type: "GET",
                 async: false,
                 dataType: '',
             }).responseJSON;
 
+            // because Dynamic-Rest nests the data one-level deep, strip out the '{ villages:{' layer.
+            locationObject = locationObject.villages;
+
             var countyName = $("#county_name").text();
 
-            var county_api_url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + countyName + "&key=AIzaSyB51yaYfTmJNUIlZCpIr0HU4m11Hmd7Y9E"
+            var county_api_url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + countyName + "+UK&key=AIzaSyB51yaYfTmJNUIlZCpIr0HU4m11Hmd7Y9E";
 
             var countyLocation = $.ajax({
                 url: county_api_url,
@@ -104,9 +110,7 @@
             var countyLng = county_results.map(f => f.geometry.location.lng);
 
             countyLat = parseFloat(countyLat);
-            countyLng = parseFloat(countyLng)
-
-            console.log("lat: " + countyLat + " & long: " + countyLng);
+            countyLng = parseFloat(countyLng);
 
             var mapOptions = {
                 zoom: 9,

@@ -8,8 +8,7 @@
                     <th>Notes</th>
                     <th>Case</th>
                     <th>Village</th>
-                    <th>Law Term</th>
-                    <th>Year</th>
+                    <th>Session</th>
                     <th>Court Type</th>
                     <th>Case Type</th>
                     <th>Verdict</th>
@@ -42,16 +41,18 @@
     $(document).ready(function () {
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1];
-        var api_url = Urls.case_api() + "?county=" + id + "&expand=case_type&expand=verdict&expand=session__village";
-        console.log(api_url);
+        url = Urls["api:case-list"]();
+        var api_url = url + "?county=" + id + "&include[]=litigant_count&include[]=session.village";
+        $("#table").DataTable().destroy();
         var table = $("#table").DataTable({
             fixedHeader:{ headerOffset: 50 },
             scrollX: true,
             order: [4, "asc"],
+            deferRender: true,
             ajax: {
                 url: api_url,
                 type: "GET",
-                dataSrc: "",
+                dataSrc: "cases.",
             },
             "columns": [
                 {
@@ -59,27 +60,25 @@
                     "orderable": "false",
                     "data": "summary",
                     "defaultContent": "",
-                    "render": function(cellData){
-                        if (cellData) {
-                            return '<i class="fa fa-plus-square" aria-hidden="true"></i>';
-                        } else {
-                            return '<i class="fa fa-plus-square" aria-hidden="true" style="color: gray"></i>';
-                        }
-                    },
+                    "render": checkNotes,
                     width:"15px"
                 },
                 {data: "id",
-                    fnCreatedCell: function(nTd, cellData, rowData, row, col) {
-                        url = Urls.case(rowData.id);
-                        $(nTd).html("<a href='"+ url +"'>" + rowData.id + "</a>");
+                    defaultContent: '',
+                    render: {
+                        display: function(data, type, row, col){
+                            url = Urls.case(data);
+                            return "<a href='" + url + "'>" + data + "</a>";
+                        },
+                        sort: "id"
                     }
                 },
                 {data: "session.village.name"},
-                {data: "session.law_term"},
-                {data: "session.date",
-                    fnCreatedCell: function(nTd, cellData, rowData, row, col) {
-                        url = Urls.session(rowData.session.id);
-                        $(nTd).html("<a href='"+ url +"'>" + rowData.session.year + "</a>");
+                {data: "session",
+                    defaultContent: '',
+                    render: {
+                        display: formatSessionDateNoVillage,
+                        sort: "date",
                     }
                 },
                 {data: "court_type"},
@@ -87,17 +86,29 @@
                 {data: "verdict.verdict"},
                 {data: "litigant_count"},
                 {data: "of_interest",
-                    fnCreatedCell: checkmaker
+                    defaultContent: '',
+                    render: {
+                        display: checkMaker,
+                    }
                 },
                 {data: "villeinage_mention",
-                fnCreatedCell: checkmaker
-            },
+                    defaultContent: '',
+                    render: {
+                        display: checkMaker,
+                    }
+                },
                 {data: "active_sale",
-                fnCreatedCell: checkmaker
-            },
+                    defaultContent: '',
+                    render: {
+                        display: checkMaker,
+                    }
+                },
                 {data: "incidental_land",
-                fnCreatedCell: checkmaker
-        },
+                    defaultContent: '',
+                    render: {
+                        display: checkMaker,
+                    }
+                },
             ]
         });
 
@@ -120,14 +131,6 @@
         });
 
     });
-
-function checkmaker(nTd, cellData, rowData, row, col) {
-    if (cellData === true){
-        $(nTd).html("<i class='fa fa-check' style='color:forestgreen'></i>")
-    } else {
-        $(nTd).html("")
-    }
-}
 
 
 </script>

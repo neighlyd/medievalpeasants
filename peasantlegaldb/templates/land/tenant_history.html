@@ -11,8 +11,7 @@
                 <th>Name</th>
                 <th>Village</th>
                 <th>Case</th>
-                <th>Law Term</th>
-                <th>Year</th>
+                <th>Session</th>
                 <th>Role</th>
                 <th>Villeinage?</th>
                 <th>Fine</th>
@@ -31,58 +30,25 @@
 
 <script>
 
-        function format( d ){
-        return "<table class='table'>" +
-            "<tr>" +
-            "<td><b>Village:</b></td>" +
-            "<td>"+d.person.village.name+"</td>" +
-            "<td><b>Gender:</b></td>" +
-            "<td>"+d.person.gender+"</td>" +
-            "<td><b>Status:</b></td>" +
-            "<td>"+d.person.status+"</td>" +
-            "</tr>" +
-            "<tr>" +
-            "<td><b>Litigation Count:</b></td>" +
-            "<td>"+d.person.case_count_litigation+"</td>" +
-            "<td><b>Total Case Count:</b></td>" +
-            "<td>"+d.person.case_count_all+"</td>" +
-            "<td><b>Earliest Case:</b></td>" +
-            "<td>"+d.person.earliest_case+"</td>" +
-            "<td><b>Latest Case:</b></td>" +
-            "<td>"+d.person.latest_case+"</td>" +
-            "</tr>" +
-            "<tr>" +
-            "<td><b>Amercement Count:</b></td>" +
-            "<td>"+d.person.case_info.amercement__count+"</td>" +
-            "<td><b>Fine Count:</b></td>" +
-            "<td>"+d.person.case_info.fine__count+"</td>" +
-            "<td><b>Damages Count:</b></td>" +
-            "<td>"+d.person.case_info.damage__count+"</td>" +
-            "</tr>" +
-            "<tr>" +
-            "<td><b>Chevage Count:</b></td>" +
-            "<td>"+d.person.case_info.chevage__count+"</td>" +
-            "<td><b>Impercamenta Count:</b></td>" +
-            "<td>"+d.person.case_info.impercamentum__count+"</td>" +
-            "<td><b>Heriot Count:</b></td>" +
-            "<td>"+d.person.case_info.heriot__count+"</td>" +
-            "</tr>"
-            "</table>"
+        function format( data ){
+        return format_person_subdata(data)
     }
 
     $(document).ready(function() {
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1];
-        var url = Urls.litigants_api() + "?land=" + id + "&expand=person__village&expand=case__session&expand=role&expand=case__case_type&expand=land&expand=case__verdict&expand=fine&expand=heriot&expand=person__case_info";
+        url = Urls['api:litigan-list']();
+        var url = url + "?include[]=land&filter{land.id}=" + id + "&include[]=person.village&include[]=case.session&include[]=person.counts&include[]=person.case_dates";
         var table = $('#tenant_history').DataTable({
             scrollX: true,
+            hideEmptyCols: true,
             ajax: {
                 processing: true,
                 url: url,
                 type: "GET",
-                dataSrc: "",
+                dataSrc: "litigants.",
             },
-            "order": [[5, "asc"]],
+            order: [[4, "asc"]],
             "columns": [
                 {
                     "class": "details-control",
@@ -94,40 +60,52 @@
                     },
                     width: "15px"
                 },
-                {data: "person.full_name",
-                    fnCreatedCell: function(nTd, cellData, rowData, row, col) {
-                        var url = Urls.person(rowData.person_id)
-                        $(nTd).html("<a href='"+ url +"'>" + rowData.person.full_name + "</a>");
+                {data: "person",
+                    render: {
+                        display: function (data, type, row, col) {
+                            url = Urls.person(data.id);
+                            return "<a href='" + url + "'>" + data.full_name + "</a>";
+                        },
+                        sort: "full_name",
                     }
                 },
                 {data: "person.village.name"},
-                {data: "case_id",
-                    fnCreatedCell: function(nTd, cellData, rowData, row, col) {
-                        var url = Urls.case(rowData.case_id)
-                        $(nTd).html("<a href='"+ url +"'>" + rowData.case_id + "</a>");
+                {data: "case",
+                    render: {
+                        display: function(data, type, row, col) {
+                            url = Urls.case(data.id);
+                            return "<a href='" + url + "'>" + data.id + "</a>";
+                        },
+                        sort: "session.date"
                     }
                 },
-                {data: "case.session.law_term"},
-                {data: "case.session.year"},
-                {data: "role.role"},
-                {data: "land_villeinage"},
-                {data: "fine",
-                    fnCreatedCell: function(nTd, cellData, rowData, row, col){
-                        if (rowData.fine === true){
-                            $(nTd).html(rowData.fine.amount + " (" + rowData.fine.in_denarius + "d.)")
-                        } else {
-                            $(nTd).html("")
-                        }
+                {data: "case.session",
+                    defaultContent: '',
+                    render: {
+                        display: formatSessionDateNoVillage,
+                        sort: "date"
                     }
+                },
+                {data: "role.role"},
+                {data: "land_villeinage",
+                    defaultContent: '',
+                    render: {
+                        display: checkMaker,
+                    }
+                },
+                {data: "fine",
+                    defaultContent: '',
+                    render: {
+                        display: formatMoney,
+                        sort: 'in_denarius'
+                    },
                 },
                 {data: "heriot",
-                    fnCreatedCell: function(nTd, cellData, rowData, row, col){
-                        if (rowData.heriot === true){
-                            $(nTd).html(rowData.heriot.amount + " (" + rowData.heriot.in_denarius + "d.)")
-                        } else {
-                            $(nTd).html("")
-                        }
-                    }
+		            defaultContent: '',
+                    render: {
+                        display: formatMoney,
+                        sort: 'in_denarius'
+                    },
                 },
                 {data: "land_notes"},
             ]

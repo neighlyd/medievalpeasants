@@ -19,6 +19,9 @@
     {% if person.relationship_exists %}
         <a class="list-group-item list-group-item-action " href="{% url 'relationship_list' person.id %}">Relationship List</a>
     {% endif %}
+    {% if person.position_exists %}
+        <a class="list-group-item list-group-item-action " href="{% url 'position_list' person.id %}">Position List</a>
+    {% endif %}
 
 
         <br>
@@ -93,11 +96,19 @@
                     </tr>
                     <tr class="row m-0">
                         <td class="d-inline-block col-4"><b>Earliest Case</b></td>
-                        <td class="d-inline-block col-8">{{ person.earliest_case }}</td>
+                        {% if person.earliest_case.id is not None %}
+                        <td class="d-inline-block col-8"><a href="{% url 'case' person.earliest_case.id %}">{{ person.earliest_case.village.name }} | {{ person.earliest_case.law_term }}, {{ person.earliest_case.year }}</a></td>
+                        {% else %}
+                        <td class="d-inline-block col-8">None</td>
+                        {% endif %}
                     </tr>
                     <tr class="row m-0">
                         <td class="d-inline-block col-4"><b>Latest Case</b></td>
-                        <td class="d-inline-block col-8">{{ person.latest_case }}</td>
+                        {% if person.latest_case.id is not None %}
+                        <td class="d-inline-block col-8"><a href="{% url 'case' person.latest_case.id %}">{{ person.latest_case.village.name }} | {{ person.latest_case.law_term }}, {{ person.latest_case.year }}</a></td>
+                        {% else %}
+                        <td class="d-inline-block col-8">None</td>
+                        {% endif %}
                     </tr>
 
                 </table>
@@ -126,25 +137,11 @@
 {% endblock %}
 
 {% block right_sidebar %}
+
     {{ block.super }}
+
 {% endblock %}
 
-<!-- Old script for showing tabs.
-<script>
-    $('#selection_list>a').click(function(e){
-        e.preventDefault();
-        var id=$(this).attr('href'), url=$(this).data('url');
-        console.log("id: " + id);
-        console.log("url: "+ url);
-        if(typeof url !== "undamaged") {
-            $(id).load(url);
-            $(id).addClass('active').siblings().removeClass('active');
-        } else {
-            $(id).addClass('active').siblings().removeClass('active');
-        }
-    });
-
-</script>-->
 {% block scripts %}
 
 {{ block.super }}
@@ -156,7 +153,7 @@
 <script>
     $(document).ready(function(){
         var url = window.location.pathname;
-        var id = url.split('/').reverse()[1]
+        var id = url.split('/').reverse()[1];
         $("#list_info").load(Urls.person_stats(id))
 
     });

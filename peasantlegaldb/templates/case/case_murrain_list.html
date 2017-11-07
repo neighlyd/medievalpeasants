@@ -20,17 +20,16 @@
 
     $(document).ready(function () {
         var url = window.location.pathname;
-        var id = url.split('/').reverse()[1]
-        console.log(id)
-        var api_url = Urls.murrain_api() + "?case=" + id + "&expand=animal";
-        console.log(api_url);
+        var id = url.split('/').reverse()[1];
+        url = Urls['api:case-detail'](id);
+        var api_url = url + "?include[]=murrain";
         var table = $("#table").DataTable({
             fixedHeader:{                headerOffset: 50            },
             order: [0, "asc"],
             ajax: {
                 url: api_url,
                 type: "GET",
-                dataSrc: "",
+                dataSrc: "case.murrain.",
             },
             "columns": [
 

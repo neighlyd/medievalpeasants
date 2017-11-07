@@ -5,12 +5,13 @@
     <div class="card-body">
             <table class="table table-bordered table-hover" id="table" data-page-length="25">
                 <thead>
+                    <th>Notes</th>
                     <th>Session ID</th>
                     <th>Village</th>
                     <th>Law Term</th>
                     <th>Date</th>
-                    <th>Notes</th>
-                    <th>Case Count</th>
+                    <th>Cases</th>
+                    <th>Litigants</th>
                 </thead>
             </table>
     </div>
@@ -22,13 +23,20 @@
 
 <script>
 
+    function format( data ) {
+        return "<table class='table'>" +
+            "<tr>" +
+            "<td>Notes</td>" +
+            "<td>" + data.notes + "</td>" +
+            "</tr>" +
+        "</table>"
+    }
 
     $(document).ready(function () {
         var url = window.location.pathname;
-        var id = url.split('/').reverse()[1]
-        console.log(id)
-        var api_url = Urls.session_api() + "?record=" + id + "&expand=village";
-        console.log(api_url);
+        var id = url.split('/').reverse()[1];
+        url = Urls['api:record-detail'](id);
+        var api_url = url + "?include[]=sessions.village&include[]=sessions.counts";
         var table = $("#table").DataTable({
             fixedHeader:{ headerOffset: 50 },
             scrollX: true,
@@ -36,9 +44,17 @@
             ajax: {
                 url: api_url,
                 type: "GET",
-                dataSrc: "",
+                dataSrc: "record.sessions.",
             },
             "columns": [
+                {
+                    "class": "details-control",
+                    "orderable": false,
+                    "data": "notes",
+                    "defaultContent": "",
+                    "render": checkNotes,
+                    width:"15px"
+                },
                 {data: "id",
                     fnCreatedCell: function(nTd, cellData, rowData, row, col) {
                         url = Urls.session(rowData.id);
@@ -57,9 +73,27 @@
                         $(nTd).html(rowData.human_date);
                     }
                 },
-                {data: "notes"},
-                {data: "case_count"},
+                {data: "counts.case"},
+                {data: "counts.litigant"},
             ]
+        });
+        // Used to activate the + expansion and trigger the format function.
+         $('#table tbody').on('click', 'td.details-control', function(){
+            var tr = $(this).closest('tr');
+            var tdi = tr.find("i.fa");
+            var row = table.row( tr );
+
+            if ( row.child.isShown()) {
+                row.child.hide();
+                tr.removeClass('shown');
+                tdi.first().removeClass('fa-minus-square');
+                tdi.first().addClass('fa-plus-square');
+            } else {
+                row.child( format( row.data() ) ).show();
+                tr.addClass('shown');
+                tdi.first().removeClass('fa-plus-square');
+                tdi.first().addClass('fa-minus-square');
+            }
         });
 
     });

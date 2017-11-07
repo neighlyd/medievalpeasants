@@ -5,11 +5,11 @@
     <div class="card-body">
             <table class="table table-bordered table-hover" id="table" data-page-length="25">
                 <thead>
-                    <th></th>
+                    <th>Info</th>
                     <th>Land ID</th>
                     <th>Parcels</th>
-                    <th>Law Term</th>
-                    <th>Year</th>
+                    <th>Session</th>
+                    <th>Case</th>
                     <th>Role</th>
                     <th>Villeinage?</th>
                     <th>Village</th>
@@ -31,16 +31,14 @@
             "<tr>" +
             "<td><b>Case ID</b></td>" +
             "<td><b>Village</b></td>" +
-            "<td><b>Law Term</b></td>" +
-            "<td><b>Year</b></td>" +
+            "<td><b>Session</b></td>" +
             "<td><b>Court Type</b></td>" +
             "<td><b>Case Type</b></td>" +
             "<td><b>Verdict</b></td>" +
             "<tr>" +
             "<td><a href='" + Urls.case(d.case.id) + "'target='_blank'>" + d.case.id + "</a></td>" +
             "<td>" + d.case.session.village.name + "</td>" +
-            "<td>" + d.case.session.law_term + "</td>" +
-            "<td>" + d.case.session.year + "</td>" +
+            "<td>" + d.case.session.law_term + ", " + d.case.session.year +"</td>" +
             "<td>" + d.case.court_type + "</td>" +
             "<td>" + d.case.case_type.case_type +"</td>" +
             "<td>" + d.case.verdict.verdict + "</td>" +
@@ -53,43 +51,60 @@
     $(document).ready(function(){
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1];
-        var url = Urls.litigants_api() + "?person=" + id + "&land=true&expand=land&expand=role&expand=case__verdict&expand=case__case_type&expand=case__session__village";
+        url = Urls["api:person-detail"](id);
+        var url = url + "?include[]=cases.land&&include[]=cases.case.session.village&filter{cases|land.isnull}=false";
         var table = $('#table').DataTable({
             scrollX: true,
             ajax: {
                 processing: true,
                 url: url,
                 type: "GET",
-                dataSrc: "",
+                dataSrc: "person.cases.",
             },
-            "order": [[4, "asc"]],
+            "order": [[3, "asc"]],
             "columns": [
                 {
                     "class": "details-control",
                     "orderable": "false",
                     "data": null,
-                    "defaultContent": "",
-                    "render": function(){
-                        return '<i class="fa fa-plus-square" aria-hidden="true"></i>';
-                    },
+                    "defaultContent": "case",
+                    "render": checkNotes,
                     width:"15px"
                 },
-                {data: "land_id",
+                {data: "land",
                     fnCreatedCell: function(nTd, cellData, rowData, row, col){
-                        $(nTd).html("<a href='" + Urls.land(rowData.land_id) + "'target='_blank'>" + rowData.land_id + "</a>");
+                        $(nTd).html("<a href='" + Urls.land(cellData.id) + "'target='_blank'>" + cellData.id + "</a>");
                     }
                 },
                 {data: "land.parcel_list",
                     fnCreatedCell: list_parcels,
                 },
-                {data: "case.session.law_term"},
-                {data: "case.session.date",
-                    fnCreatedCell: function(nTd, cellData, rowData, row, col) {
-                        $(nTd).html(rowData.case.session.year);
+                {data: "case.session",
+                    defaultContent: '',
+                    render: {
+                        display: formatSessionDate,
+                        sort: "date"
+                    }
+                },
+                {data: "case",
+                    defaultContent: '',
+                    render: {
+                        display: function(data, type, row, meta){
+                            if (data){
+                                url = Urls.case(data.id);
+                                return "<a href='" + url + "'>" + data.id + "</a>";
+                            }
+                        },
+                        sort: "session.date",
                     }
                 },
                 {data: "role.role"},
-                {data: "land_villeinage"},
+                {data: "land_villeinage",
+                    defaultContent: '',
+                    render:{
+                        display: checkMaker,
+                    }
+                },
                 {data: "case.session.village.name"},
                 {data: "land_notes"},
             ]

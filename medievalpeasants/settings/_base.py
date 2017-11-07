@@ -27,6 +27,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+LOGIN_REDIRECT_URL = 'index'
+
 
 # Application definition
 
@@ -40,11 +42,12 @@ INSTALLED_APPS = [
     'peasantlegaldb',
     'coverage',
     'rest_framework',
-    'rest_framework_serializer_extensions',
     'webpack_loader',
+    'dynamic_rest',
     'django_js_reverse',
     'django_filters',
     'peasantlegaldb.templatetags',
+    'widget_tweaks'
 ]
 
 MIDDLEWARE = [
@@ -126,6 +129,10 @@ REST_FRAMEWORK = {
     # or allow read-only access for unauthenticated users.
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+    ],
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+        'dynamic_rest.renderers.DynamicBrowsableAPIRenderer',
     ],
     'DEFAULT_FILTER_BACKENDS':
         ('django_filters.rest_framework.DjangoFilterBackend',)

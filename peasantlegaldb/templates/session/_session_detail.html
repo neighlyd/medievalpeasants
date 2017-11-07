@@ -6,7 +6,7 @@
 
 {% block left_sidebar %}
     <div id="selection_list">
-        <a class="list-group-item list-group-item-action active" href="">Cases</a>
+        <a class="list-group-item list-group-item-action active" href="{% url 'session_case_list' session.id %}">Cases</a>
     </div>
 {% endblock %}
 
@@ -40,8 +40,24 @@
                                     <td class="d-inline-block col-8">{{ session.folio }}</td>
                                 </tr>
                                 <tr class="row m-0">
-                                    <td class="d-inline-block col-4"><b>Case Count:</b></td>
+                                    <td class="d-inline-block col-4"><b>Cases:</b></td>
                                     <td class="d-inline-block col-8">{{ session.case_count }}</td>
+                                </tr>
+                                <tr class="row m-0">
+                                    <td class="d-inline-block col-4"><b>Litigants:</b></td>
+                                    <td class="d-inline-block col-8">{{ session.litigant_count }}</td>
+                                </tr>
+                                <tr class="row m-0">
+                                    <td class="d-inline-block col-4"><b>Chevage Payers:</b></td>
+                                    <td class="d-inline-block col-8">{{ session.chevage_payer_count }}</td>
+                                </tr>
+                                <tr class="row m-0">
+                                    <td class="d-inline-block col-4"><b>Impercamenta Payers:</b></td>
+                                    <td class="d-inline-block col-8">{{ session.impercamentum_payer_count }}</td>
+                                </tr>
+                                <tr class="row m-0">
+                                    <td class="d-inline-block col-4"><b>Land Cases:</b></td>
+                                    <td class="d-inline-block col-8">{{ session.land_case_count }}</td>
                                 </tr>
 
                             </table>
@@ -69,7 +85,9 @@
 {% endblock %}
 
 {% block right_sidebar %}
-    <button type="button" class="btn btn-secondary float-sm-right">Edit Session</button>
+
+    {{ block.super }}
+
 {% endblock %}
 
 {% block scripts %}

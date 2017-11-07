@@ -40,8 +40,8 @@
     $(document).ready(function () {
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1];
-        var api_url = Urls.person_api() + "?village_to_litigant=" + id + "&distinct=true";
-        console.log(api_url);
+        url = Urls['api:person-list']();
+        var api_url = url + "?village_to_litigant=" + id + "&include[]=counts&include[]=case_dates";
         var table = $("#table").DataTable({
             fixedHeader:{ headerOffset: 50 },
             scrollX: true,
@@ -49,7 +49,7 @@
             ajax: {
                 url: api_url,
                 type: "GET",
-                dataSrc: "",
+                dataSrc: "people.",
             },
             "columns": [
                 {
@@ -68,15 +68,27 @@
                         $(nTd).html("<a href='"+ url +"'>" + rowData.full_name + "</a>");
                     }
                 },
-                {data: "status"},
-                {data: "gender"},
+                {data: "status_display"},
+                {data: "gender_display"},
                 {data: "tax_1332"},
                 {data: "tax_1379"},
-                {data: "case_count_all"},
-                {data: "earliest_case"},
-                {data: "latest_case"},
-                {data: "pledges_given_count"},
-                {data: "pledges_received_count"},
+                {data: "counts.all_cases"},
+                {data: "case_dates.earliest_case",
+                    defaultContent: '',
+                    render: {
+                        display: formatCaseDateNoVillage,
+                        sort: "date"
+                    }
+                },
+                {data: "case_dates.latest_case",
+                    defaultContent: '',
+                    render: {
+                        display: formatCaseDateNoVillage,
+                        sort: "date"
+                    }
+                },
+                {data: "counts.pledge.given"},
+                {data: "counts.pledge.received"},
             ]
         });
 

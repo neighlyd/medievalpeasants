@@ -20,28 +20,55 @@
 
 <script>
 
+    function format( data ) {
+        return "<table class='table'>" +
+            "<tr>" +
+            "<td><b>Tenant History</b></td>" +
+            "<td>" + formatTenantHistory(data) +"</td>" +
+            "</tr>"
+    }
+
+    function formatTenantHistory(data){
+        var concat = '';
+        data.tenant_history.forEach(function (obj, index) {
+            concat = concat + '<div class="d-flex justify-content-between">' +
+                                    '<div class="mr-auto p-0">' +
+                                        '<u>Name:</u> ' + '<a href="' + Urls.person(obj.person.id) + '">' + obj.person.full_name + '</a>' +
+                                    '</div> ' +
+                                    '<div class="p-0">' +
+                                        '<u>Session:</u> ' + obj.case.session.law_term + ', ' + obj.case.session.year +
+                                    '</div>' +
+                                    '</div>' +
+                                    '<div class="p-0">' +
+                                        '<u>Role:</u> ' + obj.role.role +
+                                    '</div>' +
+                                '<hr>';
+            return concat;
+            });
+        return concat;
+    }
+
     $(document).ready(function () {
         var url = window.location.pathname;
-        var id = url.split('/').reverse()[1]
-        console.log(id)
-        var api_url = Urls.land_api() + "?case=" + id + "";
-        console.log(api_url);
+        var id = url.split('/').reverse()[1];
+        url = Urls['api:case-detail'](id);
+        var api_url = url + "&exclude[]=tenant_history.*&include[]=tenant_history.person&include[]=tenant_history.role&include[]=tenant_history.case.session";
         var table = $("#table").DataTable({
-            fixedHeader:{                headerOffset: 50            },
+            fixedHeader:{
+                headerOffset: 50
+            },
             ajax: {
                 url: api_url,
                 type: "GET",
-                dataSrc: "",
+                dataSrc: "lands.",
             },
-            "columns": [
+            columns: [
                 {
                     "class": "details-control",
-                    "orderable": "false",
-                    "data": null,
-                    "defaultContent": "",
-                    "render": function(){
-                        return '<i class="fa fa-plus-square" aria-hidden="true" style="color: grey"></i>';
-                    },
+                    orderable: "false",
+                    data: "tenant_history",
+                    defaultContent: "",
+                    render: checkNotes,
                     width:"15px"
                 },
                 {data: "id",

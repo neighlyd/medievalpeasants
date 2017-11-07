@@ -11,12 +11,23 @@
                 <th>Amercement</th>
                 <th>Fine</th>
                 <th>Damages</th>
+                <th>Notes</th>
                 <th>Distrain</th>
                 <th>Attach</th>
                 <th>Bail</th>
                 <th>Chevage</th>
+                <th>Crossed</th>
+                <th>Recessit</th>
+                <th>Habet Terram</th>
+                <th>Notes</th>
                 <th>Heriot</th>
-                <th>Imperc.</th>
+                <th>Animal</th>
+                <th>Land</th>
+                <th>V. Land</th>
+                <th>Land Notes</th>
+                <th>Impercamentum</th>
+                <th>Animal</th>
+                <th>Notes</th>
             </thead>
         </table>
     </div>
@@ -29,53 +40,18 @@
 <script>
 
     // provides format for nested table that displays when + sign is clicked.
-    function format( d ){
-        return "<table class='table'>" +
-            "<tr>" +
-            "<td><b>Village:</b></td>" +
-            "<td>"+d.person.village.name+"</td>" +
-            "<td><b>Gender:</b></td>" +
-            "<td>"+d.person.gender+"</td>" +
-            "<td><b>Status:</b></td>" +
-            "<td>"+d.person.status+"</td>" +
-            "</tr>" +
-            "<tr>" +
-            "<td><b>Litigation Count:</b></td>" +
-            "<td>"+d.person.case_count_litigation+"</td>" +
-            "<td><b>Total Case Count:</b></td>" +
-            "<td>"+d.person.case_count_all+"</td>" +
-            "<td><b>Earliest Case:</b></td>" +
-            "<td>"+d.person.earliest_case+"</td>" +
-            "<td><b>Latest Case:</b></td>" +
-            "<td>"+d.person.latest_case+"</td>" +
-            "</tr>" +
-            "<tr>" +
-            "<td><b>Amercement Count:</b></td>" +
-            "<td>"+d.person.case_info.amercement__count+"</td>" +
-            "<td><b>Fine Count:</b></td>" +
-            "<td>"+d.person.case_info.fine__count+"</td>" +
-            "<td><b>Damages Count:</b></td>" +
-            "<td>"+d.person.case_info.damage__count+"</td>" +
-            "</tr>" +
-            "<tr>" +
-            "<td><b>Chevage Count:</b></td>" +
-            "<td>"+d.person.case_info.chevage__count+"</td>" +
-            "<td><b>Impercamenta Count:</b></td>" +
-            "<td>"+d.person.case_info.impercamentum__count+"</td>" +
-            "<td><b>Heriot Count:</b></td>" +
-            "<td>"+d.person.case_info.heriot__count+"</td>" +
-            "</tr>"
-            "</table>"
+    function format( data ){
+        return format_person_subdata(data)
     }
 
     $(document).ready(function(){
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1];
-        console.log(id);
-        var url = Urls.litigants_api() +"/?case=" + id + "&expand=person__village&expand=role&expand=person__case_info";
-        console.log(url);
+        url = Urls['api:case-detail'](id);
+        var url = url + "?include[]=people.person.village.name&exclude[]=people.person.village.*&include[]=people.person.counts&include[]=people.person.case_dates";
         var table = $('#table').DataTable({
             order:[1, "asc"],
+            hideEmptyCols: true,
             scrollX: true,
             fixedHeader:{
               headerOffset: 50
@@ -84,7 +60,7 @@
                 processing: true,
                 url: url,
                 type: "GET",
-                dataSrc: "",
+                dataSrc: "case.people.",
             },
             "columns": [
                 {
@@ -95,40 +71,143 @@
                     "render": checkNotes,
                     width:"15px"
                 },
-                {data: "person.first_name",
-                    fnCreatedCell: function(nTd, cellData, rowData, row, col) {
-                        url = Urls.person(rowData.person.id);
-                        $(nTd).html("<a href='"+ url +"'>" + rowData.person.full_name + "</a>");
+                {data: "person",
+                    render:{
+                        display: function(data, type, row, col){
+                            url = Urls.person(data.id);
+                            return "<a href='"+ url +"'>" + data.full_name + "</a>";
+                        },
+                        sort: "full_name"
                     }
                 },
                 {data: "role.role"},
                 {data: "amercement",
-                    fnCreatedCell: replace_money,
+                    defaultContent: '',
+                    render: {
+                        display: formatMoney,
+                        sort: 'in_denarius'
+                    },
                 },
                 {data: "fine",
-                    fnCreatedCell: replace_money,
+                    defaultContent: '',
+                    render: {
+                        display: formatMoney,
+                        sort: 'in_denarius'
+                    },
                 },
                 {data: "damage",
-                    fnCreatedCell: replace_money,
+                    defaultContent: '',
+                    render: {
+                        display: formatMoney,
+                        sort: 'in_denarius'
+                    },
+                },
+                {data: "damage_notes",
+                    defaultContent: ''
                 },
                 {data: "distrained",
-                    fnCreatedCell: check_maker,
+                    defaultContent: '',
+                    render: {
+                        display: checkMaker,
+                    },
                 },
                 {data: "attached",
-                    fnCreatedCell: check_maker,
+                    defaultContent: '',
+                    render: {
+                        display: checkMaker,
+                    },
                 },
                 {data: "bail",
-                   fnCreatedCell: check_maker,
+                    defaultContent: '',
+                    render: {
+                        display: checkMaker,
+                    },
                 },
                 {data: "chevage",
-                    fnCreatedCell: replace_money,
+                    defaultContent: '',
+                    render: {
+                        display: formatMoney,
+                        sort: 'in_denarius'
+                    },
+                },
+                {data: "crossed",
+                    defaultContent: '',
+                    render: {
+                        display: checkMaker,
+                    }
+                },
+                {data: "recessit",
+                    defaultContent: '',
+                    render: {
+                        display: checkMaker,
+                    }
+                },
+                {data: "habet_terram",
+                    defaultContent: '',
+                    render: {
+                        display: checkMaker,
+                    }
+                },
+                {data: "chevage_notes",
+                    defaultContent: '',
                 },
                 {data: "heriot",
-                    fnCreatedCell: replace_money,
+                    defaultContent: '',
+                    render: {
+                        display: formatMoney,
+                        sort: 'in_denarius'
+                    },
                 },
+                {data: "heriot",
+                    defaultContent: '',
+                    render: {
+                        display: function(data, type, row, meta){
+                            if(row.heriot_quantity){
+                                if(row.heriot_animal.name !== 'N/A'){
+                                    return row.heriot_quantity + ' ' + row.heriot_animal.name;
+                                } else {
+                                    return row.heriot_animal.name;
+                                }
+                            }
+                        }
+                    }
+                },
+                {data: "land",
+                    defaultContent: '',
+                    render: {
+                        display: function(data, type, row, meta){
+                            if(data){
+                                url = Urls.land(data.id);
+                                return "<a href='" + url + "'>" + data.id + "</a>";
+                            }
+                        }
+                    }
+                },
+                {data: "land_villeinage",
+                    defaultContent: '',
+                    render: {
+                        display: checkMaker,
+                    }
+                },
+                {data: "land_notes"},
                 {data: "impercamentum",
-                    fnCreatedCell: replace_money,
+                    defaultContent: '',
+                    render: {
+                        display: formatMoney,
+                        sort: 'in_denarius'
+                    },
                 },
+                {data: "impercamentum_quantity",
+                    defaultContent: '',
+                    render: {
+                        display: function(data, type, row, meta){
+                            if(data){
+                                return data + ' ' + row.impercamentum_animal.name;
+                            }
+                        }
+                    }
+                },
+                {data: "impercamentum_notes"}
                 ]
         });
 
@@ -150,15 +229,6 @@
             }
         });
     });
-
-function check_maker(nTd, cellData, rowData, row, col){
-    if( cellData) {
-        $(nTd).html("<p class='text-center'> √ </p>");
-    } else {
-        $(nTd).html("<p class='text-center'> -- </p>")
-    }
-}
-
 
 
 </script>

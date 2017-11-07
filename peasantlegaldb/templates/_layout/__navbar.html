@@ -9,21 +9,11 @@
             <li class="nav-item active">
                 <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
             </li>
-            <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" id="navbarPeopleDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    People
-                </a>
-                <div class="dropdown-menu" aria-labelledby="navbarPeopleDropdown" style="background-color: #245602">
-                    <a class="nav-link" href="{% url 'person_list' %}">List All</a>
-                </div>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'person_list' %}">People</a>
             </li>
             <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" id="navbarCaseDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    Cases
-                </a>
-                <div class="dropdown-menu" aria-labelledby="navbarPeopleDropdown" style="background-color: #245602">
-                    <a class="nav-link" href="{% url 'case_list' %}">List All</a>
-                </div>
+                <a class="nav-link" href="{% url 'case_list' %}">Cases</a>
             </li>
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" id="navbarCaseDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -42,6 +32,7 @@
                 </a>
                 <div class="dropdown-menu" aria-labelledby="navbarPeopleDropdown" style="background-color: #245602">
                     <a class="nav-link" href="{% url 'archive_list' %}">Archives</a>
+                    <a class="nav-link" href="{% url 'session_list' %}">Sessions</a>
                     <a class="nav-link" href="{% url 'record_list' %}">Records</a>
                 </div>
             </li>
@@ -49,6 +40,33 @@
             <li class="nav-item">
                 <a class="nav-link" href="#">About</a>
             </li>
+
+        </ul>
+        <ul class="navbar-nav ml-auto">
+            {% if user.is_authenticated %}
+                <div class="btn-group mr-2">
+                    <a class="btn btn-success" href="#">
+                        Profile
+                    </a>
+                </div>
+                <div class="btn-group ml-2">
+                    <a class="btn btn-outline-danger" href="{% url 'logout' %}">
+                        Logout
+                    </a>
+                </div>
+
+            {% else %}
+                <div class="btn-group mr-2">
+                    <a class="btn btn-success" href="{% url 'login' %}">
+                        Login
+                    </a>
+                </div>
+                <div class="btn-group ml-2" href="#">
+                    <button class="btn btn-success">
+                        Register
+                    </button>
+                </div>
+            {% endif %}
         </ul>
     </div>
 
