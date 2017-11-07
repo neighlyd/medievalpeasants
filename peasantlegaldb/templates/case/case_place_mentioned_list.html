@@ -39,7 +39,8 @@
     $(document).ready(function () {
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1];
-        var api_url = "/api/cases/" + id + "?include[]=places_mentioned.village.county";
+        url = Urls['api:case-detail'](id);
+        var api_url = url + "?include[]=places_mentioned.village.county";
         var table = $("#table").DataTable({
             fixedHeader:{
                 headerOffset: 50

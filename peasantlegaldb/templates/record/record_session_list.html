@@ -34,10 +34,9 @@
 
     $(document).ready(function () {
         var url = window.location.pathname;
-        var id = url.split('/').reverse()[1]
-        console.log(id)
-        var api_url = "/api/records/" + id + "?include[]=sessions.village&include[]=sessions.counts";
-        console.log(api_url);
+        var id = url.split('/').reverse()[1];
+        url = Urls['api:record-detail'](id);
+        var api_url = url + "?include[]=sessions.village&include[]=sessions.counts";
         var table = $("#table").DataTable({
             fixedHeader:{ headerOffset: 50 },
             scrollX: true,

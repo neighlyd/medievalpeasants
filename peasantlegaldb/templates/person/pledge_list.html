@@ -31,8 +31,7 @@
                     <th>Status</th>
                     <th>Gender</th>
                     <th>Case</th>
-                    <th>Term</th>
-                    <th>Year</th>
+                    <th>Session</th>
                     <th>Court</th>
                     <th>Case Type</th>
                     <th>Verdict</th>
@@ -62,8 +61,9 @@
     $(document).ready(function () {
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1];
-        var giver_url = "/api/people/" + id + "?include[]=pledges_given.case";
-        var receiver_url = "/api/people/" + id + "?include[]=pledges_received.case";
+        url = Urls["api:person-detail"](id);
+        var giver_url = url + "?include[]=pledges_given.case.litigant_list&include[]=pledges_given.case.litigant_count&include[]=pledges_given.case.session";
+        var receiver_url = url + "?include[]=pledges_received.case.litigant_list&include[]=pledges_received.case.litigant_count&include[]=pledges_received.case.session";
         var table1 = $("#pledges_given_list").DataTable({
             scrollX: true,
             fixedHeader: {
@@ -87,21 +87,25 @@
                     width:"15px"
                 },
                 {data: 'pledge_receiver',
-                    fnCreatedCell: function(nTd, cellData, rowData, row, col) {
-                        $(nTd).html("<a href='" + Urls.person(cellData.id) + "'>" + cellData.full_name + "</a>");
+                    defaultContent: '',
+                    render:{
+                        display: formatPerson,
+                        sort: 'full_name'
                     }
                 },
                 {data: 'pledge_receiver.status_display'},
                 {data: 'pledge_receiver.gender_display'},
                 {data: "case.id",
-                    fnCreatedCell: function(nTd, cellData, rowData, row, col){
-                        $(nTd).html("<a href='" + Urls.case(rowData.case.id) + "'target='_blank'>" + rowData.case.id + "</a>");
+                    defaultContent: '',
+                    render:{
+                        display: formatCase,
+                        sort: 'full_name'
                     }
                 },
-                {data: "case.session.",
+                {data: "case.session",
                     defaultContent: '',
                     render: {
-                        display: formatSessionDate,
+                        display: formatSessionDateNoVillage,
                         sort: "date"
                     }
                 },
@@ -151,21 +155,26 @@
                     width:"15px"
                 },
                 {data: 'pledge_giver',
-                    fnCreatedCell: function(nTd, cellData, rowData, row, col) {
-                        $(nTd).html("<a href='" + Urls.person(cellData.id) + "'>" + cellData.full_name + "</a>");
+                    defaultContent: '',
+                    render:{
+                        display: formatPerson,
+                        sort: 'full_name'
                     }
                 },
                 {data: 'pledge_giver.status_display'},
                 {data: 'pledge_giver.gender_display'},
-                {data: "case.id",
-                    fnCreatedCell: function(nTd, cellData, rowData, row, col){
-                        $(nTd).html("<a href='" + Urls.case(rowData.case.id) + "'target='_blank'>" + rowData.case.id + "</a>");
+                {data: "case",
+                    defaultContent: '',
+                    render:{
+                        display: formatCase,
+                        sort: 'id'
                     }
                 },
-                {data: "case.session.law_term"},
-                {data: "case.session.date",
-                    fnCreatedCell: function(nTd, cellData, rowData, row, col) {
-                        $(nTd).html(rowData.case.session.year);
+                {data: "case.session",
+                    defaultContent: '',
+                    render: {
+                        display: formatSessionDateNoVillage,
+                        sort: "date"
                     }
                 },
                 {data: "case.court_type"},
@@ -173,7 +182,7 @@
                 {data: "case.verdict.verdict"},
                 {data: "case.litigant_count"}
             ]
-        })
+        });
          $('#pledges_received_list tbody').on('click', 'td.details-control', function(){
             var tr = $(this).closest('tr');
             var tdi = tr.find("i.fa");

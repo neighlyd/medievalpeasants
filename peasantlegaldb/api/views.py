@@ -160,6 +160,8 @@ class PersonViewSet(DynamicModelViewSet):
         chain_filter['person_to_case__fine'] = self.request.query_params.get('fine')
         chain_filter['person_to_case__heriot'] = self.request.query_params.get('heriot')
         chain_filter['person_to_case__damage'] = self.request.query_params.get('damage')
+        chain_filter['pledge_giver'] = self.request.query_params.get('pledges_given')
+        chain_filter['pledge_receiver'] = self.request.query_params.get('pledges_received')
         
         if not chain_filter:
             return queryset
@@ -185,7 +187,9 @@ class CaseViewSet(DynamicModelViewSet):
         chain_filter={}
         chain_filter['session__village_id'] =self.request.query_params.get('village')
         chain_filter['session__village__hundred_id'] = self.request.query_params.get('hundred')
+        chain_filter['session__village__county_id'] = self.request.query_params.get('county')
         chain_filter['case_to_person__land_id'] = self.request.query_params.get('land')
+        chain_filter['case_type'] = self.request.query_params.get('case_type')
         distinct = self.request.query_params.get('distinct')
 
         if not chain_filter:

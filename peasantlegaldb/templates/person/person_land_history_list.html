@@ -9,6 +9,7 @@
                     <th>Land ID</th>
                     <th>Parcels</th>
                     <th>Session</th>
+                    <th>Case</th>
                     <th>Role</th>
                     <th>Villeinage?</th>
                     <th>Village</th>
@@ -50,7 +51,8 @@
     $(document).ready(function(){
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1];
-        var url = "/api/people/" + id + "?include[]=cases.land&&include[]=cases.case.session.village&filter{cases|land.isnull}=false";
+        url = Urls["api:person-detail"](id);
+        var url = url + "?include[]=cases.land&&include[]=cases.case.session.village&filter{cases|land.isnull}=false";
         var table = $('#table').DataTable({
             scrollX: true,
             ajax: {
@@ -59,7 +61,7 @@
                 type: "GET",
                 dataSrc: "person.cases.",
             },
-            "order": [[4, "asc"]],
+            "order": [[3, "asc"]],
             "columns": [
                 {
                     "class": "details-control",
@@ -84,8 +86,25 @@
                         sort: "date"
                     }
                 },
+                {data: "case",
+                    defaultContent: '',
+                    render: {
+                        display: function(data, type, row, meta){
+                            if (data){
+                                url = Urls.case(data.id);
+                                return "<a href='" + url + "'>" + data.id + "</a>";
+                            }
+                        },
+                        sort: "session.date",
+                    }
+                },
                 {data: "role.role"},
-                {data: "land_villeinage"},
+                {data: "land_villeinage",
+                    defaultContent: '',
+                    render:{
+                        display: checkMaker,
+                    }
+                },
                 {data: "case.session.village.name"},
                 {data: "land_notes"},
             ]

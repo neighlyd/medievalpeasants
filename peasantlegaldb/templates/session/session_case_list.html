@@ -39,9 +39,13 @@
     $(document).ready(function () {
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1];
-        var api_url = "/api/sessions/" + id + "?include[]=cases.litigant_count";
+        url = Urls['api:session-detail'](id);
+        var api_url = url + "?include[]=cases.litigant_count";
         var table = $("#table").DataTable({
-            fixedHeader:{ headerOffset: 50 },
+            fixedHeader:{
+                headerOffset: 50
+            },
+            hideEmptyCols: true,
             scrollX: true,
             order: [1, "asc"],
             ajax: {

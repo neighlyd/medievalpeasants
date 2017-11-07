@@ -21,7 +21,9 @@
     $(document).ready(function () {
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1];
-        var api_url = "/api/counties/" + id + "/?include[]=hundreds.counts";
+        url = Urls['api:county-detail'](id);
+        var api_url = url + "/?include[]=hundreds.counts";
+        $("#table").DataTable().destroy();
         var table = $("#table").DataTable({
             fixedHeader:{ headerOffset: 50 },
             scrollX: true,
@@ -40,25 +42,6 @@
                 {data: "counts.village"}
             ]
         });
-
-        $('#table tbody').on('click', 'td.details-control', function(){
-            var tr = $(this).closest('tr');
-            var tdi = tr.find("i.fa");
-            var row = table.row( tr );
-
-            if ( row.child.isShown() ) {
-                row.child.hide();
-                tr.removeClass('shown');
-                tdi.first().removeClass('fa-minus-square');
-                tdi.first().addClass('fa-plus-square');
-            } else{
-                row.child( format( row.data() ) ).show();
-                tr.addClass('shown');
-                tdi.first().removeClass('fa-plus-square');
-                tdi.first().addClass('fa-minus-square');
-            }
-        });
-
     });
 
 

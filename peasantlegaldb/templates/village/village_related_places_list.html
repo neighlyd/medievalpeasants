@@ -41,8 +41,8 @@
     $(document).ready(function () {
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1];
-        var api_url = "/api/places_mentioned/?related_to=" + id + "&include[]=case.session&include[]=case.litigant_count&include[]=village";
-        console.log(api_url);
+        url = Urls['api:places-mentioned-list']();
+        var api_url = url + "?related_to=" + id + "&include[]=case.session&include[]=case.litigant_count&include[]=village";
         var table = $("#table").DataTable({
             fixedHeader:{ headerOffset: 50 },
             scrollX: true,

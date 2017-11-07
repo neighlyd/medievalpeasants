@@ -36,7 +36,8 @@
     $(document).ready(function () {
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1];
-        var api_url = "/api/archives/" + id + "?include[]=records.session_dates&include[]=records.counts";
+        url = Urls['api:archive-detail'](id);
+        var api_url = url + "?include[]=records.session_dates&include[]=records.counts";
         var table = $("#table").DataTable({
             fixedHeader:{                headerOffset: 50            },
             scrollX: true,

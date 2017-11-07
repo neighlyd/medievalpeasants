@@ -38,7 +38,8 @@
     $(document).ready(function () {
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1];
-            var api_url = "/api/people/?county_to_resident=" + id + "&include[]=case_dates&include[]=village";
+        url = Urls["api:people-list"]();
+        var api_url = url + "?county_to_resident=" + id + "&include[]=case_dates&include[]=village";
         var table = $("#table").DataTable({
             fixedHeader:{ headerOffset: 50 },
             scrollX: true,

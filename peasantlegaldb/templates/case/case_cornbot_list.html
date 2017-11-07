@@ -21,10 +21,9 @@
 
     $(document).ready(function () {
         var url = window.location.pathname;
-        var id = url.split('/').reverse()[1]
-        console.log(id)
-        var api_url = "/api/cases/" + id + "/?include[]=cornbot";
-        console.log(api_url);
+        var id = url.split('/').reverse()[1];
+        url = Urls['api:case-detail'](id);
+        var api_url = url + "/?include[]=cornbot";
         var table = $("#table").DataTable({
             fixedHeader:{                headerOffset: 50            },
             order: [1, "asc"],

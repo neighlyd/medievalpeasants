@@ -1,5 +1,6 @@
 from django.views.generic.detail import DetailView
 from django.views.generic import ListView
+from django.views.generic.edit import FormView
 from django.db.models import Count, Max, Min, Avg, Sum
 from django.core.urlresolvers import resolve
 from django.shortcuts import get_object_or_404
@@ -9,6 +10,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from . import models
+from . import forms
 
 
 class ArchiveDetailView(DetailView):
@@ -29,6 +31,11 @@ class CaseListView(ListView):
     queryset = models.Case.objects.all().select_related('session').order_by('session__village__name', 'session__date',
                                                                             'court_type')
     context_object_name = 'case_list'
+
+
+class CaseListFilterView(FormView):
+
+    form_class = forms.CaseFilterForm
 
 
 class CaseDetailView(DetailView):
@@ -89,6 +96,10 @@ class PeopleListView(ListView):
         context['current_url'] = resolve(self.request.path_info).url_name
         context['title'] = self.kwargs.get('title')
         return context
+
+class PeopleListFilterView(FormView):
+    queryset = models.Person.objects.all()
+    form_class = forms.PersonFilterForm
 
 
 class PersonDetailView(DetailView):

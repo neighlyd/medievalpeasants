@@ -171,10 +171,6 @@ class Land(models.Model):
 
         return latest_case
 
-    @property
-    def tenant_history(self):
-        return self.case_to_land.order_by('case__session__date')
-
     def __str__(self):
         return "Land ID: %s" % (self.id)
 
@@ -589,6 +585,14 @@ class Person(models.Model):
         return concated_name
 
     @property
+    def status_display(self):
+        return self.get_status_display()
+
+    @property
+    def gender_display(self):
+        return self.get_gender_display()
+
+    @property
     def name_and_village(self):
         if self.relation_name:
             concated_name = self.first_name + ' ' + self.relation_name + ' ' + self.last_name + ' | ' + self.village.name
@@ -763,43 +767,21 @@ class Case(models.Model):
 
     @property
     def litigant_list(self):
-        litigant_list = []
-        litigant_qs = self.case_to_person.all()
-        for x in litigant_qs:
-            new_entry = {
-                "name" : x.person.full_name,
-                "role" : x.role.role
-            }
-            litigant_list.append(new_entry)
+        # iterate through a case's litigant set (case_to_person) and create a list of dictionaries containing the  name
+        # and role for each person.
+        litigant_list = [{"id": person.person.id, "name": person.person.full_name, "role": person.role.role} for person in self.case_to_person.all()]
         return litigant_list
 
     @property
     def litigant_count(self):
-        # create a list of all litigants across all types of litigation tables (litigants, pledge receiver & giver)
-        # and check for duplicates to get an accurate count of unique litigants. This technique is required because
-        # Django only allows for Count Distinct in queryset creation, which is called with the view. Since SPA doesn't
-        # call views, this approach would clearly not work.
-        litigants = []
-        qs1 = self.case_to_person.values_list('person_id', flat=True)
-        try:
-            for x in qs1:
-                litigants.append(x)
-        except:
-            pass
-        qs2 = self.case_to_pledge.values_list('pledge_giver_id', flat=True)
-        try:
-            for x in qs2:
-                litigants.append(x)
-        except:
-            pass
-        qs3 = self.case_to_pledge.values_list('pledge_receiver_id', flat=True)
-        try:
-            for x in qs3:
-                litigants.append(x)
-        except:
-            pass
+        litigants = [(x) for x in self.case_to_person.values_list('person_id', flat=True)]
         number_of_litigants = len(set(litigants))
         return number_of_litigants
+
+    @property
+    def pledge_count(self):
+        pledge_count = len(set(self.case_to_pledge.all()))
+        return pledge_count
 
     @property
     def litigant_exist(self):
@@ -822,8 +804,12 @@ class Case(models.Model):
         return self.murrain.filter(case=self).exists()
 
     @property
-    def mentioned_exists(self):
+    def mentioned_exist(self):
         return self.placementioned_set.filter(case=self).exists()
+
+    @property
+    def pledge_exist(self):
+        return self.case_to_pledge.filter(case=self).exists()
 
     def __str__(self):
         return 'Case %s | %s (%s / %s)' % (self.id, self.session.village.name, self.session.get_law_term_display(), self.session.date.year)

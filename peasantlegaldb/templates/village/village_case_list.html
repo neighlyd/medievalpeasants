@@ -40,7 +40,8 @@
     $(document).ready(function () {
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1];
-        var api_url = "/api/cases/?village=" + id + "&include[]=session.village&include[]=litigant_count";
+        url = Urls['api:case-list']();
+        var api_url = url + "?village=" + id + "&include[]=session.village&include[]=litigant_count";
         var table = $("#table").DataTable({
             fixedHeader:{ headerOffset: 50 },
             scrollX: true,

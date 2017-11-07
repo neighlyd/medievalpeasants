@@ -49,9 +49,9 @@
 
 {% block scripts %}
 
+    {{ block.super }}
     <script type="text/javascript" src="http://nls.tileserver.com/api.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB51yaYfTmJNUIlZCpIr0HU4m11Hmd7Y9E"></script>
-    {{ block.super }}
 
     <script>
     // for information on Ordnance Survey API: http://maps.nls.uk/projects/api/
@@ -75,7 +75,8 @@
             // get lat and lng from API.
             var url = window.location.pathname;
             var id = url.split('/').reverse()[1];
-            var villages_url = "/api/villages/?&include[]=counts&filter{county.id}=" + id;
+            url = Urls["api:village-list"]();
+            var villages_url = url + "?&include[]=counts&filter{county.id}=" + id;
 
             var locationObject = $.ajax({
                 url: villages_url,

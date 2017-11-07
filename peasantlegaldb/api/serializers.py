@@ -291,8 +291,9 @@ class PersonSerializer(DynamicModelSerializer):
     # Use ReadOnlyField to pull in model functions:
     # https://stackoverflow.com/questions/24233988/django-serializer-method-field
     full_name = serializers.ReadOnlyField()
-    gender_display = DynamicMethodField()
-    status_display = DynamicMethodField()
+    gender_display = serializers.ReadOnlyField()
+    status_display = serializers.ReadOnlyField()
+
     counts = DynamicMethodField(
         requires = [
             'person_to_case__case__session', 'pledge_giver', 'pledge_receiver', 'position', 'relationship_person_one',
@@ -320,12 +321,6 @@ class PersonSerializer(DynamicModelSerializer):
                   'full_name', 'counts', 'village', 'cases', 'pledges_given', 'pledges_received', 'positions',
                   'gender_display', 'status_display', 'case_dates')
 
-    def get_gender_display(self, record):
-        return record.get_gender_display()
-
-    def get_status_display(self, record):
-        return record.get_status_display()
-
     def get_case_dates(self, record):
         dates = {}
 
@@ -352,10 +347,6 @@ class PersonSerializer(DynamicModelSerializer):
 
 class LandSerializer(DynamicModelSerializer):
 
-    def get_tenant_history(field):
-        # return queryset of litigants associated with particular land.
-        return models.Person.objects.filter(person_to_case__land_id=field.id)
-
     parcel_list = DynamicMethodField(
         requires = [
             'parcels__parcel_type', 'parcels__parcel_tenure'
@@ -367,8 +358,14 @@ class LandSerializer(DynamicModelSerializer):
         ],
         deferred=True
     )
+
     tenant_history = DynamicRelationField(
-        'LitigantSerializer', source='case_to_land' ,many=True, deferred=True, embed=True,
+        'LitigantSerializer',
+        source='case_to_land',
+        many=True,
+        deferred=True,
+        embed=True,
+        queryset=models.Litigant.objects.order_by('case__session__date')
     )
 
     class Meta:
@@ -392,7 +389,7 @@ class CaseSerializer(DynamicModelSerializer):
     court_type = serializers.SerializerMethodField()
     litigant_count = DynamicMethodField(
         requires=[
-            'case_to_person', 'case_to_pledge'
+            'case_to_person'
         ],
         deferred=True
     )
@@ -402,23 +399,31 @@ class CaseSerializer(DynamicModelSerializer):
         ],
         deferred=True
     )
+    pledge_count = DynamicMethodField(
+        requires=[
+            'case_to_pledge'
+        ],
+        deferred=True
+    )
 
     session = DynamicRelationField('SessionSerializer', deferred=True, embed=True)
     case_type = DynamicRelationField('CaseTypeSerializer', embed=True)
     verdict = DynamicRelationField('VerdictSerializer', embed=True)
-    litigants = DynamicRelationField('LitigantSerializer', deferred=True, many=True, embed=True)
+    litigants = DynamicRelationField('PersonSerializer', deferred=True, many=True, embed=True)
     cornbot = DynamicRelationField('CornbotSerializer', deferred=True, many=True, embed=True)
     extrahura = DynamicRelationField('ExtrahuraSerializer', deferred=True, many=True, embed=True)
     murrain = DynamicRelationField('MurrainSerializer', deferred=True, many=True, embed=True)
     places_mentioned = DynamicRelationField('PlaceMentionedSerializer', source='placementioned_set', deferred=True,
                                             many=True, embed=True)
+    people = DynamicRelationField('LitigantSerializer', source='case_to_person', deferred=True, many=True, embed=True)
+    pledges = DynamicRelationField('PledgeSerializer', source='case_to_pledge', deferred=True, many=True, embed=True)
 
 
     class Meta:
         model = models.Case
         fields = ('id', 'summary', 'court_type', 'of_interest', 'ad_legem', 'villeinage_mention', 'active_sale',
                   'incidental_land', 'session', 'case_type', 'verdict', 'litigants', 'litigant_count', 'litigant_list',
-                  'cornbot', 'extrahura', 'murrain', 'places_mentioned',)
+                  'cornbot', 'extrahura', 'murrain', 'places_mentioned', 'people', 'pledges', 'pledge_count')
 
     def get_court_type(self, record):
         return record.get_court_type_display()
@@ -429,12 +434,15 @@ class CaseSerializer(DynamicModelSerializer):
     def get_litigant_count(self, record):
         return record.litigant_count
 
+    def get_pledge_count(self, record):
+        return record.pledge_count
+
 
 class LitigantSerializer(DynamicModelSerializer):
 
     case = DynamicRelationField('CaseSerializer', deferred=True, embed=True)
     person = DynamicRelationField('PersonSerializer', deferred=True, embed=True)
-    land = DynamicRelationField('LandSerializer', deferred=True, embed=True)
+    land = DynamicRelationField('LandSerializer', embed=True)
     role = DynamicRelationField('RoleSerializer', embed=True)
     fine = DynamicRelationField('MoneySerializer', embed=True)
     amercement = DynamicRelationField('MoneySerializer', embed=True)

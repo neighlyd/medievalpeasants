@@ -8,8 +8,7 @@
                     <th>Notes</th>
                     <th>Case</th>
                     <th>Village</th>
-                    <th>Law Term</th>
-                    <th>Year</th>
+                    <th>Session</th>
                     <th>Court Type</th>
                     <th>Case Type</th>
                     <th>Verdict</th>
@@ -42,15 +41,18 @@
     $(document).ready(function () {
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1];
-        var api_url = "/api/counties/" + id + "?include[]=villages.sessions.cases.session.village&filter{villages|sessions.isnull}=false";
+        url = Urls["api:case-list"]();
+        var api_url = url + "?county=" + id + "&include[]=litigant_count&include[]=session.village";
+        $("#table").DataTable().destroy();
         var table = $("#table").DataTable({
             fixedHeader:{ headerOffset: 50 },
             scrollX: true,
             order: [4, "asc"],
+            deferRender: true,
             ajax: {
                 url: api_url,
                 type: "GET",
-                dataSrc: "county.villages.sessions.",
+                dataSrc: "cases.",
             },
             "columns": [
                 {
@@ -61,19 +63,22 @@
                     "render": checkNotes,
                     width:"15px"
                 },
-                {data: "cases.id",
-                    fnCreatedCell: function(nTd, cellData, rowData, row, col) {
-                        console.log(rowData);
-                        url = Urls.case(rowData.cases.id);
-                        $(nTd).html("<a href='"+ url +"'>" + rowData.cases.id + "</a>");
+                {data: "id",
+                    defaultContent: '',
+                    render: {
+                        display: function(data, type, row, col){
+                            url = Urls.case(data);
+                            return "<a href='" + url + "'>" + data + "</a>";
+                        },
+                        sort: "id"
                     }
                 },
-                {data: "cases.session.village.name"},
-                {data: "cases.session.law_term"},
-                {data: "session.date",
-                    fnCreatedCell: function(nTd, cellData, rowData, row, col) {
-                        url = Urls.session(rowData.session.id);
-                        $(nTd).html("<a href='"+ url +"'>" + rowData.session.law_term + ", " + rowData.session.year + "</a>");
+                {data: "session.village.name"},
+                {data: "session",
+                    defaultContent: '',
+                    render: {
+                        display: formatSessionDateNoVillage,
+                        sort: "date",
                     }
                 },
                 {data: "court_type"},

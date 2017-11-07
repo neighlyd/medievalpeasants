@@ -34,16 +34,17 @@
 <script>
 
     $(document).ready(function () {
-        var url = window.location.pathname;
-        var id = url.split('/').reverse()[1];
-        var api_url = "/api/sessions/?include[]=counts";
-        console.log(api_url);
+        var url = Urls['api:session-list']();
+        api_url = url + "?include[]=counts";
         var table = $("#table").DataTable({
-            fixedHeader:{ headerOffset: 50 },
+            fixedHeader:{
+                headerOffset: 50
+            },
+            hideEmptyCols: true,
             scrollX: true,
             order: [0, "asc"],
             ajax: {
-                url: api_url,
+                url: url,
                 type: "GET",
                 dataSrc: "sessions.",
             },

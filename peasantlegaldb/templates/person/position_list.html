@@ -23,8 +23,8 @@
     $(document).ready(function () {
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1];
-        var api_url = "/api/people/" + id + "?include[]=positions";
-        console.log(api_url);
+        url = Urls["api:person-detail"](id);
+        var api_url = url + "?include[]=positions.session";
         var position_table = $("#person_position_list").DataTable({
             fixedHeader:{ headerOffset: 50 },
             order: [2, "asc"],

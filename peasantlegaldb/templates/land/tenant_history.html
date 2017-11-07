@@ -37,16 +37,18 @@
     $(document).ready(function() {
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1];
-        var url = "/api/litigants/?include[]=land&filter{land.id}=" + id + "&include[]=person.village&include[]=case.session&include[]=person.counts&include[]=person.case_dates";
+        url = Urls['api:litigan-list']();
+        var url = url + "?include[]=land&filter{land.id}=" + id + "&include[]=person.village&include[]=case.session&include[]=person.counts&include[]=person.case_dates";
         var table = $('#tenant_history').DataTable({
             scrollX: true,
+            hideEmptyCols: true,
             ajax: {
                 processing: true,
                 url: url,
                 type: "GET",
                 dataSrc: "litigants.",
             },
-            "order": [[4, "asc"]],
+            order: [[4, "asc"]],
             "columns": [
                 {
                     "class": "details-control",

@@ -1,37 +1,96 @@
 {% extends '_layout/_l_two_col.html' %}
+{% load widget_tweaks %}
 
 {% block navbar %}
     {% include '_layout/__navbar.html' %}
 {% endblock %}
 
 {% block center_bar %}
+    <form>
+<br>
+        {% csrf_token %}
 
-    {{ block.super }}
+        <div class="form-group d-flex justify-content-center">
+        {% for field in form.visible_fields %}
+                <div class="col-sm-2">
+                    <h4>{{ field.label_tag }}</h4>
+                </div>
+                <div class="col-md-3.5">
+                    {% render_field field class="form-control" id="select_village" %}
+                </div>
+        {% endfor %}
+        </div>
+        <div class="form-group d-flex justify-content-around">
+            <div class="col-sm-1">
 
-<div class="card-body clearfix" id="main_info">
-    <table class="table table-bordered table-hover" id="table" data-page-length="25">
-        <thead>
-            <th>Details</th>
-            <th>Name</th>
-            <th>Village</th>
-            <th>Status</th>
-            <th>Gender</th>
-            <th>Earliest Case</th>
-            <th>Latest Case</th>
-        </thead>
-    </table>
+            </div>
+            <div class="btn-toolbar">
+                <div class="btn-group mr-2">
+                    <button type="button" class="btn btn-primary" id="get_residents">Get Residents</button>
+                </div>
+                <div class="btn-group mr-2">
+                    <button type="button" class="btn btn-primary" id="get_litigants">Get Litigants</button>
+                </div>
+                <div class="btn-group mr-2">
+                    <button type="button" class="btn btn-primary" id="amercement">Get Amercement Payers</button>
+                    </div>
+                <div class="btn-group mr-2">
+                    <button type="button" class="btn btn-primary" id="chevage">Get Chevage Payers</button>
+                    </div>
+                <div class="btn-group mr-2">
+                    <button type="button" class="btn btn-primary" id="impercamentum">Get Impercamentum Payers</button>
+                </div>
+                <div class="btn-group mr-2">
+                    <button type="button" class="btn btn-primary" id="fine">Get Fine Payers</button>
+                    </div>
+                <div class="btn-group mr-2">
+                    <button type="button" class="btn btn-primary" id="heriot">Get Heriot Payers</button>
+                    </div>
+                <div class="btn-group mr-2">
+                    <button type="button" class="btn btn-primary" id="damage">Get Damaged Parties</button>
+                </div>
+                <div class="btn-group mr-2">
+                    <button type="button" class="btn btn-primary" id="pledges_given">Get Pledge Givers</button>
+                </div>
+                <div class="btn-group mr-2">
+                    <button type="button" class="btn btn-primary" id="pledges_received">Get Pledge Receivers</button>
+                </div>
+
+            </div>
+        </div>
+
+    </form>
 </div>
 
+    <br>
+<div id="list_people" style="display: none">
+    <div class="card">
+        <div class="card-body clearfix" id="main_info">
+            <table class="table table-bordered table-hover" id="table" data-page-length="25">
+                <thead>
+                    <th>Details</th>
+                    <th>Name</th>
+                    <th>Village</th>
+                    <th>Status</th>
+                    <th>Gender</th>
+                    <th>Earliest Case</th>
+                    <th>Latest Case</th>
+                </thead>
+            </table>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block right_sidebar %}
-    {{ block.super }}
 {% endblock %}
 
 {% block scripts %}
-{{ block.super }}
-<script>
-    function format( data ) {
+
+    {{ block.super }}
+
+    <script>
+        function format( data ) {
         return "<table class='table'>" +
             "<tr>" +
             "<td><b>Litigation</b></td>" +
@@ -55,95 +114,119 @@
     }
 
     $(document).ready(function(){
-        var urlToCheck = window.location.pathname;
-        urlToCheck = urlToCheck.split('/').reverse()[1];
-        var url = "/api/people/?exclude[]=village.*&include[]=village.name&include[]=counts&include[]=case_dates";
-        if (urlToCheck === "people"){
-            url = "";
-        } else if (urlToCheck === "chevage_payer_list"){
-            url = "/api/people/?chevage=true&exclude[]=village.*&include[]=village.name&include[]=counts&include[]=case_dates"
-        } else if (urlToCheck === "impercamentum_payer_list"){
-            url = "/api/people/?impercamentum=true&exclude[]=village.*&include[]=village.name&include[]=counts&include[]=case_dates"
-        }
-        console.log(url);
-        var table = $('#table').DataTable({
-            order: [1, "asc"],
-            fixedHeader: {
-                headerOffset: 50
-            },
-            scrollX: true,
-            ajax: {
-                processing: true,
-                url: url,
-                type: "GET",
-                dataSrc: "people.",
-            },
-            "columns": [
-                {
-                    "class": "details-control",
-                    "orderable": false,
-                    "data": "counts",
-                    "defaultContent": "",
-                    "render": checkNotes,
-                    width:"15px"
-                },
-                {data: "full_name",
-                    fnCreatedCell: function(nTd, cellData, rowData, row, col) {
-                        $(nTd).html("<a href='" + Urls.person(rowData.id) + "'>" + rowData.full_name + "</a>");
-                    }
-                },
-                {data: "village.name"},
-                {data: "status_display"},
-                {data: "gender_display"},
-                {data: "case_dates.earliest_case",
-                    defaultContent: '',
-                    render: {
-                        display: formatCaseDate,
-                        sort: "date",
-                    }
-                },
-                {data: "case_dates.latest_case",
-                    defaultContent: '',
-                    render: {
-                        display: formatCaseDate,
-                        sort: "date",
-                    }
-                },
-            ],
 
-        });
+        $(":button").click(function(e){
+            $(".btn").removeClass('active');
+            $(this).addClass('active');
+            var village = $("#select_village").val();
+            var url = Urls["api:person-list"]();
+            var btnClicked = e.target.id;
+            if (village === ''){
+                alert("Please select a village");
+                return
+            }
+            if (village === 'None') {
+                if ($("#list_people").is(":visible")) {
+                    $("#list_people").hide();
+                    return
+                } else {
+                    return
+                }
+            }
+            if (village === "All"){
+                    if (btnClicked === "get_residents") {
+                        url = url + "?exclude[]=village.*&include[]=village.name&include[]=counts&include[]=case_dates";
+                    } else if (btnClicked === "get_litigants") {
+                        url = url + "?exclude[]=village.*&include[]=village.name&include[]=counts&include[]=case_dates";
+                    } else {
+                        url = url + "?" + btnClicked + "=true&exclude[]=village.*&include[]=village.name&include[]=counts&include[]=case_dates";
+                    }
+            }
+            else {
+                if (btnClicked === "get_residents") {
+                        url = url + "?filter{village.id}=" + village + "&exclude[]=village.*&include[]=village.name&include[]=counts&include[]=case_dates";
+                    } else if (btnClicked === "get_litigants") {
+                        url = url + "?village_to_litigant=" + village + "&exclude[]=village.*&include[]=village.name&include[]=counts&include[]=case_dates";
+                    } else {
+                        url = url + "?" + btnClicked + "=true&village_to_litigant=" + village + "&exclude[]=village.*&include[]=village.name&include[]=counts&include[]=case_dates";
+                    }
+            }
+            $("#table").DataTable().destroy();
+            var table = $('#table').DataTable({
+                order: [1, "asc"],
+                scrollX: true,
+                scrollY: 500,
+                scrollCollapse: true,
+                paging: false,
+                ajax: {
+                    processing: true,
+                    url: url,
+                    type: "GET",
+                    dataSrc: "people.",
+                },
+                "columns": [
+                    {
+                        "class": "details-control",
+                        "orderable": false,
+                        "data": "counts",
+                        "defaultContent": "",
+                        "render": checkNotes,
+                        width:"15px"
+                    },
+                    {data: "full_name",
+                        defaultContent: '',
+                        render: {
+                            display: function(data, type, row, meta){
+                                return "<a href='" + Urls.person(row.id) + "'>" + row.full_name + "</a>";
+                            },
+                        }
+                    },
+                    {data: "village.name"},
+                    {data: "status_display"},
+                    {data: "gender_display"},
+                    {data: "case_dates.earliest_case",
+                        defaultContent: '',
+                        render: {
+                            display: formatCaseDate,
+                            sort: "date",
+                        }
+                    },
+                    {data: "case_dates.latest_case",
+                        defaultContent: '',
+                        render: {
+                            display: formatCaseDate,
+                            sort: "date",
+                        }
+                    },
+                ],
 
-        // Used to activate the + expansion and trigger the format function.
-         $('#table tbody').on('click', 'td.details-control', function(){
-            var tr = $(this).closest('tr');
-            var tdi = tr.find("i.fa");
-            var row = table.row( tr );
+            });
+            $('#table tbody').on('click', 'td.details-control', function(){
+                var tr = $(this).closest('tr');
+                var tdi = tr.find("i.fa");
+                var row = table.row( tr );
 
-            if ( row.child.isShown()) {
-                row.child.hide();
-                tr.removeClass('shown');
-                tdi.first().removeClass('fa-minus-square');
-                tdi.first().addClass('fa-plus-square');
-            } else {
-                row.child( format( row.data() ) ).show();
-                tr.addClass('shown');
-                tdi.first().removeClass('fa-plus-square');
-                tdi.first().addClass('fa-minus-square');
+                if ( row.child.isShown()) {
+                    row.child.hide();
+                    tr.removeClass('shown');
+                    tdi.first().removeClass('fa-minus-square');
+                    tdi.first().addClass('fa-plus-square');
+                } else {
+                    row.child( format( row.data() ) ).show();
+                    tr.addClass('shown');
+                    tdi.first().removeClass('fa-plus-square');
+                    tdi.first().addClass('fa-minus-square');
+                }
+            });
+            if ($("#list_people").not(":visible")){
+
+                $("#list_people").show();
+
             }
         });
 
-        // can be used to change visibility of a column based on a checkbox.
-        $('#1332').change(function(){
-            table.column(6).visible($(this).is(':checked'))
-        });
-
-        $('#1379').change(function(){
-            table.column(7).visible($(this).is(':checked'))
-        });
 
     });
+    </script>
 
-
-
-</script>
 {% endblock %}

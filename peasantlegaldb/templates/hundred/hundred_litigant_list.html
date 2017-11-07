@@ -39,8 +39,8 @@
     $(document).ready(function () {
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1];
-        var api_url = "/api/people/?hundred_to_litigant=" + id + "&include[]=village&include[]=counts&include[]=case_dates";
-        console.log(api_url);
+        url = Urls['api:person-list']();
+        var api_url = url + "?hundred_to_litigant=" + id + "&include[]=village&include[]=counts&include[]=case_dates";
         var table = $("#table").DataTable({
             fixedHeader:{ headerOffset: 50 },
             scrollX: true,

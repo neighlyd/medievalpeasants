@@ -40,12 +40,12 @@
     $(document).ready(function () {
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1];
-        var api_url =  "/api/people/" + id + "/?include[]=cases.case.session.village&include[]=cases.case.litigant_count";
-        console.log(api_url);
+        url = Urls["api:person-detail"](id);
+        var api_url =  url + "/?include[]=cases.case.session.village&include[]=cases.case.litigant_count&include[]=cases.case.litigant_list";
         var table = $("#table").DataTable({
             fixedHeader:{ headerOffset: 50 },
             scrollX: true,
-            order: [3, "asc"],
+            order: [2, "asc"],
             ajax: {
                 url: api_url,
                 type: "GET",

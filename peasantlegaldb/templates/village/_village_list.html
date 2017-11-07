@@ -49,7 +49,8 @@
     $(document).ready(function () {
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1];
-        var api_url = "/api/villages/?include[]=hundred&include[]=counts";
+        url = Urls["api:village-list"]();
+        var api_url = url + "?include[]=hundred&include[]=counts";
         var table = $("#table").DataTable({
             fixedHeader:{ headerOffset: 50 },
             scrollX: true,

@@ -44,7 +44,8 @@
     $(document).ready(function() {
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1];
-        var url = "/api/cases/?land=" + id + "&include[]=session.village&include[]=litigant_list&include[]=litigant_count";
+        url = Urls['api:case-list']();
+        var url = url + "?land=" + id + "&include[]=session.village&include[]=litigant_list&include[]=litigant_count";
         var table = $('#table').DataTable({
             scrollX: true,
             order: [4, "asc"],

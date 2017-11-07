@@ -48,7 +48,8 @@
     }
 
     $(document).ready(function () {
-        var api_url = "/api/records/?include[]=counts&include[]=session_dates&include[]=archive&include[]=sessions.village";
+        var url = Urls['api:record-list']();
+        var api_url = url + "?include[]=counts&include[]=session_dates&include[]=archive&include[]=sessions.village";
         var table = $("#table").DataTable({
             fixedHeader:{ headerOffset: 50 },
             scrollX: true,
@@ -148,7 +149,6 @@
     function session_history(data){
        var concat = '';
        data.sessions.forEach(function(session){
-           console.log(session);
            concat = concat + "<tr>" +
                 "<td><a href='" + Urls.session(session.id) + "'>" + session.id + "</a></td>" +
                 "<td><a href='" + Urls.village(session.village.id) + "'>" + session.village.name + "</a></td>" +

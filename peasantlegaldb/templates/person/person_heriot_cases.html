@@ -41,10 +41,9 @@
 
     $(document).ready(function () {
         var url = window.location.pathname;
-        var id = url.split('/').reverse()[1]
-        console.log(id)
-        var api_url = "/api/people/" + id + "?include[]=cases.case.session.village&filter{cases|heriot.isnull}=false";
-        console.log(api_url);
+        var id = url.split('/').reverse()[1];
+        url = Urls['api:person-detail'](id);
+        var api_url = url + "?include[]=cases.case.session.village&include[]=cases.case.litigant_list&filter{cases|heriot.isnull}=false";
         var table = $("#table").DataTable({
             fixedHeader:{ headerOffset: 50 },
             scrollX: true,
@@ -120,16 +119,6 @@
         });
 
     });
-
-    function list_litigants(data){
-        var concat = '';
-        data.forEach(function (obj, index) {
-            concat = concat + '<div class="d-flex justify-content-end"><div class="mr-auto p-0"><u>Name:</u> ' + obj.name + '</div> <div class="p-0"><u>Role:</u> ' + obj.role + '</div></div><hr>';
-            return concat;
-            });
-        return concat;
-
-    };
 
 
 

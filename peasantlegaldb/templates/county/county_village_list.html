@@ -39,8 +39,8 @@
     $(document).ready(function () {
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1];
-        var api_url = "/api/counties/" + id + "/?include[]=villages.counts&include[]=villages.hundred";
-        console.log(api_url);
+        url = Urls["api:county-detail"](id);
+        var api_url = url + "/?include[]=villages.counts&include[]=villages.hundred";
         var table = $("#table").DataTable({
             fixedHeader:{ headerOffset: 50 },
             scrollX: true,

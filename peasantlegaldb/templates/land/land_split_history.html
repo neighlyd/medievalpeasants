@@ -30,7 +30,8 @@
     $(document).ready(function() {
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1];
-        var url = "/api/land_splits/?land=" + id + "&include[]=old_land&include[]=new_land";
+        url = Urls['api:land-split-list']();
+        var url = url + "?land=" + id + "&include[]=old_land&include[]=new_land";
         var table = $('#table').DataTable({
             scrollX: true,
             ajax: {

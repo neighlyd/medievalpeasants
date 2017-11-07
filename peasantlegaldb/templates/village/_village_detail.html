@@ -124,7 +124,7 @@
             // get lat and lng from API, since accessing django models through JS is not possible (that I'm aware).
             var url = window.location.pathname;
             var id = url.split('/').reverse()[1];
-            var village_url = "/api/villages/" + id;
+            var village_url = Urls['api:village-detail'](id);
 
             var locationObject = $.ajax({
                 url: village_url,
@@ -142,13 +142,13 @@
             var villName = locationObject.name;
 
             // ensure that lat and lng are not null, otherwise google maps api freaks out.
-            if(lng == null){
+            if(lng === null){
                 lng = 0
-            };
+            }
 
-            if (lat == null){
+            if (lat === null){
                 lat = 0
-            };
+            }
 
             var mapOptions = {
                 zoom: 13,

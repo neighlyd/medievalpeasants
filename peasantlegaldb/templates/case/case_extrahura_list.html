@@ -21,8 +21,8 @@
     $(document).ready(function () {
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1];
-        var api_url = "/api/cases/" + id + "?include[]=extrahura";
-        console.log(api_url);
+        url = Urls('api:case-detail')(id);
+        var api_url = url + "?include[]=extrahura";
         var table = $("#table").DataTable({
             fixedHeader:{                headerOffset: 50            },
             order: [1, "asc"],

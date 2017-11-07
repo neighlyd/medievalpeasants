@@ -31,8 +31,8 @@
     $(document).ready(function () {
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1];
-        var api_url = "/api/hundreds/?include[]=county&include[]=counts";
-        console.log(api_url);
+        url = Urls['api:hundred-list']();
+        var api_url = url + "?include[]=county&include[]=counts";
         var table = $("#table").DataTable({
             fixedHeader:{ headerOffset: 50 },
             scrollX: true,

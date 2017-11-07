@@ -45,7 +45,8 @@
     }
 
     $(document).ready(function () {
-        var api_url = "/api/lands/?include[]=tenant_history.person.village&include[]=tenant_history.case.session&include[]=case_dates";
+        var url = Urls['api:land-list']();
+        var api_url = url + "?include[]=tenant_history.person.village&include[]=tenant_history.case.session&include[]=case_dates";
         var table = $("#table").DataTable({
             fixedHeader:{ headerOffset: 50 },
             scrollX: true,

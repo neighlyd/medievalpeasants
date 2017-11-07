@@ -9,10 +9,10 @@
     <form>
 
         {% csrf_token %}
-<br>
+
         <div class="form-group d-flex justify-content-center">
         {% for field in form.visible_fields %}
-                <div class="col-sm-2">
+                <div class="col-sm-1">
                     <h4>{{ field.label_tag }}</h4>
                 </div>
                 <div class="col-md-3.5">
@@ -41,7 +41,6 @@
                     <th>Case Type</th>
                     <th>Verdict</th>
                     <th>Litigant Count</th>
-                    <th>Pledge Count</th>
                     <th>Of Note?</th>
                 </thead>
             </table>
@@ -72,7 +71,7 @@
             $('.btn').removeClass('active');
             $(this).addClass('active');
             var caseType = $("#select_case_type").val();
-            var url = Urls['api:case-list']();
+            var url = Urls["api:case-list"]();
             if (caseType == null || caseType == '') {
                 if ($("#list_cases").is(":visible")) {
                     $("#list_cases").hide();
@@ -82,10 +81,10 @@
                 }
             }
             if (caseType === "All"){
-                url = url + "?exclude[]=session.*&include[]=litigant_count&include[]=session.village.name&include[]=session.law_term&include[]=session.date&include[]=session.human_date&include[]=pledge_count";
+                url = url + "?exclude[]=session.*&include[]=litigant_count&include[]=session.village.name&include[]=session.law_term&include[]=session.date&include[]=session.human_date";
             }
             else {
-                url = url + "?case_type=" + caseType + "&exclude[]=session.*&include[]=litigant_count&include[]=session.village.name&include[]=session.law_term&include[]=session.date&include[]=session.human_date&include[]=pledge_count";
+                url = url + "?case_type=" + caseType + "&exclude[]=session.*&include[]=litigant_count&include[]=session.village.name&include[]=session.law_term&include[]=session.date&include[]=session.human_date";
             }
             $("#table").DataTable().destroy();
             var table = $('#table').DataTable({
@@ -110,12 +109,9 @@
                         width:"15px"
                     },
                     {data: "id",
-                        defaultContent: '',
-                        render: {
-                            display: function(data, type, row, col){
-                            var url = Urls.case(data);
-                            return "<a href='"+ url +"'>" + data + "</a>"
-                            }
+                        fnCreatedCell: function(nTd, cellData, rowData, row, col) {
+                            var url = Urls.case(rowData.id)
+                            $(nTd).html("<a href='"+ url +"'>" + rowData.id + "</a>");
                         }
                     },
                     {data: "session.village.name",
@@ -142,13 +138,15 @@
                     {data: "case_type.case_type"},
                     {data: "verdict.verdict"},
                     {data: "litigant_count"},
-                    {data: "pledge_count"},
                     {data: "of_interest",
-                        defaultContent: '',
-                        render:{
-                            display: checkMaker,
+                        fnCreatedCell: function(nTd, cellData, rowData, row, col) {
+                            if (rowData.of_interest === true){
+                                $(nTd).html("<i class='fa fa-check' style='color:forestgreen'></i>")
+                            } else {
+                                $(nTd).html("")
+                            }
                         }
-                    },
+                    }
                 ],
 
             });

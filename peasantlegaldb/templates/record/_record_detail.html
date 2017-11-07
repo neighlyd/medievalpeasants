@@ -38,7 +38,7 @@
                                 <tr class="row m-0">
                                     <td class="d-inline-block col-4"><b>Earliest Session:</b></td>
                                     {% if record.earliest_session.id %}
-                                        <td class="d-inline-block col-8"><a href="{% url 'session' record.earliest_session.id %}">{{ record.earliest_session.village }} - {{ record.earliest_session.law_term }}, {{ record.earliest_session.date.year }}</a></td>
+                                        <td class="d-inline-block col-8"><a href="{% url 'session' record.earliest_session.id %}">{{ record.earliest_session.village.name }} - {{ record.earliest_session.law_term }}, {{ record.earliest_session.date.year }}</a></td>
                                     {% else %}
                                         <td class="d-inline-block col-8">None</td>
                                     {% endif %}
@@ -46,7 +46,7 @@
                                 <tr class="row m-0">
                                     <td class="d-inline-block col-4"><b>Latest Session:</b></td>
                                     {% if record.latest_session.id %}
-                                        <td class="d-inline-block col-8"><a href="{% url 'session' record.latest_session.id %}">{{ record.latest_session.village}} - {{ record.latest_session.law_term }}, {{ record.latest_session.date.year }}</a></td>
+                                        <td class="d-inline-block col-8"><a href="{% url 'session' record.latest_session.id %}">{{ record.latest_session.village.name }} - {{ record.latest_session.law_term }}, {{ record.latest_session.date.year }}</a></td>
                                     {% else %}
                                         <td class="d-inline-block col-8">None</td>
                                     {% endif %}

@@ -31,7 +31,8 @@
 {{ block.super }}
 <script>
     $(document).ready(function(){
-        var url = '/api/archives/?include[]=counts';
+        var url = Url['api:archive-list']();
+        url = url + '?include[]=counts';
         var table = $('#table').DataTable({
             fixedHeader: {
                 headerOffset: 50
@@ -46,7 +47,6 @@
             "columns": [
                 {data: "name",
                     fnCreatedCell: function(nTd, cellData, rowData, row, col) {
-                        console.log(cellData);
                         $(nTd).html("<a href='" + '/archive/' + rowData.id + "'>" + rowData.name + "</a>");
                     }
                 },

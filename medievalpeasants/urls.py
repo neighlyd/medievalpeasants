@@ -17,6 +17,7 @@ Including another URLconf
 from django.conf.urls import url, include
 from django.contrib import admin
 from django.views.generic import TemplateView
+from django.contrib.auth import views as auth_views
 
 from rest_framework import routers
 
@@ -28,6 +29,8 @@ from peasantlegaldb import views as web_views
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
+    url(r'^login', auth_views.login, {'template_name': 'login.html'}, name='login'),
+    url(r'^logout', auth_views.logout,{'next_page': 'index'}, name='logout'),
     url(r'api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^index', TemplateView.as_view(template_name='index.html'), name='index'),
 ]
@@ -53,6 +56,8 @@ case_urls = [
         name='case_murrain_list'),
     url(r'^place_mentioned_list', web_views.CaseListView.as_view(template_name='case/case_place_mentioned_list.html'),
         name='case_place_mentioned_list'),
+    url(r'^pledge_list', web_views.CaseListView.as_view(template_name='case/case_pledge_list.html'),
+        name='case_pledge_list'),
 ]
 
 county_urls = [
@@ -91,17 +96,7 @@ land_urls = [
 ]
 
 people_list_urls = [
-    url(r'^$', web_views.PeopleListView.as_view(template_name='person/_person_list.html'), name='person_list'),
-    url(r'^chevage_payer_list/', web_views.PeopleListView.as_view(
-        template_name='person/_person_penalty_list.html'), {'title': 'Chevage'}, name='chevage_payer_list'),
-    url(r'^impercamentum_payer_list/', web_views.PeopleListView.as_view(
-        template_name='person/_person_penalty_list.html'), {'title': 'Impercamentum'}, name='impercamentum_payer_list'),
-    url(r'^fine_payer_list/', web_views.PeopleListView.as_view(
-        template_name='person/_person_penalty_list.html'), {'title': 'Fine'}, name='fine_payer_list'),
-    url(r'^heriot_payer_list/', web_views.PeopleListView.as_view(
-        template_name='person/_person_penalty_list.html'), {'title': 'Heriot'}, name='heriot_payer_list'),
-    url(r'^damaged_party_list/', web_views.PeopleListView.as_view(
-        template_name='person/_person_penalty_list.html'), {'title': 'Damage'}, name='damaged_party_list'),
+    url(r'^$', web_views.PeopleListFilterView.as_view(template_name='person/_person_list.html'), name='person_list'),
 ]
 
 person_detail_urls = [
@@ -170,7 +165,7 @@ urlpatterns += [
     url(r'^village/(?P<pk>\d+)/', include(village_urls)),
     url(r'^archives/$', web_views.ArchiveListView.as_view(template_name='archive/_archive_list.html'),
         name='archive_list'),
-    url(r'^cases/$', web_views.CaseListView.as_view(template_name='case/_case_list.html'), name='case_list'),
+    url(r'^cases/$', web_views.CaseListFilterView.as_view(template_name='case/_case_list.html'), name='case_list'),
     url(r'^counties/$', web_views.CountyListView.as_view(template_name='county/_county_list.html'),
         name='county_list'),
     url(r'^hundreds/$', web_views.HundredListView.as_view(template_name='hundred/_hundred_list.html'),
@@ -184,7 +179,6 @@ urlpatterns += [
     url(r'^sessions/$', web_views.SessionListView.as_view(template_name='session/_session_list.html'),
         name='session_list'),
     url(r'^lands/$', web_views.LandListView.as_view(template_name='land/_land_list.html'), name='land_list'),
-
 ]
 
 # JS Reverse to make Django URL routing available in JS - https://github.com/ierror/django-js-reverse
@@ -195,69 +189,35 @@ urlpatterns += [
 
 # Use DRF router to easily direct API traffic.
 router = routers.DefaultRouter()
-router.register(r'lands', api_views.LandViewSet, base_name='land_api')
-router.register(r'archives', api_views.ArchiveViewSet, base_name='archive_api')
-router.register(r'money', api_views.MoneyViewSet, base_name='money_api')
-router.register(r'chattels', api_views.ChattelViewSet, base_name='chattel_api')
-router.register(r'case_types', api_views.CaseTypeViewSet, base_name='case_type_api')
-router.register(r'counties', api_views.CountyViewSet, base_name='county_api')
-router.register(r'parcel_tenures', api_views.ParcelTenureViewSet, base_name='parcel_tenure_api')
-router.register(r'parcel_types', api_views.ParcelTypeViewSet, base_name='parcel_type_api')
-router.register(r'position_titles', api_views.PositionTypeViewSet, base_name='position_title_api')
-router.register(r'relation_types', api_views.RelationshipViewSet, base_name='relation_type_api')
-router.register(r'role_types', api_views.RoleViewSet, base_name='role_type_api')
-router.register(r'verdicts', api_views.VerdictViewSet, base_name='verdict_api')
-router.register(r'hundreds', api_views.HundredViewSet, base_name='hundred_api')
-router.register(r'villages', api_views.VillageViewSet, base_name='village_api')
-router.register(r'people', api_views.PersonViewSet, base_name='person_api')
-router.register(r'records', api_views.RecordViewSet, base_name='record_api')
-router.register(r'sessions', api_views.SessionViewSet, base_name='session_api')
-router.register(r'cornbot', api_views.CornbotViewSet, base_name='cornbot_api')
-router.register(r'extrahura', api_views.ExtrahuraViewSet, base_name='extrahura_api')
-router.register(r'murrains', api_views.MurrainViewSet, base_name='murrain_api')
-router.register(r'places_mentioned', api_views.PlaceMentionedViewSet, base_name='place_mentioned_api')
-router.register(r'land_parcels', api_views.PlaceMentionedViewSet, base_name='place_mentioned_api')
-router.register(r'pledges', api_views.PledgeViewSet, base_name='pledge_api')
-router.register(r'land_splits', api_views.LandSplitViewSet, base_name='land_split_api')
-router.register(r'relationships', api_views.RelationshipViewSet, base_name='relationship_api')
-router.register(r'cases', api_views.CaseViewSet, base_name='case_api')
-router.register(r'positions', api_views.PositionViewSet, base_name='position_api')
-router.register(r'litigants', api_views.LitigantViewSet, base_name='litigant_api')
-
-# Wire up our API using automatic URL routing.
-# Additionally, we include login URLs for the browsable API.
-
-api_urls = [
-    url(r'^archives', api_views.ArchiveViewSet.as_view({'get':'list'}), name='archive_api'),
-    url(r'^money', api_views.MoneyViewSet.as_view({'get':'list'}), name='money_api'),
-    url(r'^chattel', api_views.ChattelViewSet.as_view({'get':'list'}), name='chattel_api'),
-    url(r'^case_types', api_views.CaseTypeViewSet.as_view({'get':'list'}), name='case_types_api'),
-    url(r'^counties', api_views.CountyViewSet.as_view({'get':'list'}), name='counties_api'),
-    url(r'^lands', api_views.LandViewSet.as_view({'get':'list'}), name='land_api'),
-    url(r'^parcel_tenures', api_views.ParcelTenureViewSet.as_view({'get':'list'}), name='parcel_tenures_api'),
-    url(r'^parcel_types', api_views.ParcelTypeViewSet.as_view({'get':'list'}), name='parcel_types_api'),
-    url(r'^position_titles', api_views.PositionTypeViewSet.as_view({'get':'list'}), name='position_titles_api'),
-    url(r'^relation_types', api_views.RelationViewSet.as_view({'get':'list'}), name='relation_types_api'),
-    url(r'^role_types', api_views.RoleViewSet.as_view({'get':'list'}), name='role_type_api'),
-    url(r'^verdicts', api_views.VerdictViewSet.as_view({'get':'list'}), name='verdict_api'),
-    url(r'^hundreds', api_views.HundredViewSet.as_view({'get':'list'}), name='hundred_api'),
-    url(r'^villages', api_views.VillageViewSet.as_view({'get':'list'}), name='village_api'),
-    url(r'^people', api_views.PersonViewSet.as_view({'get':'list'}), name='person_api'),
-    url(r'^record', api_views.RecordViewSet.as_view({'get':'list'}), name='record_api'),
-    url(r'^sessions', api_views.SessionViewSet.as_view({'get':'list'}), name='session_api'),
-    url(r'^cornbots', api_views.CornbotViewSet.as_view({'get':'list'}), name='cornbot_api'),
-    url(r'^extrahura', api_views.ExtrahuraViewSet.as_view({'get':'list'}), name='extrahura_api'),
-    url(r'^murrains', api_views.MurrainViewSet.as_view({'get':'list'}), name='murrain_api'),
-    url(r'^places_mentioned', api_views.PlaceMentionedViewSet.as_view({'get':'list'}), name='place_mentioned_api'),
-    url(r'^land_parcels', api_views.LandParcelViewSet.as_view({'get':'list'}), name='land_parcels_api'),
-    url(r'^pledges', api_views.PledgeViewSet.as_view({'get':'list'}), name='pledges_api'),
-    url(r'^land_split', api_views.LandSplitViewSet.as_view({'get':'list'}), name='land_split_api'),
-    url(r'^relationships', api_views.RelationshipViewSet.as_view({'get':'list'}), name='relationships_api'),
-    url(r'^cases', api_views.CaseViewSet.as_view({'get':'list'}), name='case_api'),
-    url(r'^positions', api_views.PositionViewSet.as_view({'get':'list'}), name='positions_api'),
-    url(r'^litigants', api_views.LitigantViewSet.as_view({'get': 'list'}), name='litigants_api'),
-]
+router.register(r'lands', api_views.LandViewSet)
+router.register(r'archives', api_views.ArchiveViewSet)
+router.register(r'money', api_views.MoneyViewSet)
+router.register(r'chattels', api_views.ChattelViewSet)
+router.register(r'case_types', api_views.CaseTypeViewSet, base_name='case-type')
+router.register(r'counties', api_views.CountyViewSet)
+router.register(r'parcel_tenures', api_views.ParcelTenureViewSet, base_name='parcel-tenure')
+router.register(r'parcel_types', api_views.ParcelTypeViewSet, base_name='parcel-type')
+router.register(r'position_titles', api_views.PositionTypeViewSet, base_name='position-title')
+router.register(r'relation_types', api_views.RelationshipViewSet, base_name='relation-type')
+router.register(r'role_types', api_views.RoleViewSet, base_name='role-type')
+router.register(r'verdicts', api_views.VerdictViewSet)
+router.register(r'hundreds', api_views.HundredViewSet)
+router.register(r'villages', api_views.VillageViewSet)
+router.register(r'people', api_views.PersonViewSet, base_name='person')
+router.register(r'records', api_views.RecordViewSet)
+router.register(r'sessions', api_views.SessionViewSet)
+router.register(r'cornbot', api_views.CornbotViewSet)
+router.register(r'extrahura', api_views.ExtrahuraViewSet)
+router.register(r'murrains', api_views.MurrainViewSet)
+router.register(r'places_mentioned', api_views.PlaceMentionedViewSet, base_name='places-mentioned')
+router.register(r'land_parcels', api_views.PlaceMentionedViewSet, base_name='land-parcel')
+router.register(r'pledges', api_views.PledgeViewSet)
+router.register(r'land_splits', api_views.LandSplitViewSet, base_name='land-split')
+router.register(r'relationships', api_views.RelationshipViewSet, base_name='relationship')
+router.register(r'cases', api_views.CaseViewSet, base_name='case')
+router.register(r'positions', api_views.PositionViewSet, base_name='position')
+router.register(r'litigants', api_views.LitigantViewSet, base_name='litigant')
 
 urlpatterns += [
-    url(r'^api/', include(router.urls)),
+    url(r'^api/', include(router.urls, namespace='api')),
 ]
