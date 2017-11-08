@@ -6,12 +6,13 @@
 {% endblock %}
 
 {% block center_bar %}
+    {{ block.super }}
     <form>
 <br>
         {% csrf_token %}
 
         <div class="form-group d-flex justify-content-center">
-        {% for field in form.visible_fields %}
+        {% for field in filter_people_form %}
                 <div class="col-sm-2">
                     <h4>{{ field.label_tag }}</h4>
                 </div>
@@ -60,7 +61,6 @@
         </div>
 
     </form>
-</div>
 
     <br>
 <div id="list_people" style="display: none">
@@ -83,6 +83,7 @@
 {% endblock %}
 
 {% block right_sidebar %}
+    {{ block.super }}
 {% endblock %}
 
 {% block scripts %}

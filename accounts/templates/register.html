@@ -1,0 +1,13 @@
+{% extends '_base_accounts.html' %}
+
+{% block heading %}
+    Register
+{% endblock %}
+
+{% block card-body %}
+    <form method="post" novalidate>
+        {% csrf_token %}
+        {% include '_layout/_form.html' %}
+        <button type="submit" class="btn btn-success btn-block">Register an account</button>
+    </form>
+{% endblock %}

@@ -190,19 +190,6 @@ class CaseFactory(factory.DjangoModelFactory):
     incidental_land = False
 
 
-class ChevageFactory(factory.DjangoModelFactory):
-    class Meta:
-        model = Chevage
-
-    person = factory.SubFactory(PersonFactory)
-    amercement = factory.SubFactory(MoneyFactory)
-    case = factory.SubFactory(CaseFactory)
-    cross = False
-    recessit = False
-    habet_terram = False
-    notes = factory.Faker('paragraph')
-
-
 class CornbotFactory(factory.DjangoModelFactory):
     class Meta:
         model = Cornbot
@@ -222,29 +209,6 @@ class ExtrahuraFactory(factory.DjangoModelFactory):
     animal = factory.SubFactory(ChattelFactory)
     price = factory.SubFactory(MoneyFactory)
     case = factory.SubFactory(CaseFactory)
-
-
-class HeriotFactory(factory.DjangoModelFactory):
-    class Meta:
-        model = Heriot
-
-    person = factory.SubFactory(PersonFactory)
-    amount = random.randint(1, 10)
-    animal = factory.SubFactory(ChattelFactory)
-    assessment = factory.SubFactory(MoneyFactory)
-    case = factory.SubFactory(CaseFactory)
-
-
-class ImpercamentumFactory(factory.DjangoModelFactory):
-    class Meta:
-        model = Impercamentum
-
-    person = factory.SubFactory(PersonFactory)
-    amount = random.randint(1, 10)
-    animal = factory.SubFactory(ChattelFactory)
-    amercement = factory.SubFactory(MoneyFactory)
-    case = factory.SubFactory(CaseFactory)
-    notes = factory.Faker('paragraph')
 
 
 class MurrainFactory(factory.DjangoModelFactory):
@@ -286,23 +250,67 @@ class LitigantFactory(factory.DjangoModelFactory):
     fine = factory.SubFactory(MoneyFactory)
     amercement = factory.SubFactory(MoneyFactory)
     damage = factory.SubFactory(MoneyFactory)
-    damage_notes = factory.Faker('paragraph')
+    damage_notes = factory.Faker('sentence')
     ad_proximum = False
     distrained = False
     attached = False
     bail = False
+    chevage = factory.SubFactory(MoneyFactory)
+    crossed = False
+    recessit = False
+    habet_terram = False
+    chevage_notes = factory.Faker('sentence')
+    heriot_quantity = random.randint(1,5)
+    heriot_animal = factory.SubFactory(ChattelFactory)
+    heriot = factory.SubFactory(MoneyFactory)
+    impercamentum_quantity = random.randint(1,5)
+    impercamentum_animal = factory.SubFactory(ChattelFactory)
+    impercamentum = factory.SubFactory(MoneyFactory)
+    impercamentum_notes = factory.Faker('sentence')
+    land = factory.SubFactory(Land)
+    land_villeinage = False
+    land_notes = factory.Faker('sentence')
+
+    class PledgeFactory(factory.DjangoModelFactory):
+
+        class Meta:
+            model = Pledge
+
+        case = factory.SubFactory(CaseFactory)
+        pledge_giver = factory.SubFactory(PersonFactory)
+        pledge_receiver = factory.SubFactory(PersonFactory)
 
 
-class CasePeopleLandFactory(factory.DjangoModelFactory):
-    class Meta:
-        model = CasePeopleLand
+    class LandSplitFactory(factory.DjangoModelFactory):
 
-    person = factory.SubFactory(PersonFactory)
-    case = factory.SubFactory(CaseFactory)
-    land = factory.SubFactory(LandFactory)
-    role = factory.SubFactory(RoleFactory)
-    villeinage = True
-    notes = factory.Faker('paragraph')
+        class Meta:
+            model = LandSplit
+
+        old_land = factory.SubFactory(LandFactory)
+        new_land = factory.SubFactory(LandFactory)
+
+
+    class PositionFactory(factory.DjangoModelFactory):
+
+        class Meta:
+            model = Position
+
+        person = factory.SubFactory(PersonFactory)
+        title = factory.SubFactory(PositionTypeFactory)
+        session = factory.SubFactory(SessionFactory)
+        definitive = False
+
+
+    class RelationshipFactory(factory.DjangoModelFactory):
+
+        class Meta:
+            model = Relationship
+
+        person_one = factory.SubFactory(PersonFactory)
+        person_two = factory.SubFactory(PersonFactory)
+        relationship = factory.SubFactory(RelationFactory)
+        definitive = False
+
 
 '''
 Tests go below here. They use the factories to create junk data.

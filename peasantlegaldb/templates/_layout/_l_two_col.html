@@ -1,5 +1,5 @@
 {% extends '_layout/__base.html' %}
-{% load additionaltags %}
+{% load template_tags %}
 
 {% block navbar %}
     {% include '_layout/__navbar.html' %}
@@ -24,11 +24,13 @@
         <div class="p-0 col-md-1">
 
             {% block right_sidebar %}
-                <div class="container" style="position: sticky; top: 65px">
-                    <div class="btn-group" role="group">
-                        <button type="button" class="btn btn-secondary float-right"">Add {{ object_list | qs_classname }}</button>
+                {% if user.is_authenticated %}
+                    <div class="container" style="position: sticky; top: 65px">
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-secondary float-right"">Add {{ object_list | qs_classname }}</button>
+                        </div>
                     </div>
-                </div>
+                {% endif %}
             {% endblock %}
 
         </div>

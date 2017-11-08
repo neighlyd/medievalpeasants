@@ -28,14 +28,13 @@ class ArchiveListView(ListView):
 class CaseListView(ListView):
 
     model = models.Case
-    queryset = models.Case.objects.all().select_related('session').order_by('session__village__name', 'session__date',
-                                                                            'court_type')
-    context_object_name = 'case_list'
+    queryset = models.Case.objects.all()
 
-
-class CaseListFilterView(FormView):
-
-    form_class = forms.CaseFilterForm
+    def get_context_data(self, *args, **kwargs):
+        context = super(CaseListView, self).get_context_data(**kwargs)
+        filter_case_form = forms.CaseFilterForm(self.request.GET or None)
+        context['filter_case_form'] = filter_case_form
+        return context
 
 
 class CaseDetailView(DetailView):
@@ -95,11 +94,9 @@ class PeopleListView(ListView):
         context = super(PeopleListView, self).get_context_data(**kwargs)
         context['current_url'] = resolve(self.request.path_info).url_name
         context['title'] = self.kwargs.get('title')
+        filter_people_form = forms.PersonFilterForm(self.request.GET or None)
+        context['filter_people_form'] = filter_people_form
         return context
-
-class PeopleListFilterView(FormView):
-    queryset = models.Person.objects.all()
-    form_class = forms.PersonFilterForm
 
 
 class PersonDetailView(DetailView):
