@@ -37,7 +37,7 @@
     $(document).ready(function() {
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1];
-        url = Urls['api:litigan-list']();
+        url = Urls['api:litigant-list']();
         var url = url + "?include[]=land&filter{land.id}=" + id + "&include[]=person.village&include[]=case.session&include[]=person.counts&include[]=person.case_dates";
         var table = $('#tenant_history').DataTable({
             scrollX: true,

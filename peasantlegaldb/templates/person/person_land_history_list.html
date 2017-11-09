@@ -77,7 +77,10 @@
                     }
                 },
                 {data: "land.parcel_list",
-                    fnCreatedCell: list_parcels,
+                    defaultContent: '',
+                    render: {
+                        display: list_parcels,
+                    }
                 },
                 {data: "case.session",
                     defaultContent: '',

@@ -51,8 +51,8 @@
     $(document).ready(function () {
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1];
-        url = Urls['api:case-detail'](id);
-        var api_url = url + "&exclude[]=tenant_history.*&include[]=tenant_history.person&include[]=tenant_history.role&include[]=tenant_history.case.session";
+        url = Urls['api:land-list']();
+        var api_url = url + "?case=" + id + "&exclude[]=tenant_history.*&include[]=tenant_history.person&include[]=tenant_history.role&include[]=tenant_history.case.session";
         var table = $("#table").DataTable({
             fixedHeader:{
                 headerOffset: 50
@@ -72,12 +72,18 @@
                     width:"15px"
                 },
                 {data: "id",
-                    fnCreatedCell: function(nTd, cellData, rowData, row, col){
-                        $(nTd).html("<a href='" + Urls.land(rowData.id) + "'target='_blank'>" + rowData.id + "</a>");
+                    defaultContent: '',
+                    render: {
+                        display: function(data, type, row, col){
+                            return "<a href='" + Urls.land(data) + "'target='_blank'>" + data + "</a>"
+                        }
                     }
                 },
                 {data: "parcel_list",
-                    fnCreatedCell: list_parcels,
+                    defaultContent: '',
+                    render: {
+                        display: list_parcels,
+                    }
                 },
                 {data: "notes"},
             ]
