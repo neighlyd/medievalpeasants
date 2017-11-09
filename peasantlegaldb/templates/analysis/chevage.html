@@ -1,0 +1,513 @@
+{% extends '_layout/_l_two_col.html' %}
+
+{% block center_bar %}
+    {{ block.super }}
+
+    <div class="card-body">
+            <div class="accordion" role="tab-list">
+                <div class="card">
+                <div class="card-header text-center">
+                    <h3 class="card-title"><a data-toggle="collapse" href="#collapseChristianMalford">Christian Malford</a></h3>
+                </div>
+                <div class="collapse show" id="collapseChristianMalford" role="tabpanel">
+                    <div class="card-body">
+                    {% for person in christian_malford_chevage|dictsort:"full_name" %}
+                        <div class="accordion" role="tab-list">
+                            <div class="card">
+                                <div class="card-header" style="position: sticky; top: 50px; z-index: 2; background: #A9A9A9">
+                                    <h5  class="card-title"><a data-toggle="collapse" href="#collapse{{ person.id }}">{{ person.full_name }}, {{ person.village.name }}</a></h5>
+                                </div>
+                                <div class="collapse show" id="collapse{{ person.id }}" role="tabpanel">
+                                    <div class="card-body">
+                                    <div class="row">
+                                        <div class="card border-light" style="position: sticky; top: 115px">
+                                            <table class="table table-sm">
+                                                <tr>
+                                                    <td>Litigation Count</td>
+                                                    <td>{{ person.case_count_litigation }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Chevage Count</td>
+                                                    <td>{{ person.monetary_counts.chevage_count }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Pledges given</td>
+                                                    <td>{{ person.pledges_given_count }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Pledges Received</td>
+                                                    <td>{{ person.pledges_received_count }}</td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                        <div class="card border-light" style="position: sticky; top: 115px; padding-left: 10px">
+                                            <table class="table table-sm">
+                                                <tr>
+                                                    <td>Chevage Info</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Minimum (in d.)</td>
+                                                    {% if person.monetary_counts.chevage_min == 0 %}
+                                                            <td>0</td>
+                                                    {% elif person.monetary_counts.chevage_min > 0 %}
+                                                            <td>{{ person.monetary_counts.chevage_min }}</td>
+                                                    {% else %}
+                                                            <td>--</td>
+                                                    {% endif %}
+                                                </tr>
+                                                <tr>
+                                                    <td>Maximum (in d.)</td>
+                                                    {% if person.monetary_counts.chevage_max == 0 %}
+                                                            <td>0</td>
+                                                    {% elif person.monetary_counts.chevage_max > 0 %}
+                                                            <td>{{ person.monetary_counts.chevage_max }}</td>
+                                                    {% else %}
+                                                            <td>--</td>
+                                                    {% endif %}
+                                                </tr>
+                                                <tr>
+                                                    <td>Average (in d.)</td>
+                                                    {% if person.monetary_counts.chevage_avg == 0 %}
+                                                            <td>0</td>
+                                                    {% elif person.monetary_counts.chevage_avg > 0 %}
+                                                            <td>{{ person.monetary_counts.chevage_avg }}</td>
+                                                    {% else %}
+                                                            <td>--</td>
+                                                    {% endif %}
+                                                </tr>
+                                                <tr>
+                                                    <td>Total (in d.)</td>
+                                                    {% if person.monetary_counts.chevage_sum == 0 %}
+                                                            <td>0</td>
+                                                    {% elif person.monetary_counts.chevage_sum > 0 %}
+                                                            <td>{{ person.monetary_counts.chevage_sum }}</td>
+                                                    {% else %}
+                                                            <td>--</td>
+                                                    {% endif %}
+                                                </tr>
+                                            </table>
+                                        </div>
+                                        {% for case in person.person_to_case.all|dictsort:"case.session.date" %}
+                                        <div class="card w-75 ml-auto" style="padding-bottom: 15px">
+                                            <div class="card-body">
+                                                <div class="row">
+                                                    <div class="mr-auto card-subtitle text-muted" style="padding-left: 15px">
+                                                        <h5><u>Case:</u> <a href='{% url 'case' case.case.id %}'>{{ case.case.id }}</a></h5>
+                                                    </div>
+                                                    <div class="ml-auto">
+                                                        <h5><a href='{% url 'session' case.case.session.id %}'>{{ case.case.session.human_date }}</a></h5>
+                                                    </div>
+                                                </div>
+                                            <hr>
+                                            <div class="row">
+                                                <div class="col-md-5">
+                                                    <table class="table table-sm table-bordered">
+                                                        <tr>
+                                                            <td><b>Case Type</b></td>
+                                                            <td><b>Court Type</b></td>
+                                                            <td><b>Role</b></td>
+                                                            <td><b>Verdict</b></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>{{ case.case.case_type.case_type }}</td>
+                                                            <td>{{ case.case.court_type }}</td>
+                                                            <td>{{ case.role.role }}</td>
+                                                            <td>{{ case.case.verdict.verdict }}</td>
+                                                        </tr>
+                                                    </table>
+                                                </div>
+                                            {% if case.amercement or case.chevage or case.fine or case.impercamentum or case.heriot or case.damage or case.land %}
+                                                <div class="col-md-5 ml-auto">
+                                                    <table class="table table-sm table-bordered">
+                                                        <tr>
+                                                            {% if case.amercement %}
+                                                            <td>
+                                                                <b>Amercement</b>
+                                                            </td>
+                                                                {% endif %}
+                                                                {% if case.chevage %}
+                                                            <td>
+                                                                <b>Chevage</b>
+                                                            </td>
+                                                                {% endif %}
+                                                                {% if case.fine %}
+                                                            <td>
+                                                                <b>Fine</b>
+                                                            </td>
+                                                                {% endif %}
+                                                                {% if case.impercamentum %}
+                                                            <td>
+                                                                <b>Impercamentum Quantity</b>
+                                                            </td>
+                                                            <td>
+                                                                <b>Amercement</b>
+                                                            </td>
+                                                                {% endif %}
+                                                                {% if case.heriot %}
+                                                            <td>
+                                                                <b>Heriot Animal</b>
+                                                            </td>
+                                                            <td>
+                                                                <b>Heriot Assessment</b>
+                                                            </td>
+                                                                {% endif %}
+                                                                {% if case.damage %}
+                                                            <td>
+                                                                <b>Damages</b>
+                                                            </td>
+                                                            <td>
+                                                                <b>Notes</b>
+                                                            </td>
+                                                                {% endif %}
+                                                                {% if case.land %}
+                                                            <td>
+                                                                <b>Land</b>
+                                                            </td>
+                                                            <td>
+                                                                <b>Villeinage?</b>
+                                                            </td>
+                                                            <td>
+                                                                <b>Notes</b>
+                                                            </td>
+                                                                {% endif %}
+                                                        </tr>
+                                                        <tr>
+                                                            {% if case.amercement %}
+                                                            <td>
+                                                                {{ case.amercement.amount }} ({{ case.amercement.in_denarius }} d.)
+                                                            </td>
+                                                                {% endif %}
+                                                                {% if case.chevage %}
+                                                            <td>
+                                                                {{ case.chevage.amount }} ({{ case.chevage.in_denarius }} d.)
+                                                            </td>
+                                                                {% endif %}
+                                                                {% if case.fine %}
+                                                            <td>
+                                                                {{ case.fine.amount }} ({{ case.fine.in_denarius }} d.)
+                                                            </td>
+                                                                {% endif %}
+                                                                {% if case.impercamentum %}
+                                                            <td>
+                                                                {{ case.impercamentum_quantity }} {{ case.impercamentum_animal.name }}
+                                                            </td>
+                                                            <td>
+                                                                {{ case.impercamentum.amount }} ({{ case.impercamentum.in_denarius }} d.)
+                                                            </td>
+                                                                {% endif %}
+                                                                {% if case.heriot %}
+                                                            <td>
+                                                                {{ case.heriot_quantity }} ({{ case.heriot_animal.name }} d.)
+                                                            </td>
+                                                            <td>
+                                                                {{ case.heriot.amount }} ({{ case.heriot.in_denarius }} d.)
+                                                            </td>
+                                                                {% endif %}
+                                                                {% if case.damage %}
+                                                            <td>
+                                                                {{ case.damage.amount }} ({{ case.damage.in_denarius }} d.)
+                                                            </td>
+                                                            <td>
+                                                                {{ case.damage_notes }}
+                                                            </td>
+                                                                {% endif %}
+                                                                {% if case.land %}
+                                                            <td>
+                                                                <a href="{% url 'land' case.land.id %}">{{ case.land.id }}</a>
+                                                            </td>
+                                                            <td>
+                                                                {% if case.land_villeinage %}
+                                                                    Yes
+                                                                {% endif %}
+                                                            </td>
+                                                            <td>
+                                                                {{ case.land_notes }}
+                                                            </td>
+                                                                {% endif %}
+                                                        </tr>
+                                                    </table>
+                                                </div>
+                                                {% endif %}
+                                            </div>
+                                            {% if case.case.summary %}
+                                                <div class="card w-50">
+                                                    <div class="card-body">
+                                                    <div class="card-subtitle text-muted">
+                                                        Summary:
+                                                    </div>
+                                                        {{ case.case.summary }}
+                                                    </div>
+                                                </div>
+                                            {% endif %}
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                            <br>
+                    {% endfor %}
+                </div>
+                </div>
+            </div>
+            </div>
+        </div>
+
+    <div class="card-body">
+            <div class="accordion" role="tab-list">
+                <div class="card">
+                <div class="card-header text-center">
+                    <h3 class="card-title"><a data-toggle="collapse" href="#collapseBadbury">Badbury</a></h3>
+                </div>
+                <div class="collapse show" id="collapseBadbury" role="tabpanel">
+                    <div class="card-body">
+                    {% for person in badbury_chevage|dictsort:"full_name" %}
+                        <div class="accordion" role="tab-list">
+                            <div class="card">
+                                <div class="card-header" style="position: sticky; top: 50px; z-index: 2; background: #A9A9A9">
+                                    <h5  class="card-title"><a data-toggle="collapse" href="#collapse{{ person.id }}">{{ person.full_name }}, {{ person.village.name }}</a></h5>
+                                </div>
+                                <div class="collapse show" id="collapse{{ person.id }}" role="tabpanel">
+                                    <div class="card-body">
+                                    <div class="row">
+                                        <div class="card border-light" style="position: sticky; top: 115px">
+                                            <table class="table table-sm">
+                                                <tr>
+                                                    <td>Litigation Count</td>
+                                                    <td>{{ person.case_count_litigation }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Chevage Count</td>
+                                                    <td>{{ person.monetary_counts.chevage_count }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Pledges given</td>
+                                                    <td>{{ person.pledges_given_count }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Pledges Received</td>
+                                                    <td>{{ person.pledges_received_count }}</td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                        <div class="card border-light" style="position: sticky; top: 115px; padding-left: 10px">
+                                            <table class="table table-sm">
+                                                <tr>
+                                                    <td>Chevage Info</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Minimum (in d.)</td>
+                                                    {% if person.monetary_counts.chevage_min == 0 %}
+                                                            <td>0</td>
+                                                    {% elif person.monetary_counts.chevage_min > 0 %}
+                                                            <td>{{ person.monetary_counts.chevage_min }}</td>
+                                                    {% else %}
+                                                            <td>--</td>
+                                                    {% endif %}
+                                                </tr>
+                                                <tr>
+                                                    <td>Maximum (in d.)</td>
+                                                    {% if person.monetary_counts.chevage_max == 0 %}
+                                                            <td>0</td>
+                                                    {% elif person.monetary_counts.chevage_max > 0 %}
+                                                            <td>{{ person.monetary_counts.chevage_max }}</td>
+                                                    {% else %}
+                                                            <td>--</td>
+                                                    {% endif %}
+                                                </tr>
+                                                <tr>
+                                                    <td>Average (in d.)</td>
+                                                    {% if person.monetary_counts.chevage_avg == 0 %}
+                                                            <td>0</td>
+                                                    {% elif person.monetary_counts.chevage_avg > 0 %}
+                                                            <td>{{ person.monetary_counts.chevage_avg }}</td>
+                                                    {% else %}
+                                                            <td>--</td>
+                                                    {% endif %}
+                                                </tr>
+                                                <tr>
+                                                    <td>Total (in d.)</td>
+                                                    {% if person.monetary_counts.chevage_sum == 0 %}
+                                                            <td>0</td>
+                                                    {% elif person.monetary_counts.chevage_sum > 0 %}
+                                                            <td>{{ person.monetary_counts.chevage_sum }}</td>
+                                                    {% else %}
+                                                            <td>--</td>
+                                                    {% endif %}
+                                                </tr>
+                                            </table>
+                                        </div>
+                                        {% for case in person.person_to_case.all|dictsort:"case.session.date" %}
+                                        <div class="card w-75 ml-auto" style="padding-bottom: 15px">
+                                            <div class="card-body">
+                                                <div class="row">
+                                                    <div class="mr-auto card-subtitle text-muted" style="padding-left: 15px">
+                                                        <h5><u>Case:</u> <a href='{% url 'case' case.id %}'>{{ case.id }}</a></h5>
+                                                    </div>
+                                                    <div class="ml-auto">
+                                                        <h5><a href='{% url 'session' case.case.session.id %}'>{{ case.case.session.human_date }}</a></h5>
+                                                    </div>
+                                                </div>
+                                            <hr>
+                                            <div class="row">
+                                                <div class="col-md-5">
+                                                    <table class="table table-sm table-bordered">
+                                                        <tr>
+                                                            <td><b>Case Type</b></td>
+                                                            <td><b>Court Type</b></td>
+                                                            <td><b>Role</b></td>
+                                                            <td><b>Verdict</b></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>{{ case.case.case_type.case_type }}</td>
+                                                            <td>{{ case.case.court_type }}</td>
+                                                            <td>{{ case.role.role }}</td>
+                                                            <td>{{ case.case.verdict.verdict }}</td>
+                                                        </tr>
+                                                    </table>
+                                                </div>
+                                            {% if case.amercement or case.chevage or case.fine or case.impercamentum or case.heriot or case.damage or case.land %}
+                                                <div class="col-md-5 ml-auto">
+                                                    <table class="table table-sm table-bordered">
+                                                        <tr>
+                                                            {% if case.amercement %}
+                                                            <td>
+                                                                <b>Amercement</b>
+                                                            </td>
+                                                                {% endif %}
+                                                                {% if case.chevage %}
+                                                            <td>
+                                                                <b>Chevage</b>
+                                                            </td>
+                                                                {% endif %}
+                                                                {% if case.fine %}
+                                                            <td>
+                                                                <b>Fine</b>
+                                                            </td>
+                                                                {% endif %}
+                                                                {% if case.impercamentum %}
+                                                            <td>
+                                                                <b>Impercamentum Quantity</b>
+                                                            </td>
+                                                            <td>
+                                                                <b>Amercement</b>
+                                                            </td>
+                                                                {% endif %}
+                                                                {% if case.heriot %}
+                                                            <td>
+                                                                <b>Heriot Animal</b>
+                                                            </td>
+                                                            <td>
+                                                                <b>Heriot Assessment</b>
+                                                            </td>
+                                                                {% endif %}
+                                                                {% if case.damage %}
+                                                            <td>
+                                                                <b>Damages</b>
+                                                            </td>
+                                                            <td>
+                                                                <b>Notes</b>
+                                                            </td>
+                                                                {% endif %}
+                                                                {% if case.land %}
+                                                            <td>
+                                                                <b>Land</b>
+                                                            </td>
+                                                            <td>
+                                                                <b>Villeinage?</b>
+                                                            </td>
+                                                            <td>
+                                                                <b>Notes</b>
+                                                            </td>
+                                                                {% endif %}
+                                                        </tr>
+                                                        <tr>
+                                                            {% if case.amercement %}
+                                                            <td>
+                                                                {{ case.amercement.amount }} ({{ case.amercement.in_denarius }} d.)
+                                                            </td>
+                                                                {% endif %}
+                                                                {% if case.chevage %}
+                                                            <td>
+                                                                {{ case.chevage.amount }} ({{ case.chevage.in_denarius }} d.)
+                                                            </td>
+                                                                {% endif %}
+                                                                {% if case.fine %}
+                                                            <td>
+                                                                {{ case.fine.amount }} ({{ case.fine.in_denarius }} d.)
+                                                            </td>
+                                                                {% endif %}
+                                                                {% if case.impercamentum %}
+                                                            <td>
+                                                                {{ case.impercamentum_quantity }} {{ case.impercamentum_animal.name }}
+                                                            </td>
+                                                            <td>
+                                                                {{ case.impercamentum.amount }} ({{ case.impercamentum.in_denarius }} d.)
+                                                            </td>
+                                                                {% endif %}
+                                                                {% if case.heriot %}
+                                                            <td>
+                                                                {{ case.heriot_quantity }} ({{ case.heriot_animal.name }} d.)
+                                                            </td>
+                                                            <td>
+                                                                {{ case.heriot.amount }} ({{ case.heriot.in_denarius }} d.)
+                                                            </td>
+                                                                {% endif %}
+                                                                {% if case.damage %}
+                                                            <td>
+                                                                {{ case.damage.amount }} ({{ case.damage.in_denarius }} d.)
+                                                            </td>
+                                                            <td>
+                                                                {{ case.damage_notes }}
+                                                            </td>
+                                                                {% endif %}
+                                                                {% if case.land %}
+                                                            <td>
+                                                                <a href="{% url 'land' case.land.id %}">{{ case.land.id }}</a>
+                                                            </td>
+                                                            <td>
+                                                                {% if case.land_villeinage %}
+                                                                    Yes
+                                                                {% endif %}
+                                                            </td>
+                                                            <td>
+                                                                {{ case.land_notes }}
+                                                            </td>
+                                                                {% endif %}
+                                                        </tr>
+                                                    </table>
+                                                </div>
+                                                {% endif %}
+                                            </div>
+                                            {% if case.case.summary %}
+                                                <div class="card w-50">
+                                                    <div class="card-body">
+                                                    <div class="card-subtitle text-muted">
+                                                        Summary:
+                                                    </div>
+                                                        {{ case.case.summary }}
+                                                    </div>
+                                                </div>
+                                            {% endif %}
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                            <br>
+                    {% endfor %}
+                </div>
+                </div>
+            </div>
+            </div>
+        </div>
+
+{% endblock %}
+
+{% block right_sidebar %}
+{% endblock %}

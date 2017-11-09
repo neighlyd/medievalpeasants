@@ -22,7 +22,7 @@
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1];
         url = Urls['api:county-detail'](id);
-        var api_url = url + "/?include[]=hundreds.counts";
+        var api_url = url + "?include[]=hundreds.counts";
         $("#table").DataTable().destroy();
         var table = $("#table").DataTable({
             fixedHeader:{ headerOffset: 50 },

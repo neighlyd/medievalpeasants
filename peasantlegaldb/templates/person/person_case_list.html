@@ -41,7 +41,8 @@
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1];
         url = Urls["api:person-detail"](id);
-        var api_url =  url + "/?include[]=cases.case.session.village&include[]=cases.case.litigant_count&include[]=cases.case.litigant_list";
+        var api_url =  url + "?include[]=cases.case.session.village&include[]=cases.case.litigant_count&include[]=cases.case.litigant_list";
+        console.log(api_url);
         var table = $("#table").DataTable({
             fixedHeader:{ headerOffset: 50 },
             scrollX: true,

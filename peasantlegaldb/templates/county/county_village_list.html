@@ -40,7 +40,7 @@
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1];
         url = Urls["api:county-detail"](id);
-        var api_url = url + "/?include[]=villages.counts&include[]=villages.hundred";
+        var api_url = url + "?include[]=villages.counts&include[]=villages.hundred";
         var table = $("#table").DataTable({
             fixedHeader:{ headerOffset: 50 },
             scrollX: true,

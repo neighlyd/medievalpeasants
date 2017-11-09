@@ -743,6 +743,7 @@ class Session(models.Model):
 
 
 class Case(models.Model):
+
     COURT_TYPES = {
         (1, 'Hallmoot'),
         (2, 'Tourn'),
