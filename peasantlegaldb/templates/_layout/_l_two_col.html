@@ -13,7 +13,8 @@
 
                 {% block center_bar %}
                     <div class="card-header text-center">
-                        <h2 class="card-title">{{ object_list | qs_classname }} List</h2>
+                        <h2 class="card-title">{{ page_title }} List</h2>
+                        {% block additional_title %}{% endblock %}
                     </div>
 
                 {% endblock %}
@@ -26,7 +27,7 @@
             {% block right_sidebar %}
                 <div class="container" style="position: sticky; top: 65px">
                     <div class="btn-group" role="group">
-                        <button type="button" class="btn btn-secondary float-right"">Add {{ object_list | qs_classname }}</button>
+                        <button type="button" class="btn btn-secondary float-right"">Add {{ page_title }}</button>
                     </div>
                 </div>
             {% endblock %}

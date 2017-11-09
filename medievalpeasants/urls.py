@@ -37,6 +37,12 @@ urlpatterns = [
 
 # Map web views to URL Patterns
 
+analysis_urls = [
+    url(r'^chevage/(?P<village_pk>[0-9]+)/$', web_views.ChevageAnalysisListView.as_view(template_name='analysis/chevage.html'),
+        name='chevage_analysis'
+    ),
+]
+
 archive_urls = [
     url(r'^$', web_views.ArchiveDetailView.as_view(template_name='archive/_archive_detail.html'), name='archive'),
     url(r'^record_list$', web_views.ArchiveDetailView.as_view(template_name='archive/record_list.html'),
@@ -96,7 +102,7 @@ land_urls = [
 ]
 
 people_list_urls = [
-    url(r'^$', web_views.PeopleListFilterView.as_view(template_name='person/_person_list.html'), name='person_list'),
+    url(r'^$', web_views.PeopleListView.as_view(template_name='person/_person_list.html'), name='person_list'),
 ]
 
 person_detail_urls = [
@@ -163,9 +169,10 @@ urlpatterns += [
     url(r'^record/(?P<pk>\d+)/', include(record_urls)),
     url(r'^session/(?P<pk>\d+)/', include(session_urls)),
     url(r'^village/(?P<pk>\d+)/', include(village_urls)),
+    url(r'^analysis/', include(analysis_urls)),
     url(r'^archives/$', web_views.ArchiveListView.as_view(template_name='archive/_archive_list.html'),
         name='archive_list'),
-    url(r'^cases/$', web_views.CaseListFilterView.as_view(template_name='case/_case_list.html'), name='case_list'),
+    url(r'^cases/$', web_views.CaseListView.as_view(template_name='case/_case_list.html'), name='case_list'),
     url(r'^counties/$', web_views.CountyListView.as_view(template_name='county/_county_list.html'),
         name='county_list'),
     url(r'^hundreds/$', web_views.HundredListView.as_view(template_name='hundred/_hundred_list.html'),

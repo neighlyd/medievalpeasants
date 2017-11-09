@@ -6,12 +6,13 @@
 {% endblock %}
 
 {% block center_bar %}
+    {{ block.super }}
     <form>
 
         {% csrf_token %}
 <br>
         <div class="form-group d-flex justify-content-center">
-        {% for field in form.visible_fields %}
+        {% for field in filter_case_form.visible_fields %}
                 <div class="col-sm-2">
                     <h4>{{ field.label_tag }}</h4>
                 </div>

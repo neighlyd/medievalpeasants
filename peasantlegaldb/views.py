@@ -18,11 +18,21 @@ class ArchiveDetailView(DetailView):
     model = models.Archive
     queryset = models.Archive.objects.all()
 
+    def get_context_data(self, **kwargs):
+        context = super(ArchiveDetailView, self).get_context_data(**kwargs)
+        context['page_title'] = 'Archive'
+        return context
+    
 
 class ArchiveListView(ListView):
 
     model = models.Archive
     queryset = models.Archive.objects.all()
+    
+    def get_context_data(self, **kwargs):
+        context = super(ArchiveListView, self).get_context_data(**kwargs)
+        context['page_title'] = 'Archive'
+        return context
 
 
 class CaseListView(ListView):
@@ -30,30 +40,46 @@ class CaseListView(ListView):
     model = models.Case
     queryset = models.Case.objects.all().select_related('session').order_by('session__village__name', 'session__date',
                                                                             'court_type')
-    context_object_name = 'case_list'
 
-
-class CaseListFilterView(FormView):
-
-    form_class = forms.CaseFilterForm
-
+    def get_context_data(self, **kwargs):
+        context = super(CaseListView, self).get_context_data(**kwargs)
+        filter_case_form = forms.CaseFilterForm(self.request.GET or None)
+        context['filter_case_form'] = filter_case_form
+        context['page_title'] = 'Case'
+        return context
+    
 
 class CaseDetailView(DetailView):
 
     model = models.Case
     queryset = models.Case.objects.all()
+    
+    def get_context_data(self, **kwargs):
+        context = super(CaseDetailView, self).get_context_data(**kwargs)
+        context['page_title'] = 'Case'
+        return context
 
 
 class CountyDetailView(DetailView):
 
     model = models.County
     queryset = models.County.objects.all()
+    
+    def get_context_data(self, **kwargs):
+        context = super(CountyDetailView, self).get_context_data(**kwargs)
+        context['page_title'] = 'County'
+        return context
 
 
 class CountyListView(ListView):
 
     model = models.County
     queryset = models.County.objects.all()
+    
+    def get_context_data(self, **kwargs):
+        context = super(CountyListView, self).get_context_data(**kwargs)
+        context['page_title'] = 'County'
+        return context
 
 
 class HundredDetailView(DetailView):
@@ -61,29 +87,55 @@ class HundredDetailView(DetailView):
     model = models.Hundred
     queryset = models.Hundred.objects.all()
 
+    def get_context_data(self, **kwargs):
+        context = super(HundredDetailView, self).get_context_data(**kwargs)
+        context['page_title'] = 'Hundred'
+        return context
+
 
 class HundredListView(ListView):
 
     model = models.Hundred
     queryset = models.Hundred.objects.all()
 
+    def get_context_data(self, **kwargs):
+        context = super(HundredListView, self).get_context_data(**kwargs)
+        context['page_title'] = 'Hundred'
+        return context
+
 
 class LitigantListView(ListView):
 
     model = models.Litigant
     queryset = models.Litigant.objects.all()
+    
+    def get_context_data(self, **kwargs):
+        context = super(LitigantListView, self).get_context_data(**kwargs)
+        context['page_title'] = 'Litigant'
+        return context
 
 
 class LandDetailView(DetailView):
 
     model = models.Land
     queryset = models.Land.objects.prefetch_related('parcels').all()
+    
+    def get_context_data(self, **kwargs):
+        context = super(LandDetailView, self).get_context_data(**kwargs)
+        context['page_title'] = 'Land'
+        return context
+
 
 class LandListView(ListView):
 
     model = models.Land
     queryset = models.Land.objects.all()
 
+    def get_context_data(self, **kwargs):
+        context = super(LandListView, self).get_context_data(**kwargs)
+        context['page_title'] = 'Land'
+        return context
+    
 
 class PeopleListView(ListView):
 
@@ -94,12 +146,10 @@ class PeopleListView(ListView):
     def get_context_data(self, **kwargs):
         context = super(PeopleListView, self).get_context_data(**kwargs)
         context['current_url'] = resolve(self.request.path_info).url_name
-        context['title'] = self.kwargs.get('title')
+        filter_village_form = forms.PersonFilterForm(self.request.GET or None)
+        context['filter_village_form'] = filter_village_form
+        context['page_title'] = 'People'
         return context
-
-class PeopleListFilterView(FormView):
-    queryset = models.Person.objects.all()
-    form_class = forms.PersonFilterForm
 
 
 class PersonDetailView(DetailView):
@@ -136,23 +186,44 @@ class PersonDetailView(DetailView):
                                                     impercamentum_avg=Avg('person_to_case__impercamentum__in_denarius'),
                                                     impercamentum_sum=Sum('person_to_case__impercamentum__in_denarius'))
 
+    def get_context_data(self, **kwargs):
+        context = super(PersonDetailView, self).get_context_data(**kwargs)
+        context['page_title'] = 'Person'
+        return context
+
+
 
 class RecordDetailView(DetailView):
 
     model = models.Record
     queryset = models.Record.objects.all().prefetch_related('session_set')
 
+    def get_context_data(self, **kwargs):
+        context = super(RecordDetailView, self).get_context_data(**kwargs)
+        context['page_title'] = 'Record'
+        return context
+
 
 class RecordListView(ListView):
 
     model = models.Record
     queryset = models.Record.objects.all()
+    
+    def get_context_data(self, **kwargs):
+        context = super(RecordListView, self).get_context_data(**kwargs)
+        context['page_title'] = 'Record'
+        return context
 
 
 class SessionDetailView(DetailView):
 
     model = models.Session
     queryset = models.Session.objects.all().select_related('village')
+    
+    def get_context_data(self, **kwargs):
+        context = super(SessionDetailView, self).get_context_data(**kwargs)
+        context['page_title'] = 'Session'
+        return context
 
 
 class SessionListView(ListView):
@@ -160,17 +231,47 @@ class SessionListView(ListView):
     model = models.Session
     queryset = models.Session.objects.all()
     
+    def get_context_data(self, **kwargs):
+        context = super(SessionListView, self).get_context_data(**kwargs)
+        context['page_title'] = 'Session'
+        return context
+    
 
 class VillageDetailView(DetailView):
 
     model = models.Village
     queryset = models.Village.objects.all()
     
+    def get_context_data(self, **kwargs):
+        context = super(VillageDetailView, self).get_context_data(**kwargs)
+        context['page_title'] = 'Village'
+        return context
+    
 
 class VillageListView(ListView):
 
     model = models.Village
     queryset = models.Village.objects.all()
-
-
     
+    def get_context_data(self, **kwargs):
+        context = super(VillageListView, self).get_context_data(**kwargs)
+        context['page_title'] = 'Village'
+        return context
+
+
+class ChevageAnalysisListView(ListView):
+
+    model = models.Person
+    queryset = models.Person.objects.all().filter(person_to_case__chevage__isnull=False).distinct()\
+        .prefetch_related('person_to_case__case__session','village').order_by('last_name', 'first_name')
+
+    def get_context_data(self, **kwargs):
+        context = super(ChevageAnalysisListView, self).get_context_data(**kwargs)
+        qs = context['object_list']
+        village_id = self.kwargs.get('village_pk')
+        chevage_list = qs.filter(person_to_case__case__session__village=village_id).filter(person_to_case__chevage__isnull=True)
+        village =  models.Village.objects.get(id=village_id)
+        context['chevage_list'] = chevage_list
+        context['village'] = village
+        context['page_title'] = 'Chevage'
+        return context

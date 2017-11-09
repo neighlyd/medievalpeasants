@@ -5,13 +5,12 @@
     {% include '_layout/__navbar.html' %}
 {% endblock %}
 
-{% block center_bar %}
+{% block additional_title %}
     <form>
-<br>
         {% csrf_token %}
 
-        <div class="form-group d-flex justify-content-center">
-        {% for field in form.visible_fields %}
+        <div class="form-group d-flex justify-content-center" style="padding-top: 5px">
+        {% for field in filter_village_form.visible_fields %}
                 <div class="col-sm-2">
                     <h4>{{ field.label_tag }}</h4>
                 </div>
@@ -20,44 +19,44 @@
                 </div>
         {% endfor %}
         </div>
-        <div class="form-group d-flex justify-content-around">
-            <div class="col-sm-1">
+{% endblock %}
+
+
+{% block center_bar %}
+    {{ block.super }}
+    <br>
+        <div class="mx-auto">
+            <div class="row">
+                <div class="btn-group">
+                    <!-- remember to add 'gets' class so JQuery can properly ID the buttons -->
+                    <button type="button" class="btn btn-success gets" id="residents">Residents</button>
+                    <button type="button" class="btn btn-success gets" id="litigants">Litigants</button>
+                    <button type="button" class="btn btn-success gets" id="pledges_given">Pledge Givers</button>
+                    <button type="button" class="btn btn-success gets" id="pledges_received">Pledge Receivers</button>
+                    <button type="button" class="btn btn-success gets" id="amercement">Amercements</button>
+                    <button type="button" class="btn btn-success gets" id="fine">Fines</button>
+                    <button type="button" class="btn btn-success gets" id="damage">Damages</button>
+                    <button type="button" class="btn btn-success gets" id="chevage">Chevages</button>
+                    <button type="button" class="btn btn-success gets" id="impercamentum">Impercamenta</button>
+                    <button type="button" class="btn btn-success gets" id="heriot">Heriots</button>
+                </div>
+            </div>
+            <br>
+            <div class="row">
+                <div class="btn-group">
+                    <div class="btn-group">
+                        <!-- Remember to add 'analysis' class so JQuery can properly ID the buttons -->
+                        <button type="button" class="btn btn-success analysis" id="chevage">Chevage Analysis</button>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="btn-group">
+                </div>
 
             </div>
-            <div class="btn-toolbar">
-                <div class="btn-group mr-2">
-                    <button type="button" class="btn btn-primary" id="get_residents">Get Residents</button>
-                </div>
-                <div class="btn-group mr-2">
-                    <button type="button" class="btn btn-primary" id="get_litigants">Get Litigants</button>
-                </div>
-                <div class="btn-group mr-2">
-                    <button type="button" class="btn btn-primary" id="amercement">Get Amercement Payers</button>
-                    </div>
-                <div class="btn-group mr-2">
-                    <button type="button" class="btn btn-primary" id="chevage">Get Chevage Payers</button>
-                    </div>
-                <div class="btn-group mr-2">
-                    <button type="button" class="btn btn-primary" id="impercamentum">Get Impercamentum Payers</button>
-                </div>
-                <div class="btn-group mr-2">
-                    <button type="button" class="btn btn-primary" id="fine">Get Fine Payers</button>
-                    </div>
-                <div class="btn-group mr-2">
-                    <button type="button" class="btn btn-primary" id="heriot">Get Heriot Payers</button>
-                    </div>
-                <div class="btn-group mr-2">
-                    <button type="button" class="btn btn-primary" id="damage">Get Damaged Parties</button>
-                </div>
-                <div class="btn-group mr-2">
-                    <button type="button" class="btn btn-primary" id="pledges_given">Get Pledge Givers</button>
-                </div>
-                <div class="btn-group mr-2">
-                    <button type="button" class="btn btn-primary" id="pledges_received">Get Pledge Receivers</button>
-                </div>
 
             </div>
-        </div>
 
     </form>
 </div>
@@ -115,16 +114,32 @@
 
     $(document).ready(function(){
 
-        $(":button").click(function(e){
+        $(".analysis").click(function(e){
+            var village = $("#select_village").val();
+            var btnClicked = e.target.id;
+
+            if (village === ''){
+                alert("Please select a village");
+                return
+            } else{
+                var url = Urls.chevage_analysis({village_pk: village});
+                window.location = url;
+            }
+        });
+
+        $(".gets").click(function(e){
             $(".btn").removeClass('active');
             $(this).addClass('active');
+
             var village = $("#select_village").val();
-            var url = Urls["api:person-list"]();
             var btnClicked = e.target.id;
+            var url = Urls["api:person-list"]();
+
             if (village === ''){
                 alert("Please select a village");
                 return
             }
+
             if (village === 'None') {
                 if ($("#list_people").is(":visible")) {
                     $("#list_people").hide();
@@ -134,18 +149,18 @@
                 }
             }
             if (village === "All"){
-                    if (btnClicked === "get_residents") {
+                    if (btnClicked === "residents") {
                         url = url + "?exclude[]=village.*&include[]=village.name&include[]=counts&include[]=case_dates";
-                    } else if (btnClicked === "get_litigants") {
+                    } else if (btnClicked === "litigants") {
                         url = url + "?exclude[]=village.*&include[]=village.name&include[]=counts&include[]=case_dates";
                     } else {
                         url = url + "?" + btnClicked + "=true&exclude[]=village.*&include[]=village.name&include[]=counts&include[]=case_dates";
                     }
             }
             else {
-                if (btnClicked === "get_residents") {
+                if (btnClicked === "residents") {
                         url = url + "?filter{village.id}=" + village + "&exclude[]=village.*&include[]=village.name&include[]=counts&include[]=case_dates";
-                    } else if (btnClicked === "get_litigants") {
+                    } else if (btnClicked === "litigants") {
                         url = url + "?village_to_litigant=" + village + "&exclude[]=village.*&include[]=village.name&include[]=counts&include[]=case_dates";
                     } else {
                         url = url + "?" + btnClicked + "=true&village_to_litigant=" + village + "&exclude[]=village.*&include[]=village.name&include[]=counts&include[]=case_dates";
@@ -224,7 +239,6 @@
 
             }
         });
-
 
     });
     </script>
