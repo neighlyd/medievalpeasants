@@ -28,8 +28,9 @@
         <div class="mx-auto">
             <div class="row">
                 <div class="btn-group">
-                    <button type="button" class="btn btn-success gets" id="get_residents">Residents</button>
-                    <button type="button" class="btn btn-success gets" id="get_litigants">Litigants</button>
+                    <!-- remember to add 'gets' class so JQuery can properly ID the buttons -->
+                    <button type="button" class="btn btn-success gets" id="residents">Residents</button>
+                    <button type="button" class="btn btn-success gets" id="litigants">Litigants</button>
                     <button type="button" class="btn btn-success gets" id="pledges_given">Pledge Givers</button>
                     <button type="button" class="btn btn-success gets" id="pledges_received">Pledge Receivers</button>
                     <button type="button" class="btn btn-success gets" id="amercement">Amercements</button>
@@ -44,7 +45,8 @@
             <div class="row">
                 <div class="btn-group">
                     <div class="btn-group">
-                        <button type="button" class="btn btn-success analysis" id="chevage_analysis">Chevage Analysis</button>
+                        <!-- Remember to add 'analysis' class so JQuery can properly ID the buttons -->
+                        <button type="button" class="btn btn-success analysis" id="chevage">Chevage Analysis</button>
                     </div>
                 </div>
             </div>
@@ -147,18 +149,18 @@
                 }
             }
             if (village === "All"){
-                    if (btnClicked === "get_residents") {
+                    if (btnClicked === "residents") {
                         url = url + "?exclude[]=village.*&include[]=village.name&include[]=counts&include[]=case_dates";
-                    } else if (btnClicked === "get_litigants") {
+                    } else if (btnClicked === "litigants") {
                         url = url + "?exclude[]=village.*&include[]=village.name&include[]=counts&include[]=case_dates";
                     } else {
                         url = url + "?" + btnClicked + "=true&exclude[]=village.*&include[]=village.name&include[]=counts&include[]=case_dates";
                     }
             }
             else {
-                if (btnClicked === "get_residents") {
+                if (btnClicked === "residents") {
                         url = url + "?filter{village.id}=" + village + "&exclude[]=village.*&include[]=village.name&include[]=counts&include[]=case_dates";
-                    } else if (btnClicked === "get_litigants") {
+                    } else if (btnClicked === "litigants") {
                         url = url + "?village_to_litigant=" + village + "&exclude[]=village.*&include[]=village.name&include[]=counts&include[]=case_dates";
                     } else {
                         url = url + "?" + btnClicked + "=true&village_to_litigant=" + village + "&exclude[]=village.*&include[]=village.name&include[]=counts&include[]=case_dates";
