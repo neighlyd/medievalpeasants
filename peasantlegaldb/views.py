@@ -270,8 +270,8 @@ class ChevageAnalysisListView(ListView):
         qs = context['object_list']
         village_id = self.kwargs.get('village_pk')
         chevage_list = qs.filter(person_to_case__case__session__village=village_id).filter(person_to_case__chevage__isnull=True)
-        village_name =  models.Village.objects.filter(id=village_id).values_list('name', flat=True)
+        village =  models.Village.objects.get(id=village_id)
         context['chevage_list'] = chevage_list
-        context['village_name'] = village_name[0]
+        context['village'] = village
         context['page_title'] = 'Chevage'
         return context

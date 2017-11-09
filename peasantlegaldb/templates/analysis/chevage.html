@@ -7,17 +7,14 @@
             <div class="accordion" role="tab-list">
                 <div class="card">
                 <div class="card-header text-center">
-                    <h3 class="card-title"><a data-toggle="collapse" href="#collapse{{ village_name }}">{{ village_name }}</a></h3>
+                    <h3 class="card-title"><a href="{% url 'village' village.id %}">{{ village.name }}</a></h3>
                 </div>
-                <div class="collapse show" id="collapse{{ village_name }}" role="tabpanel">
                     <div class="card-body">
                     {% for person in chevage_list %}
-                        <div class="accordion" role="tab-list">
                             <div class="card">
                                 <div class="card-header" style="position: sticky; top: 50px; z-index: 2; background: #A9A9A9">
-                                    <h5  class="card-title"><a data-toggle="collapse" href="#collapse{{ person.id }}">{{ person.full_name }}</a></h5>
+                                    <h5  class="card-title"><a href="{% url 'person' person.id %}">{{ person.full_name }}</a></h5>
                                 </div>
-                                <div class="collapse show" id="collapse{{ person.id }}" role="tabpanel">
                                     <div class="card-body">
                                     <div class="row">
                                         <div class="card border-light" style="position: sticky; top: 115px">
@@ -244,14 +241,11 @@
                                         {% endfor %}
                                     </div>
                                     </div>
-                                </div>
                             </div>
-                        </div>
-                            <br>
+
                     {% endfor %}
                 </div>
                 </div>
-            </div>
             </div>
         </div>
 
