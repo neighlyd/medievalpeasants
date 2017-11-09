@@ -145,8 +145,27 @@
 {% endblock %}
 
 {% block right_sidebar %}
-
-    {{ block.super }}
+    <div class="container" style="position: sticky; top: 65px">
+        {% if perms.peasantlegaldb.add_case %}
+            <div class="btn-group" role="group">
+                <a class="btn btn-success" href="#">Add Case</a>
+            </div>
+            <br>
+            <br>
+        {% endif %}
+        {% if perms.peasantlegaldb.change_case %}
+            <div class="btn-group" role="group">
+                <a class="btn btn-warning" href="#">Edit Case</a>
+            </div>
+            <br>
+            <br>
+        {% endif %}
+        {% if perms.peasantlegaldb.delete_case %}
+            <div class="btn-group" role="group">
+                <a class="btn btn-danger" href="#">Delete Case</a>
+            </div>
+        {% endif %}
+    </div>
 
 {% endblock %}
 

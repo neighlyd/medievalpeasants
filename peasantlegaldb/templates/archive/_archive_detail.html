@@ -64,9 +64,27 @@
 {% endblock %}
 
 {% block right_sidebar %}
-
-    {{ block.super }}
-
+    <div class="container" style="position: sticky; top: 65px">
+        {% if perms.peasantlegaldb.add_archive %}
+            <div class="btn-group" role="group">
+                <a class="btn btn-success" href="#">Add Archive</a>
+            </div>
+            <br>
+            <br>
+        {% endif %}
+        {% if perms.peasantlegaldb.change_archive %}
+            <div class="btn-group" role="group">
+                <a class="btn btn-warning" href="#">Edit Archive</a>
+            </div>
+            <br>
+            <br>
+        {% endif %}
+        {% if perms.peasantlegaldb.delete_archive %}
+            <div class="btn-group" role="group">
+                <a class="btn btn-danger" href="#">Delete Archive</a>
+            </div>
+        {% endif %}
+    </div>
 {% endblock %}
 
 {% block scripts %}

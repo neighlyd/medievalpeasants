@@ -15,41 +15,16 @@
             </div>
         </div>
 
-        <div class="p-0 col-md-9">
+        <div class="p-0 col-md-8">
             <div class="card">
                 {% block center_bar %}
                 {% endblock %}
             </div>
         </div>
 
-        <div class="p-0 col-md-1">
+        <div class="p-0 col-md-2">
             {% block right_sidebar %}
-                <div class="container" style="position: sticky; top: 65px">
-                {% if user.is_authenticated %}
-                    {% if perms.object %}
-                        {% if perms.object.can_edit_object %}
-                            <div class="btn-group" role="group">
-                                <a class="btn btn-success float-right" href="#">Edit {{ object | obj_classname }}</a>
-                            </div>
-                        {% endif %}
-                            <br>
-                            <br>
-                        {% if perms.object.can_add.object %}
-                            <div class="btn-group" role="group">
-                                <a class="btn btn-success float-right" href="#">Add {{ object | obj_classname }}</a>
-                            </div>
-                        {% endif %}
-                            <br>
-                            <br>
-                        {% if perms.object.can_delete_object %}
-                            <div class="btn-group" role="group">
-                                <a class="btn btn-danger float-right" href="#">Delete {{ object | obj_classname }}</a>
-                            </div>
-                        {% endif %}
-                    {% endif %}
 
-                {% endif %}
-                </div>
             {% endblock %}
         </div>
 

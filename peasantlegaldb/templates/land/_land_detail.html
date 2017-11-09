@@ -54,7 +54,27 @@
 
 {% block right_sidebar %}
 
-    {{ block.super }}
+    <div class="container" style="position: sticky; top: 65px">
+        {% if perms.peasantlegaldb.add_land %}
+            <div class="btn-group" role="group">
+                <a class="btn btn-success" href="#">Add Land</a>
+            </div>
+            <br>
+            <br>
+        {% endif %}
+        {% if perms.peasantlegaldb.change_land %}
+            <div class="btn-group" role="group">
+                <a class="btn btn-warning" href="#">Edit Land</a>
+            </div>
+            <br>
+            <br>
+        {% endif %}
+        {% if perms.peasantlegaldb.delete_land %}
+            <div class="btn-group" role="group">
+                <a class="btn btn-danger" href="#">Delete Land</a>
+            </div>
+        {% endif %}
+    </div>
 
 {% endblock %}
 
