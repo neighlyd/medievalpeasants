@@ -28,21 +28,23 @@
         <div class="mx-auto">
             <div class="row">
                 <div class="btn-group">
-                    <button type="button" class="btn btn-success" id="get_residents">Residents</button>
-                    <button type="button" class="btn btn-success" id="get_litigants">Litigants</button>
-                    <button type="button" class="btn btn-success" id="pledges_given">Pledge Givers</button>
-                    <button type="button" class="btn btn-success" id="pledges_received">Pledge Receivers</button>
-                    <button type="button" class="btn btn-success" id="amercement">Amercements</button>
-                    <button type="button" class="btn btn-success" id="fine">Fines</button>
-                    <button type="button" class="btn btn-success" id="damage">Damages</button>
-                    <button type="button" class="btn btn-success" id="chevage">Chevages</button>
-                    <button type="button" class="btn btn-success" id="impercamentum">Impercamenta</button>
-                    <button type="button" class="btn btn-success" id="heriot">Heriots</button>
+                    <button type="button" class="btn btn-success gets" id="get_residents">Residents</button>
+                    <button type="button" class="btn btn-success gets" id="get_litigants">Litigants</button>
+                    <button type="button" class="btn btn-success gets" id="pledges_given">Pledge Givers</button>
+                    <button type="button" class="btn btn-success gets" id="pledges_received">Pledge Receivers</button>
+                    <button type="button" class="btn btn-success gets" id="amercement">Amercements</button>
+                    <button type="button" class="btn btn-success gets" id="fine">Fines</button>
+                    <button type="button" class="btn btn-success gets" id="damage">Damages</button>
+                    <button type="button" class="btn btn-success gets" id="chevage">Chevages</button>
+                    <button type="button" class="btn btn-success gets" id="impercamentum">Impercamenta</button>
+                    <button type="button" class="btn btn-success gets" id="heriot">Heriots</button>
                 </div>
             </div>
+            <br>
             <div class="row">
                 <div class="btn-group">
                     <div class="btn-group">
+                        <button type="button" class="btn btn-success analysis" id="chevage_analysis">Chevage Analysis</button>
                     </div>
                 </div>
             </div>
@@ -110,16 +112,32 @@
 
     $(document).ready(function(){
 
-        $(":button").click(function(e){
+        $(".analysis").click(function(e){
+            var village = $("#select_village").val();
+            var btnClicked = e.target.id;
+
+            if (village === ''){
+                alert("Please select a village");
+                return
+            } else{
+                var url = Urls.chevage_analysis({village_pk: village});
+                window.location = url;
+            }
+        });
+
+        $(".gets").click(function(e){
             $(".btn").removeClass('active');
             $(this).addClass('active');
+
             var village = $("#select_village").val();
-            var url = Urls["api:person-list"]();
             var btnClicked = e.target.id;
+            var url = Urls["api:person-list"]();
+
             if (village === ''){
                 alert("Please select a village");
                 return
             }
+
             if (village === 'None') {
                 if ($("#list_people").is(":visible")) {
                     $("#list_people").hide();
@@ -219,7 +237,6 @@
 
             }
         });
-
 
     });
     </script>
