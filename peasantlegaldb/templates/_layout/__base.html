@@ -1,6 +1,6 @@
 {% load staticfiles %}
 {% load render_bundle from webpack_loader %}
-{% load additionaltags %}
+{% load template_tags %}
 
 <!DOCTYPE html>
 
@@ -16,6 +16,7 @@
         <link rel="stylesheet" href="https://cdn.datatables.net/1.10.16/css/dataTables.bootstrap4.min.css">
         <link rel="stylesheet" href="https://cdn.datatables.net/fixedheader/3.1.3/css/fixedHeader.bootstrap4.min.css">
         <link rel="stylesheet" type="text/css" href="{% static '/css/details-control.css'%}">
+        <link rel="stylesheet" type="text/css" href="{% static '/css/base.css' %}">
         {% endblock %}
 
         <style>

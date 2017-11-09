@@ -29,7 +29,27 @@
 
 {% block right_sidebar %}
 
-    {{ block.super }}
+    <div class="container" style="position: sticky; top: 65px">
+        {% if perms.peasantlegaldb.add_hundred %}
+            <div class="btn-group" role="group">
+                <a class="btn btn-success" href="#">Add Hundred</a>
+            </div>
+            <br>
+            <br>
+        {% endif %}
+        {% if perms.peasantlegaldb.change_hundred %}
+            <div class="btn-group" role="group">
+                <a class="btn btn-warning" href="#">Edit Hundred</a>
+            </div>
+            <br>
+            <br>
+        {% endif %}
+        {% if perms.peasantlegaldb.delete_hundred %}
+            <div class="btn-group" role="group">
+                <a class="btn btn-danger" href="#">Delete Hundred</a>
+            </div>
+        {% endif %}
+    </div>
 
 {% endblock %}
 

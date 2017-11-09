@@ -31,7 +31,7 @@
 {{ block.super }}
 <script>
     $(document).ready(function(){
-        var url = Url['api:archive-list']();
+        var url = Urls['api:archive-list']();
         url = url + '?include[]=counts';
         var table = $('#table').DataTable({
             fixedHeader: {

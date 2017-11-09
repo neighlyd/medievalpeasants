@@ -27,12 +27,41 @@ from django_js_reverse.views import urls_js
 from peasantlegaldb.api import views as api_views
 from peasantlegaldb import views as web_views
 
+from accounts import views as accounts_views
+
+
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^login', auth_views.login, {'template_name': 'login.html'}, name='login'),
-    url(r'^logout', auth_views.logout,{'next_page': 'index'}, name='logout'),
+    #url(r'^register/', accounts_views.register, name='register'),
+    url(r'^register/', accounts_views.TemporaryRegistration.as_view(), name='register'),
+    url(r'^login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
+    url(r'^logout/', auth_views.LogoutView.as_view(), name='logout'),
     url(r'api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^index', TemplateView.as_view(template_name='index.html'), name='index'),
+    url(r'^reset/$', auth_views.PasswordResetView.as_view(
+        template_name='password_reset.html',
+        email_template_name='password_reset_email.html',
+        subject_template_name='password_reset_subject.txt'
+    ),
+        name='password_reset'),
+    url(r'^reset/done/$',
+        auth_views.PasswordResetDoneView.as_view(template_name='password_reset_done.html'),
+        name='password_reset_done'
+    ),
+    url(r'^reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,20})/$',
+        auth_views.PasswordResetConfirmView.as_view(template_name='password_reset_confirm.html'),
+        name='password_reset_confirm'
+    ),
+    url(r'^reset/complete/$',
+        auth_views.PasswordResetCompleteView.as_view(template_name='password_reset_complete.html'),
+        name='password_reset_complete'
+    ),
+    url(r'^settings/password/$', auth_views.PasswordChangeView.as_view(template_name='password_change.html'),
+        name='password_change'
+    ),
+    url(r'^settings/password/done/$', auth_views.PasswordChangeDoneView.as_view(template_name='password_change_done.html'),
+        name='password_change_done'
+    ),
 ]
 
 # Map web views to URL Patterns
@@ -101,9 +130,6 @@ land_urls = [
         name='land_case_history'),
 ]
 
-people_list_urls = [
-    url(r'^$', web_views.PeopleListView.as_view(template_name='person/_person_list.html'), name='person_list'),
-]
 
 person_detail_urls = [
     url(r'^$', web_views.PersonDetailView.as_view(template_name='person/_person_detail.html'), name='person'),
@@ -164,7 +190,6 @@ urlpatterns += [
     url(r'^county/(?P<pk>\d+)/', include(county_urls)),
     url(r'^hundred/(?P<pk>\d+)/', include(hundred_urls)),
     url(r'^land/(?P<pk>\d+)/', include(land_urls)),
-    url(r'^people/', include(people_list_urls)),
     url(r'^person/(?P<pk>\d+)/', include(person_detail_urls)),
     url(r'^record/(?P<pk>\d+)/', include(record_urls)),
     url(r'^session/(?P<pk>\d+)/', include(session_urls)),
@@ -172,6 +197,7 @@ urlpatterns += [
     url(r'^analysis/', include(analysis_urls)),
     url(r'^archives/$', web_views.ArchiveListView.as_view(template_name='archive/_archive_list.html'),
         name='archive_list'),
+    url(r'^people/$', web_views.PeopleListView.as_view(template_name='person/_person_list.html'), name='person_list'),
     url(r'^cases/$', web_views.CaseListView.as_view(template_name='case/_case_list.html'), name='case_list'),
     url(r'^counties/$', web_views.CountyListView.as_view(template_name='county/_county_list.html'),
         name='county_list'),

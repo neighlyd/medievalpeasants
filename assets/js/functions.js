@@ -74,14 +74,14 @@
 
             }
 
-            function list_parcels(nTd, cellData){
+            function list_parcels(data, type, row, col){
                 var concat = '';
-                cellData.forEach(function (obj, index) {
+                data.forEach(function (obj, index) {
                     concat = concat + obj.amount + ' ' + obj.type + ' held by ' + obj.tenure +
                                         '<hr>';
                     return concat;
                     });
-                $(nTd).html(concat);
+                return concat;
 
             }
 

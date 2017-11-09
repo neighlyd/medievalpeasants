@@ -1,5 +1,5 @@
 {% extends '_layout/__base.html' %}
-{% load additionaltags %}
+{% load template_tags %}
 
 {% block navbar %}
     {% include '_layout/__navbar.html' %}
@@ -15,25 +15,16 @@
             </div>
         </div>
 
-        <div class="p-0 col-md-9">
+        <div class="p-0 col-md-8">
             <div class="card">
                 {% block center_bar %}
                 {% endblock %}
             </div>
         </div>
 
-        <div class="p-0 col-md-1">
+        <div class="p-0 col-md-2">
             {% block right_sidebar %}
-                <div class="container" style="position: sticky; top: 65px">
-                <div class="btn-group" role="group">
-                    <button type="button" class="btn btn-secondary float-right">Edit {{ object | obj_classname }}</button>
-                </div>
-                <br>
-                <br>
-                <div class="btn-group" role="group">
-                    <button type="button" class="btn btn-secondary float-right">Add {{ object | obj_classname }}</button>
-                </div>
-                </div>
+
             {% endblock %}
         </div>
 

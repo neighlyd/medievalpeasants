@@ -1,0 +1,27 @@
+{% extends '_base_accounts.html' %}
+
+{% block navbar %}
+    {% include '_layout/__navbar.html' %}
+{% endblock %}
+
+{% block heading %}Login{% endblock %}
+
+{% block card-body %}
+        <form method="post" novalidate>
+            {% csrf_token %}
+            {% include '_layout/_form.html' %}
+            <button type="submit" class="btn btn-success btn-block">Login</button>
+        </form>
+        <div class="card-footer text-muted text-center">
+            New to the Medieval Peasant Database? <a href="{% url 'register' %}">Register Here</a>
+        </div>
+
+        <div class="text-center py-2">
+            <small>
+                <a href="{% url 'password_reset' %}" class="text-muted">Forgot your password?</a>
+            </small>
+        </div>
+
+{% endblock %}
+
+

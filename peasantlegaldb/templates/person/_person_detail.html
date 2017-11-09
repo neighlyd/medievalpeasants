@@ -138,7 +138,27 @@
 
 {% block right_sidebar %}
 
-    {{ block.super }}
+    <div class="container" style="position: sticky; top: 65px">
+        {% if perms.peasantlegaldb.add_person %}
+            <div class="btn-group" role="group">
+                <a class="btn btn-success" href="#">Add Person</a>
+            </div>
+            <br>
+            <br>
+        {% endif %}
+        {% if perms.peasantlegaldb.change_person %}
+            <div class="btn-group" role="group">
+                <a class="btn btn-warning" href="#">Edit Person</a>
+            </div>
+            <br>
+            <br>
+        {% endif %}
+        {% if perms.peasantlegaldb.delete_person %}
+            <div class="btn-group" role="group">
+                <a class="btn btn-danger" href="#">Delete Person</a>
+            </div>
+        {% endif %}
+    </div>
 
 {% endblock %}
 
