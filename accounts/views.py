@@ -20,3 +20,6 @@ def register(request):
 
 def logout(request):
     return render(request)
+
+class TemporaryRegistration(TemplateView):
+    template_name = 'temp_registration.html'
