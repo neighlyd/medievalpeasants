@@ -263,14 +263,15 @@ class ChevageAnalysisListView(ListView):
 
     model = models.Person
     queryset = models.Person.objects.all().filter(person_to_case__chevage__isnull=False).distinct()\
-        .prefetch_related('person_to_case__case__session','village')
+        .prefetch_related('person_to_case__case__session','village').order_by('last_name', 'first_name')
 
     def get_context_data(self, **kwargs):
         context = super(ChevageAnalysisListView, self).get_context_data(**kwargs)
         qs = context['object_list']
-        badbury_chevage = qs.filter(person_to_case__case__session__village__name='Badbury').filter(person_to_case__chevage__isnull=True)
-        christian_malford_chevage = qs.filter(person_to_case__case__session__village__name='Christian Malford').filter(person_to_case__chevage__isnull=True)
-        context['badbury_chevage'] = badbury_chevage
-        context['christian_malford_chevage'] = christian_malford_chevage
+        village_id = self.kwargs.get('village_pk')
+        chevage_list = qs.filter(person_to_case__case__session__village=village_id).filter(person_to_case__chevage__isnull=True)
+        village_name =  models.Village.objects.filter(id=village_id).values_list('name', flat=True)
+        context['chevage_list'] = chevage_list
+        context['village_name'] = village_name[0]
         context['page_title'] = 'Chevage'
         return context

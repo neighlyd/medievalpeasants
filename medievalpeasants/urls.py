@@ -38,7 +38,7 @@ urlpatterns = [
 # Map web views to URL Patterns
 
 analysis_urls = [
-    url(r'^chevage$', web_views.ChevageAnalysisListView.as_view(template_name='analysis/chevage.html'),
+    url(r'^chevage/(?P<village_pk>[0-9]+)/$', web_views.ChevageAnalysisListView.as_view(template_name='analysis/chevage.html'),
         name='chevage_analysis'
     ),
 ]
