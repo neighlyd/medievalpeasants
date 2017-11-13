@@ -1,19 +1,8 @@
-from rest_framework import viewsets, generics
-
 from django.db.models import Q
-
 from dynamic_rest.viewsets import DynamicModelViewSet
 
-from rest_framework.reverse import reverse
-
-from rest_framework_serializer_extensions.views import SerializerExtensionsAPIViewMixin
-
-from django_filters import rest_framework as filters
-import django_filters
-
-from peasantlegaldb.api import serializers
+from api import serializers
 from peasantlegaldb import models
-
 
 
 # Function created in order to be able to search for both isnull and FKs. In order to work, you need to create a

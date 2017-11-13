@@ -5,6 +5,17 @@ from django.db.models import Count, Max, Min, Avg, Sum
 from itertools import chain
 
 
+'''
+TODO:
+1) establish Manor model
+    Fields: [name, village, coterminous, owner (one-to-many - Owner model)]
+        Owner Model:
+            Fields: [name (one-to-one - Person model), person certainty, begin date, begin date certainty, end date, 
+            end date certainty, notes, references (one-to-many?)]
+2) Move Village from Session to Manor
+3) Move Session counts to Manor from Village
+'''
+
 class Archive(models.Model):
     name = models.CharField(max_length=50)
     website = models.URLField()
