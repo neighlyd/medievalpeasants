@@ -37,7 +37,7 @@
     $(document).ready(function () {
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1];
-        url = Urls['api:count-list']();
+        url = Urls['api:county-list']();
         var api_url = url + "?include[]=counts";
         var table = $("#table").DataTable({
             fixedHeader:{ headerOffset: 50 },

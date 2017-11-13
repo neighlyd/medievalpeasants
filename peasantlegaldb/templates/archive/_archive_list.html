@@ -24,7 +24,13 @@
 {% endblock %}
 
 {% block right_sidebar %}
-    {{ block.super }}
+                {% if perms.peasantlegaldb.add_archive %}
+                    <div class="container" style="position: sticky; top: 65px">
+                        <div class="btn-group" role="group">
+                        <a class="btn btn-success float-right" href="{% url 'add_archive' %}">Add {{ page_title }}</a>
+                        </div>
+                    </div>
+                {% endif %}
 {% endblock %}
 
 {% block scripts %}
@@ -51,8 +57,13 @@
                     }
                 },
                 {data: "website",
-                    fnCreatedCell: function(nTd, cellData, rowData, row, col) {
-                        $(nTd).html("<a href='" + (rowData.website) + "'> Website </a>");
+                    defaultContent: '',
+                    render:{
+                        display: function(data, type, row, col){
+                            if (data){
+                                return "<a href='" + (data) + "'> Website </a>"
+                            }
+                        }
                     }
                 },
                 {data: "notes"},

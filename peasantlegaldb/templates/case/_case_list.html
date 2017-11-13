@@ -5,8 +5,7 @@
     {% include '_layout/__navbar.html' %}
 {% endblock %}
 
-{% block center_bar %}
-    {{ block.super }}
+{% block additional_title %}
     <form>
         {% csrf_token %}
         <div class="form-group d-flex justify-content-center">
@@ -24,6 +23,10 @@
         </div>
 
     </form>
+{% endblock %}
+
+{% block center_bar %}
+    {{ block.super }}
 
 <div id="list_cases" style="display: none">
     <div class="card">

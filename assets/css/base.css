@@ -1,3 +1,19 @@
 body {
     background-image: url(../img/intersection.png);
 }
+
+#map {
+    height: 400px;
+    width: 100%;
+}
+
+td.details-control {
+    text-align:center;
+    color:forestgreen;
+    cursor: pointer;
+}
+
+tr.shown td.details-control {
+    text-align:center;
+    color:red;
+}

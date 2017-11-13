@@ -76,6 +76,8 @@ archive_urls = [
     url(r'^$', web_views.ArchiveDetailView.as_view(template_name='archive/_archive_detail.html'), name='archive'),
     url(r'^record_list$', web_views.ArchiveDetailView.as_view(template_name='archive/record_list.html'),
         name='record_list'),
+    url(r'^edit/$', web_views.ArchiveEditView.as_view(), name='edit_archive'),
+    url(r'^delete/$', web_views.ArchiveDeleteView.as_view(), name='delete_archive'),
 ]
 
 case_urls = [
@@ -160,12 +162,16 @@ record_urls = [
     url(r'^$', web_views.RecordDetailView.as_view(template_name='record/_record_detail.html'), name='record'),
     url(r'^session_list$', web_views.RecordDetailView.as_view(template_name='record/record_session_list.html'),
         name='record_session_list'),
+    url(r'^edit/$', web_views.RecordEditView.as_view(), name='edit_record'),
+    url(r'^delete/$', web_views.RecordDeleteView.as_view(), name='delete_record'),
 ]
 
 session_urls = [
     url(r'^$', web_views.SessionDetailView.as_view(template_name='session/_session_detail.html'), name='session'),
     url(r'^case_list$', web_views.CaseListView.as_view(template_name='session/session_case_list.html'),
         name='session_case_list'),
+    url(r'^edit/$', web_views.SessionEditView.as_view(), name='edit_session'),
+    url(r'^delete/$', web_views.SessionDeleteView.as_view(), name='delete_session'),
 ]
 
 village_urls = [
@@ -183,8 +189,16 @@ village_urls = [
 
 ]
 
+add_urls = [
+    url(r'^archives/add/$', web_views.ArchiveAddView.as_view(), name='add_archive'),
+    url(r'^records/add/$', web_views.RecordAddView.as_view(), name='add_record'),
+    url(r'^sessions/add/$', web_views.SessionAddView.as_view(), name='add_session'),
+    
+]
+
 
 urlpatterns += [
+    url(r'^', include(add_urls)),
     url(r'^archive/(?P<pk>\d+)/', include(archive_urls)),
     url(r'^case/(?P<pk>\d+)/', include(case_urls)),
     url(r'^county/(?P<pk>\d+)/', include(county_urls)),

@@ -33,7 +33,7 @@
                                 </tr>
                                 <tr class="row m-0">
                                     <td class="d-inline-block col-4"><b>Archive:</b></td>
-                                    <td class="d-inline-block col-8">{{ record.archive.name }}</td>
+                                    <td class="d-inline-block col-8"><a href="{% url 'archive' record.archive.id %}">{{ record.archive.name }}</a></td>
                                 </tr>
                                 <tr class="row m-0">
                                     <td class="d-inline-block col-4"><b>Earliest Session:</b></td>
@@ -89,14 +89,14 @@
     <div class="container" style="position: sticky; top: 65px">
         {% if perms.peasantlegaldb.add_record %}
             <div class="btn-group" role="group">
-                <a class="btn btn-success" href="#">Add Record</a>
+                <a class="btn btn-success" href="{% url 'add_record' %}">Add Record</a>
             </div>
             <br>
             <br>
         {% endif %}
         {% if perms.peasantlegaldb.change_record %}
             <div class="btn-group" role="group">
-                <a class="btn btn-warning" href="#">Edit Record</a>
+                <a class="btn btn-warning" href="{% url 'edit_record' record.id %}">Edit Record</a>
             </div>
             <br>
             <br>

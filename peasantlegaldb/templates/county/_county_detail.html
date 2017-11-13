@@ -123,7 +123,7 @@
             // use .map to iterate through array of objects returned by API and map key-value pairs to variable. Because
             // the Latitude and Longitude are stored as strings, convert them to floats which the Google API can read as
             // appropriate coordinates. Also grab the village name for the label.
-            var locationArray = locationObject.map(f => [f.name, parseFloat(f.latitude), parseFloat(f.longitude), f.counts.session, f.counts.case, f.counts.resident, f.counts.litigant, ] );
+            var locationArray = locationObject.map(f => [f.id, f.name, parseFloat(f.latitude), parseFloat(f.longitude), f.counts.session, f.counts.case, f.counts.resident, f.counts.litigant, ] );
             var county_results = countyLocation.results;
 
             var countyLat = county_results.map(f => f.geometry.location.lat);
@@ -148,7 +148,7 @@
 
             for(i = 0; i < locationArray.length; i++){
                 marker = new google.maps.Marker({
-                    position: new google.maps.LatLng(locationArray[i][1], locationArray[i][2]),
+                    position: new google.maps.LatLng(locationArray[i][2], locationArray[i][3]),
                     map: map
                 });
 
@@ -158,7 +158,7 @@
                         infoWindow.setContent(
                             "<div class='container'>" +
                                 "<div class='card'>" +
-                                    "<h6 class='card-header'>" + locationArray[i][0] + "</h6>" +
+                                    "<h6 class='card-header'><a href='" + Urls.village(locationArray[i][0]) + "'>" + locationArray[i][1] + "</a></h6>" +
                                     "<div class='card-body'> " +
                                         "<table class='table table-sm' style='width: 200px'>" +
                                             "<tr class='row m-0>" +
@@ -166,19 +166,19 @@
                                             "</tr>" +
                                             "<tr>" + // For some reason this first row is showing up as the header of the table. I hate computers.
                                                 "<td class='d-inline-block col-8'><b>Sessions:</b></td>" +
-                                                "<td class='d-inline-block col-4'>" + locationArray[i][3] + "<td>" +
-                                            "</tr>" +
-                                            "<tr>" +
-                                                "<td class='d-inline-block col-8'><b>Cases:</b></td>" +
                                                 "<td class='d-inline-block col-4'>" + locationArray[i][4] + "<td>" +
                                             "</tr>" +
                                             "<tr>" +
-                                                "<td class='d-inline-block col-8'><b>Residents:</b></td>" +
+                                                "<td class='d-inline-block col-8'><b>Cases:</b></td>" +
                                                 "<td class='d-inline-block col-4'>" + locationArray[i][5] + "<td>" +
                                             "</tr>" +
                                             "<tr>" +
-                                                "<td class='d-inline-block col-8'><b>Litigants:</b></td>" +
+                                                "<td class='d-inline-block col-8'><b>Residents:</b></td>" +
                                                 "<td class='d-inline-block col-4'>" + locationArray[i][6] + "<td>" +
+                                            "</tr>" +
+                                            "<tr>" +
+                                                "<td class='d-inline-block col-8'><b>Litigants:</b></td>" +
+                                                "<td class='d-inline-block col-4'>" + locationArray[i][7] + "<td>" +
                                             "</tr>" +
                                         "</table>" +
                                     "</div>" +

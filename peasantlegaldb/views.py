@@ -1,16 +1,20 @@
 from django.views.generic.detail import DetailView
+from django.views.generic.edit import UpdateView, CreateView, DeleteView
 from django.views.generic import ListView
 from django.views.generic.edit import FormView
+from django.urls import reverse_lazy, reverse
 from django.db.models import Count, Max, Min, Avg, Sum
 from django.core.urlresolvers import resolve
-from django.shortcuts import get_object_or_404
 
-from rest_framework.renderers import TemplateHTMLRenderer
-from rest_framework.response import Response
-from rest_framework.views import APIView
+from braces.views import GroupRequiredMixin
+
 
 from . import models
 from . import forms
+
+Delete = [u"Full Editor"]
+Edit = [u"Full Editor", u"Editor"]
+Add = [u"Full Editor", u"Editor", u"Contributor"]
 
 
 class ArchiveDetailView(DetailView):
@@ -33,6 +37,107 @@ class ArchiveListView(ListView):
         context = super(ArchiveListView, self).get_context_data(**kwargs)
         context['page_title'] = 'Archive'
         return context
+
+
+class ArchiveEditView(GroupRequiredMixin, UpdateView):
+
+    model = models.Archive
+    fields = ['name', 'website', 'notes']
+    template_name = 'archive/archive_edit.html'
+
+    group_required = Edit
+
+    def get_success_url(self):
+        pk = self.kwargs.get('pk')
+        return reverse('archive', kwargs={'pk': pk})
+
+
+class ArchiveAddView(GroupRequiredMixin, CreateView):
+
+    model = models.Archive
+    fields = ['name', 'website', 'notes']
+    template_name = 'archive/archive_add.html'
+
+    group_required = Add
+
+    def get_success_url(self):
+        return reverse('archive', args=(self.object.id,))
+
+
+class ArchiveDeleteView(GroupRequiredMixin, DeleteView):
+
+    model = models.Archive
+    template_name = 'confirm_delete.html'
+
+    group_required = Delete
+
+    def get_success_url(self):
+        return reverse('archive_list')
+
+
+class RecordDetailView(DetailView):
+    model = models.Record
+    queryset = models.Record.objects.all().prefetch_related('session_set')
+
+    def get_context_data(self, **kwargs):
+        context = super(RecordDetailView, self).get_context_data(**kwargs)
+        context['page_title'] = 'Record'
+        return context
+
+
+class RecordListView(ListView):
+    model = models.Record
+    queryset = models.Record.objects.all()
+
+    def get_context_data(self, **kwargs):
+        context = super(RecordListView, self).get_context_data(**kwargs)
+        context['page_title'] = 'Record'
+        return context
+
+
+class RecordEditView(GroupRequiredMixin, UpdateView):
+
+    model = models.Record
+    fields = ['name', 'archive', 'record_type', 'reel', 'notes']
+    template_name = 'record/record_edit.html'
+
+    group_required = Edit
+
+    def get_success_url(self):
+        pk = self.kwargs.get('pk')
+        return reverse('record', kwargs={'pk': pk})
+
+
+
+class RecordAddView(GroupRequiredMixin, CreateView):
+
+    model = models.Record
+    fields = ['name', 'archive', 'record_type', 'reel', 'notes']
+    template_name = 'record/record_add.html'
+
+    group_required = Add
+
+    def get_success_url(self):
+        referer = self.request.META.get('HTTP_REFERER', '/')
+        return reverse('record', args=(self.object.id,))
+
+    def get_initial(self):
+        initial = super(RecordAddView, self).get_initial()
+        archive = self.request.GET.get('archive')
+        initial['archive'] = archive
+        return initial
+
+
+
+class RecordDeleteView(GroupRequiredMixin, DeleteView):
+
+    model = models.Record
+    template_name = 'record/record_delete.html'
+
+    group_required = Delete
+
+    def get_success_url(self):
+        return reverse('record_list')
 
 
 class CaseListView(ListView):
@@ -192,29 +297,6 @@ class PersonDetailView(DetailView):
         return context
 
 
-
-class RecordDetailView(DetailView):
-
-    model = models.Record
-    queryset = models.Record.objects.all().prefetch_related('session_set')
-
-    def get_context_data(self, **kwargs):
-        context = super(RecordDetailView, self).get_context_data(**kwargs)
-        context['page_title'] = 'Record'
-        return context
-
-
-class RecordListView(ListView):
-
-    model = models.Record
-    queryset = models.Record.objects.all()
-    
-    def get_context_data(self, **kwargs):
-        context = super(RecordListView, self).get_context_data(**kwargs)
-        context['page_title'] = 'Record'
-        return context
-
-
 class SessionDetailView(DetailView):
 
     model = models.Session
@@ -235,6 +317,50 @@ class SessionListView(ListView):
         context = super(SessionListView, self).get_context_data(**kwargs)
         context['page_title'] = 'Session'
         return context
+    
+        
+class SessionEditView(GroupRequiredMixin, UpdateView):
+
+    model = models.Session
+    fields = ['date', 'law_term', 'folio', 'record', 'village', 'notes']
+    template_name = 'session/session_edit.html'
+
+    group_required = Edit
+
+    def get_success_url(self):
+        pk = self.kwargs.get('pk')
+        return reverse('session', kwargs={'pk': pk})
+
+
+class SessionAddView(GroupRequiredMixin, CreateView):
+
+    model = models.Session
+    fields = ['date', 'law_term', 'folio', 'record', 'village', 'notes']
+    template_name = 'session/session_add.html'
+
+    group_required = Add
+
+    def get_success_url(self):
+        referer = self.request.META.get('HTTP_REFERER', '/')
+        return reverse('session', args=(self.object.id,))
+
+    def get_initial(self):
+        initial = super(SessionAddView, self).get_initial()
+        record = self.request.GET.get('record')
+        initial['record'] = record
+        return initial
+
+
+class SessionDeleteView(GroupRequiredMixin, DeleteView):
+
+    model = models.Session
+    template_name = 'session/session_delete.html'
+
+    group_required = Delete
+
+    def get_success_url(self):
+        return reverse('session_list')
+
     
 
 class VillageDetailView(DetailView):

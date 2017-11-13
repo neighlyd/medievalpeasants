@@ -1,7 +1,10 @@
 {% extends '_layout/_l_single_col.html' %}
 
 {% block single_col %}
-    <h3 class="card-header text-center">Session List</h3>
+    <div class="card-header text-center">
+        <h3>Session List</h3>
+        <a href="{% url 'add_session' %}?record={{ record.id }}" class="btn btn-sm btn-success">Add Session</a>
+    </div>
     <div class="card-body">
             <table class="table table-bordered table-hover" id="table" data-page-length="25">
                 <thead>

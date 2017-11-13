@@ -44,13 +44,14 @@
             scrollX: true,
             order: [0, "asc"],
             ajax: {
-                url: url,
+                url: api_url,
                 type: "GET",
                 dataSrc: "sessions.",
             },
             "columns": [
                 {data: "id",
                     fnCreatedCell: function(nTd, cellData, rowData, row, col) {
+                        console.log(rowData);
                         url = Urls.session(rowData.id);
                         $(nTd).html("<a href='"+ url +"'>" + rowData.id + "</a>");
                     }

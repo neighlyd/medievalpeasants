@@ -1,0 +1,22 @@
+{% extends '_base_accounts.html' %}
+
+{% block left_sidebar %}
+
+{% endblock %}
+
+
+{% block card_body %}
+    <form action="" method="post">
+        {% csrf_token %}
+        {% include '_layout/_form.html' %}
+        <div class="container">
+            <div class="row">
+                <a href="{{ request.META.HTTP_REFERER }}" class="btn btn-danger mr-auto">Cancel</a>
+                <input type="submit" class="btn btn-success ml-auto" value="Add" />
+            </div>
+        </div>
+    </form>
+{% endblock %}
+
+{% block right_sidebar %}
+{% endblock %}

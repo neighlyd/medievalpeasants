@@ -7,8 +7,8 @@ from itertools import chain
 
 class Archive(models.Model):
     name = models.CharField(max_length=50)
-    website = models.URLField()
-    notes = models.TextField()
+    website = models.URLField(blank=True)
+    notes = models.TextField(blank=True)
 
     @property
     def record_count(self):
@@ -620,8 +620,8 @@ class Record(models.Model):
     name = models.CharField(max_length=25)
     archive = models.ForeignKey(Archive, on_delete=models.CASCADE)
     record_type = models.IntegerField(choices=RECORD_TYPE)
-    reel = models.IntegerField()
-    notes = models.TextField()
+    reel = models.IntegerField(blank=True)
+    notes = models.TextField(blank=True)
 
     @property
     def earliest_session(self):
