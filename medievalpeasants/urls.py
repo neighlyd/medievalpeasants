@@ -25,9 +25,9 @@ from peasantlegaldb import urls as peasantlegal_urls
 
 # Route the admin site.
 urlpatterns = [
-    url(r'^admin/', admin.site.urls),
+    url(r'^westminster/', admin.site.urls),
     # registration is currently disabled. Uncomment later to enable registration.
-    #url(r'^register/', accounts_views.register, name='register'),
+    # url(r'^register/', accounts_views.register, name='register'),
 
 ]
 

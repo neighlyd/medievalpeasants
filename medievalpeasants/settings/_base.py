@@ -46,7 +46,6 @@ INSTALLED_APPS = [
     'accounts',
     'coverage',
     'rest_framework',
-    'webpack_loader',
     'dynamic_rest',
     'django_js_reverse',
     'django_filters',
