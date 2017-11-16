@@ -8,6 +8,7 @@
 {% block additional_title %}
     <form>
         {% csrf_token %}
+
         <div class="form-group d-flex justify-content-center">
         {% for field in filter_case_form.visible_fields %}
                 <div class="col-sm-2">

@@ -22,6 +22,9 @@ SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 
 STATIC_URL = '/assets/'
 
+# Location of static files. This path must be an absolute path.
+STATIC_ROOT = os.path.dirname(BASE_DIR) + "/public/assets"
+
 # Prevents a frame from serving content from another frame. Suggested to set as false for production, but may change with content generation. We will see.
 X_FRAME_OPTIONS = 'DENY'
 

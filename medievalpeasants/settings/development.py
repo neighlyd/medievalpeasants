@@ -4,8 +4,6 @@ from ._base import *
 # Debug for testing
 DEBUG = True
 
-STATICFILES_DIRS = (os.path.join(BASE_DIR, 'assets'),)
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
