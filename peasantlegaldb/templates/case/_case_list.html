@@ -5,8 +5,7 @@
     {% include '_layout/__navbar.html' %}
 {% endblock %}
 
-{% block center_bar %}
-    {{ block.super }}
+{% block additional_title %}
     <form>
         {% csrf_token %}
         <div class="form-group d-flex justify-content-center">
@@ -18,6 +17,12 @@
                     {% render_field field class="form-control" id="select_case_type" %}
                 </div>
         {% endfor %}
+{% endblock %}
+
+{% block center_bar %}
+    {{ block.super }}
+    <br>
+    <br>
         </div>
         <div class="form-group d-flex justify-content-center">
                     <button type="button" class="btn btn-primary" id="get_cases">Get Cases</button>
