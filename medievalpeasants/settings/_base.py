@@ -60,7 +60,7 @@ MIDDLEWARE = [
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['[peasantlegaldb]/templates/'],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -112,6 +112,12 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
+
+# You can customize date inputs, but you must turn USE_L10N off before they will stick, since L10N gets priority.
+# L10N localizes date formats, but doesn't seem to do so very well (e.g. Pacific timezone is rendering dates as YYYY-mm-dd, which no one in pacific time uses).
+DATE_INPUT_FORMATS = [
+    '%m/%d/%Y', '%m/%d/%y'
+]
 
 
 # Django Rest Framework settings

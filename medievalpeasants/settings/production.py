@@ -20,7 +20,7 @@ SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
-STATIC_URL = BASE_DIR + '/assets/'
+STATIC_URL = '/assets/'
 
 # Prevents a frame from serving content from another frame. Suggested to set as false for production, but may change with content generation. We will see.
 X_FRAME_OPTIONS = 'DENY'
