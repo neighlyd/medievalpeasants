@@ -5,7 +5,7 @@ from ._base import *
 DEBUG = False
 
 # Set allowed hosts to url.
-#ALLOWED_HOSTS = ['<PUTHOSTSHERE>']
+ALLOWED_HOSTS = ['.medievalpeasants.com', '.medievalpeasants.com.']
 
 # Security settings
 CSRF_COOKIE_SECURE = True
@@ -19,17 +19,6 @@ SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 
 # Prevents a frame from serving content from another frame. Suggested to set as false for production, but may change with content generation. We will see.
 X_FRAME_OPTIONS = 'DENY'
-
-# Location of static files. This path must be an absolute path.
-#STATIC_ROOT = "~/<WHATEVERTHEURLWILLBE>/public/assets"
-STATICFILES_DIRS = (os.path.join(BASE_DIR, 'assets'),)
-
-WEBPACK_LOADER = {
-    'DEFAULT': {
-        'BUNDLE_DIR_NAME': 'bundles/',
-        'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats.json'),
-    }
-}
 
 
 # SITE_ID is used by django frameworks. To equal the ID of the site in the admin database under Sites/sites
