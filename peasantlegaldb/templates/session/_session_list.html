@@ -36,6 +36,7 @@
     $(document).ready(function () {
         var url = Urls['api:session-list']();
         api_url = url + "?include[]=counts";
+        console.log(api_url);
         var table = $("#table").DataTable({
             fixedHeader:{
                 headerOffset: 50
@@ -44,7 +45,7 @@
             scrollX: true,
             order: [0, "asc"],
             ajax: {
-                url: url,
+                url: api_url,
                 type: "GET",
                 dataSrc: "sessions.",
             },
