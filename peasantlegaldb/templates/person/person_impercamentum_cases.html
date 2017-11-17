@@ -41,7 +41,7 @@
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1];
         url = Urls["api:person-detail"](id);
-        var api_url = url + "?include[]=cases.case.session.village&include[]=cases.case.litigant_list&filter{cases|impercamentum.isnull}=false";
+        var api_url = url + "?include[]=cases.case.session.village&include[]=cases.case.litigant_list&include[]=cases.case.litigant_count&filter{cases|impercamentum.isnull}=false";
         var table = $("#table").DataTable({
             fixedHeader:{ headerOffset: 50 },
             scrollX: true,
@@ -69,9 +69,10 @@
                     defaultContent: '',
                     render: {
                         display: function(data, type, row, col){
-                            return data.impercamentum_quantity + " " + data.impercamentum_animal.name + "d.)"
+                            console.log(data);
+                            return row.impercamentum_quantity + " " + data.name + "d.)"
                         },
-                        sort: "impercamentum_animal.name"
+                        sort: "impercamentum_quantity"
                     }
                 },
                 {data: "impercamentum",
