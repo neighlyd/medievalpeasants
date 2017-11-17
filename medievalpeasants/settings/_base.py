@@ -22,12 +22,6 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__fil
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
 
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
-
-
 # email backend emulator to simulate password reset emails.
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
@@ -46,7 +40,6 @@ INSTALLED_APPS = [
     'accounts',
     'coverage',
     'rest_framework',
-    'webpack_loader',
     'dynamic_rest',
     'django_js_reverse',
     'django_filters',
@@ -64,10 +57,12 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+STATICFILES_DIRS = (os.path.join(BASE_DIR, 'assets'),)
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['[peasantlegaldb]/templates/'],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -120,11 +115,11 @@ USE_L10N = True
 
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.11/howto/static-files/
-
-STATIC_URL = BASE_DIR + '/assets/'
+# You can customize date inputs, but you must turn USE_L10N off before they will stick, since L10N gets priority.
+# L10N localizes date formats, but doesn't seem to do so very well (e.g. Pacific timezone is rendering dates as YYYY-mm-dd, which no one in pacific time uses).
+DATE_INPUT_FORMATS = [
+    '%m/%d/%Y', '%m/%d/%y'
+]
 
 
 # Django Rest Framework settings

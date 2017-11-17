@@ -4,14 +4,10 @@ from ._base import *
 # Debug for testing
 DEBUG = True
 
-STATICFILES_DIRS = (os.path.join(BASE_DIR, 'assets'),)
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/1.11/howto/static-files/
 
-WEBPACK_LOADER = {
-    'DEFAULT': {
-        'BUNDLE_DIR_NAME': 'bundles/',
-        'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats.json'),
-    }
-}
+STATIC_URL = BASE_DIR + '/assets/'
 
 # SITE_ID is used by django frameworks. To equal the ID of the site in the admin database under Sites/sites
 # This value must equal the site's ID in Django's database.

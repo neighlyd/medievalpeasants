@@ -1,32 +1,22 @@
-{% extends '_layout/_l_two_col.html' %}
+{% extends '_layout/_l_single_col.html' %}
 
-{% block navbar %}
-    {% include '_layout/__navbar.html' %}
-{% endblock %}
+{% block single_col %}
+    <h3 class="card-header text-center">Session List</h3>
+    <div class="card-body">
+            <table class="table table-bordered table-hover" id="table" data-page-length="25">
+                <thead>
+                    <th>ID</th>
+                    <th>Date</th>
+                    <th>Law Term</th>
+                    <th>Cases</th>
+                    <th>Litigants</th>
+                    <th>Chevages</th>
+                    <th>Impercamenta</th>
+                    <th>Land Cases</th>
+                </thead>
+            </table>
+    </div>
 
-{% block center_bar %}
-
-    {{ block.super }}
-
-<div class="card-body clearfix" id="main_info">
-    <table class="table table-bordered table-hover" id="table" data-page-length="25">
-        <thead>
-            <th>ID</th>
-            <th>Date</th>
-            <th>Law Term</th>
-            <th>Cases</th>
-            <th>Litigants</th>
-            <th>Chevages</th>
-            <th>Impercamenta</th>
-            <th>Land Cases</th>
-        </thead>
-    </table>
-</div>
-
-{% endblock %}
-
-{% block right_sidebar %}
-    {{ block.super }}
 {% endblock %}
 
 {% block scripts %}
@@ -34,8 +24,10 @@
 <script>
 
     $(document).ready(function () {
-        var url = Urls['api:session-list']();
-        api_url = url + "?include[]=counts";
+        var url = window.location.pathname;
+        var id = url.split('/').reverse()[1];
+        url = Urls['api:session-list']();
+        api_url = url + "?village=" + id + "&include[]=counts";
         console.log(api_url);
         var table = $("#table").DataTable({
             fixedHeader:{
@@ -52,7 +44,6 @@
             "columns": [
                 {data: "id",
                     fnCreatedCell: function(nTd, cellData, rowData, row, col) {
-                        console.log(rowData);
                         url = Urls.session(rowData.id);
                         $(nTd).html("<a href='"+ url +"'>" + rowData.id + "</a>");
                     }

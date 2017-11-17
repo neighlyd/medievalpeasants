@@ -1,19 +1,8 @@
-from rest_framework import viewsets, generics
-
 from django.db.models import Q
-
 from dynamic_rest.viewsets import DynamicModelViewSet
 
-from rest_framework.reverse import reverse
-
-from rest_framework_serializer_extensions.views import SerializerExtensionsAPIViewMixin
-
-from django_filters import rest_framework as filters
-import django_filters
-
-from peasantlegaldb.api import serializers
+from api import serializers
 from peasantlegaldb import models
-
 
 
 # Function created in order to be able to search for both isnull and FKs. In order to work, you need to create a
@@ -179,13 +168,28 @@ class SessionViewSet(DynamicModelViewSet):
     serializer_class = serializers.SessionSerializer
     queryset = models.Session.objects.all().order_by('village__name', 'record__record_type', 'date')
 
+    def get_queryset(self, queryset=models.Session.objects.all()):
+        chain_filter = {}
+        chain_filter['village'] = self.request.query_params.get('village')
+
+        distinct = self.request.query_params.get('distinct')
+
+        if not chain_filter:
+            return queryset
+        else:
+            if distinct == "true":
+                queryset = check_chain(chain_filter, queryset, True)
+            else:
+                queryset = check_chain(chain_filter, queryset, False)
+            return queryset
+
 
 class CaseViewSet(DynamicModelViewSet):
     serializer_class = serializers.CaseSerializer
 
     def get_queryset(self, queryset=models.Case.objects.all()):
         chain_filter={}
-        chain_filter['session__village_id'] =self.request.query_params.get('village')
+        chain_filter['session__village_id'] = self.request.query_params.get('village')
         chain_filter['session__village__hundred_id'] = self.request.query_params.get('hundred')
         chain_filter['session__village__county_id'] = self.request.query_params.get('county')
         chain_filter['case_to_person__land_id'] = self.request.query_params.get('land')

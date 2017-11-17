@@ -2,13 +2,12 @@ certifi==2017.7.27.1
 chardet==3.0.4
 coverage==4.2
 Django==1.11
+django-braces==1.11.0
 django-filter==1.0.4
 django-js-reverse==0.7.3
-django-webpack-loader==0.5.0
+django-widget-tweaks==1.4.1
 djangorestframework==3.6.2
-djangorestframework-serializer-extensions==0.5.2
 dnspython==1.15.0
-drf-flex-fields==0.2.2
 dynamic-rest==1.6.7
 email-validator==1.0.2
 factory-boy==2.9.2
@@ -22,5 +21,6 @@ python-dateutil==2.6.1
 pytz==2017.2
 requests==2.18.4
 six==1.10.0
+sqlparse==0.2.4
 UkPostcodeParser==1.1.1
 urllib3==1.22

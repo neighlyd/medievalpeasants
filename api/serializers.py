@@ -1,8 +1,6 @@
 from rest_framework import serializers
 
-from rest_framework_serializer_extensions.serializers import SerializerExtensionsMixin
-
-from dynamic_rest.serializers import DynamicModelSerializer, DynamicEphemeralSerializer
+from dynamic_rest.serializers import DynamicModelSerializer
 from dynamic_rest.fields import DynamicMethodField, DynamicRelationField
 
 from peasantlegaldb import models

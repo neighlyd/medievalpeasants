@@ -43,7 +43,7 @@
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1];
         url = Urls['api:person-detail'](id);
-        var api_url = url + "?include[]=cases.case.session.village&include[]=cases.case.litigant_list&filter{cases|heriot.isnull}=false";
+        var api_url = url + "?include[]=cases.case.session.village&include[]=cases.case.litigant_list&include[]=cases.case.litigant_count&filter{cases|heriot.isnull}=false";
         var table = $("#table").DataTable({
             fixedHeader:{ headerOffset: 50 },
             scrollX: true,
@@ -73,7 +73,7 @@
                     defaultContent: '',
                     render: {
                         display: function(data, type, row, col){
-                            return data.heriot_quantity + " " + data.heriot_animal.name + "d.)"
+                            return row.heriot_quantity + " " + data.name + "d.)"
                         },
                         sort: "heriot_quantity"
                     }
@@ -81,7 +81,7 @@
                 {data: "heriot",
                     defaultContent: '',
                     render: {
-                        display: formatMoney
+                        display: formatMoney,
                         sort: "in_denarius"
                     }
                 },
