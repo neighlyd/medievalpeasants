@@ -121,6 +121,8 @@ village_urls = [
         name='village_places_mentioned_list'),
     url(r'^related_places$', views.VillageListView.as_view(template_name='village/village_related_places_list.html'),
         name='village_related_places_list'),
+    url(r'^session_list$', views.SessionListView.as_view(template_name='village/village_session_list.html'),
+        name='village_session_list'),
 
 ]
 

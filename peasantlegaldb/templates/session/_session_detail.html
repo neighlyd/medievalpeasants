@@ -7,6 +7,7 @@
 {% block left_sidebar %}
     <div id="selection_list">
         <a class="list-group-item list-group-item-action active" href="{% url 'session_case_list' session.id %}">Cases</a>
+
     </div>
 {% endblock %}
 
@@ -14,12 +15,13 @@
 
 <div class="card-header text-center">
     <h2 class="card-title">Session - {{ session.id }}</h2>
+    <h6 class="card-subtitle text-muted float-right"><a href="{% url 'record' session.record.id %}" style="color: inherit; text-decoration: none">{{ session.record.name }}, F.{{ session.folio }}</a></h6>
 </div>
 
 <div class="card-body clearfix" id="main_info">
     <div class="d-flex justify-content-between flex-wrap">
 
-                    <div class="card p-0 col-5">
+                    <div class="card p-0 col-lg-5">
                         <h3 class="card-header">Info:</h3>
                         <div class="card-body">
                             <table class="table table-sm">
@@ -64,7 +66,7 @@
                         </div>
                     </div>
 
-                    <div class="card p-0 col-6">
+                    <div class="card p-0 col-lg-6">
                         <h3 class="card-header">Notes:</h3>
                             <div class="card-body">
 
