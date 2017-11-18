@@ -16,6 +16,7 @@ Including another URLconf
 
 from django.conf.urls import url, include
 from django.contrib import admin
+from django.views.generic import TemplateView
 
 from django_js_reverse.views import urls_js
 
@@ -26,6 +27,7 @@ from peasantlegaldb import urls as peasantlegal_urls
 # Route the admin site.
 urlpatterns = [
     url(r'^westminster/', admin.site.urls),
+    url(r'^acknowledgements/', TemplateView.as_view(template_name='acknowledgements.html'), name='acknowledgements'),
     # registration is currently disabled. Uncomment later to enable registration.
     # url(r'^register/', accounts_views.register, name='register'),
 
