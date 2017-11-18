@@ -1,4 +1,5 @@
 from django import forms
+from django.forms import BaseInlineFormSet
 from . import models
 
 
@@ -62,3 +63,6 @@ class CaseFilterForm(forms.Form):
         # order of the list of tuples that will be displayed, thus putting 'All Villages' and 'No Villages' up top.
         choices = EXTRA_CHOICES + choices
         self.fields['case_selection'].choices = choices
+
+
+class LitigantForm(BaseInlineFormSet):

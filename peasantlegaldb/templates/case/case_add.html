@@ -1,0 +1,15 @@
+{% extends '_layout/_add_edit.html' %}
+
+{% block card_body %}
+   {% include '_layout/_form.html' %}
+{% endblock %}
+
+{% block buttons %}
+        <a href="{{ request.META.HTTP_REFERER }}" class="btn btn-danger mr-auto">Cancel</a>
+        <br>
+        <br>
+        <input type="submit" class="btn btn-success ml-auto" value="Add" name="add_single"/>
+        <br>
+        <br>
+        <input type="submit" class="btn btn-success" value="Add Another Case" name="add_another" />
+{% endblock %}

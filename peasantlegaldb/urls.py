@@ -8,15 +8,16 @@ index_urls = [
 ]
 
 analysis_urls = [
-    url(r'^chevage/(?P<village_pk>[0-9]+)/$', views.ChevageAnalysisListView.as_view(template_name='analysis/chevage.html'),
-        name='chevage_analysis'
-    ),
+    url(r'^chevage/(?P<village_pk>[0-9]+)/$', views.ChevageAnalysisListView.as_view(
+        template_name='analysis/chevage.html'), name='chevage_analysis'),
 ]
 
 archive_urls = [
     url(r'^$', views.ArchiveDetailView.as_view(template_name='archive/_archive_detail.html'), name='archive'),
     url(r'^record_list$', views.ArchiveDetailView.as_view(template_name='archive/record_list.html'),
         name='record_list'),
+    url(r'^edit/$', views.ArchiveEditView.as_view(), name='edit_archive'),
+    url(r'^delete/$', views.ArchiveDeleteView.as_view(), name='delete_archive'),
 ]
 
 case_urls = [
@@ -34,6 +35,8 @@ case_urls = [
         name='case_place_mentioned_list'),
     url(r'^pledge_list', views.CaseListView.as_view(template_name='case/case_pledge_list.html'),
         name='case_pledge_list'),
+    url(r'^edit/$', views.CaseEditView.as_view(), name='edit_case'),
+    url(r'^delete/$', views.CaseDeleteView.as_view(), name='delete_case'),
 ]
 
 county_urls = [
@@ -79,7 +82,8 @@ person_detail_urls = [
     url(r'^pledge_list', views.PeopleListView.as_view(template_name='person/pledge_list.html'), name='pledge_list'),
     url(r'^relationship_list', views.PeopleListView.as_view(template_name='person/relationship_list.html'),
         name='relationship_list'),
-    url(r'^position_list', views.PeopleListView.as_view(template_name='person/position_list.html'), name='position_list'),
+    url(r'^position_list', views.PeopleListView.as_view(template_name='person/position_list.html'),
+        name='position_list'),
     url(r'^land_list', views.PeopleListView.as_view(template_name='person/person_land_history_list.html'),
         name='person_land_history'),
     url(r'^stats', views.PersonDetailView.as_view(template_name='person/person_stats.html'), name='person_stats'),
@@ -101,12 +105,16 @@ record_urls = [
     url(r'^$', views.RecordDetailView.as_view(template_name='record/_record_detail.html'), name='record'),
     url(r'^session_list$', views.RecordDetailView.as_view(template_name='record/record_session_list.html'),
         name='record_session_list'),
+    url(r'^edit/$', views.RecordEditView.as_view(), name='edit_record'),
+    url(r'^delete/$', views.RecordDeleteView.as_view(), name='delete_record'),
 ]
 
 session_urls = [
     url(r'^$', views.SessionDetailView.as_view(template_name='session/_session_detail.html'), name='session'),
     url(r'^case_list$', views.CaseListView.as_view(template_name='session/session_case_list.html'),
         name='session_case_list'),
+    url(r'^edit/$', views.SessionEditView.as_view(), name='edit_session'),
+    url(r'^delete/$', views.SessionDeleteView.as_view(), name='delete_session'),
 ]
 
 village_urls = [
@@ -117,8 +125,8 @@ village_urls = [
         name='village_resident_list'),
     url(r'^litigant_list$', views.PersonDetailView.as_view(template_name='village/village_litigant_list.html'),
         name='village_litigant_list'),
-    url(r'^places_mentioned_list$', views.VillageListView.as_view(template_name='village/village_place_mentioned_list.html'),
-        name='village_places_mentioned_list'),
+    url(r'^places_mentioned_list$', views.VillageListView.as_view(
+        template_name='village/village_place_mentioned_list.html'), name='village_places_mentioned_list'),
     url(r'^related_places$', views.VillageListView.as_view(template_name='village/village_related_places_list.html'),
         name='village_related_places_list'),
     url(r'^session_list$', views.SessionListView.as_view(template_name='village/village_session_list.html'),
@@ -130,19 +138,23 @@ village_urls = [
 urlpatterns = [
     url(r'^', include(index_urls)),
     url(r'^archive/(?P<pk>\d+)/', include(archive_urls)),
+    url(r'^archive/add/$', views.ArchiveAddView.as_view(), name='add_archive'),
     url(r'^case/(?P<pk>\d+)/', include(case_urls)),
+    url(r'^case/add/$', views.CaseAddView.as_view(), name='add_case'),
     url(r'^county/(?P<pk>\d+)/', include(county_urls)),
     url(r'^hundred/(?P<pk>\d+)/', include(hundred_urls)),
     url(r'^land/(?P<pk>\d+)/', include(land_urls)),
     url(r'^person/(?P<pk>\d+)/', include(person_detail_urls)),
     url(r'^record/(?P<pk>\d+)/', include(record_urls)),
+    url(r'^record/add/$', views.RecordAddView.as_view(), name='add_record'),
     url(r'^session/(?P<pk>\d+)/', include(session_urls)),
+    url(r'^session/add/$', views.SessionAddView.as_view(), name='add_session'),
     url(r'^village/(?P<pk>\d+)/', include(village_urls)),
     url(r'^analysis/', include(analysis_urls))
 ]
 
 # list views.
-urlpatterns +=[
+urlpatterns += [
     url(r'^archives/$', views.ArchiveListView.as_view(template_name='archive/_archive_list.html'),
         name='archive_list'),
     url(r'^people/$', views.PeopleListView.as_view(template_name='person/_person_list.html'), name='person_list'),

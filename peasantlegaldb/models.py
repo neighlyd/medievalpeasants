@@ -750,7 +750,7 @@ class Session(models.Model):
         return year
 
     def __str__(self):
-        return '%s %s %s Session.' % (self.village.name, self.get_law_term_display(), self.date.year)
+        return '%s Session: | %s, %s %s Session.' % (self.village.name, self.id, self.get_law_term_display(), self.human_date)
 
 
 class Case(models.Model):

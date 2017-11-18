@@ -5,6 +5,7 @@ from django.views.generic.edit import FormView
 from django.urls import reverse_lazy, reverse
 from django.db.models import Count, Max, Min, Avg, Sum
 from django.core.urlresolvers import resolve
+from django.http import HttpResponseRedirect
 
 from braces.views import GroupRequiredMixin
 
@@ -132,7 +133,7 @@ class RecordAddView(GroupRequiredMixin, CreateView):
 class RecordDeleteView(GroupRequiredMixin, DeleteView):
 
     model = models.Record
-    template_name = 'record/record_delete.html'
+    template_name = 'confirm_delete.html'
 
     group_required = Delete
 
@@ -165,6 +166,69 @@ class CaseDetailView(DetailView):
         return context
 
 
+class CaseEditView(GroupRequiredMixin, UpdateView):
+
+    model = models.Case
+    fields = ['session', 'case_type', 'court_type', 'verdict', 'of_interest', 'ad_legem',
+              'villeinage_mention', 'active_sale', 'incidental_land', 'summary',]
+    template_name = 'case/case_edit.html'
+
+    group_required = Edit
+
+    def get_success_url(self):
+        pk = self.kwargs.get('pk')
+        return reverse('case', kwargs={'pk': pk})
+
+
+
+class CaseAddView(GroupRequiredMixin, CreateView):
+
+    model = models.Case
+    fields = ['session', 'case_type', 'court_type', 'verdict', 'of_interest', 'ad_legem',
+              'villeinage_mention', 'active_sale', 'incidental_land', 'summary', ]
+    template_name = 'case/case_add.html'
+
+    group_required = Add
+
+    def form_valid(self, form):
+        if 'add_single' in self.request.POST:
+            self.object = form.save()
+            return super(CaseAddView, self).form_valid(form)
+        if 'add_another' in self.request.POST:
+            self.object = form.save()
+            session = str(self.object.session.id)
+            case_type = str(self.object.case_type.id)
+            court_type = str(self.object.court_type)
+            return HttpResponseRedirect(reverse('add_case') + "?session=" + session + "&case_type=" + case_type +
+                                        "&court_type=" + court_type)
+
+    def get_success_url(self):
+        referer = self.request.META.get('HTTP_REFERER', '/')
+        return reverse('case', args=(self.object.id,))
+
+    def get_initial(self):
+        initial = super(CaseAddView, self).get_initial()
+        session = self.request.GET.get('session')
+        case_type = self.request.GET.get('case_type')
+        court_type = self.request.GET.get('court_type')
+        initial['session'] = session
+        initial['case_type'] = case_type
+        initial['court_type'] = court_type
+        return initial
+
+
+
+class CaseDeleteView(GroupRequiredMixin, DeleteView):
+
+    model = models.Case
+    template_name = 'confirm_delete.html'
+
+    group_required = Delete
+
+    def get_success_url(self):
+        return reverse('case_list')
+
+
 class CountyDetailView(DetailView):
 
     model = models.County
@@ -185,6 +249,43 @@ class CountyListView(ListView):
         context = super(CountyListView, self).get_context_data(**kwargs)
         context['page_title'] = 'County'
         return context
+    
+
+class CountyEditView(GroupRequiredMixin, UpdateView):
+
+    model = models.County
+    fields = ['name', 'abbreviation'']
+    template_name = 'county/county_edit.html'
+
+    group_required = Edit
+
+    def get_success_url(self):
+        pk = self.kwargs.get('pk')
+        return reverse('county', kwargs={'pk': pk})
+
+
+class CountyAddView(GroupRequiredMixin, CreateView):
+
+    model = models.County
+    fields = ['name', 'abbreviation',]
+    template_name = 'county/county_add.html'
+
+    group_required = Add
+
+    def get_success_url(self):
+        referer = self.request.META.get('HTTP_REFERER', '/')
+        return reverse('county', args=(self.object.id,))
+
+
+class CountyDeleteView(GroupRequiredMixin, DeleteView):
+
+    model = models.County
+    template_name = 'confirm_delete.html'
+
+    group_required = Delete
+
+    def get_success_url(self):
+        return reverse('county_list')
 
 
 class HundredDetailView(DetailView):
@@ -207,6 +308,51 @@ class HundredListView(ListView):
         context = super(HundredListView, self).get_context_data(**kwargs)
         context['page_title'] = 'Hundred'
         return context
+
+
+class HundredEditView(GroupRequiredMixin, UpdateView):
+
+    model = models.Hundred
+    fields = ['name', 'county',]
+    template_name = 'hundred/hundred_edit.html'
+
+    group_required = Edit
+
+    def get_success_url(self):
+        pk = self.kwargs.get('pk')
+        return reverse('hundred', kwargs={'pk': pk})
+
+
+
+class HundredAddView(GroupRequiredMixin, CreateView):
+
+    model = models.Hundred
+    fields = ['name', 'county',]
+    template_name = 'hundred/hundred_add.html'
+
+    group_required = Add
+
+    def get_success_url(self):
+        referer = self.request.META.get('HTTP_REFERER', '/')
+        return reverse('hundred', args=(self.object.id,))
+
+    def get_initial(self):
+        initial = super(HundredAddView, self).get_initial()
+        county = self.request.GET.get('county')
+        initial['county'] = county
+        return initial
+
+
+
+class HundredDeleteView(GroupRequiredMixin, DeleteView):
+
+    model = models.Hundred
+    template_name = 'confirm_delete.html'
+
+    group_required = Delete
+
+    def get_success_url(self):
+        return reverse('hundred_list')
 
 
 class LitigantListView(ListView):

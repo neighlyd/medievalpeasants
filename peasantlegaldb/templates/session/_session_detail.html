@@ -91,21 +91,21 @@
     <div class="container" style="position: sticky; top: 65px">
         {% if perms.peasantlegaldb.add_session %}
             <div class="btn-group" role="group">
-                <a class="btn btn-success" href="#">Add Session</a>
+                <a class="btn btn-success" href="{% url 'add_session' %}">Add Session</a>
             </div>
             <br>
             <br>
         {% endif %}
         {% if perms.peasantlegaldb.change_session %}
             <div class="btn-group" role="group">
-                <a class="btn btn-warning" href="#">Edit Session</a>
+                <a class="btn btn-warning" href="{% url 'edit_session' session.id %}">Edit Session</a>
             </div>
             <br>
             <br>
         {% endif %}
         {% if perms.peasantlegaldb.delete_session %}
             <div class="btn-group" role="group">
-                <a class="btn btn-danger" href="#">Delete Session</a>
+                <a class="btn btn-danger" href="{% url 'delete_session' session.id %}">Delete Session</a>
             </div>
         {% endif %}
     </div>
