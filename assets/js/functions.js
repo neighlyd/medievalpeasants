@@ -1,6 +1,6 @@
             function formatCaseDate(data, type, row, meta) {
-                if (data.id) {
-                    return "<a href='" + Urls.case(data.id) + "'>" + data.village.name + " | " + data.law_term + ", " + data.year + "</a>";
+                if (data) {
+                    return "<a href='" + Urls.case(data.id) + "'>" + data.session.village.name + " | " + data.session.law_term + ", " + data.session.year + "</a>";
                 } else {
                     return "N/A";
                 }
@@ -96,6 +96,18 @@
             }
 
             function format_person_subdata(data){
+                var earliestCase = '';
+                if (data.person.earliest_case.id){
+                    earliestCase = "<a href='" + Urls.case(data.person.earliest_case.id) +"'>" + data.person.earliest_case.session.law_term + ", " + data.person.earliest_case.session.year + "</a>"
+                } else {
+                    earliestCase = "N/A"
+                }
+                var latestCase = '';
+                if (data.person.latest_case.id){
+                    latestCase = "<a href='" + Urls.case(data.person.latest_case.id) +"'>" + data.person.latest_case.session.law_term + ", " + data.person.latest_case.session.year + "</a>"
+                } else {
+                    latestCase = "N/A"
+                }
             return "<table class='table'>" +
             "<tr>" +
             "<td><b>Village:</b></td>" +
@@ -111,9 +123,9 @@
             "<td><b>Total Case Count:</b></td>" +
             "<td>" + data.person.counts.all_cases + "</td>" +
             "<td><b>Earliest Case:</b></td>" +
-            "<td><a href='" + Urls.case(data.person.case_dates.earliest_case.id) +"'>" + data.person.case_dates.earliest_case.law_term + ", " + data.person.case_dates.earliest_case.year + "</a></td>" +
+            "<td>" + earliestCase + "</td>" +
             "<td><b>Latest Case:</b></td>" +
-            "<td><a href='" + Urls.case(data.person.case_dates.latest_case.id) +"'>" + data.person.case_dates.latest_case.law_term + ", " + data.person.case_dates.latest_case.year + "</a></td>" +
+            "<td>" + latestCase + "</td>" +
             "</tr>" +
             "<tr>" +
             "<td><b>Amercement Count:</b></td>" +

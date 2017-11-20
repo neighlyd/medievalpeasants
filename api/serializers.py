@@ -299,12 +299,8 @@ class PersonSerializer(DynamicModelSerializer):
         ],
         deferred=True
     )
-    case_dates = DynamicMethodField(
-        requires = [
-            'person_to_case__case__session', 'pledge_giver__case__session', 'pledge_receiver__case__session'
-        ],
-        deferred=True
-    )
+    earliest_case = DynamicRelationField('CaseSerializer', deferred=True, embed=True)
+    latest_case = DynamicRelationField('CaseSerializer', deferred=True, embed=True)
     village = DynamicRelationField('VillageSerializer', embed=True, deferred=True)
     cases = DynamicRelationField('LitigantSerializer', deferred=True, source='person_to_case', many=True, embed=True)
     pledges_given = DynamicRelationField('PledgeSerializer', deferred=True, source='pledge_giver', many=True,
@@ -317,14 +313,7 @@ class PersonSerializer(DynamicModelSerializer):
         model = models.Person
         fields = ('id', 'first_name', 'relation_name', 'last_name', 'status', 'gender', 'tax_1332', 'tax_1379', 'notes',
                   'full_name', 'counts', 'village', 'cases', 'pledges_given', 'pledges_received', 'positions',
-                  'gender_display', 'status_display', 'case_dates')
-
-    def get_case_dates(self, record):
-        dates = {}
-
-        dates['earliest_case'] = record.earliest_case
-        dates['latest_case'] = record.latest_case
-        return dates
+                  'gender_display', 'status_display', 'earliest_case', 'latest_case')
 
     def get_counts(self, record):
         counts = {}
@@ -350,12 +339,8 @@ class LandSerializer(DynamicModelSerializer):
             'parcels__parcel_type', 'parcels__parcel_tenure'
         ]
     )
-    case_dates = DynamicMethodField(
-        requires = [
-            'case_to_land__case__session'
-        ],
-        deferred=True
-    )
+    earliest_date = DynamicRelationField('CaseSerializer', deferred=True, embed=True)
+    latest_date = DynamicRelationField('CaseSerializer', deferred=True, embed=True)
 
     tenant_history = DynamicRelationField(
         'LitigantSerializer',
@@ -369,17 +354,10 @@ class LandSerializer(DynamicModelSerializer):
     class Meta:
         model = models.Land
         name = 'land'
-        fields = ('id', 'notes', 'parcel_list', 'tenant_history', 'case_dates')
+        fields = ('id', 'notes', 'parcel_list', 'tenant_history', 'earliest_date', 'latest_date')
 
     def get_parcel_list(self, record):
         return record.parcel_list
-
-    def get_case_dates(self, record):
-        case_info={}
-        case_info['earliest'] = record.earliest_case
-        case_info['latest'] = record.latest_case
-
-        return case_info
 
 
 class CaseSerializer(DynamicModelSerializer):

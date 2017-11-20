@@ -41,7 +41,7 @@
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1];
         url = Urls['api:person-list']();
-        var api_url = url + "?village_to_litigant=" + id + "&include[]=counts&include[]=case_dates";
+        var api_url = url + "?village_to_litigant=" + id + "&include[]=counts&include[]=earliest_case.session.village&include[]=latest_case.session.village";
         var table = $("#table").DataTable({
             fixedHeader:{ headerOffset: 50 },
             scrollX: true,
@@ -73,18 +73,18 @@
                 {data: "tax_1332"},
                 {data: "tax_1379"},
                 {data: "counts.all_cases"},
-                {data: "case_dates.earliest_case",
+                {data: "earliest_case",
                     defaultContent: '',
                     render: {
                         display: formatCaseDateNoVillage,
-                        sort: "date"
+                        sort: "session.date"
                     }
                 },
-                {data: "case_dates.latest_case",
+                {data: "latest_case",
                     defaultContent: '',
                     render: {
                         display: formatCaseDateNoVillage,
-                        sort: "date"
+                        sort: "session.date"
                     }
                 },
                 {data: "counts.pledge.given"},

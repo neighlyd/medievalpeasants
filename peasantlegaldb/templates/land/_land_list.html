@@ -46,7 +46,7 @@
 
     $(document).ready(function () {
         var url = Urls['api:land-list']();
-        var api_url = url + "?include[]=tenant_history.person.village&include[]=tenant_history.case.session&include[]=case_dates";
+        var api_url = url + "?include[]=tenant_history.person.village&include[]=tenant_history.case.session&include[]=earliest_case.session.village&include[]=latest_case.session.village";
         var table = $("#table").DataTable({
             fixedHeader:{ headerOffset: 50 },
             scrollX: true,
@@ -78,18 +78,18 @@
                     }
                 },
                 {data: "notes"},
-                {data: "case_dates.earliest",
+                {data: "earliest_case",
                     defaultContent: '',
                     render: {
                         display: formatCaseDate,
-                        sort: "date"
+                        sort: "session.date"
                     }
                 },
-                {data: "case_dates.latest",
+                {data: "latest_case",
                     defaultContent: '',
                     render: {
                         display: formatCaseDate,
-                        sort: "date"
+                        sort: "session.date"
                     }
                 }
             ]

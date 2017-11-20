@@ -48,7 +48,7 @@
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1];
         url = Urls['api:case-detail'](id);
-        var url = url + "?include[]=people.person.village.name&exclude[]=people.person.village.*&include[]=people.person.counts&include[]=people.person.case_dates";
+        var url = url + "?include[]=people.person.village.name&exclude[]=people.person.village.*&include[]=people.person.counts&include[]=people.person.earliest_case.session&include[]=people.person.latest_case.session";
         var table = $('#table').DataTable({
             order:[1, "asc"],
             hideEmptyCols: true,

@@ -150,20 +150,20 @@
             }
             if (village === "All"){
                     if (btnClicked === "residents") {
-                        url = url + "?exclude[]=village.*&include[]=village.name&include[]=counts&include[]=case_dates";
+                        url = url + "?exclude[]=village.*&include[]=village.name&include[]=counts&include[]=earliest_case.session.village&include[]=latest_case.session.village";
                     } else if (btnClicked === "litigants") {
-                        url = url + "?exclude[]=village.*&include[]=village.name&include[]=counts&include[]=case_dates";
+                        url = url + "?exclude[]=village.*&include[]=village.name&include[]=counts&include[]=earliest_case.session.village&include[]=latest_case.session.village";
                     } else {
-                        url = url + "?" + btnClicked + "=true&exclude[]=village.*&include[]=village.name&include[]=counts&include[]=case_dates";
+                        url = url + "?" + btnClicked + "=true&exclude[]=village.*&include[]=village.name&include[]=counts&include[]=earliest_case.session.village&include[]=latest_case.session.village";
                     }
             }
             else {
                 if (btnClicked === "residents") {
-                        url = url + "?filter{village.id}=" + village + "&exclude[]=village.*&include[]=village.name&include[]=counts&include[]=case_dates";
+                        url = url + "?filter{village.id}=" + village + "&exclude[]=village.*&include[]=village.name&include[]=counts&include[]=earliest_case.session.village&include[]=latest_case.session.village";
                     } else if (btnClicked === "litigants") {
-                        url = url + "?village_to_litigant=" + village + "&exclude[]=village.*&include[]=village.name&include[]=counts&include[]=case_dates";
+                        url = url + "?village_to_litigant=" + village + "&exclude[]=village.*&include[]=village.name&include[]=counts&include[]=earliest_case.session.village&include[]=latest_case.session.village";
                     } else {
-                        url = url + "?" + btnClicked + "=true&village_to_litigant=" + village + "&exclude[]=village.*&include[]=village.name&include[]=counts&include[]=case_dates";
+                        url = url + "?" + btnClicked + "=true&village_to_litigant=" + village + "&exclude[]=village.*&include[]=village.name&include[]=counts&include[]=earliest_case.session.village&include[]=latest_case.session.village";
                     }
             }
             $("#table").DataTable().destroy();
@@ -199,18 +199,18 @@
                     {data: "village.name"},
                     {data: "status_display"},
                     {data: "gender_display"},
-                    {data: "case_dates.earliest_case",
+                    {data: "earliest_case",
                         defaultContent: '',
                         render: {
                             display: formatCaseDate,
-                            sort: "date",
+                            sort: "session.date"
                         }
                     },
-                    {data: "case_dates.latest_case",
+                    {data: "latest_case",
                         defaultContent: '',
                         render: {
                             display: formatCaseDate,
-                            sort: "date",
+                           sort: "session.date"
                         }
                     },
                 ],
