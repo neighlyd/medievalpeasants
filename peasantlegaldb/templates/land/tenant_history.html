@@ -38,7 +38,7 @@
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1];
         url = Urls['api:litigant-list']();
-        var url = url + "?include[]=land&filter{land.id}=" + id + "&include[]=person.village&include[]=case.session&include[]=person.counts&include[]=person.case_dates";
+        var url = url + "?include[]=land&filter{land.id}=" + id + "&include[]=person.village&include[]=case.session&include[]=person.counts&include[]=person.earliest_case.session.village&include[]=person.latest_case.session.village";
         var table = $('#tenant_history').DataTable({
             scrollX: true,
             hideEmptyCols: true,

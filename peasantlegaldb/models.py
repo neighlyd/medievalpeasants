@@ -115,6 +115,8 @@ class Land(models.Model):
     #   Change save condition to automagically update notes field w/ land owners from Litigants?
     notes = models.TextField()
     owner_chain = models.TextField()
+    earliest_case = models.ForeignKey('Case', null=True, related_name='land_to_earliest_case')
+    latest_case = models.ForeignKey('Case', null=True, related_name='land_to_latest_case')
 
     @property
     def parcel_list(self):
@@ -132,55 +134,6 @@ class Land(models.Model):
             pass
 
         return parcel_list
-
-    @property
-    def earliest_case(self):
-        try:
-            earliest = self.case_to_land.earliest('case__session__date')
-        except:
-            earliest = None
-        if not earliest:
-            earliest_case = {
-                'id': None,
-                'village': {'name': None},
-                'law_term': None,
-                'date': None,
-                'year': None,
-            }
-        else:
-            earliest_case = {
-                'id': earliest.case.session.id,
-                'village': {'name': earliest.case.session.village.name},
-                'law_term': earliest.case.session.get_law_term_display(),
-                'date': earliest.case.session.date,
-                'year': earliest.case.session.date.year,
-                }
-        return earliest_case
-
-    @property
-    def latest_case(self):
-        try:
-            latest = self.case_to_land.latest('case__session__date')
-        except:
-            latest = None
-        if not latest:
-            latest_case = {
-                'id': None,
-                'village': {'name': None},
-                'law_term': None,
-                'date': None,
-                'year': None,
-            }
-        else:
-            latest_case = {
-                'id': latest.case.session.id,
-                'village': {'name': latest.case.session.village.name},
-                'law_term': latest.case.session.get_law_term_display(),
-                'date': latest.case.session.date,
-                'year': latest.case.session.date.year,
-            }
-
-        return latest_case
 
     def __str__(self):
         return "Land ID: %s" % (self.id)
@@ -354,109 +307,9 @@ class Person(models.Model):
     # both taxes are to be input in denari.
     tax_1332 = models.FloatField()
     tax_1379 = models.FloatField()
-
-    class Meta:
-        verbose_name_plural = "People"
-
-    STATUS_CHOICES = {
-        (1, 'Villein'),
-        (2, 'Free'),
-        (3, 'Unknown'),
-        (4, 'Institution')
-    }
-
-    GENDER_CHOICES = {
-        ('M', 'Male'),
-        ('F', 'Female'),
-        ('I', 'Institution'),
-        ('U', 'Unknown')
-    }
-
-    first_name = models.CharField(max_length=250)
-    relation_name = models.CharField(max_length=250)
-    last_name = models.CharField(max_length=250)
-    status = models.IntegerField(choices=STATUS_CHOICES)
-    village = models.ForeignKey(Village)
-    gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
-    # both taxes are to be input in denari.
-    tax_1332 = models.FloatField()
-    tax_1379 = models.FloatField()
     notes = models.TextField()
-    notes = models.TextField()
-
-    @property
-    def earliest_case(self):
-        # get queryset for each area where person interacts with cases (i.e. litigant table, pledges),
-        # append together in a list and sort by date using a lambda. Pop earliest case off based on index [0].
-        case_list = []
-        try:
-            case_list.append(self.person_to_case.earliest('case__session__date'))
-        except:
-            pass
-        try:
-            case_list.append(self.pledge_giver.earliest('case__session__date'))
-        except:
-            pass
-        try:
-            case_list.append(self.pledge_receiver.earliest('case__session__date'))
-        except:
-            pass
-        if not case_list:
-            earliest = {
-                'id': None,
-                'village': {'name': None},
-                'law_term': None,
-                'year': None,
-                'date': None,
-            }
-        else:
-            earliest = sorted(case_list, key=lambda x: x.case.session.date)[0]
-            earliest = {
-                'id': earliest.case.id,
-                'village': {'name': earliest.case.session.village.name},
-                'law_term': earliest.case.session.get_law_term_display(),
-                'year': earliest.case.session.year,
-                'date': earliest.case.session.date,
-                
-            }
-        return earliest
-
-
-    @property
-    def latest_case(self):
-        # see earliest_case for explanation.
-        case_list = []
-        try:
-            case_list.append(self.person_to_case.latest('case__session__date'))
-        except:
-            pass
-        try:
-            case_list.append(self.pledge_giver.latest('case__session__date'))
-        except:
-            pass
-        try:
-            case_list.append(self.pledge_receiver.latest('case__session__date'))
-        except:
-            pass
-        if not case_list:
-            latest = {
-                'id': None,
-                'village': {'name': None},
-                'law_term': None,
-                'year': None,
-                'date': None,
-            }
-        else:
-            latest = sorted(case_list, key=lambda x: x.case.session.date, reverse=True)[0]
-            latest = {
-                'id': latest.case.id,
-                'village': {'name': latest.case.session.village.name},
-                'law_term': latest.case.session.get_law_term_display(),
-                'year': latest.case.session.year,
-                'date': latest.case.session.date,
-
-            }
-        return latest
+    earliest_case = models.ForeignKey('Case', null=True, related_name='person_to_earliest_case')
+    latest_case = models.ForeignKey('Case', null=True, related_name='person_to_latest_case')
 
     @property
     def pledges_given_count(self):
