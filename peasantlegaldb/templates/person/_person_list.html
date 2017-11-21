@@ -118,10 +118,13 @@
             var village = $("#select_village").val();
             var btnClicked = e.target.id;
 
-            if (village === ''){
+            if (village === '' || village === 'None'){
                 alert("Please select a village");
-                return
-            } else{
+                return;
+            } else if (village === 'All'){
+                alert("Chevage Analysis view is too slow when run with all villages. Please select only one village.")
+                return;
+            } else {
                 var url = Urls.chevage_analysis({village_pk: village});
                 window.location = url;
             }
