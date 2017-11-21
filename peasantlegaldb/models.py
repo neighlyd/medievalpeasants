@@ -17,10 +17,13 @@ TODO:
 def median_value(queryset, term):
     count = queryset.count()
     values = queryset.values_list(term, flat=True).order_by(term)
-    if count % 2 == 1:
-        return values[int(round(count/2))]
+    if count > 0:
+        if count % 2 == 1:
+            return values[int(round(count/2))]
+        else:
+            return sum(values[count/2-1:count/2+1])/Decimal(2.0)
     else:
-        return sum(values[count/2-1:count/2+1])/Decimal(2.0)
+        return None
 
 class Archive(models.Model):
     name = models.CharField(max_length=50)
