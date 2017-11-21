@@ -1,8 +1,6 @@
-import datetime
-
 from django.db import models
 from django.db.models import Count, Max, Min, Avg, Sum
-from itertools import chain
+from decimal import *
 
 
 '''
@@ -15,6 +13,14 @@ TODO:
 2) Move Village from Session to Manor
 3) Move Session counts to Manor from Village
 '''
+
+def median_value(queryset, term):
+    count = queryset.count()
+    values = queryset.values_list(term, flat=True).order_by(term)
+    if count % 2 == 1:
+        return values[int(round(count/2))]
+    else:
+        return sum(values[count/2-1:count/2+1])/Decimal(2.0)
 
 class Archive(models.Model):
     name = models.CharField(max_length=50)
@@ -274,6 +280,57 @@ class Village(models.Model):
     @property
     def damaged_party_count(self):
         return len(set(Litigant.objects.all().filter(damage__isnull=False, case__session__village_id=self.id).values_list('person', flat=True)))
+
+    @property
+    def monetary_counts(self):
+        return self.session_set.aggregate(amercement_count=Count('cases__case_to_person__amercement'),
+                                          amercement_max=Max('cases__case_to_person__amercement__in_denarius'),
+                                          amercement_min=Min('cases__case_to_person__amercement__in_denarius'),
+                                          amercement_avg=Avg('cases__case_to_person__amercement__in_denarius'),
+                                          amercement_sum=Sum('cases__case_to_person__amercement__in_denarius'),
+                                          fine_count=Count('cases__case_to_person__fine'),
+                                          fine_max=Max('cases__case_to_person__fine__in_denarius'),
+                                          fine_min=Min('cases__case_to_person__fine__in_denarius'),
+                                          fine_avg=Avg('cases__case_to_person__fine__in_denarius'),
+                                          fine_sum=Sum('cases__case_to_person__fine__in_denarius'),
+                                          damage_count=Count('cases__case_to_person__damage'),
+                                          damage_avg=Avg('cases__case_to_person__damage__in_denarius'),
+                                          damage_sum=Sum('cases__case_to_person__damage__in_denarius'),
+                                          chevage_count=Count('cases__case_to_person__chevage'),
+                                          chevage_max=Max('cases__case_to_person__chevage__in_denarius'),
+                                          chevage_min=Min('cases__case_to_person__chevage__in_denarius'),
+                                          chevage_avg=Avg('cases__case_to_person__chevage__in_denarius'),
+                                          chevage_sum=Sum('cases__case_to_person__chevage__in_denarius'),
+                                          heriot_count=Count('cases__case_to_person__heriot'),
+                                          heriot_max=Max('cases__case_to_person__heriot__in_denarius'),
+                                          heriot_min=Min('cases__case_to_person__heriot__in_denarius'),
+                                          heriot_avg=Avg('cases__case_to_person__heriot__in_denarius'),
+                                          heriot_sum=Sum('cases__case_to_person__heriot__in_denarius'),
+                                          impercamentum_count=Count('cases__case_to_person__impercamentum'),
+                                          impercamentum_max=Max('cases__case_to_person__impercamentum__in_denarius'),
+                                          impercamentum_min=Min('cases__case_to_person__impercamentum__in_denarius'),
+                                          impercamentum_avg=Avg('cases__case_to_person__impercamentum__in_denarius'),
+                                          impercamentum_sum=Sum('cases__case_to_person__impercamentum__in_denarius') )
+
+    @property
+    def median_chevage(self):
+        queryset = Litigant.objects.all().filter(case__session__village=self.id).filter(chevage__isnull=False)
+        return median_value(queryset, 'chevage__in_denarius')
+
+    @property
+    def median_heriot(self):
+        queryset = Litigant.objects.all().filter(case__session__village=self.id).filter(heriot__isnull=False)
+        return median_value(queryset, 'heriot__in_denarius')
+
+    @property
+    def median_damage(self):
+        queryset = Litigant.objects.all().filter(case__session__village=self.id).filter(damage__isnull=False)
+        return median_value(queryset, 'damage__in_denarius')
+
+    @property
+    def median_fine(self):
+        queryset = Litigant.objects.all().filter(case__session__village=self.id).filter(fine__isnull=False)
+        return median_value(queryset, 'fine__in_denarius')
 
     def __str__(self):
         return '%s | %s' % (self.name, self.county)

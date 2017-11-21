@@ -8,9 +8,40 @@
                 <div class="card">
                 <div class="card-header text-center">
                     <h3 class="card-title"><a href="{% url 'village' village.id %}">{{ village.name }}</a></h3>
-
                 </div>
                     <div class="card-body">
+                    <div class="card">
+                        <table>
+                            <tr>
+                                <td>Number of Chevage Payers</td>
+                                <td>{{ village.chevage_payer_count }}</td>
+                            </tr>
+                            <tr>
+                                <td>Number of Chevages Paid</td>
+                                <td>{{ village.monetary_counts.chevage_count }}</td>
+                            </tr>
+                            <tr>
+                                <td>Average Chevage</td>
+                                <td>{{ village.monetary_counts.chevage_avg }}</td>
+                            </tr>
+                            <tr>
+                                <td>Median Chevage</td>
+                                <td>{{ village.median_chevage }}</td>
+                            </tr>
+                            <tr>
+                                <td>Minimum Chevage</td>
+                                <td>{{ village.monetary_counts.chevage_min }}</td>
+                            </tr>
+                            <tr>
+                                <td>Maximum Chevage</td>
+                                <td>{{ village.monetary_counts.chevage_max }}</td>
+                            </tr>
+                            <tr>
+                                <td>Total Chevage Paid</td>
+                                <td>{{ village.monetary_counts.chevage_sum }}</td>
+                            </tr>
+                        </table>
+                    </div>
                     {% for person in chevage_list %}
                             <div class="card">
                                 <div class="card-header" style="position: sticky; top: 50px; z-index: 2; background: #A9A9A9">
