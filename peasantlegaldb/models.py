@@ -124,8 +124,8 @@ class Land(models.Model):
     #   Change save condition to automagically update notes field w/ land owners from Litigants?
     notes = models.TextField()
     owner_chain = models.TextField()
-    earliest_case = models.ForeignKey('Case', null=True, related_name='land_to_earliest_case+')
-    latest_case = models.ForeignKey('Case', null=True, related_name='land_to_latest_case+')
+    earliest_case = models.ForeignKey('Case', null=True, blank=True, related_name='land_to_earliest_case+')
+    latest_case = models.ForeignKey('Case', null=True, blank=True, related_name='land_to_latest_case+')
 
     @property
     def parcel_list(self):
@@ -239,7 +239,7 @@ class Village(models.Model):
     longitude = models.DecimalField(max_digits=10, decimal_places=7)
     # rework so County info is normalized in Hundred table.
     county = models.ForeignKey(County)
-    hundred = models.ForeignKey(Hundred, null=True)
+    hundred = models.ForeignKey(Hundred, null=True, blank=True,)
     # listed as Ancient Demesne in 1334 Feudal Aid.
     ancient_demesne = models.BooleanField(default=False)
     # Part of the "Great Rumor" petition of 1377.
@@ -368,8 +368,8 @@ class Person(models.Model):
     tax_1332 = models.FloatField()
     tax_1379 = models.FloatField()
     notes = models.TextField()
-    earliest_case = models.ForeignKey('Case', null=True, related_name='person_to_earliest_case+')
-    latest_case = models.ForeignKey('Case', null=True, related_name='person_to_latest_case+')
+    earliest_case = models.ForeignKey('Case', null=True, blank=True, related_name='person_to_earliest_case+')
+    latest_case = models.ForeignKey('Case', null=True, blank=True, related_name='person_to_latest_case+')
 
     @property
     def pledges_given_count(self):
