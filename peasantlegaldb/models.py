@@ -124,8 +124,8 @@ class Land(models.Model):
     #   Change save condition to automagically update notes field w/ land owners from Litigants?
     notes = models.TextField()
     owner_chain = models.TextField()
-    earliest_case = models.ForeignKey('Case', null=True, related_name='land_to_earliest_case')
-    latest_case = models.ForeignKey('Case', null=True, related_name='land_to_latest_case')
+    earliest_case = models.ForeignKey('Case', null=True, related_name='land_to_earliest_case+')
+    latest_case = models.ForeignKey('Case', null=True, related_name='land_to_latest_case+')
 
     @property
     def parcel_list(self):
@@ -368,8 +368,8 @@ class Person(models.Model):
     tax_1332 = models.FloatField()
     tax_1379 = models.FloatField()
     notes = models.TextField()
-    earliest_case = models.ForeignKey('Case', null=True, related_name='person_to_earliest_case')
-    latest_case = models.ForeignKey('Case', null=True, related_name='person_to_latest_case')
+    earliest_case = models.ForeignKey('Case', null=True, related_name='person_to_earliest_case+')
+    latest_case = models.ForeignKey('Case', null=True, related_name='person_to_latest_case+')
 
     @property
     def pledges_given_count(self):
@@ -777,31 +777,31 @@ class Litigant(models.Model):
     person = models.ForeignKey(Person, on_delete=models.CASCADE, related_name='person_to_case')
     case = models.ForeignKey(Case, on_delete=models.CASCADE, related_name='case_to_person')
     role = models.ForeignKey(Role, related_name='litigant_role')
-    fine = models.ForeignKey(Money, null=True, related_name='litigant_fine')
-    amercement = models.ForeignKey(Money, null=True, related_name='litigant_amercement')
-    damage = models.ForeignKey(Money, null=True, related_name='litigant_damages')
-    damage_notes = models.TextField(null=True)
+    fine = models.ForeignKey(Money, null=True, blank=True, related_name='litigant_fine')
+    amercement = models.ForeignKey(Money, null=True, blank=True, related_name='litigant_amercement')
+    damage = models.ForeignKey(Money, null=True, blank=True, related_name='litigant_damages')
+    damage_notes = models.TextField(null=True, blank=True,)
     ad_proximum = models.NullBooleanField()
     distrained = models.NullBooleanField()
     # Added at Case 1189.
     attached = models.NullBooleanField()
     # Added at Case 1424
     bail = models.NullBooleanField()
-    chevage = models.ForeignKey(Money, null=True, related_name='litigant_chevage')
+    chevage = models.ForeignKey(Money, null=True, blank=True, related_name='litigant_chevage')
     crossed = models.NullBooleanField()
     recessit = models.NullBooleanField()
     habet_terram = models.NullBooleanField()
-    chevage_notes = models.TextField(null=True)
-    heriot_quantity = models.CharField(max_length=25, null=True)
+    chevage_notes = models.TextField(null=True, blank=True,)
+    heriot_quantity = models.CharField(max_length=25, null=True, blank=True,)
     heriot_animal = models.ForeignKey(Chattel, null=True, related_name='heriot_animal')
-    heriot = models.ForeignKey(Money, null=True, related_name='heriot_assessment')
-    impercamentum_quantity = models.IntegerField(null=True)
-    impercamentum_animal = models.ForeignKey(Chattel, null=True, related_name='impercamentum_animal')
-    impercamentum = models.ForeignKey(Money, null=True, related_name='impercamentum_amercement')
-    impercamentum_notes = models.TextField(null=True)
-    land = models.ForeignKey(Land, null=True, on_delete=models.CASCADE, related_name='case_to_land')
+    heriot = models.ForeignKey(Money, null=True, blank=True, related_name='heriot_assessment')
+    impercamentum_quantity = models.IntegerField(null=True, blank=True,)
+    impercamentum_animal = models.ForeignKey(Chattel, null=True, blank=True, related_name='impercamentum_animal')
+    impercamentum = models.ForeignKey(Money, null=True, blank=True, related_name='impercamentum_amercement')
+    impercamentum_notes = models.TextField(null=True, blank=True,)
+    land = models.ForeignKey(Land, null=True, blank=True, on_delete=models.CASCADE, related_name='case_to_land')
     land_villeinage = models.NullBooleanField()
-    land_notes = models.TextField(null=True)
+    land_notes = models.TextField(null=True, blank=True,)
 
 
 class Pledge(models.Model):
