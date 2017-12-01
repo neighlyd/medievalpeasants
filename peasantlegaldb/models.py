@@ -27,8 +27,8 @@ def median_value(queryset, term):
 
 class Archive(models.Model):
     name = models.CharField(max_length=50)
-    website = models.URLField()
-    notes = models.TextField()
+    website = models.URLField(blank=True)
+    notes = models.TextField(blank=True)
 
     @property
     def record_count(self):
@@ -48,7 +48,7 @@ class Archive(models.Model):
 
 class Money(models.Model):
     amount = models.CharField(max_length=150)
-    in_denarius = models.IntegerField(null=True)
+    in_denarius = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
         if not self.in_denarius:
@@ -123,7 +123,7 @@ class County(models.Model):
 class Land(models.Model):
     #   Change save condition to automagically update notes field w/ land owners from Litigants?
     notes = models.TextField()
-    owner_chain = models.TextField()
+    owner_chain = models.TextField(blank=True)
     earliest_case = models.ForeignKey('Case', null=True, blank=True, related_name='land_to_earliest_case+')
     latest_case = models.ForeignKey('Case', null=True, blank=True, related_name='land_to_latest_case+')
 
@@ -244,7 +244,7 @@ class Village(models.Model):
     ancient_demesne = models.BooleanField(default=False)
     # Part of the "Great Rumor" petition of 1377.
     great_rumor = models.BooleanField(default=False)
-    notes = models.TextField()
+    notes = models.TextField(blank=True)
 
     @property
     def case_count(self):
@@ -359,15 +359,15 @@ class Person(models.Model):
     }
 
     first_name = models.CharField(max_length=250)
-    relation_name = models.CharField(max_length=250)
+    relation_name = models.CharField(max_length=250, blank=True)
     last_name = models.CharField(max_length=250)
     status = models.IntegerField(choices=STATUS_CHOICES)
     village = models.ForeignKey(Village)
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
     # both taxes are to be input in denari.
-    tax_1332 = models.FloatField()
-    tax_1379 = models.FloatField()
-    notes = models.TextField()
+    tax_1332 = models.FloatField(null=True, blank=True)
+    tax_1379 = models.FloatField(null=True, blank=True)
+    notes = models.TextField(blank=True)
     earliest_case = models.ForeignKey('Case', null=True, blank=True, related_name='person_to_earliest_case+')
     latest_case = models.ForeignKey('Case', null=True, blank=True, related_name='person_to_latest_case+')
 
@@ -544,8 +544,8 @@ class Record(models.Model):
     name = models.CharField(max_length=25)
     archive = models.ForeignKey(Archive, on_delete=models.CASCADE)
     record_type = models.IntegerField(choices=RECORD_TYPE)
-    reel = models.IntegerField()
-    notes = models.TextField()
+    reel = models.IntegerField(null=True, blank=True)
+    notes = models.TextField(blank=True)
 
     @property
     def earliest_session(self):
@@ -628,7 +628,7 @@ class Session(models.Model):
     folio = models.CharField(max_length=50)
     record = models.ForeignKey(Record, on_delete=models.CASCADE)
     village = models.ForeignKey(Village)
-    notes = models.TextField()
+    notes = models.TextField(blank=True)
 
     @property
     def case_count(self):
@@ -677,17 +677,17 @@ class Case(models.Model):
         (6, 'Account Roll'),
     }
 
-    summary = models.TextField()
+    summary = models.TextField(blank=True)
     session = models.ForeignKey(Session, on_delete=models.CASCADE, related_name='cases')
     case_type = models.ForeignKey(CaseType)
     court_type = models.IntegerField(choices=COURT_TYPES)
     verdict = models.ForeignKey(Verdict)
-    of_interest = models.BooleanField(default=False)
+    of_interest = models.NullBooleanField()
 #   started ad legem at Case 578.
-    ad_legem = models.NullBooleanField(default=False)
-    villeinage_mention = models.BooleanField(default=False)
-    active_sale = models.BooleanField(default=False)
-    incidental_land = models.BooleanField(default=False)
+    ad_legem = models.NullBooleanField()
+    villeinage_mention = models.NullBooleanField()
+    active_sale = models.NullBooleanField()
+    incidental_land = models.NullBooleanField()
     litigants = models.ManyToManyField(Person, through='Litigant')
 
     @property
@@ -745,7 +745,7 @@ class Cornbot(models.Model):
     crop_type = models.ForeignKey(Chattel)
     price = models.ForeignKey(Money)
     case = models.ForeignKey(Case, on_delete=models.CASCADE, related_name='cornbot')
-    notes = models.TextField()
+    notes = models.TextField(blank=True)
 
 
 class Extrahura(models.Model):
@@ -759,7 +759,7 @@ class Murrain(models.Model):
     amount = models.IntegerField()
     animal = models.ForeignKey(Chattel)
     case = models.ForeignKey(Case, on_delete=models.CASCADE, related_name='murrain')
-    notes = models.TextField()
+    notes = models.TextField(blank=True)
 
 
 class PlaceMentioned(models.Model):
@@ -769,7 +769,7 @@ class PlaceMentioned(models.Model):
 
     case = models.ForeignKey(Case, on_delete=models.CASCADE)
     village = models.ForeignKey(Village, on_delete=models.CASCADE)
-    notes = models.TextField()
+    notes = models.TextField(blank=True)
 
 
 class Litigant(models.Model):
@@ -780,7 +780,7 @@ class Litigant(models.Model):
     fine = models.ForeignKey(Money, null=True, blank=True, related_name='litigant_fine')
     amercement = models.ForeignKey(Money, null=True, blank=True, related_name='litigant_amercement')
     damage = models.ForeignKey(Money, null=True, blank=True, related_name='litigant_damages')
-    damage_notes = models.TextField(null=True, blank=True,)
+    damage_notes = models.TextField(blank=True,)
     ad_proximum = models.NullBooleanField()
     distrained = models.NullBooleanField()
     # Added at Case 1189.
@@ -791,17 +791,17 @@ class Litigant(models.Model):
     crossed = models.NullBooleanField()
     recessit = models.NullBooleanField()
     habet_terram = models.NullBooleanField()
-    chevage_notes = models.TextField(null=True, blank=True,)
-    heriot_quantity = models.CharField(max_length=25, null=True, blank=True,)
+    chevage_notes = models.TextField(blank=True,)
+    heriot_quantity = models.CharField(max_length=25, blank=True,)
     heriot_animal = models.ForeignKey(Chattel, null=True, related_name='heriot_animal')
     heriot = models.ForeignKey(Money, null=True, blank=True, related_name='heriot_assessment')
     impercamentum_quantity = models.IntegerField(null=True, blank=True,)
     impercamentum_animal = models.ForeignKey(Chattel, null=True, blank=True, related_name='impercamentum_animal')
     impercamentum = models.ForeignKey(Money, null=True, blank=True, related_name='impercamentum_amercement')
-    impercamentum_notes = models.TextField(null=True, blank=True,)
+    impercamentum_notes = models.TextField(blank=True,)
     land = models.ForeignKey(Land, null=True, blank=True, on_delete=models.CASCADE, related_name='case_to_land')
     land_villeinage = models.NullBooleanField()
-    land_notes = models.TextField(null=True, blank=True,)
+    land_notes = models.TextField(blank=True,)
 
 
 class Pledge(models.Model):
