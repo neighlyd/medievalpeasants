@@ -7,3 +7,8 @@ Integrate inline forms:
 - Django-extra-views (https://django-extra-views.readthedocs.io/en/latest/index.html)
 - Django Dynamic Formset (https://github.com/elo80ka/django-dynamic-formset/blob/master/docs/usage.rst)
 
+Delete Case:
+935
+
+Fix:
+Places Mentioned table in Case View (see Case 964)
