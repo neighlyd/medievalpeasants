@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     'django_js_reverse',
     'django_filters',
     'peasantlegaldb.templatetags',
-    'widget_tweaks'
+    'widget_tweaks',
 ]
 
 MIDDLEWARE = [

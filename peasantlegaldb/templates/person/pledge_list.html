@@ -69,7 +69,7 @@
             fixedHeader: {
                 headerOffset: 50
             },
-            order: [6, "asc"],
+            order: [5, "asc"],
             ajax: {
                 url: giver_url,
                 type: "GET",
@@ -95,11 +95,11 @@
                 },
                 {data: 'pledge_receiver.status_display'},
                 {data: 'pledge_receiver.gender_display'},
-                {data: "case.id",
+                {data: "case",
                     defaultContent: '',
                     render:{
                         display: formatCase,
-                        sort: 'full_name'
+                        sort: 'id'
                     }
                 },
                 {data: "case.session",
@@ -137,7 +137,7 @@
         var table2 = $("#pledges_received_list").DataTable({
             fixedHeader:{ headerOffset: 50 },
             scrollX: true,
-            order: [6, "asc"],
+            order: [5, "asc"],
             ajax: {
                 url: receiver_url,
                 type: "GET",

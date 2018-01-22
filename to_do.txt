@@ -1,0 +1,14 @@
+Fix Damages in Case 1717
+
+Corrupted Land Parcels:
+7, 8, 264, 265, 303, 341, 342, 343, 344, 345, 346
+
+Integrate inline forms:
+- Django-extra-views (https://django-extra-views.readthedocs.io/en/latest/index.html)
+- Django Dynamic Formset (https://github.com/elo80ka/django-dynamic-formset/blob/master/docs/usage.rst)
+
+Delete Case:
+935
+
+Fix:
+Places Mentioned table in Case View (see Case 964)
