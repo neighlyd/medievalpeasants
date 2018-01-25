@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'django_filters',
     'peasantlegaldb.templatetags',
     'widget_tweaks',
+    'crispy_forms',
 ]
 
 MIDDLEWARE = [
@@ -137,6 +138,10 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS':
         ('django_filters.rest_framework.DjangoFilterBackend',)
 }
+
+#declare template pack for Crispy Forms
+
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 # SECRET_KEY and Database information stored in secret_settings.py which is excluded from git through .gitignore.
 # Import SECRET_KEY and Database information. Ensure that the secret_settings.py file is the correct one before using.

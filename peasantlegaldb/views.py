@@ -6,6 +6,7 @@ from django.urls import reverse_lazy, reverse
 from django.db.models import Count, Max, Min, Avg, Sum
 from django.core.urlresolvers import resolve
 from django.http import HttpResponseRedirect
+from django.forms import inlineformset_factory
 
 from braces.views import GroupRequiredMixin
 
@@ -169,16 +170,24 @@ class CaseDetailView(DetailView):
 class CaseEditView(GroupRequiredMixin, UpdateView):
 
     model = models.Case
-    fields = ['session', 'case_type', 'court_type', 'verdict', 'of_interest', 'ad_legem',
-              'villeinage_mention', 'active_sale', 'incidental_land', 'summary',]
+    form_class = forms.CaseForm
     template_name = 'case/case_edit.html'
 
+
+
     group_required = Edit
+    def get_context_data(self, **kwargs):
+        context = super(CaseEditView, self).get_context_data(**kwargs)
+
+        if self.request.POST:
+            context['formset'] = forms.LitigantFormset(self.request.POST, instance=self.object)
+        else:
+            context['formset'] = forms.LitigantFormset(instance=self.object)
+        return context
 
     def get_success_url(self):
         pk = self.kwargs.get('pk')
         return reverse('case', kwargs={'pk': pk})
-
 
 
 class CaseAddView(GroupRequiredMixin, CreateView):
@@ -254,7 +263,7 @@ class CountyListView(ListView):
 class CountyEditView(GroupRequiredMixin, UpdateView):
 
     model = models.County
-    fields = ['name', 'abbreviation'']
+    fields = ['name', 'abbreviation',]
     template_name = 'county/county_edit.html'
 
     group_required = Edit

@@ -682,12 +682,12 @@ class Case(models.Model):
     case_type = models.ForeignKey(CaseType)
     court_type = models.IntegerField(choices=COURT_TYPES)
     verdict = models.ForeignKey(Verdict)
-    of_interest = models.NullBooleanField()
+    of_interest = models.BooleanField()
 #   started ad legem at Case 578.
-    ad_legem = models.NullBooleanField()
-    villeinage_mention = models.NullBooleanField()
-    active_sale = models.NullBooleanField()
-    incidental_land = models.NullBooleanField()
+    ad_legem = models.BooleanField()
+    villeinage_mention = models.BooleanField()
+    active_sale = models.BooleanField()
+    incidental_land = models.BooleanField()
     litigants = models.ManyToManyField(Person, through='Litigant')
 
     @property
