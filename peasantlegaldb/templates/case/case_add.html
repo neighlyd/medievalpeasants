@@ -1,15 +1,197 @@
-{% extends '_layout/_add_edit.html' %}
+{% extends '_layout/_l_three_col.html' %}
+{% load template_tags %}
+{% load crispy_forms_tags %}
+{% load static %}
 
-{% block card_body %}
-   {% include '_layout/_form.html' %}
+{% block navbar %}
+    {% include '_layout/__navbar.html' %}
 {% endblock %}
 
-{% block buttons %}
-        <a href="{{ request.META.HTTP_REFERER }}" class="btn btn-danger mr-auto">Cancel</a>
+<form>
+    {% block left_sidebar %}
+        <div class="container" style="position: sticky; top: 65px">
+            <button type="button" class="btn btn-success js-add-litigant pull-right" id="add_litigant"">Add Litigant</button>
+        </div>
+    {% endblock %}
+
+{% block center_bar %}
+
+    <div class="card-header text-center">
+        <h2 class="card-title">Add Case</h2>
+    </div>
+
+    <div class="card-body clearfix" id="main_form">
+        <div class="d-flex justify-content-between flex-wrap">
+
+                        <div class="card p-0 col-lg-5">
+                            <h3 class="card-header">Case Info:</h3>
+                                <div class="card-body">
+                                    <table class="table table-sm">
+                                        <tr class="row m-0">
+                                            <td class="d-inline-block col-4"><label for="session">Session:</label></td>
+                                            <td class="d-inline-block col-8"><select class="form-control" id="session_select">
+                                                                                    <option value="">Select a Session</option>
+                                                                                {% for session in session_search %}
+                                                                                    <option value="{{ session.id }}">{{ session }}</option>
+                                                                                {% endfor %}
+                                                                            </select>
+                                            </td>
+                                        </tr>
+                                        <tr class="row m-0">
+                                            <td class="d-inline-block col-4"><label for="select_court_type">Court Type:</label></td>
+                                            <td class="d-inline-block col-8"><select class="form-control" id="select_court_type">
+                                                    <option value="">Select a Court</option>
+                                                {% for type in court_type_search %}
+                                                    <option value="{{ type.0 }}">{{ type.1 }}</option>
+                                                {% endfor %}
+                                            </select></td>
+                                        </tr>
+                                        <tr class="row m-0">
+                                            <td class="d-inline-block col-4"><label for="select_case_type">Case Type:</label></td>
+                                            <td class="d-inline-block col-8"><select class="form-control" id="select_case_type">
+                                                    <option value="">Select a Case</option>
+                                                {% for type in case_type_search %}
+                                                    <option value="{{ type.id }}">{{ type }}</option>
+                                                {% endfor %}
+                                            </select></td>
+                                        </tr>
+                                        <tr class="row m-0">
+                                            <td class="d-inline-block col-4"><label for="select_verdict">Verdict:</label></td>
+                                            <td class="d-inline-block col-8"><select class="form-control" id="select_verdict">
+                                                    <option value="">Select a Verdict</option>
+                                                {% for verdict in verdict_search %}
+                                                    <option value="{{ verdict.id }}">{{ verdict }}</option>
+                                                {% endfor %}
+                                            </select></td>
+                                        </tr>
+                                        <tr class="row m-0">
+                                            <td class="d-inline-block col-6"><label for="of_interest" class="form-check-label">Of Interest?</label></td>
+                                            <td  class="d-inline-block col-5"><input class="form-check-input" type="checkbox" value="" id="of_interest">
+                                            </td>
+                                        </tr>
+                                        <tr class="row m-0">
+                                            <td class="d-inline-block col-6"><label for="ad_legem" class="form-check-label">At Law?</label></td>
+                                            <td  class="d-inline-block col-5"><input class="form-check-input" type="checkbox" value="" id="ad_legem">
+                                            </td>
+                                        </tr>
+                                        <tr class="row m-0">
+                                            <td class="d-inline-block col-6"><label for="villeinage" class="form-check-label">Villeinage?</label></td>
+                                            <td  class="d-inline-block col-5"><input class="form-check-input" type="checkbox" value="" id="villeinage">
+                                            </td>
+                                        </tr>
+                                        <tr class="row m-0">
+                                            <td class="d-inline-block col-6"><label for="active_sale" class="form-check-label">Active Sale?</label></td>
+                                            <td  class="d-inline-block col-5"><input class="form-check-input" type="checkbox" value="" id="active_sale">
+                                            </td>
+                                        </tr>
+                                        <tr class="row m-0">
+                                            <td class="d-inline-block col-6"><label for="incidental_land" class="form-check-label">Incidental Land?</label></td>
+                                            <td  class="d-inline-block col-5"><input class="form-check-input pull-right" type="checkbox" value="" id="incidental_land">
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                        </div>
+                        <div class="card p-0 col-lg-6">
+                            <h3 class="card-header">Notes:</h3>
+                            <div class="card-body">
+                                <textarea class="form-control" id="summary" rows="15"></textarea>
+                            </div>
+                        </div>
+        </div>
+    </div>
+    <br>
+    <div class="card">
+        <div class="card-header text-center">
+            <h4 class="card-title">Litigants</h4>
+        </div>
+        <div class="card-body">
+        <div id="litigants">
+        </div>
+
+
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block right_sidebar %}
+    <div class="container" style="position: sticky; top: 65px">
+        <button type="button" class="btn btn-success">Save Case</button>
         <br>
         <br>
-        <input type="submit" class="btn btn-success ml-auto" value="Add" name="add_single"/>
+        <button type="button" class="btn btn-success">Save and Add Another</button>
         <br>
         <br>
-        <input type="submit" class="btn btn-success" value="Add Another Case" name="add_another" />
+        <button type="button" class="btn btn-danger">Cancel</button>
+
+    </div>
+{% endblock %}
+
+</form>
+
+{% block scripts %}
+
+    {{ block.super }}
+
+    <script>
+        $(document).ready(function(){
+
+           $("#add_litigant").click(function(){
+               $("#litigants").append(
+                   '<div class="litigant_subform">' +
+                   '<div class="form-row">' +
+                   '    <div class="form-group col-5">' +
+                   '        <label for="litigant_name">Name:</label>' +
+                   '        <input class="form-control" type="text">' +
+                   '    </div>' +
+                   '    <div class="form-group col-5">' +
+                   '        <label for="litigant_role">Role:</label>' +
+                   '        <select class="form-control" id="litigant_role">' +
+                   '        <option value="">Select a Role</option>' +
+                   '            {% for role in role_search %}' +
+                   '        <option value="{{ role.id }}">{{ role }}</option>' + '"{% endfor %}"' + '' +
+                   '        </select>' +
+                   '    </div>' +
+                   '</div>' +
+                   '<div class="form-group">' +
+                   '    <div class="form-check form-check-inline">' +
+                   '        <input class="form-check-input" type="checkbox" id="ad_proximum">' +
+                   '        <label class="form-check-label" for="ad_proximum">Ad Proximum</label>' +
+                   '    </div>' +
+                   '    <div class="form-check form-check-inline">' +
+                   '        <input class="form-check-input" type="checkbox" id="distrain">' +
+                   '        <label class="form-check-label" for="distrain">Distrain</label>' +
+                   '    </div>' +
+                   '    <div class="form-check form-check-inline">' +
+                   '        <input class="form-check-input" type="checkbox" id="attach">' +
+                   '        <label class="form-check-label" for="attach">Attach</label>' +
+                   '    </div>' +
+                   '    <div class="form-check form-check-inline">' +
+                   '        <input class="form-check-input" type="checkbox" id="bail">' +
+                   '        <label class="form-check-label" for="bail">Bail</label>' +
+                   '    </div>' +
+                   '</div>' +
+                   '<div class="d-flex">' +
+                   '    <button class="btn btn-success" id="add_amercement">Amercement</button>' +
+                   '    <button class="btn btn-success" id="add_fine">Fine</button>' +
+                   '    <button class="btn btn-success" id="add_damage">Damage</button>' +
+                   '    <button class="btn btn-success" id="add_capitagium">Capitagium</button>' +
+                   '    <button class="btn btn-success" id="add_land">Land</button>' +
+                   '    <button class="btn btn-success" id="add_heriot">Heriot</button>' +
+                   '    <button class="btn btn-success" id="add_impercamentum">Impercamentum</button>' +
+                   '    <button class="btn btn-danger ml-auto" id="remove_litigant">Remove Litigant</button>' +
+                   '</div>' +
+                   '<hr>' +
+                   '</div>' )
+           });
+
+           $(document).on("click", "#remove_litigant",function(){
+               console.log('just checking');
+               $(this).parent().parent().remove();
+           });
+        });
+
+    </script>
+
 {% endblock %}

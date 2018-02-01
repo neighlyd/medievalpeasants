@@ -1,13 +1,17 @@
 {% extends '_layout/_l_three_col.html' %}
 {% load template_tags %}
 {% load crispy_forms_tags %}
+{% load static %}
 
 {% block navbar %}
     {% include '_layout/__navbar.html' %}
 {% endblock %}
 
 <form>
-    {% block side_bar %}
+    {% block left_sidebar %}
+        <div class="container" style="position: sticky; top: 65px">
+            <button type="button" class="btn btn-success js-add-litigant pull-right" data-url="{% url 'add_litigant' %}">Add Litigant</button>
+        </div>
     {% endblock %}
 
 {% block center_bar %}
@@ -24,6 +28,10 @@
                         <div class="card p-0 col-lg-5">
                             <h3 class="card-header">Case Info:</h3>
                                 <div class="card-body">
+                                    <table class="table table-sm">
+
+                                    </table>
+
                                     {% for field in form %}
                                         {% if field.name != 'summary' %}
                                             {{ field | as_crispy_field }}
@@ -42,17 +50,50 @@
     <br>
     <div class="card">
         <div class="card-header text-center">
+
             <h4 class="card-title">Litigants</h4>
         </div>
-        <div class="card-body" id="litigant_form">
-        <hr>
-            {% crispy formset formset.form.helper %}
+        <div class="card-body">
+            {% for form in litigant_formset %}
+                <div id="litigant_form">
+                    {% crispy form %}
+                    <button class="btn btn-primary">Add Amercement</button>
+                    <button class="btn btn-primary">Add Fine</button>
+                    <hr>
+                </div>
+            {% endfor %}
+            {{  litigant_formset.management_form | crispy }}
         </div>
     </div>
 
 {% endblock %}
 
 {% block right_sidebar %}
+    <div class="container" style="position: sticky; top: 65px">
+        <button type="button" class="btn btn-success">Save Case</button>
+        <br>
+        <br>
+        <button type="button" class="btn btn-success">Save and Add Another</button>
+        <br>
+        <br>
+        <button type="button" class="btn btn-danger">Cancel</button>
+
+    </div>
 {% endblock %}
 
 </form>
+
+{% block scripts %}
+
+    {{ block.super }}
+    <script src="{% static '/js/add_litigant.js' %}"></script>
+    <script src="{% static '/js/formset.js' %}"></script>
+    <script>
+        $(function() {
+            $('#litigant_form').formset({
+                prefix:'{{ litigant.prefix }}'
+            });
+        });
+    </script>
+
+{% endblock %}

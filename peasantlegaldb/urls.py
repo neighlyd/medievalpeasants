@@ -35,7 +35,7 @@ case_urls = [
         name='case_place_mentioned_list'),
     url(r'^pledge_list', views.CaseListView.as_view(template_name='case/case_pledge_list.html'),
         name='case_pledge_list'),
-    url(r'^edit/$', views.CaseEditView.as_view(), name='edit_case'),
+    url(r'^edit/$', views.CaseEditView, name='edit_case'),
     url(r'^delete/$', views.CaseDeleteView.as_view(), name='delete_case'),
 ]
 
@@ -72,6 +72,11 @@ land_urls = [
         name='land_split_history'),
     url(r'^case_history', views.LandDetailView.as_view(template_name='land/land_case_history.html'),
         name='land_case_history'),
+]
+
+litigant_urls = [
+    url(r'^add', views.add_litigant, name='add_litigant'),
+    url(r'^edit/(?P<id>\d+)/', views.edit_litigant, name='edit_litigant'),
 ]
 
 
@@ -140,10 +145,11 @@ urlpatterns = [
     url(r'^archive/(?P<pk>\d+)/', include(archive_urls)),
     url(r'^archive/add/$', views.ArchiveAddView.as_view(), name='add_archive'),
     url(r'^case/(?P<pk>\d+)/', include(case_urls)),
-    url(r'^case/add/$', views.CaseAddView.as_view(), name='add_case'),
+    url(r'^case/add/$', views.add_case, name='add_case'),
     url(r'^county/(?P<pk>\d+)/', include(county_urls)),
     url(r'^hundred/(?P<pk>\d+)/', include(hundred_urls)),
     url(r'^land/(?P<pk>\d+)/', include(land_urls)),
+    url(r'^litigant/', include(litigant_urls)),
     url(r'^person/(?P<pk>\d+)/', include(person_detail_urls)),
     url(r'^record/(?P<pk>\d+)/', include(record_urls)),
     url(r'^record/add/$', views.RecordAddView.as_view(), name='add_record'),

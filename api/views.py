@@ -1,5 +1,6 @@
 from django.db.models import Q
 from dynamic_rest.viewsets import DynamicModelViewSet
+from rest_framework import permissions
 
 from api import serializers
 from peasantlegaldb import models
@@ -33,6 +34,9 @@ def check_chain(check, queryset, distinct=False):
 # API views
 class ArchiveViewSet(DynamicModelViewSet):
 
+    # Must be logged in to edit
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
     # API endpoint that allows the model to be viewed or edited.
     queryset = models.Archive.objects.all()
     serializer_class = serializers.ArchiveSerializer
@@ -41,32 +45,47 @@ class ArchiveViewSet(DynamicModelViewSet):
         return super(ArchiveViewSet, self).list(request, *args, **kwargs)
 
 
-class ArchiveListEndpoint(DynamicModelViewSet):
-    queryset = models.Archive.objects.all()
-    serializer_class = serializers.ArchiveSerializer
-
-
 class MoneyViewSet(DynamicModelViewSet):
+
+    # Must be logged in to edit
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
     queryset = models.Money.objects.all().order_by('in_denarius', 'amount')
     serializer_class = serializers.MoneySerializer
 
 
 class ChattelViewSet(DynamicModelViewSet):
+
+    # Must be logged in to edit
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
     queryset = models.Chattel.objects.all().order_by('name')
     serializer_class = serializers.ChattelSerializer
 
 
 class CaseTypeViewSet(DynamicModelViewSet):
+
+    # Must be logged in to edit
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
     queryset = models.CaseType.objects.all().order_by('case_type')
     serializer_class = serializers.CaseTypeSerializer
 
 
 class CountyViewSet(DynamicModelViewSet):
+
+    # Must be logged in to edit
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
     serializer_class = serializers.CountySerializer
     queryset = models.County.objects.all().order_by('name')
 
 
 class LandViewSet(DynamicModelViewSet):
+
+    # Must be logged in to edit
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
     queryset = models.Land.objects.all()
     serializer_class = serializers.LandSerializer
 
@@ -94,46 +113,82 @@ class LandViewSet(DynamicModelViewSet):
             return models.Land.objects.filter(id__in=land_list)
 
 class ParcelTenureViewSet(DynamicModelViewSet):
+
+    # Must be logged in to edit
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
     queryset = models.ParcelTenure.objects.all().order_by('tenure')
     serializer_class = serializers.ParcelTenureSerializer
 
 
 class ParcelTypeViewSet(DynamicModelViewSet):
+
+    # Must be logged in to edit
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
     queryset = models.ParcelType.objects.all().order_by('parcel_type')
     serializer_class = serializers.ParcelTypeSerializer
 
 
 class PositionTypeViewSet(DynamicModelViewSet):
+
+    # Must be logged in to edit
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
     queryset = models.PositionType.objects.all().order_by('title')
     serializer_class = serializers.PositionTypeSerializer
 
 
 class RelationViewSet(DynamicModelViewSet):
+
+    # Must be logged in to edit
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
     queryset = models.Relation.objects.all().order_by('relation')
     serializer_class = serializers.RelationSerializer
 
 
 class RoleViewSet(DynamicModelViewSet):
+
+    # Must be logged in to edit
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
     queryset = models.Role.objects.all().order_by('role')
     serializer_class = serializers.RoleSerializer
 
 
 class VerdictViewSet(DynamicModelViewSet):
+
+    # Must be logged in to edit
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
     queryset = models.Verdict.objects.all().order_by('verdict')
     serializer_class = serializers.VerdictSerializer
 
 
 class HundredViewSet(DynamicModelViewSet):
+
+    # Must be logged in to edit
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
     serializer_class = serializers.HundredSerializer
     queryset = models.Hundred.objects.all()
 
 
 class VillageViewSet(DynamicModelViewSet):
+
+    # Must be logged in to edit
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
     serializer_class = serializers.VillageSerializer
     queryset = models.Village.objects.all().order_by('county__name', 'name')
 
 
 class PersonViewSet(DynamicModelViewSet):
+
+    # Must be logged in to edit
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
     serializer_class = serializers.PersonSerializer
 
     def get_queryset(self, queryset=models.Person.objects.all()):
@@ -160,11 +215,19 @@ class PersonViewSet(DynamicModelViewSet):
 
 
 class RecordViewSet(DynamicModelViewSet):
+
+    # Must be logged in to edit
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
     serializer_class = serializers.RecordSerializer
     queryset = models.Record.objects.all().order_by('archive__name', 'name')
 
 
 class SessionViewSet(DynamicModelViewSet):
+
+    # Must be logged in to edit
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
     serializer_class = serializers.SessionSerializer
     queryset = models.Session.objects.all().order_by('village__name', 'record__record_type', 'date')
 
@@ -185,6 +248,10 @@ class SessionViewSet(DynamicModelViewSet):
 
 
 class CaseViewSet(DynamicModelViewSet):
+
+    # Must be logged in to edit
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
     serializer_class = serializers.CaseSerializer
 
     def get_queryset(self, queryset=models.Case.objects.all()):
@@ -207,21 +274,37 @@ class CaseViewSet(DynamicModelViewSet):
 
 
 class CornbotViewSet(DynamicModelViewSet):
+
+    # Must be logged in to edit
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
     serializer_class = serializers.CornbotSerializer
     queryset = models.Cornbot.objects.all().order_by('case__session__village__name', 'case__session__date')
 
 
 class ExtrahuraViewSet(DynamicModelViewSet):
+
+    # Must be logged in to edit
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
     serializer_class = serializers.ExtrahuraSerializer
     queryset = models.Extrahura.objects.all().order_by('case__session__village__name', 'case__session__date')
 
 
 class MurrainViewSet(DynamicModelViewSet):
+
+    # Must be logged in to edit
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
     serializer_class = serializers.MurrainSerializer
     queryset = models.Murrain.objects.all().order_by('case__session__village__name', 'case__session__date')
 
 
 class PlaceMentionedViewSet(DynamicModelViewSet):
+
+    # Must be logged in to edit
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
     serializer_class = serializers.PlaceMentionedSerializer
     queryset = models.PlaceMentioned.objects.all()
 
@@ -237,22 +320,38 @@ class PlaceMentionedViewSet(DynamicModelViewSet):
 
 
 class LandParcelViewSet(DynamicModelViewSet):
+
+    # Must be logged in to edit
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
     queryset = models.LandParcel.objects.all().order_by('land', 'parcel_type__parcel_type')
     serializer_class = serializers.LandParcelSerializer
 
 
 class LitigantViewSet(DynamicModelViewSet):
+
+    # Must be logged in to edit
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
     serializer_class = serializers.LitigantSerializer
     queryset = models.Litigant.objects.all()
 
 
 class PledgeViewSet(DynamicModelViewSet):
+
+    # Must be logged in to edit
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
     serializer_class = serializers.PledgeSerializer
     queryset = models.Pledge.objects.all().order_by('case__session__village__name', 'case__session__date',
                                                     'pledge_giver__last_name', 'pledge_giver__first_name')
 
 
 class LandSplitViewSet(DynamicModelViewSet):
+
+    # Must be logged in to edit
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
     serializer_class = serializers.LandSplitSerializer
 
     def get_queryset(self, queryset=models.LandSplit.objects.all()):
@@ -265,11 +364,19 @@ class LandSplitViewSet(DynamicModelViewSet):
 
 
 class PositionViewSet(DynamicModelViewSet):
+
+    # Must be logged in to edit
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
     serializer_class = serializers.PositionSerializer
     queryset = models.Position.objects.all()
 
 
 class RelationshipViewSet(DynamicModelViewSet):
+
+    # Must be logged in to edit
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
     serializer_class = serializers.RelationshipSerializer
 
     def get_queryset(self, *args, **kwargs):

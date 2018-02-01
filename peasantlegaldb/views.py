@@ -1,7 +1,11 @@
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import UpdateView, CreateView, DeleteView
 from django.views.generic import ListView
-from django.views.generic.edit import FormView
+
+from django.shortcuts import render, get_object_or_404
+from django.template.loader import render_to_string
+from django.http import JsonResponse
+
 from django.urls import reverse_lazy, reverse
 from django.db.models import Count, Max, Min, Avg, Sum
 from django.core.urlresolvers import resolve
@@ -167,13 +171,92 @@ class CaseDetailView(DetailView):
         return context
 
 
+def CaseEditView(request, pk):
+
+    case = get_object_or_404(models.Case, pk=pk)
+    litigants = models.Litigant.objects.filter(case = case)
+    # inlines
+    LitigantFormset = inlineformset_factory(models.Case, models.Litigant, form=forms.LitigantForm, extra=1, can_delete=True)
+
+    if request.method == 'POST':
+        form = forms.CaseForm(request.POST, instance=case)
+        litigant_formset = LitigantFormset(request.POST, prefix='litigant')
+    else:
+        form = forms.CaseForm(instance=case)
+        litigant_formset = LitigantFormset(instance=case, prefix='litigant')
+
+    context = {
+        'case': case,
+        'litigants': litigants,
+        'form': form,
+        'litigant_formset': litigant_formset,
+    }
+
+    return render(request, 'case/case_edit.html', context)
+
+
+def add_litigant(request):
+
+    data = dict()
+
+    if request.method == "POST":
+        form = forms.LitigantForm(request.POST)
+        if form.is_valid():
+            form.save()
+            data['form_is_valid'] = True
+        else:
+            data['form_is_valid'] = False
+    else:
+        form = forms.LitigantForm()
+
+    context = {'form': form}
+
+    # Before passing context along, render it as a string so that it can be serialized and sent as JSON data.
+    data['html_form'] = render_to_string('case/_case_add_litigant_modal.html', context, request=request)
+
+    return JsonResponse(data)
+
+
+def edit_litigant(request, id):
+    litigant = get_object_or_404(models.Litigant, pk=id)
+
+    data = dict()
+
+    if request.method == 'POST':
+        form = forms.LitigantForm(request.POST, instance=litigant)
+    else:
+        form = forms.LitigantForm(instance=litigant)
+
+    context = {'form': form}
+
+    data['html_form'] = render_to_string('case/_case_edit_litigant_modal.html', context, request=request)
+
+    return JsonResponse(data)
+
+def add_case(request):
+
+    context = dict()
+
+    # establish queries for search boxes
+    session_search = models.Session.objects.all()
+    court_type_search = models.Case.COURT_TYPES
+    case_type_search = models.CaseType.objects.all().order_by('case_type')
+    verdict_search = models.Verdict.objects.all().order_by('verdict')
+    role_search = models.Role.objects.all().order_by('role')
+    context['session_search'] = session_search
+    context['court_type_search'] = court_type_search
+    context['case_type_search'] = case_type_search
+    context['verdict_search'] = verdict_search
+    context['role_search'] = role_search
+
+    return render(request, 'case/case_add.html', context)
+
+'''
 class CaseEditView(GroupRequiredMixin, UpdateView):
 
     model = models.Case
     form_class = forms.CaseForm
     template_name = 'case/case_edit.html'
-
-
 
     group_required = Edit
     def get_context_data(self, **kwargs):
@@ -192,9 +275,6 @@ class CaseEditView(GroupRequiredMixin, UpdateView):
 
 class CaseAddView(GroupRequiredMixin, CreateView):
 
-    model = models.Case
-    fields = ['session', 'case_type', 'court_type', 'verdict', 'of_interest', 'ad_legem',
-              'villeinage_mention', 'active_sale', 'incidental_land', 'summary', ]
     template_name = 'case/case_add.html'
 
     group_required = Add
@@ -224,7 +304,7 @@ class CaseAddView(GroupRequiredMixin, CreateView):
         initial['case_type'] = case_type
         initial['court_type'] = court_type
         return initial
-
+'''
 
 
 class CaseDeleteView(GroupRequiredMixin, DeleteView):

@@ -339,8 +339,8 @@ class LandSerializer(DynamicModelSerializer):
             'parcels__parcel_type', 'parcels__parcel_tenure'
         ]
     )
-    earliest_date = DynamicRelationField('CaseSerializer', deferred=True, embed=True)
-    latest_date = DynamicRelationField('CaseSerializer', deferred=True, embed=True)
+    #earliest_date = DynamicRelationField('CaseSerializer', deferred=True, embed=True)
+    #latest_date = DynamicRelationField('CaseSerializer', deferred=True, embed=True)
 
     tenant_history = DynamicRelationField(
         'LitigantSerializer',
@@ -354,7 +354,7 @@ class LandSerializer(DynamicModelSerializer):
     class Meta:
         model = models.Land
         name = 'land'
-        fields = ('id', 'notes', 'parcel_list', 'tenant_history', 'earliest_date', 'latest_date')
+        fields = ('id', 'notes', 'parcel_list', 'tenant_history')
 
     def get_parcel_list(self, record):
         return record.parcel_list

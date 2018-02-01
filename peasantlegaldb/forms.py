@@ -56,7 +56,7 @@ class CaseFilterForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super(CaseFilterForm, self).__init__(*args, **kwargs)
 
-        # set up a list of tuples as additional optionssasdfasdfwef.
+        # set up a list of tuples as additional options
 
         EXTRA_CHOICES = [
             (None, 'Select a Case Type'),
@@ -77,9 +77,16 @@ class CaseForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(CaseForm, self).__init__(*args, **kwargs)
         self.helper = FormHelper()
-        #remove label for 'summary', to be replaced by "Notes" in Fieldset.
+        # remove label for 'summary', to be replaced by "Notes" in Fieldset.
         self.fields['summary'].label = False
+        # adjust size of summary field widget.
+        self.fields['summary'].widget.attrs['rows'] = 15
+        self.fields['summary'].widget.attrs['columns'] = 55
+        # set form_tag to False to prevent crispy forms from auto-creating a <form> tag. This will allow us to add
+        # multiple forms to a single template, though we need to manually add the <form> tag ourselves.
         self.helper.form_tag = False
+        # Disable CSRF so that way Crispy forms doesn't create multiple CSRF tokens for each subform generated. Need to
+        # manually add CSRF token generation to template.
         self.helper.disable_csrf = True
         self.helper.form_id = 'id-caseForm'
         self.helper.wrapper_class = 'form-row'
@@ -87,15 +94,12 @@ class CaseForm(forms.ModelForm):
         self.helper.field_class = 'col-8'
         self.helper.form_method = 'post'
         self.helper.form_action = 'submit_case'
-        # set form_tag to False to prevent crispy forms from auto-creating a <form> tag. This will allow us to add
-        # multiple forms to a single template, though we need to manually add the <form> tag ourselves.
-        self.helper.form_tag = False
         self.helper.layout = Layout(
             'session',
             'court_type',
             'case_type',
             'verdict',
-            Field('of_interest', css_class='pull-right'),
+            'of_interest',
             'ad_legem',
             'villeinage_mention',
             'active_sale',
@@ -120,24 +124,32 @@ class CaseForm(forms.ModelForm):
             'incidental_land': _('Incidental Land'),
         }
 
+
 class LitigantForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(LitigantForm, self).__init__(*args, **kwargs)
         self.helper = FormHelper()
-        self.form_method = 'post'
         # disable form_tag so that way LitigantForm can nest within Case form. Need to manually add <form> tags to
         # template.
         self.helper.form_tag = False
         # Disable CSRF so that way Crispy forms doesn't create multiple CSRF tokens for each subform generated. Need to
         # manually add CSRF token generation to template.
         self.helper.disable_csrf = True
-        self.helper.form_show_labels = False
-        self.helper.template = 'bootstrap/table_inline_formset.html'
         self.helper.layout = Layout(
-            'person',
-            'role',
-            Field('DELETE'),
-            Button('add_amercement', 'Add Amercement')
+            Div(
+                Div(
+                    'person',
+                    css_class='col',
+                ),
+                Div(
+                    'role',
+                    css_class='col',
+                ),
+                Div(
+                    Field('DELETE',),
+                ),
+                css_class='row',
+            ),
         )
 
     class Meta:
@@ -145,5 +157,8 @@ class LitigantForm(forms.ModelForm):
         fields = ['person', 'role']
 
 
-# inlines
-LitigantFormset = inlineformset_factory(models.Case, models.Litigant, form=LitigantForm, extra=0, can_delete=True)
+class AmercementForm(forms.ModelForm):
+
+    class Meta:
+        model = models.Amercement
+        fields = ['amercement']
