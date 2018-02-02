@@ -238,16 +238,24 @@ def add_case(request):
     context = dict()
 
     # establish queries for search boxes
+    person_search = models.Person.objects.all().order_by('last_name', 'first_name')
     session_search = models.Session.objects.all()
     court_type_search = models.Case.COURT_TYPES
     case_type_search = models.CaseType.objects.all().order_by('case_type')
     verdict_search = models.Verdict.objects.all().order_by('verdict')
     role_search = models.Role.objects.all().order_by('role')
+    money_search = models.Money.objects.all().order_by('in_denarius')
+    chattel_search = models.Chattel.objects.all().order_by('name')
+    land_search = models.Land.objects.all()
+    context['person_search'] = person_search
     context['session_search'] = session_search
     context['court_type_search'] = court_type_search
     context['case_type_search'] = case_type_search
     context['verdict_search'] = verdict_search
     context['role_search'] = role_search
+    context['money_search'] = money_search
+    context['chattel_search'] = chattel_search
+    context['land_search'] = land_search
 
     return render(request, 'case/case_add.html', context)
 

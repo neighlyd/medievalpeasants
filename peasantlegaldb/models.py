@@ -830,6 +830,13 @@ class Capitagium(models.Model):
     mortuus = models.NullBooleanField()
 
 
+class Heriot(models.Model):
+    litigant = models.ForeignKey(Litigant, on_delete=models.CASCADE, related_name='person_to_heriot')
+    heriot_quantity = models.CharField(max_length=25, blank=True,)
+    heriot_animal = models.ForeignKey(Chattel, null=True)
+    heriot = models.ForeignKey(Money, null=True, blank=True)
+
+
 class Impercamentum(models.Model):
     litigant = models.ForeignKey(Litigant, on_delete=models.CASCADE, related_name='person_to_impercamentum')
     impercamentum_quantity = models.IntegerField(null=True, blank=True)

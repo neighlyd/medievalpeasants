@@ -7,14 +7,18 @@
     {% include '_layout/__navbar.html' %}
 {% endblock %}
 
-<form>
     {% block left_sidebar %}
+
+
         <div class="container" style="position: sticky; top: 65px">
             <button type="button" class="btn btn-success js-add-litigant pull-right" id="add_litigant"">Add Litigant</button>
         </div>
     {% endblock %}
 
 {% block center_bar %}
+    <!-- Checkbox inputs require both `name` and `id` because serializeJSON() uses `name` to locate and generate fields, while Bootstrap uses `id` to make labels clickable.-->
+    <form id="case">
+        {% csrf_token %}
 
     <div class="card-header text-center">
         <h2 class="card-title">Add Case</h2>
@@ -29,7 +33,7 @@
                                     <table class="table table-sm">
                                         <tr class="row m-0">
                                             <td class="d-inline-block col-4"><label for="session">Session:</label></td>
-                                            <td class="d-inline-block col-8"><select class="form-control" id="session_select">
+                                            <td class="d-inline-block col-8"><select class="form-control" name="session">
                                                                                     <option value="">Select a Session</option>
                                                                                 {% for session in session_search %}
                                                                                     <option value="{{ session.id }}">{{ session }}</option>
@@ -38,8 +42,8 @@
                                             </td>
                                         </tr>
                                         <tr class="row m-0">
-                                            <td class="d-inline-block col-4"><label for="select_court_type">Court Type:</label></td>
-                                            <td class="d-inline-block col-8"><select class="form-control" id="select_court_type">
+                                            <td class="d-inline-block col-4"><label for="court_type">Court Type:</label></td>
+                                            <td class="d-inline-block col-8"><select class="form-control" name="court_type">
                                                     <option value="">Select a Court</option>
                                                 {% for type in court_type_search %}
                                                     <option value="{{ type.0 }}">{{ type.1 }}</option>
@@ -47,8 +51,8 @@
                                             </select></td>
                                         </tr>
                                         <tr class="row m-0">
-                                            <td class="d-inline-block col-4"><label for="select_case_type">Case Type:</label></td>
-                                            <td class="d-inline-block col-8"><select class="form-control" id="select_case_type">
+                                            <td class="d-inline-block col-4"><label for="case_type">Case Type:</label></td>
+                                            <td class="d-inline-block col-8"><select class="form-control" name="case_Type">
                                                     <option value="">Select a Case</option>
                                                 {% for type in case_type_search %}
                                                     <option value="{{ type.id }}">{{ type }}</option>
@@ -56,37 +60,39 @@
                                             </select></td>
                                         </tr>
                                         <tr class="row m-0">
-                                            <td class="d-inline-block col-4"><label for="select_verdict">Verdict:</label></td>
-                                            <td class="d-inline-block col-8"><select class="form-control" id="select_verdict">
+                                            <td class="d-inline-block col-4"><label for="verdict">Verdict:</label></td>
+                                            <td class="d-inline-block col-8"><select class="form-control" name="verdict">
                                                     <option value="">Select a Verdict</option>
                                                 {% for verdict in verdict_search %}
                                                     <option value="{{ verdict.id }}">{{ verdict }}</option>
                                                 {% endfor %}
                                             </select></td>
                                         </tr>
-                                        <tr class="row m-0">
-                                            <td class="d-inline-block col-6"><label for="of_interest" class="form-check-label">Of Interest?</label></td>
-                                            <td  class="d-inline-block col-5"><input class="form-check-input" type="checkbox" value="" id="of_interest">
+                                        <tr class="row m-0 form-check">
+                                            <td class="d-inline-block col-6">
+                                                <label for="of_interest" class="form-check-label">Of Interest?</label></td>
+                                            <td  class="d-inline-block col-5">
+                                                <input class="form-check-input" type="checkbox" value="" name="of_interest" id="of_interest">
                                             </td>
                                         </tr>
-                                        <tr class="row m-0">
+                                        <tr class="row m-0 form-check">
                                             <td class="d-inline-block col-6"><label for="ad_legem" class="form-check-label">At Law?</label></td>
-                                            <td  class="d-inline-block col-5"><input class="form-check-input" type="checkbox" value="" id="ad_legem">
+                                            <td  class="d-inline-block col-5"><input class="form-check-input" type="checkbox" value="" name="ad_legem" id="ad_legem">
                                             </td>
                                         </tr>
-                                        <tr class="row m-0">
+                                        <tr class="row m-0 form-check">
                                             <td class="d-inline-block col-6"><label for="villeinage" class="form-check-label">Villeinage?</label></td>
-                                            <td  class="d-inline-block col-5"><input class="form-check-input" type="checkbox" value="" id="villeinage">
+                                            <td  class="d-inline-block col-5"><input class="form-check-input" type="checkbox" value="" name="villeinage" id="villeinage">
                                             </td>
                                         </tr>
-                                        <tr class="row m-0">
+                                        <tr class="row m-0 form-check">
                                             <td class="d-inline-block col-6"><label for="active_sale" class="form-check-label">Active Sale?</label></td>
-                                            <td  class="d-inline-block col-5"><input class="form-check-input" type="checkbox" value="" id="active_sale">
+                                            <td  class="d-inline-block col-5"><input class="form-check-input" type="checkbox" value="" name="active_sale" id="active_sale">
                                             </td>
                                         </tr>
-                                        <tr class="row m-0">
+                                        <tr class="row m-0 form-check">
                                             <td class="d-inline-block col-6"><label for="incidental_land" class="form-check-label">Incidental Land?</label></td>
-                                            <td  class="d-inline-block col-5"><input class="form-check-input pull-right" type="checkbox" value="" id="incidental_land">
+                                            <td  class="d-inline-block col-5"><input class="form-check-input pull-left" type="checkbox" value="" name="incidental_land" id="incidental_land">
                                             </td>
                                         </tr>
                                     </table>
@@ -106,18 +112,22 @@
             <h4 class="card-title">Litigants</h4>
         </div>
         <div class="card-body">
+
         <div id="litigants">
+
         </div>
 
 
         </div>
     </div>
 
+</form>
+
 {% endblock %}
 
 {% block right_sidebar %}
     <div class="container" style="position: sticky; top: 65px">
-        <button type="button" class="btn btn-success">Save Case</button>
+        <button type="button" class="btn btn-success" id="save">Save Case</button>
         <br>
         <br>
         <button type="button" class="btn btn-success">Save and Add Another</button>
@@ -125,70 +135,455 @@
         <br>
         <button type="button" class="btn btn-danger">Cancel</button>
 
+    <form id="test_form">
+        <label for="test_input">Test Input</label>
+        <input class="form-control" type="text" name="test_input" value="">
+        <button class="btn" id="test_button">Test</button>
+    </form>
     </div>
 {% endblock %}
 
-</form>
 
 {% block scripts %}
 
     {{ block.super }}
 
+    <script src="{% static '/js/serialize-object.min.js' %}"></script>
+
     <script>
         $(document).ready(function(){
 
-           $("#add_litigant").click(function(){
-               $("#litigants").append(
-                   '<div class="litigant_subform">' +
-                   '<div class="form-row">' +
-                   '    <div class="form-group col-5">' +
-                   '        <label for="litigant_name">Name:</label>' +
-                   '        <input class="form-control" type="text">' +
-                   '    </div>' +
-                   '    <div class="form-group col-5">' +
-                   '        <label for="litigant_role">Role:</label>' +
-                   '        <select class="form-control" id="litigant_role">' +
-                   '        <option value="">Select a Role</option>' +
-                   '            {% for role in role_search %}' +
-                   '        <option value="{{ role.id }}">{{ role }}</option>' + '"{% endfor %}"' + '' +
-                   '        </select>' +
-                   '    </div>' +
-                   '</div>' +
-                   '<div class="form-group">' +
-                   '    <div class="form-check form-check-inline">' +
-                   '        <input class="form-check-input" type="checkbox" id="ad_proximum">' +
-                   '        <label class="form-check-label" for="ad_proximum">Ad Proximum</label>' +
-                   '    </div>' +
-                   '    <div class="form-check form-check-inline">' +
-                   '        <input class="form-check-input" type="checkbox" id="distrain">' +
-                   '        <label class="form-check-label" for="distrain">Distrain</label>' +
-                   '    </div>' +
-                   '    <div class="form-check form-check-inline">' +
-                   '        <input class="form-check-input" type="checkbox" id="attach">' +
-                   '        <label class="form-check-label" for="attach">Attach</label>' +
-                   '    </div>' +
-                   '    <div class="form-check form-check-inline">' +
-                   '        <input class="form-check-input" type="checkbox" id="bail">' +
-                   '        <label class="form-check-label" for="bail">Bail</label>' +
-                   '    </div>' +
-                   '</div>' +
-                   '<div class="d-flex">' +
-                   '    <button class="btn btn-success" id="add_amercement">Amercement</button>' +
-                   '    <button class="btn btn-success" id="add_fine">Fine</button>' +
-                   '    <button class="btn btn-success" id="add_damage">Damage</button>' +
-                   '    <button class="btn btn-success" id="add_capitagium">Capitagium</button>' +
-                   '    <button class="btn btn-success" id="add_land">Land</button>' +
-                   '    <button class="btn btn-success" id="add_heriot">Heriot</button>' +
-                   '    <button class="btn btn-success" id="add_impercamentum">Impercamentum</button>' +
-                   '    <button class="btn btn-danger ml-auto" id="remove_litigant">Remove Litigant</button>' +
-                   '</div>' +
+            $("#save").click(function(e){
+                e.preventDefault();
+                console.log("clicky");
+                var data = $("form#case").serializeJSON();
+                console.log(data);
+            });
+
+            // HTML constants for various appends.
+
+            const damage_html = '<div id="add_damage_subform">' +
                    '<hr>' +
-                   '</div>' )
+                   '<div class="row">' +
+                   '    <div class="col-9">' +
+                   '        <div class="form-row">' +
+                   '            <div class="col-4">' +
+                   '                <label for="litigant[damage]">Damage:</label>' +
+                   '                    <select class="form-control" name="litigant[damage]">' +
+                   '                        <option value="">Select Damage</option>' +
+                   '                            {% for money in money_search %}' +
+                   '                        <option value="{{ money.id }}">{{ money }}</option>' +
+                   '                            {% endfor %}' +
+                   '                    </select>' +
+                   '            </div>' +
+                   '            <div class="col-8">' +
+                   '                <label for="litigant[damage_notes]">Notes:</label>' +
+                   '                    <textarea class="form-control" id="litigant[damage_notes]" rows="3"></textarea>' +
+                   '            </div>' +
+                   '        </div>' +
+                   '    </div>' +
+                   '    <div class="col-3">' +
+                   '            <button class="btn btn-danger pull-right" id="remove_damage">Remove Damage</button>' +
+                   '    </div>' +
+                   '</div>';
+
+            const fine_html = '<div id="add_fine_subform">' +
+                   '<hr>' +
+                   '<div class="row">' +
+                   '    <div class="col-9">' +
+                   '        <div class="form-row">' +
+                   '            <div class="col-4">' +
+                   '                <label for="fine">Fine:</label>' +
+                   '                    <select class="form-control" name="litigant[fine]">' +
+                   '                        <option value="">Select Fine</option>' +
+                   '                            {% for money in money_search %}' +
+                   '                        <option value="{{ money.id }}">{{ money }}</option>' +
+                   '                            {% endfor %}' +
+                   '                    </select>' +
+                   '            </div>' +
+                   '        </div>' +
+                   '    </div>' +
+                   '    <div class="col">' +
+                   '        <button class="btn btn-danger pull-right" id="remove_fine">Remove Fine</button>' +
+                   '    </div>' +
+                   '</div>';
+
+            const impercamentum_html = '<div id="add_impercamentum_subform">' +
+                   '<hr>' +
+                   '<div class="row">' +
+                   '    <div class="col-9">' +
+                   '        <div class="form-row">' +
+                   '            <div class="col-2">' +
+                   '                <label for="litigant[impercamentum_quantity]">Quantity:</label>' +
+                   '                    <input class="form-control" name="litigant[impercamentum_quantity]" type="text">' +
+                   '            </div>' +
+                   '            <div class="col-3">' +
+                   '                <label for="litigant[impercamentum_animal]">Animal:</label>' +
+                   '                <select class="form-control" name="litigant[impercamentum_animal]">' +
+                   '                    <option value="">Select Animal</option>' +
+                   '                        {% for chattel in chattel_search %}' +
+                   '                    <option value="{{ chattel.id }}">{{ chattel }}</option>' +
+                   '                        {% endfor %}' +
+                   '                </select>' +
+                   '            </div>' +
+                   '            <div class="col-3">' +
+                   '                <label for="litigant[impercamentum]">Amercement:</label>' +
+                   '                    <select class="form-control" name="litigant[impercamentum]">' +
+                   '                        <option value="">Select Amercement</option>' +
+                   '                            {% for money in money_search %}' +
+                   '                        <option value="{{ money.id }}">{{ money }}</option>' +
+                   '                            {% endfor %}' +
+                   '                    </select>' +
+                   '            </div>' +
+                   '            <div class="col-4">' +
+                   '                <label for="litigant[impercamentum_notes]">Notes:</label>' +
+                   '                    <textarea class="form-control" name="litigant[impercamentum_notes]" rows="3"></textarea>' +
+                   '            </div>' +
+                   '        </div>' +
+                   '    </div>' +
+                   '    <div class="col-3">' +
+                   '            <button class="btn btn-danger pull-right" id="remove_impercamentum">Remove Impercamentum</button>' +
+                   '    </div>' +
+                   '</div>';
+
+            const heriot_html = '<div id="add_heriot_subform">' +
+                   '<hr>' +
+                   '<div class="row">' +
+                   '    <div class="col-9">' +
+                   '        <div class="form-group row">' +
+                   '            <div class="col-3">' +
+                   '                <label for="litigant[impercamentum_quantity]">Quantity:</label>' +
+                   '                    <input class="form-control" name="litigant[impercamentum_quantity]" type="text">' +
+                   '            </div>' +
+                   '            <div class="col-5">' +
+                   '                <label for="litigant[impercamentum_animal">Animal:</label>' +
+                   '                <select class="form-control" name="litigant[impercamentum_animal]">' +
+                   '                    <option value="">Select Animal</option>' +
+                   '                        {% for chattel in chattel_search %}' +
+                   '                    <option value="{{ chattel.id }}">{{ chattel }}</option>' +
+                   '                        {% endfor %}' +
+                   '                </select>' +
+                   '            </div>' +
+                   '            <div class="col-4">' +
+                   '                <label for="litigant[impercamentum]">Amercement:</label>' +
+                   '                    <select class="form-control" name="litigant[impercamentum]">' +
+                   '                        <option value="">Select Amercement</option>' +
+                   '                            {% for money in money_search %}' +
+                   '                        <option value="{{ money.id }}">{{ money }}</option>' +
+                   '                            {% endfor %}' +
+                   '                    </select>' +
+                   '            </div>' +
+                   '        </div>' +
+                   '    </div>' +
+                   '    <div class="col">' +
+                   '        <button class="btn btn-danger pull-right" id="remove_heriot">Remove Heriot</button>' +
+                   '    </div>' +
+                   '</div>';
+
+            const land_html = '<div id="add_land_subform">' +
+                   '<hr>' +
+                   '<div class="row">' +
+                   '    <div class="col-9">' +
+                   '        <div class="form-group row">' +
+                   '            <div class="col-3">' +
+                   '                <label for="litigant[land]">Land:</label>' +
+                   '                <select class="form-control" name="litigant[land]">' +
+                   '                    <option value="">Select Land</option>' +
+                   '                        {% for land in land_search %}' +
+                   '                    <option value="{{ land.id }}">{{ land }}</option>' +
+                   '                        {% endfor %}' +
+                   '                </select>' +
+                   '            </div>' +
+                   '            <div class="col-8">' +
+                   '                <label for="litigant[land_notes]">Notes:</label>' +
+                   '                    <textarea class="form-control" name="litigant[land_notes]" rows="3"></textarea>' +
+                   '            </div>' +
+                   '            <div class="col-1">' +
+                   '                <input class="form-check-input" type="checkbox" name="litigant[land_villeinage]" id="litigant[land_villeinage]">' +
+                   '                <label class="form-check-label" for="litigant[land_villeinage]">Villeinage</label>' +
+                   '            </div>' +
+                   '        </div>' +
+                   '    </div>' +
+                   '    <div class="col">' +
+                   '        <button class="btn btn-danger pull-right" id="remove_land">Remove Land</button>' +
+                   '    </div>' +
+                   '</div>';
+
+            const capitagium_html = '<div id="add_capitagium_subform">' +
+                   '<hr>' +
+                   '<div class="row">' +
+                   '    <div class="col-8">' +
+                   '        <div class="form-row">' +
+                   '            <div class="col-3">' +
+                   '                <label for="litigant[capitagium]">Capitagium:</label>' +
+                   '                    <select class="form-control" name="litigant[capitagium]">' +
+                   '                        <option value="">Select Capitagium</option>' +
+                   '                            {% for money in money_search %}' +
+                   '                        <option value="{{ money.id }}">{{ money }}</option>' +
+                   '                            {% endfor %}' +
+                   '                    </select>' +
+                   '            </div>' +
+                   '            <div class="col-8">' +
+                   '                <label for="litigant[capitagium_notes]">Notes:</label>' +
+                   '                    <textarea class="form-control" name="litigant[capitagium_notes]" rows="3"></textarea>' +
+                   '            </div>' +
+                   '            <div class="col-1">' +
+                   '                <div class="form-check">' +
+                   '                    <input class="form-check-input" type="checkbox" value="" name="litigant[crossed]" id="litigant[crossed]">' +
+                   '                    <label class="form-check-label" for="litigant[crossed]">Crossed</label>' +
+                   '                </div>' +
+                   '                <div class="form-check">' +
+                   '                    <input class="form-check-input" type="checkbox" value="" name="litigant[recessit]" id="litigant[recessit]">' +
+                   '                    <label class="form-check-label" for="litigant[recessit]">Recessit</label>' +
+                   '                </div>' +
+                   '                <div class="form-check">' +
+                   '                    <input class="form-check-input" type="checkbox" value="" name="litigant[habet_terram]" id="litigant[habet_terram]">' +
+                   '                    <label class="form-check-label" for="litigant[habet_terram]">Habet Terram</label>' +
+                   '                </div>' +
+                   '                <div class="form-check">' +
+                   '                    <input class="form-check-input" type="checkbox" value="" name="litigant[mortuus]" id="litigant[mortuus]">' +
+                   '                    <label class="form-check-label" for="litigant[mortuus]">Mortuus</label>' +
+                   '                </div>' +
+                   '            </div>' +
+                   '        </div>' +
+                   '    </div>' +
+                   '    <div class="col">' +
+                   '        <button class="btn btn-danger pull-right" id="remove_capitagium">Remove Capitagium</button>' +
+                   '    </div>' +
+                   '</div>';
+
+
+           $("#add_litigant").click(function(){
+
+               // Set an upper limit for the number of `litigant_subform` instances allowed. This is to prevent memory problems client-side. Had to set high enough to allow for Capitagium entry.
+               const max_litigants = 150;
+
+               // Find out how many litigant subforms exist.
+               var total_litigants = $(".litigant_subform").length;
+
+               // Find out what the next `litigant_subform` id should be.
+               // First check to see if there are any instances of `litigant_subform`; otherwise the split will return an error.
+               // Next, you grab the last element's id attribute, split it at the `_` and retrieve its id number using `pop()` (the id number is the last element in the array, then add 1 to it.
+               // If no instance of `litigant_subform` is found, generate the nextid of 1.
+               if (total_litigants){
+                   var lastid = $(".litigant_subform:last").attr("id");
+                   var splitid = lastid.split("_");
+                   var nextid = Number(splitid.pop()) + 1;
+               } else {
+                   var nextid = 1
+               };
+
+               if (total_litigants <= max_litigants){
+                   $("#litigants").append(
+                       '<div class="litigant_subform" id="litigant_' + nextid + '">' +
+                       '    <div class="form-row">' +
+                       '        <div class="form-group col-5">' +
+                       '            <label for="litigant[person]">Name:</label>' +
+                       '            <select class="form-control" name="litigant_' + nextid +'[person]">' +
+                       '                <option value="">Select Person</option>' +
+                       '                    {% for person in person_search %}' +
+                       '                <option value="{{ person.id }}">{{ person }}</option>' +
+                       '                    {% endfor %}' +
+                       '            </select>' +
+                       '        </div>' +
+                       '        <div class="form-group col-5">' +
+                       '            <label for="litigant[role]">Role:</label>' +
+                       '            <select class="form-control" name="litigant_' + nextid + '[role]">' +
+                       '                <option value="">Select a Role</option>' +
+                       '                    {% for role in role_search %}' +
+                       '                <option value="{{ role.id }}">{{ role }}</option>' +
+                       '                    {% endfor %}' +
+                       '            </select>' +
+                       '        </div>' +
+                       '    </div>' +
+                       '    <div class="row">' +
+                       '        <div class="col-5">' +
+                       '            <div class="form-check">' +
+                       '                <input class="form-check-input" type="checkbox" name="litigant_'+ nextid +'[ad_proximum]" id="litigant_' + nextid + '[ad_proximum]">' +
+                       '                <label class="form-check-label" for="litigant_' + nextid + '[ad_proximum]">Ad Proximum</label>' +
+                       '            </div>' +
+                       '            <div class="form-check">' +
+                       '                <input class="form-check-input" type="checkbox" name="litigant_' + nextid + '[distrain]" id="litigant_' + nextid + '[distrain]">' +
+                       '                <label class="form-check-label" for="litigant_' + nextid + '[distrain]">Distrain</label>' +
+                       '            </div>' +
+                       '            <div class="form-check">' +
+                       '                <input class="form-check-input" type="checkbox" name="litigant_' + nextid + '[attach]" id="litigant_' + nextid + '[attach]">' +
+                       '                <label class="form-check-label" for="litigant_' + nextid + '[attach]">Attach</label>' +
+                       '            </div>' +
+                       '            <div class="form-check">' +
+                       '                <input class="form-check-input" type="checkbox" name="litigant_' + nextid + '[bail]" id="litigant_' + nextid + '[bail">' +
+                       '                <label class="form-check-label" for="litigant_' + nextid + '[bail]">Bail</label>' +
+                       '            </div>' +
+                       '        </div>' +
+                       '        <div class="col">' +
+                       '            <div class="row">' +
+                       '                <div>' +
+                       '                    <button class="btn btn-success" id="add_amercement">Amercement</button>' +
+                       '                    <button class="btn btn-success" id="add_damage">Damage</button>' +
+                       '                    <button class="btn btn-success" id="add_fine">Fine</button>' +
+                       '                </div>' +
+                       '            </div>' +
+                       '            <div class="row">' +
+                       '                <div>' +
+                       '                    <button class="btn btn-success" id="add_impercamentum">Impercamentum</button>' +
+                       '                    <button class="btn btn-success" id="add_heriot">Heriot</button>' +
+                       '                    <button class="btn btn-success" id="add_land">Land</button>' +
+                       '                </div>' +
+                       '            </div>' +
+                       '            <div class="row">' +
+                       '                <div>' +
+                       '                    <button class="btn btn-success" id="add_capitagium">Capitagium</button>' +
+                       '                </div>' +
+                       '            </div>' +
+                       '        </div>' +
+                       '    </div>' +
+                       '<div class="d-flex">' +
+                       '    <button class="btn btn-danger ml-auto" id="remove_litigant">Remove Litigant</button>' +
+                       '</div>' +
+                       '<div id="amercements">' +
+                       '</div>' +
+                       '<div id="damages">' +
+                       '</div>' +
+                       '<div id="fines">' +
+                       '</div>' +
+                       '<div id="impercamenta">' +
+                       '</div>' +
+                       '<div id="heriots">' +
+                       '</div>' +
+                       '<div id="lands">' +
+                       '</div>' +
+                       '<div id="capitagia">' +
+                       '</div>' +
+                       '<hr>' +
+                       '</div>' );
+               }
+
            });
 
-           $(document).on("click", "#remove_litigant",function(){
-               console.log('just checking');
-               $(this).parent().parent().remove();
+           $(document).on("click", "#add_amercement", function(e){
+               // must preventDefault() to stop submit because button is within the <form>.
+               e.preventDefault();
+
+               // Get id of containing `litigant_subform` to properly label fields for nesting in json. Logic is the same as that used in the `add_litigant` click function.
+               var litigantid = $(this).closest(".litigant_subform").attr("id");
+               var splitid = litigantid.split("_");
+               litigantid = Number(splitid.pop());
+
+               // In order to be able to have multiple amercements, we need to add an iterator to them as well. Same logic is used as the `add_litigant` click function.
+               const max_amercements = 10;
+               var total_amercement_subforms = $(this).closest(".litigant_subform").find(".add_amercement_subform").length;
+               if (total_amercement_subforms){
+                   var last_amercement_id = $(this).closest(".litigant_subform").find(".add_amercement_subform:last").attr("id");
+                   var split_amercement_id = last_amercement_id.split("_");
+                   var next_amercement_id = Number(split_amercement_id.pop()) + 1;
+               } else {
+                   var next_amercement_id = 1;
+               }
+
+               if (total_amercement_subforms <= max_amercements){
+                    // To make sure the amercement subform gets added to the right div, use closest() to travel up the tree to the `litigant_subform`, then find() to travel back down to find `amercements`.
+                    $(this).closest(".litigant_subform").find("#amercements").append(
+                       '<div class="add_amercement_subform" id="add_amercement_subform_' + next_amercement_id +'">' +
+                       '<hr>' +
+                       '<div class="row">' +
+                       '    <div class="col-9">' +
+                       '        <div class="form-row">' +
+                       '            <div class="col-4">' +
+                       '                <label for="litigant_' + litigantid + '[amercement_' + next_amercement_id +'][amercement]">Amercement:</label>' +
+                       '                    <select class="form-control" name="litigant_' + litigantid + '[amercement_' + next_amercement_id + '][amercement]">' +
+                       '                        <option value="">Select Amercement</option>' +
+                       '                            {% for money in money_search %}' +
+                       '                        <option value="{{ money.id }}">{{ money }}</option>' +
+                       '                            {% endfor %}' +
+                       '                    </select>' +
+                       '            </div>' +
+                       '        </div>' +
+                       '    </div>' +
+                       '    <div class="col">' +
+                       '        <button class="btn btn-danger pull-right" id="remove_amercement">Remove Amercement</button>' +
+                       '    </div>' +
+                       '</div>'
+                   )};
+           });
+
+           $(document).on("click", "#add_damage", function(e){
+               e.preventDefault();
+              $(this).closest(".litigant_subform").find("#damages").append(damage_html);
+           });
+
+           $(document).on("click", "#add_fine", function(e){
+               e.preventDefault();
+              $(this).closest(".litigant_subform").find("#fines").append(fine_html);
+           });
+
+           $(document).on("click", "#add_impercamentum", function(e){
+               e.preventDefault();
+              $(this).closest(".litigant_subform").find("#impercamenta").append(impercamentum_html);
+           });
+           
+           $(document).on("click", "#add_heriot", function(e){
+               e.preventDefault();
+              $(this).closest(".litigant_subform").find("#heriots").append(heriot_html);
+           });
+
+           $(document).on("click", "#add_land", function(e){
+               e.preventDefault();
+              $(this).closest(".litigant_subform").find("#lands").append(land_html);
+           });
+           
+           $(document).on("click", "#add_capitagium", function(e){
+               e.preventDefault();
+              $(this).closest(".litigant_subform").find("#capitagia").append(capitagium_html); 
+           });
+
+
+           $(document).on("click", "#remove_litigant",function(e){
+               e.preventDefault();
+               // Need to use the $(document).on syntax, because this event handler propogates from the DOM. This means that dynamically added elements (such as this remove button, will still have access to it).
+               // When the `#remove_litigant` button is clicked, it removes the closest div with class `litigant_subform` which is the one in which it resides.
+               $(this).closest(".litigant_subform").remove();
+           });
+
+           $(document).on("click", "#remove_amercement", function(e){
+               e.preventDefault();
+              // for use of $(document).on see #remove_litigant
+              $(this).closest(".add_amercement_subform").remove();
+           });
+           
+           $(document).on("click", "#remove_damage", function(e){
+               e.preventDefault();
+              // for use of $(document).on see #remove_litigant
+              $(this).closest("#add_damage_subform").remove();
+           });
+           
+           $(document).on("click", "#remove_fine", function(e){
+               e.preventDefault();
+              // for use of $(document).on see #remove_litigant
+              $(this).closest("#add_fine_subform").remove();
+           });
+           
+           $(document).on("click", "#remove_impercamentum", function(e){
+               e.preventDefault();
+              // for use of $(document).on see #remove_litigant
+              $(this).closest("#add_impercamentum_subform").remove();
+           });
+           
+           $(document).on("click", "#remove_heriot", function(e){
+               e.preventDefault();
+              // for use of $(document).on see #remove_litigant
+              $(this).closest("#add_heriot_subform").remove();
+           });
+           
+           $(document).on("click", "#remove_land", function(e){
+               e.preventDefault();
+              // for use of $(document).on see #remove_litigant
+              $(this).closest("#add_land_subform").remove();
+           });
+           
+           $(document).on("click", "#remove_capitagium", function(e){
+               e.preventDefault();
+              // for use of $(document).on see #remove_litigant
+              $(this).closest("#add_capitagium_subform").remove();
            });
         });
 
