@@ -7,8 +7,9 @@
     {% include '_layout/__navbar.html' %}
 {% endblock %}
 
-<form>
     {% block left_sidebar %}
+<form>
+        {% csrf_token %}
         <div class="container" style="position: sticky; top: 65px">
             <button type="button" class="btn btn-success js-add-litigant pull-right" data-url="{% url 'add_litigant' %}">Add Litigant</button>
         </div>
@@ -55,7 +56,7 @@
         </div>
         <div class="card-body">
             {% for form in litigant_formset %}
-                <div id="litigant_form">
+                <div class="litigant_formset">
                     {% crispy form %}
                     <button class="btn btn-primary">Add Amercement</button>
                     <button class="btn btn-primary">Add Fine</button>
@@ -79,9 +80,9 @@
         <button type="button" class="btn btn-danger">Cancel</button>
 
     </div>
+</form>
 {% endblock %}
 
-</form>
 
 {% block scripts %}
 
@@ -90,8 +91,10 @@
     <script src="{% static '/js/formset.js' %}"></script>
     <script>
         $(function() {
-            $('#litigant_form').formset({
-                prefix:'{{ litigant.prefix }}'
+            $('.litigant_formset').formset({
+                prefix:'{{ litigant.prefix }}',
+                add_text: "add another"
+
             });
         });
     </script>
