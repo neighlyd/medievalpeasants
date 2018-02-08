@@ -156,6 +156,7 @@ class LitigantForm(forms.ModelForm):
         model = models.Litigant
         fields = ['person', 'role']
 
+LitigantFormset = inlineformset_factory(models.Case, models.Litigant, form=LitigantForm, extra=1)
 
 class AmercementForm(forms.ModelForm):
 

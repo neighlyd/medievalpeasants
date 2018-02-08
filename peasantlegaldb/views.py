@@ -236,7 +236,6 @@ def edit_litigant(request, id):
 def add_case(request):
 
     context = dict()
-
     # establish queries for search boxes
     person_search = models.Person.objects.all().order_by('last_name', 'first_name')
     session_search = models.Session.objects.all()
@@ -256,6 +255,7 @@ def add_case(request):
     context['money_search'] = money_search
     context['chattel_search'] = chattel_search
     context['land_search'] = land_search
+    context['litigant_formset'] = forms.LitigantFormset
 
     return render(request, 'case/case_add.html', context)
 

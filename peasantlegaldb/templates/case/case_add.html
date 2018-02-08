@@ -112,9 +112,9 @@
             <h4 class="card-title">Litigants</h4>
         </div>
         <div class="card-body">
-
         <div id="litigants">
-
+            {% crispy litigant_formset %}
+            <button class="btn btn-success">Test</button>
         </div>
 
 
@@ -149,6 +149,14 @@
     {{ block.super }}
 
     <script src="{% static '/js/serialize-object.min.js' %}"></script>
+    <script src="{% static '/js/formset.js' %}"></script>
+    <script>
+        $(function(){
+            $('#litigants').formset({
+                prefix: '{{ litigant_formset.prefix }}'
+            });
+        })
+    </script>
 
     <script>
         $(document).ready(function(){
