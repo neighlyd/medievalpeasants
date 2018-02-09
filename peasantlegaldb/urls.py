@@ -37,6 +37,8 @@ case_urls = [
         name='case_pledge_list'),
     url(r'^edit/$', views.CaseEditView, name='edit_case'),
     url(r'^delete/$', views.CaseDeleteView.as_view(), name='delete_case'),
+    url(r'^litigants/$', views.LitigantListforAddCase.as_view(template_name='case/case_litigant_list_for_add_case.html')
+        , name='litigant_list_for_add_case')
 ]
 
 county_urls = [
@@ -145,7 +147,7 @@ urlpatterns = [
     url(r'^archive/(?P<pk>\d+)/', include(archive_urls)),
     url(r'^archive/add/$', views.ArchiveAddView.as_view(), name='add_archive'),
     url(r'^case/(?P<pk>\d+)/', include(case_urls)),
-    url(r'^case/add/$', views.add_case, name='add_case'),
+    url(r'^case/add/$', views.CaseAddView, name='add_case'),
     url(r'^county/(?P<pk>\d+)/', include(county_urls)),
     url(r'^hundred/(?P<pk>\d+)/', include(hundred_urls)),
     url(r'^land/(?P<pk>\d+)/', include(land_urls)),

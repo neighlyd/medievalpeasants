@@ -25,7 +25,6 @@ Add = [u"Full Editor", u"Editor", u"Contributor"]
 
 class ArchiveDetailView(DetailView):
 
-    model = models.Archive
     queryset = models.Archive.objects.all()
 
     def get_context_data(self, **kwargs):
@@ -233,6 +232,8 @@ def edit_litigant(request, id):
 
     return JsonResponse(data)
 
+
+'''
 def add_case(request):
 
     context = dict()
@@ -259,7 +260,7 @@ def add_case(request):
 
     return render(request, 'case/case_add.html', context)
 
-'''
+
 class CaseEditView(GroupRequiredMixin, UpdateView):
 
     model = models.Case
@@ -279,17 +280,24 @@ class CaseEditView(GroupRequiredMixin, UpdateView):
     def get_success_url(self):
         pk = self.kwargs.get('pk')
         return reverse('case', kwargs={'pk': pk})
-
+'''
 
 class CaseAddView(GroupRequiredMixin, CreateView):
 
+    model = models.Case
+    fields = ['summary', 'session', 'case_type', 'court_type', 'verdict', 'of_interest', 'ad_legem', 'villeinage_mention', 'active_sale', 'incidental_land']
     template_name = 'case/case_add.html'
-
+    form = forms.CaseForm
     group_required = Add
 
     def form_valid(self, form):
         if 'add_single' in self.request.POST:
-            self.object = form.save()
+            self.object = form.save(commit=false)
+            litigant_formset = context['litigant_formset']
+            if litigant_formset.is_valid():
+                litigant_formset.instance = self.object
+                litigant_formset.save()
+            self.object.save()
             return super(CaseAddView, self).form_valid(form)
         if 'add_another' in self.request.POST:
             self.object = form.save()
@@ -303,6 +311,14 @@ class CaseAddView(GroupRequiredMixin, CreateView):
         referer = self.request.META.get('HTTP_REFERER', '/')
         return reverse('case', args=(self.object.id,))
 
+    def get_context_data(self, **kwargs):
+        data = super(CaseAddView, self).get_context_data(**kwargs)
+        if self.request.POST:
+            data['litigant_formset'] = forms.LitigantFormset(self.request.POST)
+        else:
+            data['litigant_formset'] = forms.LitigantFormset()
+        return data
+
     def get_initial(self):
         initial = super(CaseAddView, self).get_initial()
         session = self.request.GET.get('session')
@@ -312,8 +328,15 @@ class CaseAddView(GroupRequiredMixin, CreateView):
         initial['case_type'] = case_type
         initial['court_type'] = court_type
         return initial
-'''
 
+
+# temp view for testing an idea
+class LitigantListforAddCase(ListView):
+
+    model = models.Litigant
+
+    def get_queryset(self):
+        return models.Litigant.objects.filter(case=self.kwargs['pk'])
 
 class CaseDeleteView(GroupRequiredMixin, DeleteView):
 

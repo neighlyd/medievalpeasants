@@ -54,15 +54,7 @@
             <h4 class="card-title">Litigants</h4>
         </div>
         <div class="card-body">
-            {% for form in litigant_formset %}
-                <div id="litigant_form">
-                    {% crispy form %}
-                    <button class="btn btn-primary">Add Amercement</button>
-                    <button class="btn btn-primary">Add Fine</button>
-                    <hr>
-                </div>
-            {% endfor %}
-            {{  litigant_formset.management_form | crispy }}
+            {% include 'case/case_litigant_list_for_add_case.html' %}
         </div>
     </div>
 
