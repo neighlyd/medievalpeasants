@@ -2,7 +2,7 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import UpdateView, CreateView, DeleteView
 from django.views.generic import ListView
 
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.template.loader import render_to_string
 from django.http import JsonResponse
 
@@ -233,34 +233,43 @@ def edit_litigant(request, id):
     return JsonResponse(data)
 
 
-'''
+
 def add_case(request):
 
-    context = dict()
-    # establish queries for search boxes
-    person_search = models.Person.objects.all().order_by('last_name', 'first_name')
-    session_search = models.Session.objects.all()
-    court_type_search = models.Case.COURT_TYPES
-    case_type_search = models.CaseType.objects.all().order_by('case_type')
-    verdict_search = models.Verdict.objects.all().order_by('verdict')
-    role_search = models.Role.objects.all().order_by('role')
-    money_search = models.Money.objects.all().order_by('in_denarius')
-    chattel_search = models.Chattel.objects.all().order_by('name')
-    land_search = models.Land.objects.all()
-    context['person_search'] = person_search
-    context['session_search'] = session_search
-    context['court_type_search'] = court_type_search
-    context['case_type_search'] = case_type_search
-    context['verdict_search'] = verdict_search
-    context['role_search'] = role_search
-    context['money_search'] = money_search
-    context['chattel_search'] = chattel_search
-    context['land_search'] = land_search
-    context['litigant_formset'] = forms.LitigantFormset
+    initial = dict()
 
-    return render(request, 'case/case_add.html', context)
+    if request.method == 'POST':
+        form = forms.CaseForm(request.POST)
+        if 'add_litigants' in request.POST:
+            if form.is_valid():
+                case = form.save(commit=False)
+                case.save()
+                return redirect('edit_case', pk=case.pk)
+        elif 'add_another' in request.POST:
+            if form.is_valid():
+                case = form.save(commit=False)
+                case.save()
+                session = str(case.session.id)
+                case_type = str(case.case_type.id)
+                court_type = str(case.court_type)
+                return HttpResponseRedirect(
+                    reverse('add_case') + "?session=" + session + "&case_type=" + case_type +
+                    "&court_type=" + court_type)
+    else:
+        session = request.GET.get('session')
+        case_type = request.GET.get('case_type')
+        court_type = request.GET.get('court_type')
+        initial['session'] = session
+        initial['case_type'] = case_type
+        initial['court_type'] = court_type
+        if (initial is not None):
+            form = forms.CaseForm(initial=initial)
+        else:
+            form = forms.CaseForm
 
+    return render(request, 'case/case_add.html', {'form': form})
 
+'''
 class CaseEditView(GroupRequiredMixin, UpdateView):
 
     model = models.Case
@@ -280,7 +289,7 @@ class CaseEditView(GroupRequiredMixin, UpdateView):
     def get_success_url(self):
         pk = self.kwargs.get('pk')
         return reverse('case', kwargs={'pk': pk})
-'''
+
 
 class CaseAddView(GroupRequiredMixin, CreateView):
 
@@ -292,13 +301,7 @@ class CaseAddView(GroupRequiredMixin, CreateView):
 
     def form_valid(self, form):
         if 'add_single' in self.request.POST:
-            self.object = form.save(commit=false)
-            litigant_formset = context['litigant_formset']
-            if litigant_formset.is_valid():
-                litigant_formset.instance = self.object
-                litigant_formset.save()
-            self.object.save()
-            return super(CaseAddView, self).form_valid(form)
+            pass
         if 'add_another' in self.request.POST:
             self.object = form.save()
             session = str(self.object.session.id)
@@ -328,7 +331,7 @@ class CaseAddView(GroupRequiredMixin, CreateView):
         initial['case_type'] = case_type
         initial['court_type'] = court_type
         return initial
-
+'''
 
 # temp view for testing an idea
 class LitigantListforAddCase(ListView):

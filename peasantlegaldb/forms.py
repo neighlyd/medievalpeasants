@@ -92,8 +92,6 @@ class CaseForm(forms.ModelForm):
         self.helper.wrapper_class = 'form-row'
         self.helper.label_class = 'col-4'
         self.helper.field_class = 'col-8'
-        self.helper.form_method = 'post'
-        self.helper.form_action = 'submit_case'
         self.helper.layout = Layout(
             'session',
             'court_type',

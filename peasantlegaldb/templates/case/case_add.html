@@ -1,4 +1,4 @@
-{% extends '_layout/_l_three_col.html' %}
+{% extends '_layout/_l_form_input.html' %}
 {% load template_tags %}
 {% load crispy_forms_tags %}
 {% load static %}
@@ -7,15 +7,10 @@
     {% include '_layout/__navbar.html' %}
 {% endblock %}
 
-    {% block left_sidebar %}
 
-
-        <div class="container" style="position: sticky; top: 65px">
-            <button type="button" class="btn btn-success js-add-litigant pull-right" id="add_litigant"">Add Litigant</button>
-        </div>
-    {% endblock %}
-
-{% block center_bar %}
+{% block center_block %}
+<div class="p-0 col-lg-8">
+    <div class="card">
     <!-- Checkbox inputs require both `name` and `id` because serializeJSON() uses `name` to locate and generate fields, while Bootstrap uses `id` to make labels clickable.-->
     <form id="case" action="" method="post">
         {% csrf_token %}
@@ -30,16 +25,11 @@
                         <div class="card p-0 col-lg-5">
                             <h3 class="card-header">Case Info:</h3>
                                 <div class="card-body">
-                                    <table class="table table-sm">
-                                        {% for field in form %}
-                                            <tr>
-
-                                            {% if field.name != 'summary' %}
-                                                {{ field | as_crispy_field }}
-                                            {% endif %}
-                                            </tr>
-                                        {% endfor %}
-                                    </table>
+                                    {% for field in form %}
+                                        {% if field.name != 'summary' %}
+                                            {{ field | as_crispy_field }}
+                                        {% endif %}
+                                    {% endfor %}
                                 </div>
                         </div>
                         <div class="card p-0 col-lg-6">
@@ -50,19 +40,22 @@
                         </div>
         </div>
     </div>
-    <br>
-    <div class="card">
-        <div class="card-header text-center">
-            <h4 class="card-title">Litigants</h4>
-        </div>
-        <div class="card-body">
-        <div id="litigants">
-            {% crispy litigant_formset %}
-        </div>
 
-
-        </div>
     </div>
+</div>
+
+<div class="p-0 col-lg-2">
+    <div class="container" style="position: sticky; top: 65px">
+        <button type="submit" class="btn btn-success" name="add_litigants">Add Litigants</button>
+        <br>
+        <br>
+        <button type="submit" class="btn btn-success" name="add_another">Add New Case</button>
+        <br>
+        <br>
+</form>
+        <a href="{{ request.META.HTTP_REFERER }}"><button class="btn btn-danger" name="cancel">Cancel</button></a>
+    </div>
+</div>
 
 
 {% endblock %}

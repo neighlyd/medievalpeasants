@@ -147,7 +147,7 @@ urlpatterns = [
     url(r'^archive/(?P<pk>\d+)/', include(archive_urls)),
     url(r'^archive/add/$', views.ArchiveAddView.as_view(), name='add_archive'),
     url(r'^case/(?P<pk>\d+)/', include(case_urls)),
-    url(r'^case/add/$', views.CaseAddView, name='add_case'),
+    url(r'^case/add/$', views.add_case, name='add_case'),
     url(r'^county/(?P<pk>\d+)/', include(county_urls)),
     url(r'^hundred/(?P<pk>\d+)/', include(hundred_urls)),
     url(r'^land/(?P<pk>\d+)/', include(land_urls)),
