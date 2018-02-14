@@ -51,7 +51,7 @@
             "columns": [
                 {data: "name",
                     fnCreatedCell: function(nTd, cellData, rowData, row, col) {
-                        url = Urls.county(rowData.id);
+                        url = Urls['county:detail'](rowData.id);
                         $(nTd).html("<a href='"+ url +"'>" + rowData.name + "</a>");
                     }
                 },

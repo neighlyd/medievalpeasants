@@ -45,7 +45,7 @@
                     defaultContent: '',
                     render: {
                         display: function(data, type, row, col){
-                            url = Urls.land(data.id);
+                            url = Urls['land:detail'](data.id);
                             return "<a href='"+ url +"'>" + data.id+ "</a>";
                         },
                         sort: "id"
@@ -62,7 +62,7 @@
                     defaultContent: '',
                     render: {
                         display: function(data, type, row, col){
-                            url = Urls.land(data.id);
+                            url = Urls['land:detail'](data.id);
                             return "<a href='"+ url +"'>" + data.id+ "</a>";
                         },
                         sort: "id"

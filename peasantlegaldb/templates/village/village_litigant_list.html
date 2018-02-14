@@ -64,7 +64,7 @@
                 },
                 {data: "full_name",
                     fnCreatedCell: function(nTd, cellData, rowData, row, col) {
-                        url = Urls.person(rowData.id);
+                        url = Urls['person:detail'](rowData.id);
                         $(nTd).html("<a href='"+ url +"'>" + rowData.full_name + "</a>");
                     }
                 },

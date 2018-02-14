@@ -53,7 +53,7 @@
                 {data: "id",
                     fnCreatedCell: function(nTd, cellData, rowData, row, col) {
                         console.log(rowData);
-                        url = Urls.session(rowData.id);
+                        url = Urls['session:detail'](rowData.id);
                         $(nTd).html("<a href='"+ url +"'>" + rowData.id + "</a>");
                     }
                 },

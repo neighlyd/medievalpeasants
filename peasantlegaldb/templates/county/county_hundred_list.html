@@ -35,7 +35,7 @@
             "columns": [
                 {data: "name",
                     fnCreatedCell: function(nTd, cellData, rowData, row, col){
-                        url = Urls.hundred(rowData.id);
+                        url = Urls['hundred:detail'](rowData.id);
                         $(nTd).html("<a href='"+ url +"'>" + rowData.name + "</a>");
                     }
                 },

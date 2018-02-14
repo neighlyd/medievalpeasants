@@ -71,14 +71,14 @@
                 },
                 {data: "name",
                     fnCreatedCell: function(nTd, cellData, rowData, row, col) {
-                        url = Urls.village(rowData.id);
+                        url = Urls['village:detail'](rowData.id);
                         $(nTd).html("<a href='"+ url +"'>" + rowData.name + "</a>");
                     }
                 },
                 {data: "hundred",
                     fnCreatedCell: function(nTd, cellData, rowData, row, col){
                         if (cellData){
-                            url = Urls.hundred(cellData.id);
+                            url = Urls['hundred:detail'](cellData.id);
                             $(nTd).html("<a href='"+ url + "'>" + cellData.name + "</a>");
                         } else {
                             $(nTd).html("N/A")

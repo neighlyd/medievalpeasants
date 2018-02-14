@@ -63,7 +63,7 @@
                 {data: "person",
                     render: {
                         display: function (data, type, row, col) {
-                            url = Urls.person(data.id);
+                            url = Urls['person:detail'](data.id);
                             return "<a href='" + url + "'>" + data.full_name + "</a>";
                         },
                         sort: "full_name",
@@ -73,7 +73,7 @@
                 {data: "case",
                     render: {
                         display: function(data, type, row, col) {
-                            url = Urls.case(data.id);
+                            url = Urls['case:detail'](data.id);
                             return "<a href='" + url + "'>" + data.id + "</a>";
                         },
                         sort: "session.date"

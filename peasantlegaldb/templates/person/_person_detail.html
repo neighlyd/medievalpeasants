@@ -174,7 +174,7 @@
     $(document).ready(function(){
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1];
-        $("#list_info").load(Urls.person_stats(id))
+        $("#list_info").load(Urls['person:stats'](id))
 
     });
 </script>

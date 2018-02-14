@@ -67,7 +67,7 @@
                     defaultContent: '',
                     render: {
                         display: function(data, type, row, col){
-                            url = Urls.case(data);
+                            url = Urls['case:detail'](data);
                             return "<a href='" + url + "'>" + data + "</a>";
                         },
                         sort: "id"

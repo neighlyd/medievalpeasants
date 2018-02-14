@@ -116,8 +116,8 @@
     <script>
         $(document).ready(function(){
              var url = window.location.pathname;
-            var id = url.split('/').reverse()[1]
-            $("#list_info").load(Urls.record_session_list(id))
+            var id = url.split('/').reverse()[1];
+            $("#list_info").load(Urls['record:sessions'](id))
         })
     </script>
 

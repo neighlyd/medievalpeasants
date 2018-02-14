@@ -1,6 +1,6 @@
             function formatCaseDate(data, type, row, meta) {
                 if (data) {
-                    return "<a href='" + Urls.case(data.id) + "'>" + data.session.village.name + " | " + data.session.law_term + ", " + data.session.year + "</a>";
+                    return "<a href='" + Urls['case:detail'](data.id) + "'>" + data.session.village.name + " | " + data.session.law_term + ", " + data.session.year + "</a>";
                 } else {
                     return "N/A";
                 }
@@ -8,19 +8,19 @@
 
             function formatCase(data, type, row, meta) {
                 if (data){
-                    return "<a href='" + Urls.case(data.id) + "'>" + data.id + "</a>";
+                    return "<a href='" + Urls['case:detail'](data.id) + "'>" + data.id + "</a>";
                 }
             }
 
             function formatPerson(data, type, row, meta) {
                 if (data){
-                    return "<a href='" + Urls.person(data.id) + "'>" + data.full_name + "</a>";
+                    return "<a href='" + Urls['person:detail'](data.id) + "'>" + data.full_name + "</a>";
                 }
             }
 
             function formatCaseDateNoVillage(data, type, row, meta) {
                 if (data.id) {
-                    return "<a href='" + Urls.case(data.id) + "'>" + data.law_term + ", " + data.year + "</a>";
+                    return "<a href='" + Urls['case:detail'](data.id) + "'>" + data.law_term + ", " + data.year + "</a>";
                 } else {
                     return "N/A";
                 }
@@ -28,7 +28,7 @@
 
             function formatSessionDate(data, type, row, meta) {
                 if (data.id) {
-                    return "<a href='" + Urls.session(data.id) + "'>" + data.village.name + " | " + data.law_term + ", " + data.year + "</a>";
+                    return "<a href='" + Urls['session:detail'](data.id) + "'>" + data.village.name + " | " + data.law_term + ", " + data.year + "</a>";
                 } else {
                     return "N/A";
                 }
@@ -36,7 +36,7 @@
 
             function formatSessionDateNoVillage(data, type, row, meta) {
                 if (data.id) {
-                    return "<a href='" + Urls.session(data.id) + "'>" + data.law_term + ", " + data.year + "</a>";
+                    return "<a href='" + Urls['session:detail'](data.id) + "'>" + data.law_term + ", " + data.year + "</a>";
                 } else {
                     return "N/A";
                 }
@@ -61,7 +61,7 @@
                 data.forEach(function (obj, index) {
                     concat = concat + '<div class="d-flex justify-content-end">' +
                                             '<div class="mr-auto p-0">' +
-                                                '<u>Name:</u> ' + '<a href="' + Urls.person(obj.id) + '">' + obj.name + '</a>' +
+                                                '<u>Name:</u> ' + '<a href="' + Urls['person:detail'](obj.id) + '">' + obj.name + '</a>' +
                                             '</div> ' +
                                             '<div class="p-0">' +
                                                 '<u>Role:</u> ' + obj.role +
@@ -98,13 +98,13 @@
             function format_person_subdata(data){
                 var earliestCase = '';
                 if (data.person.earliest_case.id){
-                    earliestCase = "<a href='" + Urls.case(data.person.earliest_case.id) +"'>" + data.person.earliest_case.session.law_term + ", " + data.person.earliest_case.session.year + "</a>"
+                    earliestCase = "<a href='" + Urls['case:detail'](data.person.earliest_case.id) +"'>" + data.person.earliest_case.session.law_term + ", " + data.person.earliest_case.session.year + "</a>"
                 } else {
                     earliestCase = "N/A"
                 }
                 var latestCase = '';
                 if (data.person.latest_case.id){
-                    latestCase = "<a href='" + Urls.case(data.person.latest_case.id) +"'>" + data.person.latest_case.session.law_term + ", " + data.person.latest_case.session.year + "</a>"
+                    latestCase = "<a href='" + Urls['case:detail'](data.person.latest_case.id) +"'>" + data.person.latest_case.session.law_term + ", " + data.person.latest_case.session.year + "</a>"
                 } else {
                     latestCase = "N/A"
                 }

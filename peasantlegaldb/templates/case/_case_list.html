@@ -64,18 +64,6 @@
             <br>
             <br>
         {% endif %}
-        {% if perms.peasantlegaldb.change_case %}
-            <div class="btn-group" role="group">
-                <a class="btn btn-warning" href="{% url 'case:edit' case.pk %}">Edit Case</a>
-            </div>
-            <br>
-            <br>
-        {% endif %}
-        {% if perms.peasantlegaldb.delete_case %}
-            <div class="btn-group" role="group">
-                <a class="btn btn-danger" href="#">Delete Case</a>
-            </div>
-        {% endif %}
     </div>
 {% endblock %}
 
@@ -139,7 +127,7 @@
                         defaultContent: '',
                         render: {
                             display: function(data, type, row, col){
-                            var url = Urls.case(data);
+                            var url = Urls['case:detail'](data);
                             return "<a href='"+ url +"'>" + data + "</a>"
                             }
                         }
@@ -148,7 +136,7 @@
                         defaultContent: '',
                         render:{
                             display: function(data, type, row, col){
-                                var url = Urls.village(row.session.village.id);
+                                var url = Urls['village:detail'](row.session.village.id);
                                 return "<a href='" + url + "'>" + data + "</a>";
                             }
                         }
@@ -157,7 +145,7 @@
                         defaultContent: '',
                         render:{
                             display: function(data, type, row, col){
-                                var url = Urls.session(data.id);
+                                var url = Urls['session:detail'](data.id);
                                 return "<a href'" + url + "'>" + data.human_date + "</a>";
 
                             },
@@ -184,6 +172,7 @@
                 var tr = $(this).closest('tr');
                 var tdi = tr.find("i.fa");
                 var row = table.row( tr );
+                console.log('click');
 
                 if ( row.child.isShown()) {
                     row.child.hide();

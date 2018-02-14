@@ -36,7 +36,7 @@
             "<td><b>Case Type</b></td>" +
             "<td><b>Verdict</b></td>" +
             "<tr>" +
-            "<td><a href='" + Urls.case(d.case.id) + "'target='_blank'>" + d.case.id + "</a></td>" +
+            "<td><a href='" + Urls['case:detail'](d.case.id) + "'target='_blank'>" + d.case.id + "</a></td>" +
             "<td>" + d.case.session.village.name + "</td>" +
             "<td>" + d.case.session.law_term + ", " + d.case.session.year +"</td>" +
             "<td>" + d.case.court_type + "</td>" +
@@ -73,7 +73,7 @@
                 },
                 {data: "land",
                     fnCreatedCell: function(nTd, cellData, rowData, row, col){
-                        $(nTd).html("<a href='" + Urls.land(cellData.id) + "'target='_blank'>" + cellData.id + "</a>");
+                        $(nTd).html("<a href='" + Urls['land:detail'](cellData.id) + "'target='_blank'>" + cellData.id + "</a>");
                     }
                 },
                 {data: "land.parcel_list",
@@ -94,7 +94,7 @@
                     render: {
                         display: function(data, type, row, meta){
                             if (data){
-                                url = Urls.case(data.id);
+                                url = Urls['case:detail'](data.id);
                                 return "<a href='" + url + "'>" + data.id + "</a>";
                             }
                         },

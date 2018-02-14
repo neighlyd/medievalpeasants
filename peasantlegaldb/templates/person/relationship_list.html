@@ -36,12 +36,12 @@
             "columns": [
                 {data: "person_one.full_name",
                     fnCreatedCell: function(nTd, cellData, rowData, row, col){
-                        $(nTd).html("<a href='" + Urls.person(rowData.person_one.id) + "'target='_blank'>" + rowData.person_one.full_name + " (" + rowData.person_one.village.name + ")</a>");
+                        $(nTd).html("<a href='" + Urls['person:detail'](rowData.person_one.id) + "'target='_blank'>" + rowData.person_one.full_name + " (" + rowData.person_one.village.name + ")</a>");
                     }
                 },
                 {data: "person_two.full_name",
                     fnCreatedCell: function(nTd, cellData, rowData, row, col){
-                        $(nTd).html("<a href='" + Urls.person(rowData.person_two.id) + "'target='_blank'>" + rowData.person_two.full_name + " (" + rowData.person_two.village.name + ")</a>");
+                        $(nTd).html("<a href='" + Urls['person:detail'](rowData.person_two.id) + "'target='_blank'>" + rowData.person_two.full_name + " (" + rowData.person_two.village.name + ")</a>");
                     }
                 },
                 {data: "relationship.relation"},

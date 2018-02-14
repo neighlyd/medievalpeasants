@@ -63,14 +63,14 @@
                 },
                 {data: "village.name",
                     fnCreatedCell: function(nTd, cellData, rowData, row, col) {
-                        url = Urls.village(rowData.village.id);
+                        url = Urls['village:detail'](rowData.village.id);
                         $(nTd).html("<a href='"+ url +"'>" + rowData.village.name + "</a>");
                     }
                 },
                 {data: "village.id",
                     fnCreatedCell: function(nTd, cellData, rowData, row, col){
                         if (rowData.village.county_id){
-                            url = Urls.county(rowData.village.county.id);
+                            url = Urls['county:detail'](rowData.village.county.id);
                             $(nTd).html("<a href='"+ url + "'>" + rowData.village.county.name + "</a>");
                         } else {
                             $(nTd).html("N/A")

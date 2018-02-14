@@ -60,13 +60,13 @@
                 },
                 {data: "id",
                     fnCreatedCell: function(nTd, cellData, rowData, row, col) {
-                        url = Urls.session(rowData.id);
+                        url = Urls['session:detail'](rowData.id);
                         $(nTd).html("<a href='"+ url +"'>" + rowData.id + "</a>");
                     }
                 },
                 {data: "village.name",
                     fnCreatedCell: function(nTd, cellData, rowData, row, col) {
-                        url = Urls.village(rowData.id);
+                        url = Urls['village:detail'](rowData.id);
                         $(nTd).html("<a href='"+ url +"'>" + rowData.village.name + "</a>");
                     }
                 },

@@ -65,7 +65,7 @@
                     defaultContent: '',
                     render: {
                         display: function(data, type, row, meta){
-                            url = Urls.village(data.id);
+                            url = Urls['village:detail'](data.id);
                             return "<a href='" + url + "'>" + data.name +"</a>";
                         },
                         sort: "name"
@@ -75,7 +75,7 @@
                     defaultContent: '',
                     render: {
                         display: function(data, type, row, col) {
-                            url = Urls.case(data.id);
+                            url = Urls['case:detail'](data.id);
                             return "<a href='"+ url +"'>" + data.id + "</a>";
                         },
                         sort: "id"

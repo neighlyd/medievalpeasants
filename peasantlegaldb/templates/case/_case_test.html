@@ -110,7 +110,7 @@
                     },
                     {data: "id",
                         fnCreatedCell: function(nTd, cellData, rowData, row, col) {
-                            var url = Urls.case(rowData.id)
+                            var url = Urls['case:detail'](rowData.id)
                             $(nTd).html("<a href='"+ url +"'>" + rowData.id + "</a>");
                         }
                     },
@@ -118,7 +118,7 @@
                         defaultContent: '',
                         render:{
                             display: function(data, type, row, col){
-                                var url = Urls.village(row.session.village.id);
+                                var url = Urls['village:detail'](row.session.village.id);
                                 return "<a href='" + url + "'>" + data + "</a>";
                             }
                         }
@@ -127,7 +127,7 @@
                         defaultContent: '',
                         render:{
                             display: function(data, type, row, col){
-                                var url = Urls.session(data.id);
+                                var url = Urls['session:detail'](data.id);
                                 return "<a href'" + url + "'>" + data.human_date + "</a>";
 
                             },

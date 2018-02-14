@@ -81,7 +81,15 @@
 {% endblock %}
 
 {% block right_sidebar %}
-    {{ block.super }}
+    <div class="container" style="position: sticky; top: 65px">
+        {% if perms.peasantlegaldb.add_person %}
+            <div class="btn-group" role="group">
+                <a class="btn btn-success" href="#">Add Person</a>
+            </div>
+            <br>
+            <br>
+        {% endif %}
+    </div>
 {% endblock %}
 
 {% block scripts %}
@@ -195,7 +203,7 @@
                         defaultContent: '',
                         render: {
                             display: function(data, type, row, meta){
-                                return "<a href='" + Urls.person(row.id) + "'>" + row.full_name + "</a>";
+                                return "<a href='" + Urls['person:detail'](row.id) + "'>" + row.full_name + "</a>";
                             },
                         }
                     },

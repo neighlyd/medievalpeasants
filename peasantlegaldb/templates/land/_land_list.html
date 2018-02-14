@@ -67,7 +67,7 @@
                 },
                 {data: "id",
                     fnCreatedCell: function(nTd, cellData, rowData, row, col) {
-                        url = Urls.land(rowData.id);
+                        url = Urls['land:detail'](rowData.id);
                         $(nTd).html("<a href='"+ url +"'>" + rowData.id + "</a>");
                     }
                 },
@@ -119,9 +119,9 @@
         var concat = '';
         data.tenant_history.forEach(function(litigant){
             concat = concat + "<tr>" +
-                "<td><a href='" + Urls.person(litigant.person.id) + "'>" + litigant.person.full_name + "</a></td>" +
-                "<td><a href='" + Urls.village(litigant.person.village.id) + "'>" + litigant.person.village.name + "</a></td>" +
-                "<td><a href='" + Urls.case(litigant.case.id) + "'>" + litigant.case.id + "</a></td>" +
+                "<td><a href='" + Urls['person:detail'](litigant.person.id) + "'>" + litigant.person.full_name + "</a></td>" +
+                "<td><a href='" + Urls['village:detail'](litigant.person.village.id) + "'>" + litigant.person.village.name + "</a></td>" +
+                "<td><a href='" + Urls['case:detail'](litigant.case.id) + "'>" + litigant.case.id + "</a></td>" +
                 "<td>" + litigant.role.role + "</td>" +
                 "<td>" + litigant.case.session.law_term + "</td>" +
                 "<td>" + litigant.case.session.year + "</td>" +

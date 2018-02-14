@@ -63,7 +63,7 @@
                 {data: "case",
                     render: {
                         display: function (data, type, row, col) {
-                            url = Urls.case(data.id);
+                            url = Urls['case:detail'](data.id);
                             return "<a href='" + url + "'target='_blank'>" + data.id + "</a>";
                         },
                         sort: "id"

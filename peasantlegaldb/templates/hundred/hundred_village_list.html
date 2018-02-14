@@ -62,7 +62,7 @@
                     defaultContent: '',
                     render: {
                         display: function(data, type, row, col){
-                            url = Urls.village(row.id);
+                            url = Urls['village:detail'](row.id);
                             return "<a href='"+ url +"'>" + data + "</a>";
                         },
                         sort: "name"

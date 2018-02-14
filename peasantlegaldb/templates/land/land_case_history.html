@@ -67,7 +67,7 @@
                 {
                     data: "id",
                     fnCreatedCell: function (nTd, cellData, rowData, row, col) {
-                        var url = Urls.case(rowData.id)
+                        var url = Urls['case:detail'](rowData.id)
                         $(nTd).html("<a href='" + url + "'>" + rowData.id + "</a>");
                     }
                 },

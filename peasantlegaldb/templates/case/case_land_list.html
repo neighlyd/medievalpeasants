@@ -33,7 +33,7 @@
         data.tenant_history.forEach(function (obj, index) {
             concat = concat + '<div class="d-flex justify-content-between">' +
                                     '<div class="mr-auto p-0">' +
-                                        '<u>Name:</u> ' + '<a href="' + Urls.person(obj.person.id) + '">' + obj.person.full_name + '</a>' +
+                                        '<u>Name:</u> ' + '<a href="' + Urls['person:detail'](obj.person.id) + '">' + obj.person.full_name + '</a>' +
                                     '</div> ' +
                                     '<div class="p-0">' +
                                         '<u>Session:</u> ' + obj.case.session.law_term + ', ' + obj.case.session.year +
@@ -75,7 +75,7 @@
                     defaultContent: '',
                     render: {
                         display: function(data, type, row, col){
-                            return "<a href='" + Urls.land(data) + "'target='_blank'>" + data + "</a>"
+                            return "<a href='" + Urls['land:detail'](data) + "'target='_blank'>" + data + "</a>"
                         }
                     }
                 },
