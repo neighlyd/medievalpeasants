@@ -7,7 +7,7 @@
             <div class="accordion" role="tab-list">
                 <div class="card">
                 <div class="card-header text-center">
-                    <h3 class="card-title"><a href="{% url 'village' village.id %}">{{ village.name }}</a></h3>
+                    <h3 class="card-title"><a href="{% url 'village:detail' village.id %}">{{ village.name }}</a></h3>
                 </div>
                     <div class="card-body">
                     <div class="card">
@@ -45,7 +45,7 @@
                     {% for person in chevage_list %}
                             <div class="card">
                                 <div class="card-header" style="position: sticky; top: 50px; z-index: 2; background: #A9A9A9">
-                                    <h5  class="card-title"><a href="{% url 'person' person.id %}">{{ person.full_name }}</a></h5>
+                                    <h5  class="card-title"><a href="{% url 'person:detail' person.id %}">{{ person.full_name }}</a></h5>
                                 </div>
                                     <div class="card-body">
                                     <div class="row">
@@ -126,10 +126,10 @@
                                                     <div class="card-body">
                                                     <div class="row">
                                                         <div class="mr-auto card-subtitle text-muted" style="padding-left: 15px">
-                                                            <h5><u>Case:</u> <a href='{% url 'case' case.case.id %}'>{{ case.case.id }}</a></h5>
+                                                            <h5><u>Case:</u> <a href='{% url 'case:detail' case.case.id %}'>{{ case.case.id }}</a></h5>
                                                         </div>
                                                         <div class="ml-auto">
-                                                            <h5><a href='{% url 'session' case.case.session.id %}'>{{ case.case.session.human_date }}</a></h5>
+                                                            <h5><a href='{% url 'session:detail' case.case.session.id %}'>{{ case.case.session.human_date }}</a></h5>
                                                         </div>
                                                     </div>
                                                 <hr>
@@ -247,7 +247,7 @@
                                                                     {% endif %}
                                                                     {% if case.land %}
                                                                 <td>
-                                                                    <a href="{% url 'land' case.land.id %}">{{ case.land.id }}</a>
+                                                                    <a href="{% url 'land:detail' case.land.id %}">{{ case.land.id }}</a>
                                                                 </td>
                                                                 <td>
                                                                     {% if case.land_villeinage %}

@@ -1,4 +1,4 @@
-{% extends '_layout/_l_three_col.html' %}
+{% extends '_layout/_l_form_input.html' %}
 {% load template_tags %}
 {% load crispy_forms_tags %}
 {% load static %}
@@ -7,19 +7,20 @@
     {% include '_layout/__navbar.html' %}
 {% endblock %}
 
-<form>
     {% block left_sidebar %}
         <div class="container" style="position: sticky; top: 65px">
-            <button type="button" class="btn btn-success js-add-litigant pull-right" data-url="{% url 'add_litigant' %}">Add Litigant</button>
+            <button type="button" class="btn btn-success js-add-litigant pull-right" data-url="{% url 'litigant:add' %}">Add Litigant</button>
         </div>
     {% endblock %}
 
-{% block center_bar %}
+{% block center_block %}
+<div class="p-0 col-lg-8">
+    <div class="card">
+    <form id="case" action="" method="post">
+        {% csrf_token %}
 
     <div class="card-header text-center">
         <h2 class="card-title">Case {{ case.id }}</h2>
-        <h3 class="card-subtitle text-muted"><a href="{% url 'village' case.session.village.id %}" style="color: inherit; text-decoration: none">{{ case.session.village.name}}</a> - {{case.session.get_law_term_display }}, {{ case.session.date.year}}</h3>
-        <h6 class="card-subtitle text-muted float-right"><a href="{% url 'record' case.session.record.id %}" style="color: inherit; text-decoration: none">{{ case.session.record.name }}, F.{{ case.session.folio }}</a></h6>
     </div>
 
     <div class="card-body clearfix" id="main_form">
@@ -28,10 +29,6 @@
                         <div class="card p-0 col-lg-5">
                             <h3 class="card-header">Case Info:</h3>
                                 <div class="card-body">
-                                    <table class="table table-sm">
-
-                                    </table>
-
                                     {% for field in form %}
                                         {% if field.name != 'summary' %}
                                             {{ field | as_crispy_field }}
@@ -53,27 +50,26 @@
 
             <h4 class="card-title">Litigants</h4>
         </div>
-        <div class="card-body">
+        <div class="card-body" id="litigants">
             {% include 'case/case_litigant_list_for_add_case.html' %}
         </div>
     </div>
-
-{% endblock %}
-
-{% block right_sidebar %}
-    <div class="container" style="position: sticky; top: 65px">
-        <button type="button" class="btn btn-success">Save Case</button>
-        <br>
-        <br>
-        <button type="button" class="btn btn-success">Save and Add Another</button>
-        <br>
-        <br>
-        <button type="button" class="btn btn-danger">Cancel</button>
-
     </div>
-{% endblock %}
+</div>
+<div class="p-0 col-lg-2">
+    <div class="container" style="position: sticky; top: 65px">
+        <button type="submit" class="btn btn-success" name="finish_editing">Finish Editing</button>
+        <br>
+        <br>
+        <button type="submit" class="btn btn-success" name="add_another">Add New Case</button>
+        <br>
+        <br>
+    </form>
+        <a class="btn btn-danger" href="{{ request.META.HTTP_REFERER }}">Cancel</a>
+    </div>
+</div>
 
-</form>
+{% endblock %}
 
 {% block scripts %}
 
@@ -81,11 +77,12 @@
     <script src="{% static '/js/add_litigant.js' %}"></script>
     <script src="{% static '/js/formset.js' %}"></script>
     <script>
-        $(function() {
-            $('#litigant_form').formset({
-                prefix:'{{ litigant.prefix }}'
-            });
-        });
+        $(document).ready(function(){
+            $('#litigants').on('click', '#edit_litigant', function(){
+                var litigant_id = $(this).attr('name').split('_').pop();
+                console.log(litigant_id);
+            })
+        })
     </script>
 
 {% endblock %}

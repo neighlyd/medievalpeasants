@@ -3,7 +3,7 @@
 {% block single_col %}
     <div class="card-header text-center">
             <h3>Record List</h3>
-            <a href="{% url 'add_record' %}?archive={{ archive.id }}" class="btn btn-sm btn-success">Add Record</a>
+            <a href="{% url 'record:add' %}?archive={{ archive.id }}" class="btn btn-sm btn-success">Add Record</a>
     </div>
     <div class="card-body">
             <table class="table table-bordered table-hover" id="table" data-page-length="25">

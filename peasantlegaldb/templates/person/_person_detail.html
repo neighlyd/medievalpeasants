@@ -6,43 +6,43 @@
 
 {% block left_sidebar %}
     <div id="selection_list">
-        <a class="list-group-item list-group-item-action active" href="{% url 'person_stats' person.id %}">Stats</a>
+        <a class="list-group-item list-group-item-action active" href="{% url 'person:stats' person.id %}">Stats</a>
     {% if person.case_exists %}
-        <a class="list-group-item list-group-item-action " href="{% url 'person_case_list' person.id %}" >Case List</a>
+        <a class="list-group-item list-group-item-action " href="{% url 'person:cases' person.id %}" >Case List</a>
     {% endif %}
     {% if person.pledge_exists %}
-        <a class="list-group-item list-group-item-action " href="{% url 'pledge_list' person.id %}">Pledge List</a>
+        <a class="list-group-item list-group-item-action " href="{% url 'person:pledges' person.id %}">Pledge List</a>
     {% endif %}
     {% if person.land_exists %}
-        <a class="list-group-item list-group-item-action " href="{% url 'person_land_history' person.id %}">Land List</a>
+        <a class="list-group-item list-group-item-action " href="{% url 'person:lands' person.id %}">Land List</a>
     {% endif %}
     {% if person.relationship_exists %}
-        <a class="list-group-item list-group-item-action " href="{% url 'relationship_list' person.id %}">Relationship List</a>
+        <a class="list-group-item list-group-item-action " href="{% url 'person:relationships' person.id %}">Relationship List</a>
     {% endif %}
     {% if person.position_exists %}
-        <a class="list-group-item list-group-item-action " href="{% url 'position_list' person.id %}">Position List</a>
+        <a class="list-group-item list-group-item-action " href="{% url 'person:positions' person.id %}">Position List</a>
     {% endif %}
 
 
         <br>
     {% if person.amercement_exists %}
-        <a class="list-group-item list-group-item-action " href="{% url 'person_amercement_list' person.id %}">Amercement Cases</a>
+        <a class="list-group-item list-group-item-action " href="{% url 'person:amercements' person.id %}">Amercement Cases</a>
     {% endif %}
     {% if person.fine_exists %}
-        <a class="list-group-item list-group-item-action " href="{% url 'person_fine_list' person.id %}">Fine Cases</a>
+        <a class="list-group-item list-group-item-action " href="{% url 'person:fines' person.id %}">Fine Cases</a>
     {% endif %}
     {% if person.damage_exists %}
-        <a class="list-group-item list-group-item-action " href="{% url 'person_damage_list' person.id %}">Damage Cases</a>
+        <a class="list-group-item list-group-item-action " href="{% url 'person:damages' person.id %}">Damage Cases</a>
     {% endif %}
         <br>
     {% if person.chevage_exists %}
-        <a class="list-group-item list-group-item-action " href="{% url 'person_chevage_list' person.id %}">Chevage Cases</a>
+        <a class="list-group-item list-group-item-action " href="{% url 'person:chevages' person.id %}">Chevage Cases</a>
     {% endif %}
     {% if person.impercamentum_exists %}
-        <a class="list-group-item list-group-item-action " href="{% url 'person_impercamentum_list' person.id %}">Impercamenta Cases</a>
+        <a class="list-group-item list-group-item-action " href="{% url 'person:impercamenta' person.id %}">Impercamenta Cases</a>
     {% endif %}
     {% if person.heriot_exists %}
-        <a class="list-group-item list-group-item-action " href="{% url 'person_heriot_list' person.id %}">Heriot Cases</a>
+        <a class="list-group-item list-group-item-action " href="{% url 'person:heriots' person.id %}">Heriot Cases</a>
     {% endif %}
 
     </div>
@@ -84,7 +84,7 @@
                     </tr>
                     <tr class="row m-0">
                         <td class="d-inline-block col-4"><b>Home Village:</b></td>
-                        <td class="d-inline-block col-8"><a href="{% url 'village' person.village.id %}">{{ person.village.name }}</a></td>
+                        <td class="d-inline-block col-8"><a href="{% url 'village:detail' person.village.id %}">{{ person.village.name }}</a></td>
                     </tr>
                     <tr class="row m-0">
                         <td class="d-inline-block col-4"><b>1332 Tax</b></td>
@@ -97,7 +97,7 @@
                     <tr class="row m-0">
                         <td class="d-inline-block col-4"><b>Earliest Case</b></td>
                         {% if person.earliest_case.id is not None %}
-                        <td class="d-inline-block col-8"><a href="{% url 'case' person.earliest_case.id %}">{{ person.earliest_case.session.village.name }} | {{ person.earliest_case.session.get_law_term_display }}, {{ person.earliest_case.session.year }}</a></td>
+                        <td class="d-inline-block col-8"><a href="{% url 'case:detail' person.earliest_case.id %}">{{ person.earliest_case.session.village.name }} | {{ person.earliest_case.session.get_law_term_display }}, {{ person.earliest_case.session.year }}</a></td>
                         {% else %}
                         <td class="d-inline-block col-8">None</td>
                         {% endif %}
@@ -105,7 +105,7 @@
                     <tr class="row m-0">
                         <td class="d-inline-block col-4"><b>Latest Case</b></td>
                         {% if person.latest_case.id is not None %}
-                        <td class="d-inline-block col-8"><a href="{% url 'case' person.latest_case.id %}">{{ person.latest_case.session.village.name }} | {{ person.latest_case.session.get_law_term_display }}, {{ person.latest_case.session.year }}</a></td>
+                        <td class="d-inline-block col-8"><a href="{% url 'case:detail' person.latest_case.id %}">{{ person.latest_case.session.village.name }} | {{ person.latest_case.session.get_law_term_display }}, {{ person.latest_case.session.year }}</a></td>
                         {% else %}
                         <td class="d-inline-block col-8">None</td>
                         {% endif %}

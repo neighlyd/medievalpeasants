@@ -6,7 +6,7 @@
 
 {% block left_sidebar %}
     <div id="selection_list">
-        <a class="list-group-item list-group-item-action active" href="{% url 'session_case_list' session.id %}">Cases</a>
+        <a class="list-group-item list-group-item-action active" href="{% url 'session:cases' session.id %}">Cases</a>
 
     </div>
 {% endblock %}
@@ -15,7 +15,7 @@
 
 <div class="card-header text-center">
     <h2 class="card-title">Session - {{ session.id }}</h2>
-    <h6 class="card-subtitle text-muted float-right"><a href="{% url 'record' session.record.id %}" style="color: inherit; text-decoration: none">{{ session.record.name }}, F.{{ session.folio }}</a></h6>
+    <h6 class="card-subtitle text-muted float-right"><a href="{% url 'record:detail' session.record.id %}" style="color: inherit; text-decoration: none">{{ session.record.name }}, F.{{ session.folio }}</a></h6>
 </div>
 
 <div class="card-body clearfix" id="main_info">
@@ -27,7 +27,7 @@
                             <table class="table table-sm">
                                 <tr class="row m-0">
                                     <td class="d-inline-block col-4"><b>Village:</b></td>
-                                    <td class="d-inline-block col-8"><a href="{% url 'village' session.village.id %}">{{ session.village.name }}</a></td>
+                                    <td class="d-inline-block col-8"><a href="{% url 'village:detail' session.village.id %}">{{ session.village.name }}</a></td>
                                 </tr>
                                 <tr class="row m-0">
                                     <td class="d-inline-block col-4"><b>Term:</b></td>
@@ -91,21 +91,21 @@
     <div class="container" style="position: sticky; top: 65px">
         {% if perms.peasantlegaldb.add_session %}
             <div class="btn-group" role="group">
-                <a class="btn btn-success" href="{% url 'add_session' %}">Add Session</a>
+                <a class="btn btn-success" href="{% url 'session:add' %}">Add Session</a>
             </div>
             <br>
             <br>
         {% endif %}
         {% if perms.peasantlegaldb.change_session %}
             <div class="btn-group" role="group">
-                <a class="btn btn-warning" href="{% url 'edit_session' session.id %}">Edit Session</a>
+                <a class="btn btn-warning" href="{% url 'session:edit' session.id %}">Edit Session</a>
             </div>
             <br>
             <br>
         {% endif %}
         {% if perms.peasantlegaldb.delete_session %}
             <div class="btn-group" role="group">
-                <a class="btn btn-danger" href="{% url 'delete_session' session.id %}">Delete Session</a>
+                <a class="btn btn-danger" href="{% url 'session:delete' session.id %}">Delete Session</a>
             </div>
         {% endif %}
     </div>

@@ -11,7 +11,6 @@
 {% block center_block %}
 <div class="p-0 col-lg-8">
     <div class="card">
-    <!-- Checkbox inputs require both `name` and `id` because serializeJSON() uses `name` to locate and generate fields, while Bootstrap uses `id` to make labels clickable.-->
     <form id="case" action="" method="post">
         {% csrf_token %}
 
@@ -53,25 +52,11 @@
         <br>
         <br>
 </form>
-        <a href="{{ request.META.HTTP_REFERER }}"><button class="btn btn-danger" name="cancel">Cancel</button></a>
+        <a class="btn btn-danger" href="{{ request.META.HTTP_REFERER }}">Cancel</a>
     </div>
 </div>
 
 
-{% endblock %}
-
-{% block right_sidebar %}
-    <div class="container" style="position: sticky; top: 65px">
-        <button type="submit" class="btn btn-success" id="add_single">Save Case</button>
-        <br>
-        <br>
-        <button type="button" class="btn btn-success" id="add_another">Save and Add Another</button>
-        <br>
-        <br>
-        <button type="button" class="btn btn-danger">Cancel</button>
-</form>
-
-</div>
 {% endblock %}
 
 
@@ -90,7 +75,7 @@
     </script>
     <script>
         $(document).ready(function(){
-            $("#add_single").click(function(){
+            $("#add").click(function(){
                 $("#case").submit();
             })
         })

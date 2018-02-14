@@ -3,8 +3,8 @@
 {% block left_sidebar%}
     <div id="selection_list">
         <a class="list-group-item active" href="{% url 'tenant_history' land.id %}">Tenant History</a>
-        <a class="list-group-item" href="{% url 'land_case_history' land.id %}" >Case History</a>
-        <a class="list-group-item" href="{% url 'land_split_history' land.id %}" >Land Split History</a>
+        <a class="list-group-item" href="{% url 'land:cases' land.id %}" >Case History</a>
+        <a class="list-group-item" href="{% url 'land:split_history' land.id %}" >Land Split History</a>
     </div>
 {% endblock %}
 

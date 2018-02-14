@@ -54,7 +54,7 @@ class ArchiveEditView(GroupRequiredMixin, UpdateView):
 
     def get_success_url(self):
         pk = self.kwargs.get('pk')
-        return reverse('archive', kwargs={'pk': pk})
+        return reverse('archive:detail', kwargs={'pk': pk})
 
 
 class ArchiveAddView(GroupRequiredMixin, CreateView):
@@ -66,7 +66,7 @@ class ArchiveAddView(GroupRequiredMixin, CreateView):
     group_required = Add
 
     def get_success_url(self):
-        return reverse('archive', args=(self.object.id,))
+        return reverse('archive:detail', args=(self.object.id,))
 
 
 class ArchiveDeleteView(GroupRequiredMixin, DeleteView):
@@ -77,7 +77,7 @@ class ArchiveDeleteView(GroupRequiredMixin, DeleteView):
     group_required = Delete
 
     def get_success_url(self):
-        return reverse('archive_list')
+        return reverse('archive:list')
 
 
 class RecordDetailView(DetailView):
@@ -110,7 +110,7 @@ class RecordEditView(GroupRequiredMixin, UpdateView):
 
     def get_success_url(self):
         pk = self.kwargs.get('pk')
-        return reverse('record', kwargs={'pk': pk})
+        return reverse('record:detail', kwargs={'pk': pk})
 
 
 
@@ -124,7 +124,7 @@ class RecordAddView(GroupRequiredMixin, CreateView):
 
     def get_success_url(self):
         referer = self.request.META.get('HTTP_REFERER', '/')
-        return reverse('record', args=(self.object.id,))
+        return reverse('record:detail', args=(self.object.id,))
 
     def get_initial(self):
         initial = super(RecordAddView, self).get_initial()
@@ -142,7 +142,7 @@ class RecordDeleteView(GroupRequiredMixin, DeleteView):
     group_required = Delete
 
     def get_success_url(self):
-        return reverse('record_list')
+        return reverse('record:list')
 
 
 class CaseListView(ListView):
@@ -253,7 +253,7 @@ def add_case(request):
                 case_type = str(case.case_type.id)
                 court_type = str(case.court_type)
                 return HttpResponseRedirect(
-                    reverse('add_case') + "?session=" + session + "&case_type=" + case_type +
+                    reverse('case:add') + "?session=" + session + "&case_type=" + case_type +
                     "&court_type=" + court_type)
     else:
         session = request.GET.get('session')
@@ -288,7 +288,7 @@ class CaseEditView(GroupRequiredMixin, UpdateView):
 
     def get_success_url(self):
         pk = self.kwargs.get('pk')
-        return reverse('case', kwargs={'pk': pk})
+        return reverse('case:detail', kwargs={'pk': pk})
 
 
 class CaseAddView(GroupRequiredMixin, CreateView):
@@ -307,12 +307,12 @@ class CaseAddView(GroupRequiredMixin, CreateView):
             session = str(self.object.session.id)
             case_type = str(self.object.case_type.id)
             court_type = str(self.object.court_type)
-            return HttpResponseRedirect(reverse('add_case') + "?session=" + session + "&case_type=" + case_type +
+            return HttpResponseRedirect(reverse('case:add') + "?session=" + session + "&case_type=" + case_type +
                                         "&court_type=" + court_type)
 
     def get_success_url(self):
         referer = self.request.META.get('HTTP_REFERER', '/')
-        return reverse('case', args=(self.object.id,))
+        return reverse('case:detail', args=(self.object.id,))
 
     def get_context_data(self, **kwargs):
         data = super(CaseAddView, self).get_context_data(**kwargs)
@@ -349,7 +349,7 @@ class CaseDeleteView(GroupRequiredMixin, DeleteView):
     group_required = Delete
 
     def get_success_url(self):
-        return reverse('case_list')
+        return reverse('case:list')
 
 
 class CountyDetailView(DetailView):
@@ -384,7 +384,7 @@ class CountyEditView(GroupRequiredMixin, UpdateView):
 
     def get_success_url(self):
         pk = self.kwargs.get('pk')
-        return reverse('county', kwargs={'pk': pk})
+        return reverse('county:detail', kwargs={'pk': pk})
 
 
 class CountyAddView(GroupRequiredMixin, CreateView):
@@ -397,7 +397,7 @@ class CountyAddView(GroupRequiredMixin, CreateView):
 
     def get_success_url(self):
         referer = self.request.META.get('HTTP_REFERER', '/')
-        return reverse('county', args=(self.object.id,))
+        return reverse('county:detail', args=(self.object.id,))
 
 
 class CountyDeleteView(GroupRequiredMixin, DeleteView):
@@ -408,7 +408,7 @@ class CountyDeleteView(GroupRequiredMixin, DeleteView):
     group_required = Delete
 
     def get_success_url(self):
-        return reverse('county_list')
+        return reverse('county:list')
 
 
 class HundredDetailView(DetailView):
@@ -443,7 +443,7 @@ class HundredEditView(GroupRequiredMixin, UpdateView):
 
     def get_success_url(self):
         pk = self.kwargs.get('pk')
-        return reverse('hundred', kwargs={'pk': pk})
+        return reverse('hundred:detail', kwargs={'pk': pk})
 
 
 
@@ -457,7 +457,7 @@ class HundredAddView(GroupRequiredMixin, CreateView):
 
     def get_success_url(self):
         referer = self.request.META.get('HTTP_REFERER', '/')
-        return reverse('hundred', args=(self.object.id,))
+        return reverse('hundred:detail', args=(self.object.id,))
 
     def get_initial(self):
         initial = super(HundredAddView, self).get_initial()
@@ -475,7 +475,7 @@ class HundredDeleteView(GroupRequiredMixin, DeleteView):
     group_required = Delete
 
     def get_success_url(self):
-        return reverse('hundred_list')
+        return reverse('hundred:list')
 
 
 class LitigantListView(ListView):
@@ -598,7 +598,7 @@ class SessionEditView(GroupRequiredMixin, UpdateView):
 
     def get_success_url(self):
         pk = self.kwargs.get('pk')
-        return reverse('session', kwargs={'pk': pk})
+        return reverse('session:detail', kwargs={'pk': pk})
 
 
 class SessionAddView(GroupRequiredMixin, CreateView):
@@ -611,7 +611,7 @@ class SessionAddView(GroupRequiredMixin, CreateView):
 
     def get_success_url(self):
         referer = self.request.META.get('HTTP_REFERER', '/')
-        return reverse('session', args=(self.object.id,))
+        return reverse('session:detail', args=(self.object.id,))
 
     def get_initial(self):
         initial = super(SessionAddView, self).get_initial()
@@ -628,7 +628,7 @@ class SessionDeleteView(GroupRequiredMixin, DeleteView):
     group_required = Delete
 
     def get_success_url(self):
-        return reverse('session_list')
+        return reverse('session:list')
 
     
 

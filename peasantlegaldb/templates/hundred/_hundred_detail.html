@@ -6,10 +6,10 @@
 
 {% block left_sidebar %}
     <div id="selection_list">
-        <a class="list-group-item list-group-item-action" href="{% url 'hundred_village_list' hundred.id %}">Villages</a>
-        <a class="list-group-item list-group-item-action" href="{% url 'hundred_case_list' hundred.id %}">Cases</a>
-        <a class="list-group-item list-group-item-action" href="{% url 'hundred_resident_list' hundred.id %}">Known Residents</a>
-        <a class="list-group-item list-group-item-action" href="{% url 'hundred_litigant_list' hundred.id %}">Litigants</a>
+        <a class="list-group-item list-group-item-action" href="{% url 'hundred:villages' hundred.id %}">Villages</a>
+        <a class="list-group-item list-group-item-action" href="{% url 'hundred:cases' hundred.id %}">Cases</a>
+        <a class="list-group-item list-group-item-action" href="{% url 'hundred:residents' hundred.id %}">Known Residents</a>
+        <a class="list-group-item list-group-item-action" href="{% url 'hundred:litigants' hundred.id %}">Litigants</a>
     </div>
 {% endblock %}
 

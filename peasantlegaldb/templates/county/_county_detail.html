@@ -6,11 +6,11 @@
 
 {% block left_sidebar %}
     <div id="selection_list">
-        <a class="list-group-item list-group-item-action" href="{% url 'county_village_list' county.id %}">Villages</a>
-        <a class="list-group-item list-group-item-action" href="{% url 'county_case_list' county.id %}">Cases</a>
-        <a class="list-group-item list-group-item-action" href="{% url 'county_resident_list' county.id %}">Known Residents</a>
-        <a class="list-group-item list-group-item-action" href="{% url 'county_litigant_list' county.id %}">Litigants</a>
-        <a class="list-group-item list-group-item-action" href="{% url 'county_hundred_list' county.id %}">Hundreds</a>
+        <a class="list-group-item list-group-item-action" href="{% url 'county:villages' county.id %}">Villages</a>
+        <a class="list-group-item list-group-item-action" href="{% url 'county:cases' county.id %}">Cases</a>
+        <a class="list-group-item list-group-item-action" href="{% url 'county:residents' county.id %}">Known Residents</a>
+        <a class="list-group-item list-group-item-action" href="{% url 'county:residents' county.id %}">Litigants</a>
+        <a class="list-group-item list-group-item-action" href="{% url 'county:hundreds' county.id %}">Hundreds</a>
     </div>
 {% endblock %}
 

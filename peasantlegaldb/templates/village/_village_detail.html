@@ -6,12 +6,12 @@
 
 {% block left_sidebar %}
     <div id="selection_list">
-        <a class="list-group-item list-group-item-action" href="{% url 'village_case_list' village.id %}">Cases</a>
-        <a class="list-group-item list-group-item-action" href="{% url 'village_resident_list' village.id %}">Known Residents</a>
-        <a class="list-group-item list-group-item-action" href="{% url 'village_litigant_list' village.id %}">Litigants</a>
-        <a class="list-group-item list-group-item-action" href="{% url 'village_session_list' village.id %}">Sessions</a>
-        <a class="list-group-item list-group-item-action" href="{% url 'village_related_places_list' village.id %}">Places Mentioned Here</a>
-        <a class="list-group-item list-group-item-action" href="{% url 'village_places_mentioned_list' village.id %}">Mentioned Elsewhere</a>
+        <a class="list-group-item list-group-item-action" href="{% url 'village:cases' village.id %}">Cases</a>
+        <a class="list-group-item list-group-item-action" href="{% url 'village:residents' village.id %}">Known Residents</a>
+        <a class="list-group-item list-group-item-action" href="{% url 'village:litigants' village.id %}">Litigants</a>
+        <a class="list-group-item list-group-item-action" href="{% url 'village:sessions' village.id %}">Sessions</a>
+        <a class="list-group-item list-group-item-action" href="{% url 'village:related_places' village.id %}">Places Mentioned Here</a>
+        <a class="list-group-item list-group-item-action" href="{% url 'village:places_mentioned' village.id %}">Mentioned Elsewhere</a>
     </div>
 {% endblock %}
 
@@ -30,12 +30,12 @@
                             <table class="table table-sm">
                                 <tr class="row m-0">
                                     <td class="d-inline-block col-4"><b>County:</b></td>
-                                    <td class="d-inline-block col-8"><a href="{% url 'county' village.county.id %}">{{ village.county.name}}</a></td>
+                                    <td class="d-inline-block col-8"><a href="{% url 'county:detail' village.county.id %}">{{ village.county.name}}</a></td>
                                 </tr>
                                 {% if village.hundred_id %}
                                 <tr class="row m-0">
                                     <td class="d-inline-block col-4"><b>Hundred:</b></td>
-                                    <td class="d-inline-block col-8"><a href="{% url 'hundred' village.hundred.id %}">{{ village.hundred.name}}</a></td>
+                                    <td class="d-inline-block col-8"><a href="{% url 'hundred:detail' village.hundred.id %}">{{ village.hundred.name}}</a></td>
                                 </tr>
                                 {% endif %}
                                 <tr class="row m-0">

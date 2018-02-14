@@ -27,7 +27,7 @@
                 {% if perms.peasantlegaldb.add_archive %}
                     <div class="container" style="position: sticky; top: 65px">
                         <div class="btn-group" role="group">
-                        <a class="btn btn-success float-right" href="{% url 'add_archive' %}">Add {{ page_title }}</a>
+                        <a class="btn btn-success float-right" href="{% url 'archive:add' %}">Add {{ page_title }}</a>
                         </div>
                     </div>
                 {% endif %}
