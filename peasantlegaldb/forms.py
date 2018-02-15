@@ -43,7 +43,16 @@ class PersonFilterForm(forms.Form):
 
 
 class CaseFilterForm(forms.Form):
-    case_selection = forms.ChoiceField(
+    village = forms.ChoiceField(
+        label='Village',
+        choices=(),
+        widget=forms.Select(
+            attrs={
+                'class':'selector',
+            }
+        )
+    )
+    case_type = forms.ChoiceField(
         label='Case Type',
         choices=(),
         widget=forms.Select(
@@ -56,20 +65,45 @@ class CaseFilterForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super(CaseFilterForm, self).__init__(*args, **kwargs)
 
-        # set up a list of tuples as additional options
+        # Set initial case_type_queryset to none, because it will dynamically update using ajax after village has been
+        # selected.
+        village_queryset = models.Village.objects.filter(session__cases__isnull=False).order_by('name').distinct()
 
-        EXTRA_CHOICES = [
-            (None, 'Select a Case Type'),
+        # set up a list of tuples as additional options
+        CASE_TYPE_CHOICES = [
+            ('None', 'Select a Case Type'),
             ('All', 'All Case Types'),
-            (None, '––––––––––––––––––––––––'),
+            ('None', '––––––––––––––––––––––––'),
         ]
 
-        # create a list of tuples for the choices by iterating through Village.objects.all.
-        choices = [(case_type.id, str(case_type)) for case_type in models.CaseType.objects.all().order_by('case_type')]
-        # add choices list of tuples to EXTRA_CHOICES. Make sure to put E_C before choices, as this establishes the
-        # order of the list of tuples that will be displayed, thus putting 'All Villages' and 'No Villages' up top.
-        choices = EXTRA_CHOICES + choices
-        self.fields['case_selection'].choices = choices
+        EXTRA_VILLAGE_CHOICES = [
+            ('None', 'Select a Village'),
+            ('All', 'All Villages'),
+            ('None', '––––––––––––––––––––––––'),
+        ]
+
+        # create a list of tuples for the choices by iterating through querysets
+        village_choices = [(village.id, str(village)) for village in village_queryset]
+
+        # add choices list of tuples to EXTRA_CHOICES. Make sure to put EXTRA_CHOICES before choices, as this
+        # establishes the order of the list of tuples that will be displayed, thus putting 'All' and 'No' up top.
+        additional_village_choices = EXTRA_VILLAGE_CHOICES + village_choices
+
+        # assign the concatted choices to the form fields.
+        self.fields['case_type'].choices = CASE_TYPE_CHOICES
+        self.fields['village'].choices = additional_village_choices
+
+        # set Crispy Forms helper stuff
+        self.helper = FormHelper()
+        self.helper.form_tag = False
+        self.helper.disable_csrf = True
+        self.helper.wrapper_class = 'form-row'
+        self.helper.label_class = 'col-2.5'
+        self.helper.field_class = 'col-3.5'
+        self.helper.layout = Layout(
+            Field('village', css_id='select_village'),
+            Field('case_type', css_id='select_case_type'),
+        )
 
 
 class CaseForm(forms.ModelForm):

@@ -1,5 +1,6 @@
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import UpdateView, CreateView, DeleteView
+from django.views.generic.base import TemplateView
 from django.views.generic import ListView
 
 from django.shortcuts import render, get_object_or_404, redirect
@@ -148,8 +149,7 @@ class RecordDeleteView(GroupRequiredMixin, DeleteView):
 class CaseListView(ListView):
 
     model = models.Case
-    queryset = models.Case.objects.all().select_related('session').order_by('session__village__name', 'session__date',
-                                                                            'court_type')
+    queryset = models.Case.objects.all()
 
     def get_context_data(self, **kwargs):
         context = super(CaseListView, self).get_context_data(**kwargs)
@@ -157,7 +157,18 @@ class CaseListView(ListView):
         context['filter_case_form'] = filter_case_form
         context['page_title'] = 'Case'
         return context
-    
+
+
+# view used to dynamically load list of case_types in the Case List view after selecting the village.
+def load_case_types(request):
+    village_id = request.GET.get('village')
+    if (village_id == "All"):
+        case_types = models.CaseType.objects.all().order_by('case_type').distinct()
+    elif (village_id == "None"):
+        case_types = models.CaseType.objects.none()
+    else:
+        case_types = models.CaseType.objects.filter(case__session__village_id=village_id).order_by('case_type').distinct()
+    return render(request, 'case/case_type_dropdown.html', {'case_types': case_types})
 
 class CaseDetailView(DetailView):
 

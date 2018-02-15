@@ -6,33 +6,25 @@
 {% endblock %}
 
 {% block additional_title %}
-    <form>
-        {% csrf_token %}
-
-        <div class="form-group d-flex justify-content-center" style="padding-top: 5px">
-        {% for field in filter_case_form.visible_fields %}
-                <div class="col-sm-2">
+    <div class="form-inline d-flex justify-content-center" id="select_cases" data_case_types_url="{% url 'case:ajax_case_types' %}">
+            <div class="form-group" style="padding-top: 5px">
+            {% for field in filter_case_form.visible_fields %}
+                <div class="col-2">
                     <h4>{{ field.label_tag }}</h4>
                 </div>
-                <div class="col-md-3.5">
-                    {% render_field field class="form-control" id="select_case_type" %}
+                <div class="col-3.5">
+                    {% render_field field class="form-control" id=field.name %}
                 </div>
         {% endfor %}
         </div>
+
+        <button type="button" class="btn btn-primary" id="get_cases">Get Cases</button>
+    </div>
 {% endblock %}
 
 {% block center_bar %}
     {{ block.super }}
     <br>
-        <div class="mx-auto">
-            <div class="justify-content-center">
-                        <button type="button" class="btn btn-primary" id="get_cases">Get Cases</button>
-            </div>
-        </div>
-
-    </form>
-    <br>
-
 <div id="list_cases" style="display: none">
     <div class="card">
         <div class="card-body clearfix" id="main_info">
@@ -82,12 +74,28 @@
 
 
     $(document).ready(function(){
+
+        $('#village').change(function(){
+           var url = $('#select_cases').attr('data_case_types_url');
+           var villageID = $(this).val();
+           $.ajax({
+                   url: url,
+                   data: {
+                       'village': villageID
+                   },
+                   success: function(data){
+                       $("#case_type").html(data);
+                   }
+               })
+        });
+
         $(":button").click(function(e){
             $('.btn').removeClass('active');
             $(this).addClass('active');
-            var caseType = $("#select_case_type").val();
+            var caseType = $("#case_type").val();
+            var village = $("#village").val();
             var url = Urls['api:case-list']();
-            if (caseType == null || caseType == '') {
+            if (caseType === 'None' || village === 'None') {
                 if ($("#list_cases").is(":visible")) {
                     $("#list_cases").hide();
                     return
@@ -96,10 +104,18 @@
                 }
             }
             if (caseType === "All"){
-                url = url + "?exclude[]=session.*&include[]=litigant_count&include[]=session.village.name&include[]=session.law_term&include[]=session.date&include[]=session.human_date&include[]=pledge_count";
+                if (village === "All"){
+                    url = url + "?exclude[]=session.*&include[]=litigant_count&include[]=session.village.name&include[]=session.law_term&include[]=session.date&include[]=session.human_date&include[]=pledge_count";
+                } else if (village !== 'None') {
+                    url = url + "?village=" + village + "&exclude[]=session.*&include[]=litigant_count&include[]=session.village.name&include[]=session.law_term&include[]=session.date&include[]=session.human_date&include[]=pledge_count";
+                }
             }
             else {
-                url = url + "?case_type=" + caseType + "&exclude[]=session.*&include[]=litigant_count&include[]=session.village.name&include[]=session.law_term&include[]=session.date&include[]=session.human_date&include[]=pledge_count";
+                if (village === "All"){
+                    url = url + "?case_type=" + caseType + "&exclude[]=session.*&include[]=litigant_count&include[]=session.village.name&include[]=session.law_term&include[]=session.date&include[]=session.human_date&include[]=pledge_count";
+                } else if (village !== 'None') {
+                    url = url + "?village=" + village + "&case_type=" + caseType + "&exclude[]=session.*&include[]=litigant_count&include[]=session.village.name&include[]=session.law_term&include[]=session.date&include[]=session.human_date&include[]=pledge_count";
+                }
             }
             $("#table").DataTable().destroy();
             var table = $('#table').DataTable({

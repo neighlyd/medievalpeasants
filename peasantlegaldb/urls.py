@@ -45,6 +45,7 @@ case_urls = [
     url(r'^(?P<pk>\d+)/delete/$', views.CaseDeleteView.as_view(), name='delete'),
     url(r'^(?P<pk>\d+)/litigants/$', views.LitigantListforAddCase.as_view(template_name='case/case_litigant_list_for_add_case.html')
         , name='litigant_list_for_add_case'),
+    url(r'^ajax/load_case_types/', views.load_case_types, name='ajax_case_types')
 ]
 
 county_urls = [
