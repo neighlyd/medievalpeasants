@@ -11,8 +11,17 @@ from crispy_forms.bootstrap import StrictButton
 
 
 class PersonFilterForm(forms.Form):
-    village_selection = forms.ChoiceField(
+    select_village = forms.ChoiceField(
         label='Village',
+        choices=(),
+        widget=forms.Select(
+            attrs={
+                'class':'selector',
+            }
+        )
+    )
+    select_filter = forms.ChoiceField(
+        label='Filter',
         choices=(),
         widget=forms.Select(
             attrs={
@@ -26,24 +35,39 @@ class PersonFilterForm(forms.Form):
 
         # set up a list of tuples as additional optionssasdfasdfwef.
 
-        EXTRA_CHOICES = [
-            (None, 'Select a Village'),
-            (None, '––––––––––––––––––––––––'),
+        EXTRA_VILLAGE_CHOICES = [
+            ('None', 'Select a Village'),
+            ('None', '––––––––––––––––––––––––'),
             ('All', 'All Villages'),
-            ('None', 'No Village'),
-            (None, '––––––––––––––––––––––––'),
+            ('None', '––––––––––––––––––––––––'),
+        ]
+
+        FILTER_CHOICES = [
+            ('None', 'Select a Filter'),
+            ('None', '––––––––––––––––––––––––'),
+            ('residents', 'Residents'),
+            ('litigants', 'Litigants'),
+            ('pledges_given', 'Pledge Givers'),
+            ('pledges_received', 'Pledge Receivers'),
+            ('amercement', 'Amerced'),
+            ('fine', 'Fined'),
+            ('damage', 'Damaged'),
+            ('chevage', 'Capitagium'),
+            ('impercamentum', 'Impercamenta'),
+            ('heriot', 'Heriot'),
         ]
 
         # create a list of tuples for the choices by iterating through Village.objects.all.
         choices = [(vill.id, str(vill)) for vill in models.Village.objects.filter(person__isnull=False).order_by('name').distinct()]
         # add choices list of tuples to EXTRA_CHOICES. Make sure to put E_C before choices, as this establishes the
         # order of the list of tuples that will be displayed, thus putting 'All Villages' and 'No Villages' up top.
-        choices = EXTRA_CHOICES + choices
-        self.fields['village_selection'].choices = choices
+        choices = EXTRA_VILLAGE_CHOICES + choices
+        self.fields['select_village'].choices = choices
+        self.fields['select_filter'].choices = FILTER_CHOICES
 
 
 class CaseFilterForm(forms.Form):
-    village = forms.ChoiceField(
+    select_village = forms.ChoiceField(
         label='Village',
         choices=(),
         widget=forms.Select(
@@ -52,7 +76,7 @@ class CaseFilterForm(forms.Form):
             }
         )
     )
-    case_type = forms.ChoiceField(
+    select_case_type = forms.ChoiceField(
         label='Case Type',
         choices=(),
         widget=forms.Select(
@@ -90,20 +114,9 @@ class CaseFilterForm(forms.Form):
         additional_village_choices = EXTRA_VILLAGE_CHOICES + village_choices
 
         # assign the concatted choices to the form fields.
-        self.fields['case_type'].choices = CASE_TYPE_CHOICES
-        self.fields['village'].choices = additional_village_choices
+        self.fields['select_case_type'].choices = CASE_TYPE_CHOICES
+        self.fields['select_village'].choices = additional_village_choices
 
-        # set Crispy Forms helper stuff
-        self.helper = FormHelper()
-        self.helper.form_tag = False
-        self.helper.disable_csrf = True
-        self.helper.wrapper_class = 'form-row'
-        self.helper.label_class = 'col-2.5'
-        self.helper.field_class = 'col-3.5'
-        self.helper.layout = Layout(
-            Field('village', css_id='select_village'),
-            Field('case_type', css_id='select_case_type'),
-        )
 
 
 class CaseForm(forms.ModelForm):

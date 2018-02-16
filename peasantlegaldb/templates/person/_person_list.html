@@ -6,61 +6,27 @@
 {% endblock %}
 
 {% block additional_title %}
-    <form>
-        {% csrf_token %}
+    <div class="form-inline d-flex justify-content-center" id="filter_people">
+            <div class="form-group" style="padding-top: 5px">
 
-        <div class="form-group d-flex justify-content-center" style="padding-top: 5px">
         {% for field in filter_village_form.visible_fields %}
-                <div class="col-sm-2">
+                <div class="col-2">
                     <h4>{{ field.label_tag }}</h4>
                 </div>
-                <div class="col-md-3.5">
-                    {% render_field field class="form-control" id="select_village" %}
+                <div class="col-4">
+                    {% render_field field class="form-control" id=field.name %}
                 </div>
         {% endfor %}
-        </div>
+
+    </div>
+
+    <button type="button" class="btn btn-primary" id="get_people">Get People</button>
+    </div>
 {% endblock %}
 
 
 {% block center_bar %}
     {{ block.super }}
-    <br>
-        <div class="mx-auto">
-            <div class="row">
-                <div class="btn-group">
-                    <!-- remember to add 'gets' class so JQuery can properly ID the buttons -->
-                    <button type="button" class="btn btn-success gets" id="residents">Residents</button>
-                    <button type="button" class="btn btn-success gets" id="litigants">Litigants</button>
-                    <button type="button" class="btn btn-success gets" id="pledges_given">Pledge Givers</button>
-                    <button type="button" class="btn btn-success gets" id="pledges_received">Pledge Receivers</button>
-                    <button type="button" class="btn btn-success gets" id="amercement">Amercements</button>
-                    <button type="button" class="btn btn-success gets" id="fine">Fines</button>
-                    <button type="button" class="btn btn-success gets" id="damage">Damages</button>
-                    <button type="button" class="btn btn-success gets" id="chevage">Chevages</button>
-                    <button type="button" class="btn btn-success gets" id="impercamentum">Impercamenta</button>
-                    <button type="button" class="btn btn-success gets" id="heriot">Heriots</button>
-                </div>
-            </div>
-            <br>
-            <div class="row">
-                <div class="btn-group">
-                    <div class="btn-group">
-                        <!-- Remember to add 'analysis' class so JQuery can properly ID the buttons -->
-                        <button type="button" class="btn btn-success analysis" id="chevage">Chevage Analysis</button>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="btn-group">
-                </div>
-
-            </div>
-
-            </div>
-
-    </form>
-
-    <br>
 <div id="list_people" style="display: none">
     <div class="card">
         <div class="card-body clearfix" id="main_info">
@@ -138,45 +104,41 @@
             }
         });
 
-        $(".gets").click(function(e){
+        $("#get_people").click(function(e){
             $(".btn").removeClass('active');
             $(this).addClass('active');
 
             var village = $("#select_village").val();
+            var filter = $('#select_filter').val();
             var btnClicked = e.target.id;
             var url = Urls["api:person-list"]();
 
-            if (village === ''){
-                alert("Please select a village");
-                return
-            }
-
-            if (village === 'None') {
+            if (village === 'None' || filter === 'None') {
                 if ($("#list_people").is(":visible")) {
                     $("#list_people").hide();
                     return
                 } else {
                     return
                 }
-            }
-            if (village === "All"){
-                    if (btnClicked === "residents") {
+            } else if (village === "All"){
+                    if (filter === "residents") {
                         url = url + "?exclude[]=village.*&include[]=village.name&include[]=counts&include[]=earliest_case.session.village&include[]=latest_case.session.village";
-                    } else if (btnClicked === "litigants") {
+                    } else if (filter === "litigants") {
                         url = url + "?exclude[]=village.*&include[]=village.name&include[]=counts&include[]=earliest_case.session.village&include[]=latest_case.session.village";
                     } else {
-                        url = url + "?" + btnClicked + "=true&exclude[]=village.*&include[]=village.name&include[]=counts&include[]=earliest_case.session.village&include[]=latest_case.session.village";
+                        url = url + "?" + filter + "=true&exclude[]=village.*&include[]=village.name&include[]=counts&include[]=earliest_case.session.village&include[]=latest_case.session.village";
                     }
             }
             else {
-                if (btnClicked === "residents") {
+                if (filter === "residents") {
                         url = url + "?filter{village.id}=" + village + "&exclude[]=village.*&include[]=village.name&include[]=counts&include[]=earliest_case.session.village&include[]=latest_case.session.village";
-                    } else if (btnClicked === "litigants") {
+                    } else if (filter === "litigants") {
                         url = url + "?village_to_litigant=" + village + "&exclude[]=village.*&include[]=village.name&include[]=counts&include[]=earliest_case.session.village&include[]=latest_case.session.village";
                     } else {
-                        url = url + "?" + btnClicked + "=true&village_to_litigant=" + village + "&exclude[]=village.*&include[]=village.name&include[]=counts&include[]=earliest_case.session.village&include[]=latest_case.session.village";
+                        url = url + "?" + filter + "=true&village_to_litigant=" + village + "&exclude[]=village.*&include[]=village.name&include[]=counts&include[]=earliest_case.session.village&include[]=latest_case.session.village";
                     }
             }
+            console.log('url is:' + url);
             $("#table").DataTable().destroy();
             var table = $('#table').DataTable({
                 order: [1, "asc"],

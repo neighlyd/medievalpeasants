@@ -24,7 +24,6 @@
 
 {% block center_bar %}
     {{ block.super }}
-    <br>
 <div id="list_cases" style="display: none">
     <div class="card">
         <div class="card-body clearfix" id="main_info">
@@ -75,7 +74,7 @@
 
     $(document).ready(function(){
 
-        $('#village').change(function(){
+        $('#select_village').change(function(){
            var url = $('#select_cases').attr('data_case_types_url');
            var villageID = $(this).val();
            $.ajax({
@@ -84,36 +83,35 @@
                        'village': villageID
                    },
                    success: function(data){
-                       $("#case_type").html(data);
+                       $("#select_case_type").html(data);
                    }
                })
         });
 
-        $(":button").click(function(e){
+        $("#get_cases").click(function(e){
             $('.btn').removeClass('active');
             $(this).addClass('active');
-            var caseType = $("#case_type").val();
-            var village = $("#village").val();
+            var caseType = $("#select_case_type").val();
+            var village = $("#select_village").val();
             var url = Urls['api:case-list']();
             if (caseType === 'None' || village === 'None') {
                 if ($("#list_cases").is(":visible")) {
                     $("#list_cases").hide();
+
                     return
                 } else {
                     return
                 }
-            }
-            if (caseType === "All"){
+            } else if (caseType === "All"){
                 if (village === "All"){
                     url = url + "?exclude[]=session.*&include[]=litigant_count&include[]=session.village.name&include[]=session.law_term&include[]=session.date&include[]=session.human_date&include[]=pledge_count";
-                } else if (village !== 'None') {
+                } else {
                     url = url + "?village=" + village + "&exclude[]=session.*&include[]=litigant_count&include[]=session.village.name&include[]=session.law_term&include[]=session.date&include[]=session.human_date&include[]=pledge_count";
                 }
-            }
-            else {
+            } else {
                 if (village === "All"){
                     url = url + "?case_type=" + caseType + "&exclude[]=session.*&include[]=litigant_count&include[]=session.village.name&include[]=session.law_term&include[]=session.date&include[]=session.human_date&include[]=pledge_count";
-                } else if (village !== 'None') {
+                } else {
                     url = url + "?village=" + village + "&case_type=" + caseType + "&exclude[]=session.*&include[]=litigant_count&include[]=session.village.name&include[]=session.law_term&include[]=session.date&include[]=session.human_date&include[]=pledge_count";
                 }
             }
