@@ -77,7 +77,7 @@ class CaseFilterForm(forms.Form):
         )
     )
     select_case_type = forms.ChoiceField(
-        label='Case Type',
+        label='Type',
         choices=(),
         widget=forms.Select(
             attrs={

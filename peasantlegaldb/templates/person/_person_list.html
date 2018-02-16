@@ -138,7 +138,6 @@
                         url = url + "?" + filter + "=true&village_to_litigant=" + village + "&exclude[]=village.*&include[]=village.name&include[]=counts&include[]=earliest_case.session.village&include[]=latest_case.session.village";
                     }
             }
-            console.log('url is:' + url);
             $("#table").DataTable().destroy();
             var table = $('#table').DataTable({
                 order: [1, "asc"],
