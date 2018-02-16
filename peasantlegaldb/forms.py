@@ -171,8 +171,12 @@ class CaseForm(forms.ModelForm):
 
 
 class LitigantForm(forms.ModelForm):
+
     def __init__(self, *args, **kwargs):
         super(LitigantForm, self).__init__(*args, **kwargs)
+        self.fields['person'].queryset = self.fields['person'].queryset.order_by('first_name', 'last_name', 'relation_name')
+        self.fields['role'].queryset = self.fields['role'].queryset.order_by('role')
+
         self.helper = FormHelper()
         # disable form_tag so that way LitigantForm can nest within Case form. Need to manually add <form> tags to
         # template.

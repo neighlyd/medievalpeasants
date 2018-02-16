@@ -45,6 +45,7 @@ case_urls = [
     url(r'^(?P<pk>\d+)/delete/$', views.CaseDeleteView.as_view(), name='delete'),
     url(r'^(?P<pk>\d+)/litigants/$', views.LitigantListforAddCase.as_view(template_name='case/case_litigant_list_for_add_case.html')
         , name='litigant_list_for_add_case'),
+    url(r'^(?P<pk>\d+)/add_litigant/$', views.add_litigant, name='add_litigant'),
     url(r'^ajax/load_case_types/', views.load_case_types, name='ajax_case_types')
 ]
 
@@ -89,8 +90,7 @@ land_urls = [
 ]
 
 litigant_urls = [
-    url(r'^add', views.add_litigant, name='add'),
-    url(r'^edit/(?P<id>\d+)/', views.edit_litigant, name='edit'),
+    url(r'^edit/(?P<pk>\d+)/', views.edit_litigant, name='edit'),
 ]
 
 person_detail_urls = [

@@ -1,66 +1,23 @@
-{% for litigant in litigants %}
-    <div class="card" id="litigant_{{ litigant.id }}">
-        <div class="card-body">
-            <div class="row">
-                <div class="col-8">
-                    <table class="table table-sm">
-                        <tr>
-                            <th class="d-inline-block col-4"><b>Litigant:</b></th>
-                            <th class="d-inline-block col-4"><b>Role:</b></th>
-                        </tr>
-                        <tbody>
-                            <tr>
-                                <td class="d-inline-block col-4"><b>{{ litigant.person.full_name }}</b></td>
-                                <td class="d-inline-block col-4"><b>{{ litigant.role.role }}</b></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="col-2 ml-auto">
-                    <button class="btn btn-warning" type="button" id="edit_litigant" name="edit_litigant_{{ litigant.id }}">Edit</button>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-8">
-                    <table class="table table-sm">
-                        <thead>
-                            <tr class="row m-0">
-                                {% if litigant.ad_proximum %}
-                                    <th class="d-inline-block col-2">Ad Proximum</b></th>
-                                {% endif %}
-                                {% if litigant.distrained %}
-                                    <th class="d-inline-block col-2">Distrain</b></th>
-                                {% endif %}
-                                {% if litigant.attached %}
-                                    <th class="d-inline-block col-2">Attach</b></th>
-                                {% endif %}
-                                {% if litigant.bail %}
-                                    <th class="d-inline-block col-2">Bail</b></th>
-                                {% endif %}
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                {% if litigant.ad_proximum %}
-                                    <th class="d-inline-block col-2"><i class="fas fa-check"></i></th>
-                                {% endif %}
-                                {% if litigant.distrained %}
-                                    <th class="d-inline-block col-2"><i class="fas fa-check"></i></th>
-                                {% endif %}
-                                {% if litigant.attached %}
-                                    <th class="d-inline-block col-2"><i class="fas fa-check"></i></th>
-                                {% endif %}
-                                {% if litigant.bail %}
-                                    <th class="d-inline-block col-2"><i class="fas fa-check"></i></th>
-                                {% endif %}
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-        </div>
+<div class="card">
+    <div class="card-body">
+        <table class="table table-hover" id="litigant_table">
+            <thead class="thead-dark">
+                <tr>
+                    <th scope="col">Litigant</th>
+                    <th scope="col">Role</th>
+                    <th scope="col"></th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for  litigant in litigant_list %}
+                <tr>
+                    <td scope="row">{{ litigant.person.full_name }}</td>
+                    <td>{{ litigant.role.role }}</td>
+                    <td><button class="btn btn-warning edit_litigant" type="button" data-url="{% url 'litigant:edit' litigant.id %}"><i class="fas fa-pencil-alt"></i> Edit</button></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
     </div>
-    <br>
-{% endfor %}
+</div>
+

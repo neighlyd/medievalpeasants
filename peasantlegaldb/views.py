@@ -184,7 +184,7 @@ class CaseDetailView(DetailView):
 def CaseEditView(request, pk):
 
     case = get_object_or_404(models.Case, pk=pk)
-    litigants = models.Litigant.objects.filter(case = case)
+    litigant_list = models.Litigant.objects.filter(case = case)
     # inlines
     LitigantFormset = inlineformset_factory(models.Case, models.Litigant, form=forms.LitigantForm, extra=1, can_delete=True)
 
@@ -197,7 +197,7 @@ def CaseEditView(request, pk):
 
     context = {
         'case': case,
-        'litigants': litigants,
+        'litigant_list': litigant_list,
         'form': form,
         'litigant_formset': litigant_formset,
     }
@@ -205,30 +205,39 @@ def CaseEditView(request, pk):
     return render(request, 'case/case_edit.html', context)
 
 
-def add_litigant(request):
+def add_litigant(request, pk):
 
     data = dict()
+    # Get the appropriate case pk for the litigant to be assigned to.
+    case_instance = get_object_or_404(models.Case, pk=pk)
 
     if request.method == "POST":
-        form = forms.LitigantForm(request.POST)
+        form = forms.LitigantForm(request.POST, case=case_instance)
         if form.is_valid():
             form.save()
             data['form_is_valid'] = True
+            # Once litigant has been added, requery the Litigant model to retrieve an updated list of Litigants.
+            litigant_list = models.Litigant.objects.filter(case=case_instance)
+            # Add this updated litigant_list to the html list and render it as a string for ajax to consume and refresh
+            # that portion of the page.
+            data['html_litigant_list'] = render_to_string('case/case_litigant_list_for_add_case.html',
+                                                          {'litigant_list': litigant_list}
+                                                          )
         else:
             data['form_is_valid'] = False
     else:
         form = forms.LitigantForm()
 
-    context = {'form': form}
+    context = {'form': form, 'case': case_instance}
 
-    # Before passing context along, render it as a string so that it can be serialized and sent as JSON data.
+    # Before passing template and context along, render it as a string so that it can be serialized and sent as JSON data.
     data['html_form'] = render_to_string('case/_case_add_litigant_modal.html', context, request=request)
 
     return JsonResponse(data)
 
 
-def edit_litigant(request, id):
-    litigant = get_object_or_404(models.Litigant, pk=id)
+def edit_litigant(request, pk):
+    litigant = get_object_or_404(models.Litigant, pk=pk)
 
     data = dict()
 
