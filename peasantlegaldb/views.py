@@ -215,9 +215,9 @@ def add_litigant(request, pk):
     if request.method == "POST":
         form = forms.LitigantForm(request.POST)
         if form.is_valid():
-            form.save(commit=False)
-            form.case = case_instance
-            form.save()
+            new_litigant = form.save(commit=False)
+            new_litigant.case = case_instance
+            new_litigant.save()
             data['form_is_valid'] = True
             # Once litigant has been added, requery the Litigant model to retrieve an updated list of Litigants.
             litigant_list = models.Litigant.objects.filter(case=case_instance).prefetch_related('person')\
