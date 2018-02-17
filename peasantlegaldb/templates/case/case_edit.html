@@ -9,7 +9,7 @@
 
     {% block left_sidebar %}
         <div class="container" style="position: sticky; top: 65px">
-            <button type="button" class="btn btn-success js-add-litigant pull-right" data-url="{% url 'case:add_litigant' case.id %}"><i class="fas fa-plus"></i>  Add Litigant</button>
+            <button type="button" class="btn btn-success add-litigant pull-right" data-url="{% url 'case:add_litigant' case.id %}"><i class="fas fa-plus"></i>  Add Litigant</button>
         </div>
     {% endblock %}
 
@@ -86,7 +86,7 @@
     <script src="{% static '/js/formset.js' %}"></script>
     <script>
         $(document).ready(function(){
-            $(".js-add-litigant").click(function(){
+            $(".add-litigant").click(function(){
                var url = $(this).attr('data-url');
                $.ajax({
                    url: url,
@@ -116,9 +116,11 @@
                 })
             });
 
-            $('#modal-litigant').on('submit', '.js-add-litigant-form', function(){
+            $('#modal-litigant').on('submit', '.add-litigant-form', function(){
                var form = $(this);
                console.log('clicky');
+               var data = form.serialize();
+               console.log(data);
                $.ajax({
                    url: form.attr('action'),
                    data: form.serialize(),

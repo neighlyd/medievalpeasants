@@ -1,6 +1,6 @@
 {% load crispy_forms_tags %}
 
-<form method="post" action="{% url 'case:add_litigant' case.id %}" class="js-add-litigant-form">
+<form method="post" action="{% url 'case:add_litigant' case.id %}" class="add-litigant-form">
     {% csrf_token %}
     <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">

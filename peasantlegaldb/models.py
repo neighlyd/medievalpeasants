@@ -791,7 +791,7 @@ class Litigant(models.Model):
     crossed = models.NullBooleanField()
     recessit = models.NullBooleanField()
     habet_terram = models.NullBooleanField()
-    chevage_notes = models.TextField(blank=True, null=True)
+    chevage_notes = models.TextField(blank=True)
     heriot_quantity = models.CharField(max_length=25, blank=True,)
     heriot_animal = models.ForeignKey(Chattel, null=True, related_name='heriot_animal')
     heriot = models.ForeignKey(Money, null=True, blank=True, related_name='heriot_assessment')

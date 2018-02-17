@@ -199,11 +199,12 @@ class LitigantForm(forms.ModelForm):
                 ),
                 css_class='row',
             ),
+            Field('case', type='hidden'),
         )
 
     class Meta:
         model = models.Litigant
-        fields = ['person', 'role']
+        fields = ['person', 'role', 'case']
 
 LitigantFormset = inlineformset_factory(models.Case, models.Litigant, form=LitigantForm, extra=1)
 

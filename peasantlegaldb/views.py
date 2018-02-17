@@ -184,7 +184,8 @@ class CaseDetailView(DetailView):
 def CaseEditView(request, pk):
 
     case = get_object_or_404(models.Case, pk=pk)
-    litigant_list = models.Litigant.objects.filter(case = case)
+    litigant_list = models.Litigant.objects.filter(case = case).prefetch_related('person')\
+        .order_by('person__first_name', 'person__last_name')
     # inlines
     LitigantFormset = inlineformset_factory(models.Case, models.Litigant, form=forms.LitigantForm, extra=1, can_delete=True)
 
@@ -212,12 +213,15 @@ def add_litigant(request, pk):
     case_instance = get_object_or_404(models.Case, pk=pk)
 
     if request.method == "POST":
-        form = forms.LitigantForm(request.POST, case=case_instance)
+        form = forms.LitigantForm(request.POST)
         if form.is_valid():
+            form.save(commit=False)
+            form.case = case_instance
             form.save()
             data['form_is_valid'] = True
             # Once litigant has been added, requery the Litigant model to retrieve an updated list of Litigants.
-            litigant_list = models.Litigant.objects.filter(case=case_instance)
+            litigant_list = models.Litigant.objects.filter(case=case_instance).prefetch_related('person')\
+                .order_by('person__first_name', 'person__last_name')
             # Add this updated litigant_list to the html list and render it as a string for ajax to consume and refresh
             # that portion of the page.
             data['html_litigant_list'] = render_to_string('case/case_litigant_list_for_add_case.html',
@@ -226,7 +230,7 @@ def add_litigant(request, pk):
         else:
             data['form_is_valid'] = False
     else:
-        form = forms.LitigantForm()
+        form = forms.LitigantForm(initial={'case' : case_instance})
 
     context = {'form': form, 'case': case_instance}
 
