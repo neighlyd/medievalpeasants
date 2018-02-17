@@ -43,9 +43,10 @@ case_urls = [
     url(r'^add/$', views.add_case, name='add'),
     url(r'^(?P<pk>\d+)/edit/$', views.CaseEditView, name='edit'),
     url(r'^(?P<pk>\d+)/delete/$', views.CaseDeleteView.as_view(), name='delete'),
-    url(r'^(?P<pk>\d+)/litigants/$', views.LitigantListforAddCase.as_view(template_name='case/case_litigant_list_for_add_case.html')
+    url(r'^(?P<pk>\d+)/litigants/$', views.LitigantListforAddCase.as_view(template_name='case/litigant_table_body_for_case.html')
         , name='litigant_list_for_add_case'),
     url(r'^(?P<pk>\d+)/add_litigant/$', views.add_litigant, name='add_litigant'),
+    url(r'^(?P<pk>\d+)/edit_litigant/(?P<litigant_pk>\d+)/', views.edit_litigant, name='edit_litigant'),
     url(r'^ajax/load_case_types/', views.load_case_types, name='ajax_case_types')
 ]
 
@@ -87,10 +88,6 @@ land_urls = [
     url(r'^(?P<pk>\d+)/case_history', views.LandDetailView.as_view(template_name='land/land_case_history.html'),
         name='cases'),
     url(r'^list/$', views.LandListView.as_view(template_name='land/_land_list.html'), name='list'),
-]
-
-litigant_urls = [
-    url(r'^edit/(?P<pk>\d+)/', views.edit_litigant, name='edit'),
 ]
 
 person_detail_urls = [
@@ -168,7 +165,6 @@ urlpatterns = [
     url(r'^county/', include(county_urls, namespace='county')),
     url(r'^hundred/', include(hundred_urls, namespace='hundred')),
     url(r'^land/', include(land_urls, namespace='land')),
-    url(r'^litigant/', include(litigant_urls, namespace='litigant')),
     url(r'^person/', include(person_detail_urls, namespace='person')),
     url(r'^record/', include(record_urls, namespace='record')),
     url(r'^session/', include(session_urls, namespace='session')),

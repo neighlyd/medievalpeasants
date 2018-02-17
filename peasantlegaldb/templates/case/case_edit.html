@@ -51,7 +51,7 @@
             <h4 class="card-title">Litigants</h4>
         </div>
         <div class="card-body" id="litigants">
-            {% include 'case/case_litigant_list_for_add_case.html' %}
+            {% include 'case/litigant_table_for_case.html' %}
         </div>
     </div>
     </div>
@@ -86,7 +86,7 @@
     <script src="{% static '/js/formset.js' %}"></script>
     <script>
         $(document).ready(function(){
-            $(".add-litigant").click(function(){
+            $('.add-litigant').click(function(){
                var url = $(this).attr('data-url');
                $.ajax({
                    url: url,
@@ -101,7 +101,7 @@
                })
             });
 
-            $(".edit_litigant").click(function(){
+            $('#litigant_table').on('click', '.edit_litigant', function(){
                 var url = $(this).attr('data-url');
                 $.ajax({
                     url: url,
@@ -117,6 +117,31 @@
             });
 
             $('#modal-litigant').on('submit', '.add-litigant-form', function(){
+               var form = $(this);
+               console.log('clicky');
+               var data = form.serialize();
+               console.log(data);
+               $.ajax({
+                   url: form.attr('action'),
+                   data: form.serialize(),
+                   type: form.attr('method'),
+                   dataType: 'json',
+                   success: function(data){
+                       if(data.form_is_valid) {
+                           $('#litigant_table tbody').html(data.html_litigant_list);
+                           $('#modal-litigant').modal('hide');
+                           console.log('success');
+                       } else {
+                           $('#modal-litigant .modal-content').html(data.html_form);
+                           console.log('failure');
+                       }
+                   }
+               });
+                // return false to prevent submission of POST and refreshing of page.
+                return false;
+            });
+
+            $('#modal-litigant').on('submit', '.edit-litigant-form', function(){
                var form = $(this);
                console.log('clicky');
                var data = form.serialize();

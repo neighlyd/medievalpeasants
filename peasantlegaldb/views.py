@@ -222,10 +222,11 @@ def add_litigant(request, pk):
             # Once litigant has been added, requery the Litigant model to retrieve an updated list of Litigants.
             litigant_list = models.Litigant.objects.filter(case=case_instance).prefetch_related('person')\
                 .order_by('person__first_name', 'person__last_name')
-            # Add this updated litigant_list to the html list and render it as a string for ajax to consume and refresh
-            # that portion of the page.
-            data['html_litigant_list'] = render_to_string('case/case_litigant_list_for_add_case.html',
-                                                          {'litigant_list': litigant_list}
+            # Render the template to a string, with associated context (i.e. litigant list and case used for reversing
+            # urls) and assign to a dict entry in data to pass through ajax.
+            data['html_litigant_list'] = render_to_string('case/litigant_table_body_for_case.html',
+                                                          {'litigant_list': litigant_list,
+                                                           'case': case_instance}
                                                           )
         else:
             data['form_is_valid'] = False
@@ -240,22 +241,33 @@ def add_litigant(request, pk):
     return JsonResponse(data)
 
 
-def edit_litigant(request, pk):
-    litigant = get_object_or_404(models.Litigant, pk=pk)
-
+def edit_litigant(request, pk, litigant_pk):
+    # See add_litigant for comments.
+    litigant = get_object_or_404(models.Litigant, pk=litigant_pk)
+    case_instance = litigant.case
     data = dict()
 
     if request.method == 'POST':
         form = forms.LitigantForm(request.POST, instance=litigant)
+        if form.is_valid():
+            new_litigant = form.save(commit=False)
+            new_litigant.save()
+            data['form_is_valid'] = True
+            litigant_list = models.Litigant.objects.filter(case=case_instance).prefetch_related('person') \
+                .order_by('person__first_name', 'person__last_name')
+            data['html_litigant_list'] = render_to_string('case/litigant_table_body_for_case.html',
+                                                          {'litigant_list': litigant_list,
+                                                           'case': case_instance}
+                                                          )
+        else:
+            data['form_is_valid'] = False
     else:
         form = forms.LitigantForm(instance=litigant)
 
-    context = {'form': form}
-
+    context = {'form': form, 'litigant': litigant, 'case': case_instance}
     data['html_form'] = render_to_string('case/_case_edit_litigant_modal.html', context, request=request)
 
     return JsonResponse(data)
-
 
 
 def add_case(request):
