@@ -186,21 +186,16 @@ def CaseEditView(request, pk):
     case = get_object_or_404(models.Case, pk=pk)
     litigant_list = models.Litigant.objects.filter(case = case).prefetch_related('person')\
         .order_by('person__first_name', 'person__last_name')
-    # inlines
-    LitigantFormset = inlineformset_factory(models.Case, models.Litigant, form=forms.LitigantForm, extra=1, can_delete=True)
 
     if request.method == 'POST':
         form = forms.CaseForm(request.POST, instance=case)
-        litigant_formset = LitigantFormset(request.POST, prefix='litigant')
     else:
         form = forms.CaseForm(instance=case)
-        litigant_formset = LitigantFormset(instance=case, prefix='litigant')
 
     context = {
         'case': case,
         'litigant_list': litigant_list,
         'form': form,
-        'litigant_formset': litigant_formset,
     }
 
     return render(request, 'case/case_edit.html', context)

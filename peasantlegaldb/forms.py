@@ -194,9 +194,6 @@ class LitigantForm(forms.ModelForm):
                     'role',
                     css_class='col',
                 ),
-                Div(
-                    Field('DELETE',),
-                ),
                 css_class='row',
             ),
         )

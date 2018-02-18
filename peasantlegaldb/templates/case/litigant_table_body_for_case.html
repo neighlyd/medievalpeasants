@@ -1,8 +1,51 @@
 {% for  litigant in litigant_list %}
-    <tr>
-        <td scope="row">{{ litigant.person.full_name }}</td>
-        <td>{{ litigant.role.role }}</td>
-        <td><button class="btn btn-warning edit_litigant" type="button" data-url="{% url 'case:edit_litigant' pk=case.id litigant_pk=litigant.id %}"><i class="fas fa-pencil-alt"></i> Edit</button></td>
-    </tr>
+    <li class="list-group-item">
+        <div class="row">
+            <div class="col-4"><h6>{{ litigant.person.full_name }}</h6></div>
+            <div class="col-4 text-center"><h6>{{ litigant.role.role }}</h6></div>
+            <div class="col-4">
+
+            <button class="btn btn-warning edit_litigant float-right" type="button" data-url="{% url 'case:edit_litigant' pk=case.id litigant_pk=litigant.id %}"><i class="fas fa-pencil-alt"></i> Edit</button>
+            </div>
+        </div>
+        <div class="col-3">
+            <table class="table table-bordered table-sm">
+                <thead>
+                    <tr>
+                        {% if litigant.ad_proximum %}
+                            <th scope="col">Ad Proximum</th>
+                        {% endif %}
+                        {% if litigant.distrained %}
+                            <th scope="col">Distrain</th>
+                        {% endif %}
+                        {% if litigant.attached %}
+                            <th scope="col">Attach</th>
+                        {% endif %}
+                        {% if litigant.bail %}
+                            <th scope="col">Bail</th>
+                        {% endif %}
+
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        {% if litigant.ad_proximum %}
+                            <td><i class="fas fa-check"></i></td>
+                        {% endif %}
+                        {% if litigant.distrained %}
+                            <td><i class="fas fa-check"></i></td>
+                        {% endif %}
+                        {% if litigant.attached %}
+                            <td><i class="fas fa-check"></i></td>
+                        {% endif %}
+                        {% if litigant.bail %}
+                            <td><i class="fas fa-check"></i></td>
+                        {% endif %}
+
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </li>
 {% endfor %}
 

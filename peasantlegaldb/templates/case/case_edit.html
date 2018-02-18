@@ -101,7 +101,7 @@
                })
             });
 
-            $('#litigant_table').on('click', '.edit_litigant', function(){
+            $('#ajax_litigant_list').on('click', '.edit_litigant', function(){
                 var url = $(this).attr('data-url');
                 $.ajax({
                     url: url,
@@ -118,7 +118,6 @@
 
             $('#modal-litigant').on('submit', '.add-litigant-form', function(){
                var form = $(this);
-               console.log('clicky');
                var data = form.serialize();
                console.log(data);
                $.ajax({
@@ -128,12 +127,10 @@
                    dataType: 'json',
                    success: function(data){
                        if(data.form_is_valid) {
-                           $('#litigant_table tbody').html(data.html_litigant_list);
+                           $('#ajax_litigant_list ul').html(data.html_litigant_list);
                            $('#modal-litigant').modal('hide');
-                           console.log('success');
                        } else {
                            $('#modal-litigant .modal-content').html(data.html_form);
-                           console.log('failure');
                        }
                    }
                });
@@ -143,7 +140,6 @@
 
             $('#modal-litigant').on('submit', '.edit-litigant-form', function(){
                var form = $(this);
-               console.log('clicky');
                var data = form.serialize();
                console.log(data);
                $.ajax({
@@ -153,12 +149,10 @@
                    dataType: 'json',
                    success: function(data){
                        if(data.form_is_valid) {
-                           $('#litigant_table tbody').html(data.html_litigant_list);
+                           $('#ajax_litigant_list ul').html(data.html_litigant_list);
                            $('#modal-litigant').modal('hide');
-                           console.log('success');
                        } else {
                            $('#modal-litigant .modal-content').html(data.html_form);
-                           console.log('failure');
                        }
                    }
                });

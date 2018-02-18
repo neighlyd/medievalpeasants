@@ -1,6 +1,9 @@
 from django.db import models
 from django.db.models import Count, Max, Min, Avg, Sum
+
 from decimal import *
+
+from datetime import date
 
 
 '''
@@ -802,6 +805,28 @@ class Litigant(models.Model):
     land = models.ForeignKey(Land, null=True, blank=True, on_delete=models.CASCADE, related_name='case_to_land')
     land_villeinage = models.NullBooleanField()
     land_notes = models.TextField(blank=True,)
+
+    def save(self, *args, **kwargs):
+        person = Person.objects.get(id=self.person_id)
+        try:
+            earliest_case = person.earliest_case
+            if self.case.session.date <= earliest_case.session.date:
+                person.earliest_case = self.case
+                person.save()
+        except:
+            person.earliest_case = self.case
+            person.save()
+        try:
+            latest_case = person.latest_case
+            if self.case.session.date >= latest_case.session.date:
+                person.latest_case = self.case
+                person.save()
+        except:
+            person.latest_case = self.case
+            person.save()
+        super(Litigant, self).save(*args, **kwargs)
+
+
 
 
 class Fine(models.Model):
