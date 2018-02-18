@@ -71,7 +71,7 @@
 
 <!-- Modal for editing litigants. The content is loaded dynamically through ajax. -->
 <div class="modal fade" id="modal-litigant">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
 
         </div>
@@ -119,7 +119,6 @@
             $('#modal-litigant').on('submit', '.add-litigant-form', function(){
                var form = $(this);
                var data = form.serialize();
-               console.log(data);
                $.ajax({
                    url: form.attr('action'),
                    data: form.serialize(),
@@ -141,7 +140,6 @@
             $('#modal-litigant').on('submit', '.edit-litigant-form', function(){
                var form = $(this);
                var data = form.serialize();
-               console.log(data);
                $.ajax({
                    url: form.attr('action'),
                    data: form.serialize(),

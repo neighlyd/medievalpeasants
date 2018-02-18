@@ -1,53 +1,50 @@
-{% load widget_tweaks %}
+{% load crispy_forms_tags %}
 
 <form method="post" action="{% url 'case:edit_litigant' pk=case.id litigant_pk=litigant.id %}" class="edit-litigant-form">
     {% csrf_token %}
 
     <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-            <h4 class="modal-title text-center">Edit Litigant</h4>
+        <h4 class="modal-title text-center">Edit Litigant</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
     </div>
 
     <div class="modal-body">
 
-        {% for hidden_field in form.hidden_fields %}
-            {{ hidden_field }}
-        {% endfor %}
+        <div class="row">
 
-        {% if form.non_field_errors %}
-            <div class="alert alert-danger" role="alert">
-              {% for error in form.non_field_errors %}
-                {{ error }}
-              {% endfor %}
+            <div class="col-3">
+                <div style="position: sticky;">
+                        <ul class="list-group">
+                          <li class="list-group-item text-center">Add</li>
+                          <button type="button" class="list-group-item list-group-item-action" id="add_amercement">Amercement</button>
+                          <button type="button" class="list-group-item list-group-item-action" id="add_fine">Fine</button>
+                          <button type="button" class="list-group-item list-group-item-action" id="add_damage">Damage</button>
+                          <button type="button" class="list-group-item list-group-item-action" id="add_heriot">Heriot</button>
+                          <button type="button" class="list-group-item list-group-item-action" id="add_capitagium">Capitagium</button>
+                          <button type="button" class="list-group-item list-group-item-action" id="add_impercamentum">Impercamentum</button>
+                          <button type="button" class="list-group-item list-group-item-action" id="add_land">Land</button>
+                        </ul>
+                </div>
             </div>
-        {% endif %}
 
-        {% for field in form.visible_fields %}
-            <div class="form-group">
-              {{ field.label_tag }}
+            <div class="col-1">
 
-              {% if form.is_bound %}
-                {% if field.errors %}
-                  {% render_field field class="form-control is-invalid" %}
-                  {% for error in field.errors %}
-                    <div class="invalid-feedback">
-                      {{ error }}
-                    </div>
-                  {% endfor %}
-                {% else %}
-                  {% render_field field class="form-control is-valid" %}
-                {% endif %}
-              {% else %}
-                {% render_field field class="form-control" %}
-              {% endif %}
-
-              {% if field.help_text %}
-                <small class="form-text text-muted">{{ field.help_text }}</small>
-              {% endif %}
             </div>
-        {% endfor %}
+
+            <div class="col-8">
+                {% crispy form %}
+            </div>
+
+        </div>
+        <div class="row">
+            <div class="col-4">
+            </div>
+            <div class="collapse" id="add_amercement_collapse">
+            </div>
+        </div>
+
 
     </div>
 
@@ -56,3 +53,18 @@
         <button type="submit" class="btn btn-success">Edit Litigant</button>
     </div>
 </form>
+
+<script>
+
+    const amercement_formset = '{% crispy amercement_formset %}';
+
+    // On the first click of 'add' button, append the formset to the collapse div.
+    $('#add_amercement').one('click', function(){
+       $('#add_amercement_collapse').append(amercement_formset);
+    });
+
+    // collapse appropriate collapse div.
+    $('#add_amercement').click(function(){
+        $('#add_amercement_collapse').collapse('toggle');
+    });
+</script>

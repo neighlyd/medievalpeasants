@@ -196,16 +196,37 @@ class LitigantForm(forms.ModelForm):
                 ),
                 css_class='row',
             ),
+            Div(
+                Div(
+                    'ad_proximum',
+                    css_class='col',
+                ),
+                Div(
+                    'attached',
+                    css_class='col',
+                ),
+                Div(
+                    'distrained',
+                    css_class='col',
+                ),
+                Div(
+                    'bail',
+                    css_class='col',
+                ),
+                css_class='row',
+            ),
         )
 
     class Meta:
         model = models.Litigant
-        fields = ['person', 'role',]
+        fields = ['person', 'role', 'ad_proximum', 'distrained', 'attached', 'bail']
 
-LitigantFormset = inlineformset_factory(models.Case, models.Litigant, form=LitigantForm, extra=1)
 
 class AmercementForm(forms.ModelForm):
 
     class Meta:
         model = models.Amercement
         fields = ['amercement']
+
+
+AmercementFormset = inlineformset_factory(models.Litigant, models.Amercement, form=AmercementForm, extra=1)

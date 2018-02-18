@@ -258,8 +258,9 @@ def edit_litigant(request, pk, litigant_pk):
             data['form_is_valid'] = False
     else:
         form = forms.LitigantForm(instance=litigant)
+        amercement_formset = forms.AmercementFormset(instance=litigant)
 
-    context = {'form': form, 'litigant': litigant, 'case': case_instance}
+    context = {'form': form, 'litigant': litigant, 'case': case_instance, 'amercement_formset': amercement_formset}
     data['html_form'] = render_to_string('case/_case_edit_litigant_modal.html', context, request=request)
 
     return JsonResponse(data)

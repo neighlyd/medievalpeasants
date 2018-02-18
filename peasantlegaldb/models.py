@@ -784,12 +784,12 @@ class Litigant(models.Model):
     amercement = models.ForeignKey(Money, null=True, blank=True, related_name='litigant_amercement')
     damage = models.ForeignKey(Money, null=True, blank=True, related_name='litigant_damages')
     damage_notes = models.TextField(blank=True,)
-    ad_proximum = models.NullBooleanField()
-    distrained = models.NullBooleanField()
+    ad_proximum = models.BooleanField()
+    distrained = models.BooleanField()
     # Added at Case 1189.
-    attached = models.NullBooleanField()
+    attached = models.BooleanField()
     # Added at Case 1424
-    bail = models.NullBooleanField()
+    bail = models.BooleanField()
     chevage = models.ForeignKey(Money, null=True, blank=True, related_name='litigant_chevage')
     crossed = models.NullBooleanField()
     recessit = models.NullBooleanField()
@@ -827,12 +827,11 @@ class Litigant(models.Model):
         super(Litigant, self).save(*args, **kwargs)
 
 
-
-
 class Fine(models.Model):
 
     litigant = models.ForeignKey(Litigant, on_delete=models.CASCADE, related_name='person_to_fine')
     fine = models.ForeignKey(Money, null=True)
+
 
 class Amercement(models.Model):
     litigant = models.ForeignKey(Litigant, on_delete=models.CASCADE, related_name='person_to_amercement')
@@ -875,6 +874,7 @@ class LandtoCase(models.Model):
     land = models.ForeignKey(Land, null=True, blank=True, on_delete=models.CASCADE)
     land_villeinage = models.NullBooleanField()
     land_notes = models.TextField(blank=True,)
+
 
 class Pledge(models.Model):
     case = models.ForeignKey(Case, on_delete=models.CASCADE, related_name='case_to_pledge')
