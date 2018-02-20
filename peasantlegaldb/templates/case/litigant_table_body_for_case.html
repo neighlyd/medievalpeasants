@@ -1,7 +1,7 @@
 {% for  litigant in litigant_list %}
     <li class="list-group-item">
         <div class="row">
-            <div class="col-4"><h6>{{ litigant.person.full_name }}</h6></div>
+            <div class="col-4"><a href="{% url 'person:detail' litigant.person.id %}"><h6>{{ litigant.person.full_name }}</h6></a></div>
             <div class="col-4 text-center"><h6>{{ litigant.role.role }}</h6></div>
             <div class="col-4">
 
@@ -48,46 +48,166 @@
             </table>
         </div>
 
-        <div class="row">
-            {% if litigant.amercement_exists %}
-                <div class="card">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <td scope="col">Amercement</td>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for amercement in litigant.amercements.all %}
-                            <tr>
-                                <td>{{ amercement.amercement }}</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            {% endif %}
-            {% if litigant.damage_exists %}
-                <div class="col">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <td scope="col">Damages</td>
-                                <td scope="col">Notes</td>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for damage in litigant.person_to_damage.all %}
-                            <tr>
-                                <td>{{ damage.damage }}</td>
-                                <td>{{ damage.notes }}</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            {% endif %}
-        </div>
+            <div class="d-flex flex-wrap justify-content-around">
+
+                {% if litigant.amercement_exists %}
+                    <div class="card">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <td scope="col">Amercement</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for amercement in litigant.amercements.all %}
+                                <tr>
+                                    <td>{{ amercement.amercement }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif %}
+
+                {% if litigant.fine_exists %}
+                    <div class="card">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <td scope="col">Fine</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for fine in litigant.fines.all %}
+                                <tr>
+                                    <td>{{ fine.fine }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif %}
+
+                {% if litigant.damage_exists %}
+                    <div class="card">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <td scope="col">Damages</td>
+                                    <td scope="col">Notes</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for damage in litigant.damages.all %}
+                                <tr>
+                                    <td>{{ damage.damage }}</td>
+                                    <td>{{ damage.notes }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif %}
+            
+                {% if litigant.capitagium_exists %}
+                    <div class="card">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <td scope="col">Capitagium</td>
+                                    <td scope="col">Crossed</td>
+                                    <td scope="col">Recessit</td>
+                                    <td scope="col">Habet Terram</td>
+                                    <td scope="col">Mortuus</td>
+                                    <td scope="col">Notes</td>
+                                    
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for capitagium in litigant.capitagia.all %}
+                                <tr>
+                                    <td>{{ capitagium.capitagium }}</td>
+                                    <td>{{ capitagium.crossed }}</td>
+                                    <td>{{ capitagium.recessit }}</td>
+                                    <td>{{ capitagium.habet_terram }}</td>
+                                    <td>{{ capitagium.mortuus }}</td>
+                                    <td>{{ capitagium.notes }}</td>                                
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif %}
+            
+                {% if litigant.heriot_exists %}
+                    <div class="card">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <td scope="col">Assessment</td>
+                                    <td scope="col">Heriot</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for heriot in litigant.heriots.all %}
+                                <tr>
+                                    <td>{{ heriot.heriot }}</td>
+                                    <td>{{ heriot.quantity }} {{ heriot.animal }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif %}
+
+
+                {% if litigant.impercamentum_exists %}
+                    <div class="card">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <td scope="col">Impercamentum</td>
+                                    <td scope="col">Assessment</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for impercamentum in litigant.impercamenta.all %}
+                                <tr>
+                                    <td>{{ impercamentum.quantity }} {{ impercamentum.animal }}</td>
+                                    <td>{{ impercamentum.impercamentum}}</td>
+                                    <td>{{ impercamentum.notes }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif %}
+
+                {% if litigant.land_exists %}
+                    <div class="card">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <td scope="col">Land</td>
+                                    <td scope="col">Villeinage</td>
+                                    <td scope="col">Notes</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for land in litigant.lands.all %}
+                                <tr>
+                                    <td>{{ land.land }}</td>
+                                    <td>{{ land.villeinage}} </td>
+                                    <td>{{ land.notes }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif %}
+
+
+            </div>
     </li>
 {% endfor %}
 

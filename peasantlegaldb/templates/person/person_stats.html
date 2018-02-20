@@ -6,7 +6,7 @@
 
         <br>
 
-        <div class="d-flex justify-content-around">
+        <div class="d-flex flex-wrap justify-content-around">
 
             <div class="card">
                 <div class="card-body">
@@ -24,7 +24,8 @@
                 </div>
             </div>
 
-            <div class="card">
+            {% if person.pledge_exists %}
+                <div class="card">
                 <div class="card-body">
                     <h4 class="card-title">Pledge Info</h4>
                     <table class="table table-sm">
@@ -39,8 +40,10 @@
                     </table>
                 </div>
             </div>
+            {% endif %}
 
-            <div class="card">
+            {% if person.relationship_exists %}
+                <div class="card">
                 <div class="card-body">
                     <h4 class="card-title">Relationship Info</h4>
                     <table class="table table-sm">
@@ -55,14 +58,10 @@
                     </table>
                 </div>
             </div>
+            {% endif %}
 
-        </div>
-
-        <hr>
-
-        <div class="d-flex justify-content-around">
-
-            <div class="card">
+            {% if person.amercement_exists %}
+                <div class="card">
                 <div class="card-body">
                     <h4 class="card-title">Amercement Info</h4>
                     <table class="table table-sm">
@@ -113,8 +112,9 @@
                     </table>
                 </div>
             </div>
-
-            <div class="card">
+            {% endif %}
+            {% if person.fine_exists %}
+                <div class="card">
                 <div class="card-body">
                     <h4 class="card-title">Fine Info</h4>
                     <table class="table table-sm">
@@ -165,8 +165,10 @@
                     </table>
                 </div>
             </div>
+            {% endif %}
 
-            <div class="card">
+            {% if person.damage_exists %}
+                <div class="card">
                 <div class="card-body">
                     <h4 class="card-title">Damages Info</h4>
                     <table class="table table-sm">
@@ -217,14 +219,10 @@
                     </table>
                 </div>
             </div>
+            {% endif %}
 
-        </div>
-
-        <hr>
-
-        <div class="d-flex justify-content-around">
-
-            <div class="card">
+            {% if person.chevage_exists %}
+                <div class="card">
                 <div class="card-body">
                     <h4 class="card-title">Chevage Info</h4>
                     <table class="table table-sm">
@@ -275,8 +273,10 @@
                     </table>
                 </div>
             </div>
+            {% endif %}
 
-            <div class="card">
+            {% if person.impercamentum_exists %}
+                <div class="card">
                 <div class="card-body">
                     <h4 class="card-title">Impercamenta Info</h4>
                     <table class="table table-sm">
@@ -327,8 +327,10 @@
                     </table>
                 </div>
             </div>
+            {% endif %}
 
-            <div class="card">
+            {% if person.heriot_exists %}
+                <div class="card">
                 <div class="card-body">
                     <h4 class="card-title">Heriot Info</h4>
                     <table class="table table-sm">
@@ -379,7 +381,7 @@
                     </table>
                 </div>
             </div>
-
+            {% endif %}
         </div>
 
     </div>

@@ -121,7 +121,7 @@
                                         </div>
                                         </div>
                                         <div class="col-lg-8">
-                                            {% for case in person.person_to_case.all|dictsort:"case.session.date" %}
+                                            {% for case in person.cases.all|dictsort:"case.session.date" %}
                                                 <div class="card" style="padding-bottom: 15px">
                                                     <div class="card-body">
                                                     <div class="row">

@@ -678,36 +678,36 @@ class PeopleListView(ListView):
 class PersonDetailView(DetailView):
 
     model = models.Person
-    queryset = models.Person.objects.all().annotate(amercement_count=Count('person_to_case__amercement'),
-                                                    amercement_max=Max('person_to_case__amercement__in_denarius'),
-                                                    amercement_min=Min('person_to_case__amercement__in_denarius'),
-                                                    amercement_avg=Avg('person_to_case__amercement__in_denarius'),
-                                                    amercement_sum=Sum('person_to_case__amercement__in_denarius'),
-                                                    fine_count=Count('person_to_case__fine'),
-                                                    fine_max=Max('person_to_case__fine__in_denarius'),
-                                                    fine_min=Min('person_to_case__fine__in_denarius'),
-                                                    fine_avg=Avg('person_to_case__fine__in_denarius'),
-                                                    fine_sum=Sum('person_to_case__fine__in_denarius'),
-                                                    damage_count=Count('person_to_case__damage'),
-                                                    damage_max=Max('person_to_case__damage__in_denarius'),
-                                                    damage_min=Min('person_to_case__damage__in_denarius'),
-                                                    damage_avg=Avg('person_to_case__damage__in_denarius'),
-                                                    damage_sum=Sum('person_to_case__damage__in_denarius'),
-                                                    chevage_count=Count('person_to_case__chevage'),
-                                                    chevage_max=Max('person_to_case__chevage__in_denarius'),
-                                                    chevage_min=Min('person_to_case__chevage__in_denarius'),
-                                                    chevage_avg=Avg('person_to_case__chevage__in_denarius'),
-                                                    chevage_sum=Sum('person_to_case__chevage__in_denarius'),
-                                                    heriot_count=Count('person_to_case__heriot'),
-                                                    heriot_max=Max('person_to_case__heriot__in_denarius'),
-                                                    heriot_min=Min('person_to_case__heriot__in_denarius'),
-                                                    heriot_avg=Avg('person_to_case__heriot__in_denarius'),
-                                                    heriot_sum=Sum('person_to_case__heriot__in_denarius'),
-                                                    impercamentum_count=Count('person_to_case__impercamentum'),
-                                                    impercamentum_max=Max('person_to_case__impercamentum__in_denarius'),
-                                                    impercamentum_min=Min('person_to_case__impercamentum__in_denarius'),
-                                                    impercamentum_avg=Avg('person_to_case__impercamentum__in_denarius'),
-                                                    impercamentum_sum=Sum('person_to_case__impercamentum__in_denarius'))
+    queryset = models.Person.objects.all().annotate(amercement_count=Count('cases__amercement'),
+                                                    amercement_max=Max('cases__amercement__in_denarius'),
+                                                    amercement_min=Min('cases__amercement__in_denarius'),
+                                                    amercement_avg=Avg('cases__amercement__in_denarius'),
+                                                    amercement_sum=Sum('cases__amercement__in_denarius'),
+                                                    fine_count=Count('cases__fine'),
+                                                    fine_max=Max('cases__fine__in_denarius'),
+                                                    fine_min=Min('cases__fine__in_denarius'),
+                                                    fine_avg=Avg('cases__fine__in_denarius'),
+                                                    fine_sum=Sum('cases__fine__in_denarius'),
+                                                    damage_count=Count('cases__damage'),
+                                                    damage_max=Max('cases__damage__in_denarius'),
+                                                    damage_min=Min('cases__damage__in_denarius'),
+                                                    damage_avg=Avg('cases__damage__in_denarius'),
+                                                    damage_sum=Sum('cases__damage__in_denarius'),
+                                                    chevage_count=Count('cases__chevage'),
+                                                    chevage_max=Max('cases__chevage__in_denarius'),
+                                                    chevage_min=Min('cases__chevage__in_denarius'),
+                                                    chevage_avg=Avg('cases__chevage__in_denarius'),
+                                                    chevage_sum=Sum('cases__chevage__in_denarius'),
+                                                    heriot_count=Count('cases__heriot'),
+                                                    heriot_max=Max('cases__heriot__in_denarius'),
+                                                    heriot_min=Min('cases__heriot__in_denarius'),
+                                                    heriot_avg=Avg('cases__heriot__in_denarius'),
+                                                    heriot_sum=Sum('cases__heriot__in_denarius'),
+                                                    impercamentum_count=Count('cases__impercamentum'),
+                                                    impercamentum_max=Max('cases__impercamentum__in_denarius'),
+                                                    impercamentum_min=Min('cases__impercamentum__in_denarius'),
+                                                    impercamentum_avg=Avg('cases__impercamentum__in_denarius'),
+                                                    impercamentum_sum=Sum('cases__impercamentum__in_denarius'))
 
     def get_context_data(self, **kwargs):
         context = super(PersonDetailView, self).get_context_data(**kwargs)
@@ -806,14 +806,14 @@ class VillageListView(ListView):
 class ChevageAnalysisListView(ListView):
 
     model = models.Person
-    queryset = models.Person.objects.all().filter(person_to_case__chevage__isnull=False).distinct()\
-        .prefetch_related('person_to_case__case__session','village').order_by('last_name', 'first_name')
+    queryset = models.Person.objects.all().filter(cases__chevage__isnull=False).distinct()\
+        .prefetch_related('cases__case__session','village').order_by('last_name', 'first_name')
 
     def get_context_data(self, **kwargs):
         context = super(ChevageAnalysisListView, self).get_context_data(**kwargs)
         qs = context['object_list']
         village_id = self.kwargs.get('village_pk')
-        chevage_list = qs.filter(person_to_case__case__session__village=village_id).filter(person_to_case__chevage__isnull=True)
+        chevage_list = qs.filter(cases__case__session__village=village_id).filter(cases__chevage__isnull=True)
         village =  models.Village.objects.get(id=village_id)
         context['chevage_list'] = chevage_list
         context['village'] = village
