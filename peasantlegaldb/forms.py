@@ -229,4 +229,45 @@ class AmercementForm(forms.ModelForm):
         fields = ['amercement']
 
 
-AmercementFormset = inlineformset_factory(models.Litigant, models.Amercement, form=AmercementForm, extra=1)
+class AmercementFormsetHelper(FormHelper):
+
+    def __init__(self, *args, **kwargs):
+        super(AmercementFormsetHelper, self).__init__(*args, **kwargs)
+        self.form_tag = False
+        self.disable_csrf = True
+        self.form_show_labels = False
+        self.template = 'bootstrap/table_inline_formset.html'
+        self.layout = Layout(
+            'amercement',
+        )
+
+# inline formsets
+
+AmercementFormset = inlineformset_factory(models.Litigant, models.Amercement,
+                                          fields=('amercement',),
+                                          extra=1, can_delete=True)
+
+FineFormset = inlineformset_factory(models.Litigant, models.Fine,
+                                    fields=('fine',),
+                                    extra=1, can_delete=True)
+
+DamageFormset = inlineformset_factory(models.Litigant, models.Damage,
+                                      fields=('damage', 'notes'),
+                                      extra=1, can_delete=True)
+
+HeriotFormset = inlineformset_factory(models.Litigant, models.Heriot,
+                                      fields=('quantity', 'animal', 'heriot'),
+                                      extra=1, can_delete=True)
+
+CapitagiumFormset = inlineformset_factory(models.Litigant, models.Capitagium,
+                                          fields=('capitagium', 'notes', 'crossed', 'recessit', 'habet_terram',
+                                                  'mortuus'),
+                                          extra=1, can_delete=True)
+
+ImpercamentumFormset = inlineformset_factory(models.Litigant, models.Impercamentum,
+                                             fields=('quantity', 'animal', 'impercamentum', 'notes'),
+                                             extra=1, can_delete=True)
+
+LandFormset = inlineformset_factory(models.Litigant, models.LandtoCase,
+                                    fields=('land', 'villeinage', 'notes'),
+                                    extra=1, can_delete=True)

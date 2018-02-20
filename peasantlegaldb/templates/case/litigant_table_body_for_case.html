@@ -8,6 +8,7 @@
             <button class="btn btn-warning edit_litigant float-right" type="button" data-url="{% url 'case:edit_litigant' pk=case.id litigant_pk=litigant.id %}"><i class="fas fa-pencil-alt"></i> Edit</button>
             </div>
         </div>
+
         <div class="col-3">
             <table class="table table-bordered table-sm">
                 <thead>
@@ -45,6 +46,47 @@
                     </tr>
                 </tbody>
             </table>
+        </div>
+
+        <div class="row">
+            {% if litigant.amercement_exists %}
+                <div class="card">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <td scope="col">Amercement</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for amercement in litigant.amercements.all %}
+                            <tr>
+                                <td>{{ amercement.amercement }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endif %}
+            {% if litigant.damage_exists %}
+                <div class="col">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <td scope="col">Damages</td>
+                                <td scope="col">Notes</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for damage in litigant.person_to_damage.all %}
+                            <tr>
+                                <td>{{ damage.damage }}</td>
+                                <td>{{ damage.notes }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endif %}
         </div>
     </li>
 {% endfor %}

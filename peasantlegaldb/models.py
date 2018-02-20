@@ -374,6 +374,8 @@ class Person(models.Model):
     earliest_case = models.ForeignKey('Case', null=True, blank=True, related_name='person_to_earliest_case+')
     latest_case = models.ForeignKey('Case', null=True, blank=True, related_name='person_to_latest_case+')
 
+    # Used to check if a person has amercements, fines, etc. in templates.
+    # TODO: Update to reflect change in amercement, fines, etc. model structure.
     @property
     def pledges_given_count(self):
         return self.pledge_giver.all().count()
@@ -806,6 +808,35 @@ class Litigant(models.Model):
     land_villeinage = models.NullBooleanField()
     land_notes = models.TextField(blank=True,)
 
+    # Used to check if a litigant has amercements, fines, etc. in templates.
+    @property
+    def amercement_exists(self):
+        return self.amercements.exists()
+    
+    @property
+    def damage_exists(self):
+        return self.damages.exists()
+    
+    @property
+    def capitagium_exists(self):
+        return self.capitagia.exists()
+
+    @property
+    def fine_exists(self):
+        return self.fines.exists()
+    
+    @property
+    def heriot_exists(self):
+        return self.heriots.exists()
+    
+    @property
+    def impercamentum_exists(self):
+        return self.impercamenta.exists()
+    
+    @property
+    def land_exists(self):
+        return self.lands.exists()
+    
     def save(self, *args, **kwargs):
         person = Person.objects.get(id=self.person_id)
         try:
@@ -829,25 +860,25 @@ class Litigant(models.Model):
 
 class Fine(models.Model):
 
-    litigant = models.ForeignKey(Litigant, on_delete=models.CASCADE, related_name='person_to_fine')
-    fine = models.ForeignKey(Money, null=True)
+    litigant = models.ForeignKey(Litigant, on_delete=models.CASCADE, related_name='fines')
+    fine = models.ForeignKey(Money)
 
 
 class Amercement(models.Model):
-    litigant = models.ForeignKey(Litigant, on_delete=models.CASCADE, related_name='person_to_amercement')
-    amercement = models.ForeignKey(Money, null=True)
+    litigant = models.ForeignKey(Litigant, on_delete=models.CASCADE, related_name='amercements')
+    amercement = models.ForeignKey(Money)
 
 
 class Damage(models.Model):
-    litigant = models.ForeignKey(Litigant, on_delete=models.CASCADE, related_name='person_to_damage')
-    damage = models.ForeignKey(Money, null=True)
-    damage_notes = models.TextField(blank=True)
+    litigant = models.ForeignKey(Litigant, on_delete=models.CASCADE, related_name='damages')
+    damage = models.ForeignKey(Money)
+    notes = models.TextField(blank=True)
 
 
 class Capitagium(models.Model):
-    litigant = models.ForeignKey(Litigant, on_delete=models.CASCADE, related_name='person_to_capitagium')
-    capitagium = models.ForeignKey(Money, null=True)
-    capitagium_notes = models.TextField(blank=True,)
+    litigant = models.ForeignKey(Litigant, on_delete=models.CASCADE, related_name='capitagia')
+    capitagium = models.ForeignKey(Money)
+    notes = models.TextField(blank=True,)
     crossed = models.NullBooleanField()
     recessit = models.NullBooleanField()
     habet_terram = models.NullBooleanField()
@@ -855,25 +886,25 @@ class Capitagium(models.Model):
 
 
 class Heriot(models.Model):
-    litigant = models.ForeignKey(Litigant, on_delete=models.CASCADE, related_name='person_to_heriot')
-    heriot_quantity = models.CharField(max_length=25, blank=True,)
-    heriot_animal = models.ForeignKey(Chattel, null=True)
-    heriot = models.ForeignKey(Money, null=True, blank=True)
+    litigant = models.ForeignKey(Litigant, on_delete=models.CASCADE, related_name='heriots')
+    quantity = models.CharField(max_length=25, blank=True,)
+    animal = models.ForeignKey(Chattel, null=True)
+    heriot = models.ForeignKey(Money)
 
 
 class Impercamentum(models.Model):
-    litigant = models.ForeignKey(Litigant, on_delete=models.CASCADE, related_name='person_to_impercamentum')
-    impercamentum_quantity = models.IntegerField(null=True, blank=True)
-    impercamentum_animal = models.ForeignKey(Chattel, null=True, blank=True)
-    impercamentum = models.ForeignKey(Money, null=True)
-    impercamentum_notes = models.TextField(blank=True)
+    litigant = models.ForeignKey(Litigant, on_delete=models.CASCADE, related_name='impercamenta')
+    quantity = models.IntegerField(null=True, blank=True)
+    animal = models.ForeignKey(Chattel, null=True, blank=True)
+    impercamentum = models.ForeignKey(Money)
+    notes = models.TextField(blank=True)
 
 
 class LandtoCase(models.Model):
-    litigant = models.ForeignKey(Litigant, on_delete=models.CASCADE, related_name='person_to_land')
+    litigant = models.ForeignKey(Litigant, on_delete=models.CASCADE, related_name='lands')
     land = models.ForeignKey(Land, null=True, blank=True, on_delete=models.CASCADE)
-    land_villeinage = models.NullBooleanField()
-    land_notes = models.TextField(blank=True,)
+    villeinage = models.NullBooleanField()
+    notes = models.TextField(blank=True,)
 
 
 class Pledge(models.Model):

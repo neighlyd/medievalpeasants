@@ -1,4 +1,5 @@
 {% load crispy_forms_tags %}
+{% load widget_tweaks %}
 
 <form method="post" action="{% url 'case:add_litigant' case.id %}" class="add-litigant-form">
     {% csrf_token %}
@@ -10,34 +11,379 @@
     </div>
 
     <div class="modal-body">
-
         <div class="row">
 
             <div class="col-3">
                 <div style="position: sticky;">
                         <ul class="list-group">
                           <li class="list-group-item text-center">Add</li>
-                          <button type="button" class="list-group-item list-group-item-action" id="add_amercement">Amercement</button>
-                          <button type="button" class="list-group-item list-group-item-action" id="add_fine">Fine</button>
-                          <button type="button" class="list-group-item list-group-item-action" id="add_damage">Damage</button>
-                          <button type="button" class="list-group-item list-group-item-action" id="add_heriot">Heriot</button>
-                          <button type="button" class="list-group-item list-group-item-action" id="add_capitagium">Capitagium</button>
-                          <button type="button" class="list-group-item list-group-item-action" id="add_impercamentum">Impercamentum</button>
-                          <button type="button" class="list-group-item list-group-item-action" id="add_land">Land</button>
+                          <button type="button" class="list-group-item list-group-item-action" data-toggle="collapse" data-target="#add_amercement_collapse">Amercement</button>
+                          <button type="button" class="list-group-item list-group-item-action" data-toggle="collapse" data-target="#add_fine_collapse">Fine</button>
+                          <button type="button" class="list-group-item list-group-item-action" data-toggle="collapse" data-target="#add_damage_collapse">Damage</button>
+                          <button type="button" class="list-group-item list-group-item-action" data-toggle="collapse" data-target="#add_heriot_collapse">Heriot</button>
+                          <button type="button" class="list-group-item list-group-item-action" data-toggle="collapse" data-target="#add_capitagium_collapse">Capitagium</button>
+                          <button type="button" class="list-group-item list-group-item-action" data-toggle="collapse" data-target="#add_impercamentum_collapse">Impercamentum</button>
+                          <button type="button" class="list-group-item list-group-item-action" data-toggle="collapse" data-target="#add_land_collapse">Land</button>
                         </ul>
                 </div>
             </div>
+            <div class="col">
+                <div class="container">
 
-            <div class="col-1">
+                    <div class="col-11 offset-1">
+                        {% crispy form %}
+                    </div>
 
+                    <div class="col-11 offset-1">
+                        {% if litigant.amercement_exists %}
+                            <div class="collase show" id="add_amercement_collapse">
+                        {% else %}
+                            <div class="collapse" id="add_amercement_collapse">
+                        {% endif %}
+                                <div class="card">
+                                <div class="card-header text-center">
+                                    <h5>Amercements</h5>
+                                </div>
+                                <div class="card-body">
+                                    <table class="table table-striped">
+                                        <tbody>
+                                            {{ amercement_formset.management_form }}
+                                                {% for form in amercement_formset %}
+                                                    {% if forloop.first %}
+                                                    <thead>
+                                                    <tr>
+                                                        {% for field in form.visible_fields %}
+                                                            <th>{{ field.label|capfirst }}</th>
+                                                        {% endfor %}
+                                                    </tr>
+                                                    </thead>
+                                                    {% endif %}
+                                                    <tr class="{% cycle row1 row2 %} formset_row">
+                                                    {% for field in form.visible_fields %}
+                                                        <td>
+                                                            {# Include the hidden fields in the form #}
+                                                            {% if forloop.first %}
+                                                                {% for hidden in form.hidden_fields %}
+                                                                    {{ hidden }}
+                                                                {% endfor %}
+                                                            {% endif %}
+                                                            {{ field.errors.as_ul }}
+                                                            {% render_field field class="form-control" %}
+                                                        </td>
+                                                    {% endfor %}
+                                                </tr>
+                                                {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    
+
+                    <div class="col-11 offset-1">
+                        {% if litigant.fine_exists %}
+                            <div class="collase show" id="add_fine_collapse">
+                        {% else %}
+                            <div class="collapse" id="add_fine_collapse">
+                        {% endif %}
+                                <div class="card">
+                                <div class="card-header text-center">
+                                    <h5>Fines</h5>
+                                </div>
+                                <div class="card-body">
+                                    <table class="table table-striped">
+                                        <tbody>
+                                            {{ fine_formset.management_form }}
+                                                {% for form in fine_formset %}
+                                                    {% if forloop.first %}
+                                                    <thead>
+                                                    <tr>
+                                                        {% for field in form.visible_fields %}
+                                                            <th>{{ field.label|capfirst }}</th>
+                                                        {% endfor %}
+                                                    </tr>
+                                                    </thead>
+                                                    {% endif %}
+                                                    <tr class="{% cycle row1 row2 %} formset_row">
+                                                    {% for field in form.visible_fields %}
+                                                        <td>
+                                                            {# Include the hidden fields in the form #}
+                                                            {% if forloop.first %}
+                                                                {% for hidden in form.hidden_fields %}
+                                                                    {{ hidden }}
+                                                                {% endfor %}
+                                                            {% endif %}
+                                                            {{ field.errors.as_ul }}
+                                                            {% render_field field class="form-control" %}
+                                                        </td>
+                                                    {% endfor %}
+                                                </tr>
+                                                {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    
+                    </div>
+
+                    <div class="col-11 offset-1">
+                        {% if litigant.damage_exists %}
+                            <div class="collase show" id="add_damage_collapse">
+                        {% else %}
+                            <div class="collapse" id="add_damage_collapse">
+                        {% endif %}
+                                <div class="card">
+                                <div class="card-header text-center">
+                                    <h5>Damages</h5>
+                                </div>
+                                <div class="card-body">
+                                    <table class="table table-striped">
+                                        <tbody>
+                                            {{ damage_formset.management_form }}
+                                                {% for form in damage_formset %}
+                                                    {% if forloop.first %}
+                                                    <thead>
+                                                    <tr>
+                                                        {% for field in form.visible_fields %}
+                                                            <th>{{ field.label|capfirst }}</th>
+                                                        {% endfor %}
+                                                    </tr>
+                                                    </thead>
+                                                    {% endif %}
+                                                    <tr class="{% cycle row1 row2 %} formset_row">
+                                                    {% for field in form.visible_fields %}
+                                                        <td>
+                                                            {# Include the hidden fields in the form #}
+                                                            {% if forloop.first %}
+                                                                {% for hidden in form.hidden_fields %}
+                                                                    {{ hidden }}
+                                                                {% endfor %}
+                                                            {% endif %}
+                                                            {{ field.errors.as_ul }}
+                                                            {% render_field field class="form-control" %}
+                                                        </td>
+                                                    {% endfor %}
+                                                </tr>
+                                                {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    
+
+                    <div class="col-11 offset-1">
+                        {% if litigant.heriot_exists %}
+                            <div class="collase show" id="add_heriot_collapse">
+                        {% else %}
+                            <div class="collapse" id="add_heriot_collapse">
+                        {% endif %}
+                                <div class="card">
+                                <div class="card-header text-center">
+                                    <h5>Heriot</h5>
+                                </div>
+                                <div class="card-body">
+                                    <table class="table table-striped">
+                                        <tbody>
+                                            {{ heriot_formset.management_form }}
+                                                {% for form in heriot_formset %}
+                                                    {% if forloop.first %}
+                                                    <thead>
+                                                    <tr>
+                                                        {% for field in form.visible_fields %}
+                                                            <th>{{ field.label|capfirst }}</th>
+                                                        {% endfor %}
+                                                    </tr>
+                                                    </thead>
+                                                    {% endif %}
+                                                    <tr class="{% cycle row1 row2 %} formset_row">
+                                                    {% for field in form.visible_fields %}
+                                                        <td>
+                                                            {# Include the hidden fields in the form #}
+                                                            {% if forloop.first %}
+                                                                {% for hidden in form.hidden_fields %}
+                                                                    {{ hidden }}
+                                                                {% endfor %}
+                                                            {% endif %}
+                                                            {{ field.errors.as_ul }}
+                                                            {% render_field field class="form-control" %}
+                                                        </td>
+                                                    {% endfor %}
+                                                </tr>
+                                                {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    
+
+                    <div class="col-11 offset-1">
+                        {% if litigant.capitagium_exists %}
+                            <div class="collase show" id="add_capitagium_collapse">
+                        {% else %}
+                            <div class="collapse" id="add_capitagium_collapse">
+                        {% endif %}
+                                <div class="card">
+                                <div class="card-header text-center">
+                                    <h5>Capitagium</h5>
+                                </div>
+                                <div class="card-body">
+                                    <table class="table table-striped">
+                                        <tbody>
+                                            {{ capitagium_formset.management_form }}
+                                                {% for form in capitagium_formset %}
+                                                    {% if forloop.first %}
+                                                    <thead>
+                                                    <tr>
+                                                        {% for field in form.visible_fields %}
+                                                            <th>{{ field.label|capfirst }}</th>
+                                                        {% endfor %}
+                                                    </tr>
+                                                    </thead>
+                                                    {% endif %}
+                                                    <tr class="{% cycle row1 row2 %} formset_row">
+                                                    {% for field in form.visible_fields %}
+                                                        <td>
+                                                            {# Include the hidden fields in the form #}
+                                                            {% if forloop.first %}
+                                                                {% for hidden in form.hidden_fields %}
+                                                                    {{ hidden }}
+                                                                {% endfor %}
+                                                            {% endif %}
+                                                            {{ field.errors.as_ul }}
+                                                            {% render_field field class="form-control" %}
+                                                        </td>
+                                                    {% endfor %}
+                                                </tr>
+                                                {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    
+
+                    <div class="col-11 offset-1">
+                        {% if litigant.impercamentum_exists %}
+                            <div class="collase show" id="add_impercamentum_collapse">
+                        {% else %}
+                            <div class="collapse" id="add_impercamentum_collapse">
+                        {% endif %}
+                                <div class="card">
+                                <div class="card-header text-center">
+                                    <h5>Impercamentum</h5>
+                                </div>
+                                <div class="card-body">
+                                    <table class="table table-striped">
+                                        <tbody>
+                                            {{ impercamentum_formset.management_form }}
+                                                {% for form in impercamentum_formset %}
+                                                    {% if forloop.first %}
+                                                    <thead>
+                                                    <tr>
+                                                        {% for field in form.visible_fields %}
+                                                            <th>{{ field.label|capfirst }}</th>
+                                                        {% endfor %}
+                                                    </tr>
+                                                    </thead>
+                                                    {% endif %}
+                                                    <tr class="{% cycle row1 row2 %} formset_row">
+                                                    {% for field in form.visible_fields %}
+                                                        <td>
+                                                            {# Include the hidden fields in the form #}
+                                                            {% if forloop.first %}
+                                                                {% for hidden in form.hidden_fields %}
+                                                                    {{ hidden }}
+                                                                {% endfor %}
+                                                            {% endif %}
+                                                            {{ field.errors.as_ul }}
+                                                            {% render_field field class="form-control" %}
+                                                        </td>
+                                                    {% endfor %}
+                                                </tr>
+                                                {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    
+
+                    <div class="col-11 offset-1">
+                        {% if litigant.land_exists %}
+                            <div class="collase show" id="add_land_collapse">
+                        {% else %}
+                            <div class="collapse" id="add_land_collapse">
+                        {% endif %}
+                                <div class="card">
+                                <div class="card-header text-center">
+                                    <h5>Land</h5>
+                                </div>
+                                <div class="card-body">
+                                    <table class="table table-striped">
+                                        <tbody>
+                                            {{ land_formset.management_form }}
+                                                {% for form in land_formset %}
+                                                    {% if forloop.first %}
+                                                    <thead>
+                                                    <tr>
+                                                        {% for field in form.visible_fields %}
+                                                            <th>{{ field.label|capfirst }}</th>
+                                                        {% endfor %}
+                                                    </tr>
+                                                    </thead>
+                                                    {% endif %}
+                                                    <tr class="{% cycle row1 row2 %} formset_row">
+                                                    {% for field in form.visible_fields %}
+                                                        <td>
+                                                            {# Include the hidden fields in the form #}
+                                                            {% if forloop.first %}
+                                                                {% for hidden in form.hidden_fields %}
+                                                                    {{ hidden }}
+                                                                {% endfor %}
+                                                            {% endif %}
+                                                            {{ field.errors.as_ul }}
+                                                            {% render_field field class="form-control" %}
+                                                        </td>
+                                                    {% endfor %}
+                                                </tr>
+                                                {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
             </div>
-
-            <div class="col-8">
-                {% crispy form %}
-            </div>
-
         </div>
-
     </div>
 
     <div class="modal-footer">
