@@ -1,14 +1,11 @@
-{% extends '_layout/_l_single_col.html' %}
-
-{% block single_col %}
-    <h3 class="card-header text-center">Heriot List</h3>
+<div class="card">
+    <h3 class="card-header text-center">Fine List</h3>
     <div class="card-body">
             <table class="table table-bordered table-hover" id="table" data-page-length="25">
                 <thead>
                     <th></th>
                     <th>Case</th>
-                    <th>Animal</th>
-                    <th>Assessment</th>
+                    <th>Fine</th>
                     <th>Session</th>
                     <th>Court</th>
                     <th>Case Type</th>
@@ -19,10 +16,7 @@
             </table>
     </div>
 
-{% endblock %}
-
-{% block scripts %}
-    {{ block.super }}
+</div>
 
 <script>
     // provides format for nested table that displays when + sign is clicked.
@@ -43,7 +37,7 @@
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1];
         url = Urls['api:person-detail'](id);
-        var api_url = url + "?include[]=cases.case.session.village&include[]=cases.case.litigant_list&include[]=cases.case.litigant_count&filter{cases|heriot.isnull}=false";
+        var api_url = url + "?include[]=cases.case.session.village&include[]=cases.case.litigant_list&include[]=cases.case.litigant_count&filter{cases|fine.isnull}=false";
         var table = $("#table").DataTable({
             fixedHeader:{ headerOffset: 50 },
             scrollX: true,
@@ -58,10 +52,8 @@
                     "class": "details-control",
                     "orderable": false,
                     "data": null,
-                    "defaultContent": "",
-                    "render": function(){
-                        return '<i class="fa fa-plus-square" aria-hidden="true"></i>';
-                    },
+                    "defaultContent": "case",
+                    "render": checkNotes,
                     width:"15px"
                 },
                 {data: "case.id",
@@ -69,16 +61,7 @@
                         $(nTd).html("<a href='" + Urls['case:detail'](rowData.case.id) + "'target='_blank'>" + rowData.case.id + "</a>");
                     }
                 },
-                {data: "heriot_animal",
-                    defaultContent: '',
-                    render: {
-                        display: function(data, type, row, col){
-                            return row.heriot_quantity + " " + data.name + "d.)"
-                        },
-                        sort: "heriot_quantity"
-                    }
-                },
-                {data: "heriot",
+                {data: "fine",
                     defaultContent: '',
                     render: {
                         display: formatMoney,
@@ -96,7 +79,7 @@
                 {data: "case.case_type.case_type"},
                 {data: "role.role"},
                 {data: "case.verdict.verdict"},
-                {data: "case.litigant_count"},
+                {data: "case.litigant_count"}
             ]
         });
 
@@ -120,9 +103,4 @@
 
     });
 
-
-
 </script>
-
-
-{% endblock %}

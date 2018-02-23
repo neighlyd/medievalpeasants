@@ -1,6 +1,5 @@
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import UpdateView, CreateView, DeleteView
-from django.views.generic.base import TemplateView
 from django.views.generic import ListView
 
 from django.shortcuts import render, get_object_or_404, redirect
@@ -8,10 +7,10 @@ from django.template.loader import render_to_string
 from django.http import JsonResponse
 
 from django.urls import reverse_lazy, reverse
-from django.db.models import Count, Max, Min, Avg, Sum
+from django.db.models import Count, Max, Min, Avg, Sum, Q
 from django.core.urlresolvers import resolve
 from django.http import HttpResponseRedirect
-from django.forms import inlineformset_factory
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from braces.views import GroupRequiredMixin
 
@@ -202,6 +201,8 @@ def CaseEditView(request, pk):
 
     return render(request, 'case/case_edit.html', context)
 
+
+# TODO: Convert add_litigant and edit_litigant to class based views and add in GroupRequiredMixin.
 
 def add_litigant(request, pk):
 
@@ -418,71 +419,7 @@ def add_case(request):
 
     return render(request, 'case/case_add.html', {'form': form})
 
-'''
-class CaseEditView(GroupRequiredMixin, UpdateView):
 
-    model = models.Case
-    form_class = forms.CaseForm
-    template_name = 'case/case_edit.html'
-
-    group_required = Edit
-    def get_context_data(self, **kwargs):
-        context = super(CaseEditView, self).get_context_data(**kwargs)
-
-        if self.request.POST:
-            context['formset'] = forms.LitigantFormset(self.request.POST, instance=self.object)
-        else:
-            context['formset'] = forms.LitigantFormset(instance=self.object)
-        return context
-
-    def get_success_url(self):
-        pk = self.kwargs.get('pk')
-        return reverse('case:detail', kwargs={'pk': pk})
-
-
-class CaseAddView(GroupRequiredMixin, CreateView):
-
-    model = models.Case
-    fields = ['summary', 'session', 'case_type', 'court_type', 'verdict', 'of_interest', 'ad_legem', 'villeinage_mention', 'active_sale', 'incidental_land']
-    template_name = 'case/case_add.html'
-    form = forms.CaseForm
-    group_required = Add
-
-    def form_valid(self, form):
-        if 'add_single' in self.request.POST:
-            pass
-        if 'add_another' in self.request.POST:
-            self.object = form.save()
-            session = str(self.object.session.id)
-            case_type = str(self.object.case_type.id)
-            court_type = str(self.object.court_type)
-            return HttpResponseRedirect(reverse('case:add') + "?session=" + session + "&case_type=" + case_type +
-                                        "&court_type=" + court_type)
-
-    def get_success_url(self):
-        referer = self.request.META.get('HTTP_REFERER', '/')
-        return reverse('case:detail', args=(self.object.id,))
-
-    def get_context_data(self, **kwargs):
-        data = super(CaseAddView, self).get_context_data(**kwargs)
-        if self.request.POST:
-            data['litigant_formset'] = forms.LitigantFormset(self.request.POST)
-        else:
-            data['litigant_formset'] = forms.LitigantFormset()
-        return data
-
-    def get_initial(self):
-        initial = super(CaseAddView, self).get_initial()
-        session = self.request.GET.get('session')
-        case_type = self.request.GET.get('case_type')
-        court_type = self.request.GET.get('court_type')
-        initial['session'] = session
-        initial['case_type'] = case_type
-        initial['court_type'] = court_type
-        return initial
-'''
-
-# temp view for testing an idea
 class LitigantListforAddCase(ListView):
 
     model = models.Litigant
@@ -673,6 +610,49 @@ class PeopleListView(ListView):
         context['filter_village_form'] = filter_village_form
         context['page_title'] = 'People'
         return context
+
+
+def person_lists(request, pk):
+
+    # Set up our data dictionary that will be passed through the JsonResponse
+    data = dict()
+
+    # get the last element of the requesting URL.
+    path = request.path.split('/').pop()
+
+    # Depending on the last element, assign the query
+    if (path == 'case_list'):
+        list = models.Litigant.objects.filter(person=pk).distinct().prefetch_related('case__session').order_by('case__session__date')
+    elif (path == 'damage_list'):
+        list = models.Litigant.objects.filter(person=pk, damages__damage__isnull=False).distinct().prefetch_related('case__session').order_by('case__session__date')
+    elif (path == 'relationship_list'):
+        list = models.Relationship.objects.filter(Q(person_one=pk) | Q(person_two=pk))
+
+    # TODO: lists - amercement, capitagium, fine, heriot, impercamentum, land, pledge, position.
+
+    # Check which page the url is on by getting the `?page=` param. If it is not 1, assign 1
+    page = request.GET.get('page', 1)
+    # Limit the list to 15 items.
+    paginator = Paginator(list, 10)
+
+    try:
+        list = paginator.page(page)
+    except PageNotAnInteger:
+        list = paginator.page(1)
+    except EmptyPage:
+        list = paginator.page(paginator.num_pages)
+
+    template = 'person/' + path + '.html'
+
+    # Need to assign person context for in-page links and data-urls, such as the pagination buttons.
+    context={
+        'list': list,
+        'person': pk,
+        'path': path,
+    }
+
+    data['html_list'] = render_to_string(template, context, request=request)
+    return JsonResponse(data)
 
 
 class PersonDetailView(DetailView):

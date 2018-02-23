@@ -39,11 +39,13 @@ class Archive(models.Model):
 
     @property
     def session_count(self):
+        # .aggregate(Count('<FIELD>')) returns a dict of {'<FIELD>__count': amount}. Then use .get('<FIELD>__count') to
+        # get the value for the API.
         return self.record_set.aggregate(Count('session')).get('session__count')
 
     @property
     def case_count(self):
-        return self.record_set.aggregate(Count('session__case_set')).get('session__case_set__count')
+        return self.record_set.aggregate(Count('session__case')).get('session__case__count')
 
     def __str__(self):
         return self.name
@@ -109,7 +111,7 @@ class County(models.Model):
 
     @property
     def case_count(self):
-        return self.village_set.aggregate(Count('session__case_set')).get('session__case_set__count')
+        return self.village_set.aggregate(Count('session__case')).get('session__case__count')
 
     @property
     def resident_count(self):
@@ -251,7 +253,7 @@ class Village(models.Model):
 
     @property
     def case_count(self):
-        return self.session_set.aggregate(Count('case_set')).get('case_set__count')
+        return self.session_set.aggregate(Count('case')).get('case__count')
 
     @property
     def litigant_count(self):
@@ -289,34 +291,34 @@ class Village(models.Model):
 
     @property
     def monetary_counts(self):
-        return self.session_set.aggregate(amercement_count=Count('case_set__litigants__amercement'),
-                                          amercement_max=Max('case_set__litigants__amercement__in_denarius'),
-                                          amercement_min=Min('case_set__litigants__amercement__in_denarius'),
-                                          amercement_avg=Avg('case_set__litigants__amercement__in_denarius'),
-                                          amercement_sum=Sum('case_set__litigants__amercement__in_denarius'),
-                                          fine_count=Count('case_set__litigants__fine'),
-                                          fine_max=Max('case_set__litigants__fine__in_denarius'),
-                                          fine_min=Min('case_set__litigants__fine__in_denarius'),
-                                          fine_avg=Avg('case_set__litigants__fine__in_denarius'),
-                                          fine_sum=Sum('case_set__litigants__fine__in_denarius'),
-                                          damage_count=Count('case_set__litigants__damage'),
-                                          damage_avg=Avg('case_set__litigants__damage__in_denarius'),
-                                          damage_sum=Sum('case_set__litigants__damage__in_denarius'),
-                                          chevage_count=Count('case_set__litigants__chevage'),
-                                          chevage_max=Max('case_set__litigants__chevage__in_denarius'),
-                                          chevage_min=Min('case_set__litigants__chevage__in_denarius'),
-                                          chevage_avg=Avg('case_set__litigants__chevage__in_denarius'),
-                                          chevage_sum=Sum('case_set__litigants__chevage__in_denarius'),
-                                          heriot_count=Count('case_set__litigants__heriot'),
-                                          heriot_max=Max('case_set__litigants__heriot__in_denarius'),
-                                          heriot_min=Min('case_set__litigants__heriot__in_denarius'),
-                                          heriot_avg=Avg('case_set__litigants__heriot__in_denarius'),
-                                          heriot_sum=Sum('case_set__litigants__heriot__in_denarius'),
-                                          impercamentum_count=Count('case_set__litigants__impercamentum'),
-                                          impercamentum_max=Max('case_set__litigants__impercamentum__in_denarius'),
-                                          impercamentum_min=Min('case_set__litigants__impercamentum__in_denarius'),
-                                          impercamentum_avg=Avg('case_set__litigants__impercamentum__in_denarius'),
-                                          impercamentum_sum=Sum('case_set__litigants__impercamentum__in_denarius') )
+        return self.session_set.aggregate(amercement_count=Count('case__litigants__amercement'),
+                                          amercement_max=Max('case__litigants__amercement__in_denarius'),
+                                          amercement_min=Min('case__litigants__amercement__in_denarius'),
+                                          amercement_avg=Avg('case__litigants__amercement__in_denarius'),
+                                          amercement_sum=Sum('case__litigants__amercement__in_denarius'),
+                                          fine_count=Count('case__litigants__fine'),
+                                          fine_max=Max('case__litigants__fine__in_denarius'),
+                                          fine_min=Min('case__litigants__fine__in_denarius'),
+                                          fine_avg=Avg('case__litigants__fine__in_denarius'),
+                                          fine_sum=Sum('case__litigants__fine__in_denarius'),
+                                          damage_count=Count('case__litigants__damage'),
+                                          damage_avg=Avg('case__litigants__damage__in_denarius'),
+                                          damage_sum=Sum('case__litigants__damage__in_denarius'),
+                                          chevage_count=Count('case__litigants__chevage'),
+                                          chevage_max=Max('case__litigants__chevage__in_denarius'),
+                                          chevage_min=Min('case__litigants__chevage__in_denarius'),
+                                          chevage_avg=Avg('case__litigants__chevage__in_denarius'),
+                                          chevage_sum=Sum('case__litigants__chevage__in_denarius'),
+                                          heriot_count=Count('case__litigants__heriot'),
+                                          heriot_max=Max('case__litigants__heriot__in_denarius'),
+                                          heriot_min=Min('case__litigants__heriot__in_denarius'),
+                                          heriot_avg=Avg('case__litigants__heriot__in_denarius'),
+                                          heriot_sum=Sum('case__litigants__heriot__in_denarius'),
+                                          impercamentum_count=Count('case__litigants__impercamentum'),
+                                          impercamentum_max=Max('case__litigants__impercamentum__in_denarius'),
+                                          impercamentum_min=Min('case__litigants__impercamentum__in_denarius'),
+                                          impercamentum_avg=Avg('case__litigants__impercamentum__in_denarius'),
+                                          impercamentum_sum=Sum('case__litigants__impercamentum__in_denarius') )
 
     @property
     def median_chevage(self):
@@ -606,7 +608,7 @@ class Record(models.Model):
 
     @property
     def case_count(self):
-        return self.session_set.aggregate(Count('case_set')).get('case_set__count')
+        return self.session_set.aggregate(Count('case')).get('case__count')
 
 
     def __str__(self):

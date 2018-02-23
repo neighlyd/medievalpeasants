@@ -1,27 +1,21 @@
-{% extends '_layout/_l_single_col.html' %}
-
-{% block single_col %}
-    <h3 class="card-header text-center">Fine List</h3>
+<div class="card">
+    <h3 class="card-header text-center">Impercamentum List</h3>
     <div class="card-body">
             <table class="table table-bordered table-hover" id="table" data-page-length="25">
                 <thead>
                     <th></th>
-                    <th>Case</th>
-                    <th>Fine</th>
+                    <th>Court</th>
+                    <th>Animal</th>
+                    <th>Amercement</th>
                     <th>Session</th>
                     <th>Court</th>
-                    <th>Case Type</th>
-                    <th>Role</th>
                     <th>Verdict</th>
                     <th>Litigant Count</th>
                 </thead>
             </table>
     </div>
 
-{% endblock %}
-
-{% block scripts %}
-    {{ block.super }}
+</div>
 
 <script>
     // provides format for nested table that displays when + sign is clicked.
@@ -41,16 +35,16 @@
     $(document).ready(function () {
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1];
-        url = Urls['api:person-detail'](id);
-        var api_url = url + "?include[]=cases.case.session.village&include[]=cases.case.litigant_list&include[]=cases.case.litigant_count&filter{cases|fine.isnull}=false";
+        url = Urls["api:person-detail"](id);
+        var api_url = url + "?include[]=cases.case.session.village&include[]=cases.case.litigant_list&include[]=cases.case.litigant_count&filter{cases|impercamentum.isnull}=false";
         var table = $("#table").DataTable({
             fixedHeader:{ headerOffset: 50 },
             scrollX: true,
-            order: [4, "asc"],
+            order: [5, "asc"],
             ajax: {
                 url: api_url,
                 type: "GET",
-                dataSrc: "person.cases.",
+                dataSrc: "person.cases",
             },
             "columns": [
                 {
@@ -66,7 +60,17 @@
                         $(nTd).html("<a href='" + Urls['case:detail'](rowData.case.id) + "'target='_blank'>" + rowData.case.id + "</a>");
                     }
                 },
-                {data: "fine",
+                {data: "impercamentum_animal",
+                    defaultContent: '',
+                    render: {
+                        display: function(data, type, row, col){
+                            console.log(data);
+                            return row.impercamentum_quantity + " " + data.name + "d.)"
+                        },
+                        sort: "impercamentum_quantity"
+                    }
+                },
+                {data: "impercamentum",
                     defaultContent: '',
                     render: {
                         display: formatMoney,
@@ -81,8 +85,6 @@
                     }
                 },
                 {data: "case.court_type"},
-                {data: "case.case_type.case_type"},
-                {data: "role.role"},
                 {data: "case.verdict.verdict"},
                 {data: "case.litigant_count"}
             ]
@@ -109,6 +111,3 @@
     });
 
 </script>
-
-
-{% endblock %}

@@ -1,28 +1,23 @@
-{% extends '_layout/_l_single_col.html' %}
-
-{% block single_col %}
-    <h3 class="card-header text-center">Damages List</h3>
+<div class="card">
+    <h3 class="card-header text-center">Amercement List</h3>
     <div class="card-body">
             <table class="table table-bordered table-hover" id="table" data-page-length="25">
                 <thead>
                     <th></th>
-                    <th>Case</th>
-                    <th>Damages</th>
-                    <th>Damage Notes</th>
-                    <th>Session</th>
+                    <th>ID</th>
+                    <th>Amercement</th>
+                    <th>Term</th>
+                    <th>Year</th>
                     <th>Court</th>
                     <th>Case Type</th>
                     <th>Role</th>
                     <th>Verdict</th>
-                    <th>Litigant Count</th>
+                    <th>Litigants</th>
                 </thead>
             </table>
     </div>
 
-{% endblock %}
-
-{% block scripts %}
-    {{ block.super }}
+</div>
 
 <script>
     // provides format for nested table that displays when + sign is clicked.
@@ -42,12 +37,12 @@
     $(document).ready(function () {
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1];
-        url = Urls["api:person-detail"](id);
-        var api_url = url + "?include[]=cases.case.session.village&include[]=cases.case.litigant_list&include[]=cases.case.litigant_count&filter{cases|damage.isnull}=false";
+        url = Urls['api:person-detail'](id);
+        var api_url = url + "?include[]=cases.case.session.village&include[]=cases.case.litigant_list&include[]=cases.case.litigant_count&filter{cases|amercement.isnull}=false";
         var table = $("#table").DataTable({
             fixedHeader:{ headerOffset: 50 },
             scrollX: true,
-            order: [5, "asc"],
+            order: [4, "asc"],
             ajax: {
                 url: api_url,
                 type: "GET",
@@ -58,10 +53,8 @@
                     "class": "details-control",
                     "orderable": false,
                     "data": null,
-                    "defaultContent": "",
-                    "render": function(){
-                        return '<i class="fa fa-plus-square" aria-hidden="true"></i>';
-                    },
+                    "defaultContent": "case",
+                    "render": checkNotes,
                     width:"15px"
                 },
                 {data: "case.id",
@@ -69,19 +62,15 @@
                         $(nTd).html("<a href='" + Urls['case:detail'](rowData.case.id) + "'target='_blank'>" + rowData.case.id + "</a>");
                     }
                 },
-                {data: "damage",
-                    defaultContent: '',
-                    render: {
-                        display: formatMoney,
-                        sort: "in_denarius"
+                {data: "amercement.in_denarius",
+                    fnCreatedCell: function(nTd, cellData, rowData, row, col){
+                    $(nTd).html(rowData.amercement.amount + " (" + rowData.amercement.in_denarius + "d.)")
                     }
                 },
-                {data: "damage_notes"},
-                {data: "case.session",
-                    defaultContent: '',
-                    render: {
-                        display: formatSessionDate,
-                        sort: "date"
+                {data: "case.session.law_term"},
+                {data: "case.session.date",
+                    fnCreatedCell: function(nTd, cellData, rowData, row, col) {
+                        $(nTd).html(rowData.case.session.year);
                     }
                 },
                 {data: "case.court_type"},
@@ -112,19 +101,4 @@
 
     });
 
-    function list_litigants(data){
-        var concat = '';
-        data.forEach(function (obj, index) {
-            concat = concat + '<div class="d-flex justify-content-end"><div class="mr-auto p-0"><u>Name:</u> ' + obj.name + '</div> <div class="p-0"><u>Role:</u> ' + obj.role + '</div></div><hr>';
-            return concat;
-            });
-        return concat;
-
-    };
-
-
-
 </script>
-
-
-{% endblock %}

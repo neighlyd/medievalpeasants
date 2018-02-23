@@ -1,0 +1,74 @@
+<div class="card">
+    <h3 class="card-header text-center">Damages List</h3>
+    <div class="card-body">
+            <table class="table table-bordered table-hover" id="table" data-page-length="25">
+                <thead>
+                    <th></th>
+                    <th>Case</th>
+                    <th>Session</th>
+                    <th>Damages</th>
+                    <th>Damage Notes</th>
+                    <th>Court</th>
+                    <th>Case Type</th>
+                    <th>Role</th>
+                    <th>Verdict</th>
+                    <th>Litigant Count</th>
+                </thead>
+                <tbody>
+                    {% for cases in list %}
+                        <tr>
+                            <td></td>
+                            <td><a href="{% url 'case:detail' cases.case.id %}">{{ cases.case.id }}</a></td>
+                            <td><a href="{% url 'session:detail' cases.case.session.id %}">{{ cases.case.session }}</a></td>
+                            <td>{% for damage in cases.damages.all %}{% if forloop.first %}{{ damage.damage }}{% else %}<hr> {{ damage.damage }}{% endif %}{% endfor %}</td>
+                            <td>{% for damage in cases.damages.all %}{% if forloop.first %}{{ damage.notes }}{% else %}<hr> {{ damage.notes }}{% endif %}{% endfor %}</td>
+                            <td>{{ cases.case.get_court_type_display }}</td>
+                            <td>{{ cases.case.case_type.case_type }}
+                            <td>{{ cases.role.role }}</td>
+                            <td>{{ cases.case.verdict.verdict }}</td>
+                            <td>{{ cases.case.litigant_count }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+        {% if list.has_other_pages %}
+            <nav aria-label="Case list navigation">
+                <ul class="pagination">
+                    {% if list.has_previous %}
+                        <li class="page-item" name="test"><a class="page-link" data-url="{% url 'person:damages' person %}?page={{ list.previous_page_number }}">&laquo;</a></li>
+                    {% else %}
+                        <li class="page-item disabled" name="test"><span class="page-link">&laquo;</span></li>
+                    {% endif %}
+                {% for i in list.paginator.page_range %}
+                    {% if list.number == i %}
+                        <li class="page-item active" name="test"><span class="page-link">{{ i }}</span><span class="sr-only">(current)</span></li>
+                    {% else %}
+                        <li class="page-item" name="test"><a class="page-link" data-url="{% url 'person:damages' person %}?page={{ i }}">{{ i }}</a></li>
+                    {% endif %}
+                {% endfor %}
+                {% if list.has_next %}
+                    <li class="page-item" name="test"><a class="page-link" data-url="{% url 'person:damages' person %}?page={{ list.next_page_number }}">&raquo;</a></li>
+                {% else %}
+                    <li class="page-item disabled" name="test"><span class="page-link">&raquo;</span></li>
+                {% endif %}
+                </ul>
+            </nav>
+        {% endif %}
+
+    </div>
+</div>
+
+<script>
+    $('.page-link').click(function(){
+            var url = $(this).attr('data-url');
+            $.ajax({
+                url: url,
+                type: 'get',
+                dataType: 'json',
+                success: function(data){
+                    $('#list_info').html(data.html_list);
+                }
+            })
+        });
+</script>

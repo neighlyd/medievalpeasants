@@ -1,5 +1,4 @@
-{% extends '_layout/_l_single_col.html' %}
-{% block single_col %}
+<div class="card">
 
     <h3 class="card-header text-center">Positions</h3>
     <div class="card-body">
@@ -12,10 +11,7 @@
             </table>
     </div>
 
-{% endblock %}
-
-{% block scripts %}
-    {{ block.super }}
+</div>
 
 <script>
     // provides format for nested table that displays when + sign is clicked.
@@ -53,6 +49,3 @@
     });
 
 </script>
-
-
-{% endblock %}
