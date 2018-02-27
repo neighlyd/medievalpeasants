@@ -91,7 +91,7 @@ class CaseFilterForm(forms.Form):
 
         # Set initial case_type_queryset to none, because it will dynamically update using ajax after village has been
         # selected.
-        village_queryset = models.Village.objects.filter(session__cases__isnull=False).order_by('name').distinct()
+        village_queryset = models.Village.objects.filter(session__case__isnull=False).order_by('name').distinct()
 
         # set up a list of tuples as additional options
         CASE_TYPE_CHOICES = [

@@ -191,7 +191,7 @@ class PersonViewSet(DynamicModelViewSet):
 
     serializer_class = serializers.PersonSerializer
 
-    def get_queryset(self, queryset=models.Person.objects.all()):
+    def get_queryset(self, queryset=models.Person.objects.all().select_related('village')):
         chain_filter = {}
         chain_filter['person_to_case__case__session__village__county_id'] = self.request.query_params.get('county_to_litigant')
         chain_filter['village__county_id'] = self.request.query_params.get('county_to_resident')

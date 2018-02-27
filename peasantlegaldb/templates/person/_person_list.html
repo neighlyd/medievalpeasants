@@ -32,7 +32,6 @@
         <div class="card-body clearfix" id="main_info">
             <table class="table table-bordered table-hover" id="table" data-page-length="25">
                 <thead>
-                    <th>Details</th>
                     <th>Name</th>
                     <th>Village</th>
                     <th>Status</th>
@@ -63,28 +62,6 @@
     {{ block.super }}
 
     <script>
-        function format( data ) {
-        return "<table class='table'>" +
-            "<tr>" +
-            "<td><b>Litigation</b></td>" +
-            "<td><b>Cases</b></td>" +
-            "<td><b>Chevage</b></td>" +
-            "<td><b>Pledges Given</b></td>" +
-            "<td><b>Pledges Received</b></td>" +
-            "<td><b>Relationships</b></td>" +
-            "<td><b>Positions</b></td>" +
-            "</tr>" +
-            "<tr>" +
-            "<td>"+ data.counts.litigation +"</td>" +
-            "<td>" + data.counts.all_cases + "</td>" +
-            "<td>" + data.counts.monetary.chevage_count + "</td>" +
-            "<td>" + data.counts.pledge.given + "</td>" +
-            "<td>" + data.counts.pledge.received + "</td>" +
-            "<td>" + data.counts.relationship + "</td>" +
-            "<td>" + data.counts.position + "</td>" +
-            "</tr>" +
-        "</table>"
-    }
 
     $(document).ready(function(){
 
@@ -122,25 +99,25 @@
                 }
             } else if (village === "All"){
                     if (filter === "residents") {
-                        url = url + "?exclude[]=village.*&include[]=village.name&include[]=counts&include[]=earliest_case.session.village&include[]=latest_case.session.village";
+                        url = url + "?exclude[]=village.*&include[]=village.name&include[]=earliest_case.session.village&include[]=latest_case.session.village";
                     } else if (filter === "litigants") {
-                        url = url + "?exclude[]=village.*&include[]=village.name&include[]=counts&include[]=earliest_case.session.village&include[]=latest_case.session.village";
+                        url = url + "?exclude[]=village.*&include[]=village.name&include[]=earliest_case.session.village&include[]=latest_case.session.village";
                     } else {
-                        url = url + "?" + filter + "=true&exclude[]=village.*&include[]=village.name&include[]=counts&include[]=earliest_case.session.village&include[]=latest_case.session.village";
+                        url = url + "?" + filter + "=true&exclude[]=village.*&include[]=village.name&include[]=earliest_case.session.village&include[]=latest_case.session.village";
                     }
             }
             else {
                 if (filter === "residents") {
-                        url = url + "?filter{village.id}=" + village + "&exclude[]=village.*&include[]=village.name&include[]=counts&include[]=earliest_case.session.village&include[]=latest_case.session.village";
+                        url = url + "?filter{village.id}=" + village + "&exclude[]=village.*&include[]=village.name&include[]=earliest_case.session.village&include[]=latest_case.session.village";
                     } else if (filter === "litigants") {
-                        url = url + "?village_to_litigant=" + village + "&exclude[]=village.*&include[]=village.name&include[]=counts&include[]=earliest_case.session.village&include[]=latest_case.session.village";
+                        url = url + "?village_to_litigant=" + village + "&exclude[]=village.*&include[]=village.name&include[]=earliest_case.session.village&include[]=latest_case.session.village";
                     } else {
-                        url = url + "?" + filter + "=true&village_to_litigant=" + village + "&exclude[]=village.*&include[]=village.name&include[]=counts&include[]=earliest_case.session.village&include[]=latest_case.session.village";
+                        url = url + "?" + filter + "=true&village_to_litigant=" + village + "&exclude[]=village.*&include[]=village.name&include[]=earliest_case.session.village&include[]=latest_case.session.village";
                     }
             }
             $("#table").DataTable().destroy();
             var table = $('#table').DataTable({
-                order: [1, "asc"],
+                order: [0, "asc"],
                 scrollX: true,
                 scrollY: 500,
                 scrollCollapse: true,
@@ -152,14 +129,6 @@
                     dataSrc: "people.",
                 },
                 "columns": [
-                    {
-                        "class": "details-control",
-                        "orderable": false,
-                        "data": "counts",
-                        "defaultContent": "",
-                        "render": checkNotes,
-                        width:"15px"
-                    },
                     {data: "full_name",
                         defaultContent: '',
                         render: {
@@ -168,7 +137,14 @@
                             },
                         }
                     },
-                    {data: "village.name"},
+                    {data: "village",
+                        defaultContent: '',
+                        render: {
+                            display: function(data, type, row, meta){
+                                return "<a href='" + Urls['village:detail'](row.village.id) + "'>" + row.village.name + "</a>";
+                            },
+                        }
+                    },
                     {data: "status_display"},
                     {data: "gender_display"},
                     {data: "earliest_case",
@@ -187,23 +163,6 @@
                     },
                 ],
 
-            });
-            $('#table tbody').on('click', 'td.details-control', function(){
-                var tr = $(this).closest('tr');
-                var tdi = tr.find("i.fa");
-                var row = table.row( tr );
-
-                if ( row.child.isShown()) {
-                    row.child.hide();
-                    tr.removeClass('shown');
-                    tdi.first().removeClass('fa-minus-square');
-                    tdi.first().addClass('fa-plus-square');
-                } else {
-                    row.child( format( row.data() ) ).show();
-                    tr.addClass('shown');
-                    tdi.first().removeClass('fa-plus-square');
-                    tdi.first().addClass('fa-minus-square');
-                }
             });
             if ($("#list_people").not(":visible")){
 
