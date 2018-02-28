@@ -193,17 +193,17 @@ class PersonViewSet(DynamicModelViewSet):
 
     def get_queryset(self, queryset=models.Person.objects.all().select_related('village')):
         chain_filter = {}
-        chain_filter['person_to_case__case__session__village__county_id'] = self.request.query_params.get('county_to_litigant')
+        chain_filter['cases__case__session__village__county_id'] = self.request.query_params.get('county_to_litigant')
         chain_filter['village__county_id'] = self.request.query_params.get('county_to_resident')
-        chain_filter['person_to_case__case__session__village_id'] = self.request.query_params.get('village_to_litigant')
-        chain_filter['person_to_case__case__session__village__hundred_id'] = self.request.query_params.get('hundred_to_litigant')
+        chain_filter['cases__case__session__village_id'] = self.request.query_params.get('village_to_litigant')
+        chain_filter['cases__case__session__village__hundred_id'] = self.request.query_params.get('hundred_to_litigant')
         chain_filter['village__hundred_id'] = self.request.query_params.get('hundred')
-        chain_filter['person_to_case__chevage'] = self.request.query_params.get('chevage')
-        chain_filter['person_to_case__impercamentum'] = self.request.query_params.get('impercamentum')
-        chain_filter['person_to_case__amercement'] = self.request.query_params.get('amercement')
-        chain_filter['person_to_case__fine'] = self.request.query_params.get('fine')
-        chain_filter['person_to_case__heriot'] = self.request.query_params.get('heriot')
-        chain_filter['person_to_case__damage'] = self.request.query_params.get('damage')
+        chain_filter['cases__chevage'] = self.request.query_params.get('chevage')
+        chain_filter['cases__impercamentum'] = self.request.query_params.get('impercamentum')
+        chain_filter['cases__amercement'] = self.request.query_params.get('amercement')
+        chain_filter['cases__fine'] = self.request.query_params.get('fine')
+        chain_filter['cases__heriot'] = self.request.query_params.get('heriot')
+        chain_filter['cases__damage'] = self.request.query_params.get('damage')
         chain_filter['pledge_giver'] = self.request.query_params.get('pledges_given')
         chain_filter['pledge_receiver'] = self.request.query_params.get('pledges_received')
         
