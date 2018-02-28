@@ -47,7 +47,8 @@ case_urls = [
         , name='litigant_list_for_add_case'),
     url(r'^(?P<pk>\d+)/add_litigant/$', views.add_litigant, name='add_litigant'),
     url(r'^(?P<pk>\d+)/edit_litigant/(?P<litigant_pk>\d+)/', views.edit_litigant, name='edit_litigant'),
-    url(r'^ajax/load_case_types/', views.load_case_types, name='ajax_case_types')
+    url(r'^ajax/load_case_types/', views.load_case_types, name='ajax_case_types'),
+    url(r'^ajax/load_verdict_types/', views.load_verdict_types, name='ajax_verdict_types'),
 ]
 
 county_urls = [

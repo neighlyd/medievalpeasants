@@ -171,6 +171,16 @@ def load_case_types(request):
         case_types = models.CaseType.objects.filter(case__session__village_id=village_id).order_by('case_type').distinct()
     return render(request, 'case/case_type_dropdown.html', {'case_types': case_types})
 
+def load_verdict_types(request):
+    case_type_id = request.GET.get('case_type')
+    if (case_type_id == "All"):
+        verdicts = models.Verdict.objects.all().order_by('verdict').distinct()
+    elif(case_type_id == "None"):
+        verdicts = models.Verdict.objects.none()
+    else:
+        verdicts = models.Verdict.objects.filter(case__case_type=case_type_id).order_by('verdict').distinct()
+    return render(request, 'case/verdict_type_dropdown.html', {'verdicts': verdicts})
+
 class CaseDetailView(DetailView):
 
     model = models.Case

@@ -259,8 +259,9 @@ class CaseViewSet(DynamicModelViewSet):
         chain_filter['session__village_id'] = self.request.query_params.get('village')
         chain_filter['session__village__hundred_id'] = self.request.query_params.get('hundred')
         chain_filter['session__village__county_id'] = self.request.query_params.get('county')
-        chain_filter['case_to_person__land_id'] = self.request.query_params.get('land')
+        chain_filter['litigants__land_id'] = self.request.query_params.get('land')
         chain_filter['case_type'] = self.request.query_params.get('case_type')
+        chain_filter['verdict'] = self.request.query_params.get('verdict')
         distinct = self.request.query_params.get('distinct')
 
         if not chain_filter:

@@ -6,7 +6,7 @@
 {% endblock %}
 
 {% block additional_title %}
-    <div class="form-inline d-flex justify-content-center" id="select_cases" data_case_types_url="{% url 'case:ajax_case_types' %}">
+    <div class="form-inline d-flex justify-content-center" id="select_cases"">
             <div class="form-group" style="padding-top: 5px">
             {% for field in filter_case_form.visible_fields %}
                 <div class="col-2">
@@ -77,7 +77,7 @@
     $(document).ready(function(){
 
         $('#select_village').change(function(){
-           var url = $('#select_cases').attr('data_case_types_url');
+           var url = $('#select_village').attr('data_case_types_url');
            var villageID = $(this).val();
            $.ajax({
                    url: url,
@@ -90,13 +90,29 @@
                })
         });
 
+        $('#select_case_type').change(function(){
+            var url = $('#select_case_type').attr('data_verdict_types_url');
+            var caseTypeID = $(this).val();
+            $.ajax({
+                url: url,
+                data: {
+                    'case_type': caseTypeID
+                },
+                success: function(data){
+                    $('#select_verdict_type').html(data);
+                }
+            })
+
+        });
+
         $("#get_cases").click(function(e){
             $('.btn').removeClass('active');
             $(this).addClass('active');
             var caseType = $("#select_case_type").val();
             var village = $("#select_village").val();
+            var verdictType = $("#select_verdict_type").val();
             var url = Urls['api:case-list']();
-            if (caseType === 'None' || village === 'None') {
+            if (caseType === 'None' || village === 'None' || verdictType === 'None') {
                 if ($("#list_cases").is(":visible")) {
                     $("#list_cases").hide();
 
@@ -104,19 +120,38 @@
                 } else {
                     return
                 }
-            } else if (caseType === "All"){
-                if (village === "All"){
-                    url = url + "?exclude[]=session.*&include[]=litigant_count&include[]=session.village.name&include[]=session.law_term&include[]=session.date&include[]=session.human_date&include[]=pledge_count";
+            }
+            if ( village === "All" ){
+                if ( caseType === "All" ){
+                    if ( verdictType === "All" ){
+                        url = url + "?exclude[]=session.*&include[]=litigant_count&include[]=session.village.name&include[]=session.law_term&include[]=session.date&include[]=session.human_date&include[]=pledge_count";
+                    } else {
+                        url = url + "?verdict=" + verdictType + "&exclude[]=session.*&include[]=litigant_count&include[]=session.village.name&include[]=session.law_term&include[]=session.date&include[]=session.human_date&include[]=pledge_count";
+                    }
                 } else {
-                    url = url + "?village=" + village + "&exclude[]=session.*&include[]=litigant_count&include[]=session.village.name&include[]=session.law_term&include[]=session.date&include[]=session.human_date&include[]=pledge_count";
+                    if ( verdictType === "All" ){
+                        url = url + "?case_type=" + caseType + "&exclude[]=session.*&include[]=litigant_count&include[]=session.village.name&include[]=session.law_term&include[]=session.date&include[]=session.human_date&include[]=pledge_count";
+                    } else {
+                        url = url + "?case_type=" + caseType + "&verdict=" + verdictType + "&exclude[]=session.*&include[]=litigant_count&include[]=session.village.name&include[]=session.law_term&include[]=session.date&include[]=session.human_date&include[]=pledge_count";
+
+                    }
                 }
             } else {
-                if (village === "All"){
-                    url = url + "?case_type=" + caseType + "&exclude[]=session.*&include[]=litigant_count&include[]=session.village.name&include[]=session.law_term&include[]=session.date&include[]=session.human_date&include[]=pledge_count";
+                if ( caseType === "All" ){
+                    if ( verdictType === "All" ){
+                        url = url + "?village=" + village + "&exclude[]=session.*&include[]=litigant_count&include[]=session.village.name&include[]=session.law_term&include[]=session.date&include[]=session.human_date&include[]=pledge_count";
+                    } else {
+                        url = url + "?village=" + village + "&verdict=" + verdictType + "&exclude[]=session.*&include[]=litigant_count&include[]=session.village.name&include[]=session.law_term&include[]=session.date&include[]=session.human_date&include[]=pledge_count";
+                    }
                 } else {
-                    url = url + "?village=" + village + "&case_type=" + caseType + "&exclude[]=session.*&include[]=litigant_count&include[]=session.village.name&include[]=session.law_term&include[]=session.date&include[]=session.human_date&include[]=pledge_count";
+                    if ( verdictType === "All" ){
+                        url = url + "?village=" + village + "&case_type=" + caseType + "&exclude[]=session.*&include[]=litigant_count&include[]=session.village.name&include[]=session.law_term&include[]=session.date&include[]=session.human_date&include[]=pledge_count";
+                    } else {
+                        url = url + "?village=" + village + "&case_type=" + caseType + "&verdict=" + verdictType + "&exclude[]=session.*&include[]=litigant_count&include[]=session.village.name&include[]=session.law_term&include[]=session.date&include[]=session.human_date&include[]=pledge_count";
+                    }
                 }
             }
+            
             $("#table").DataTable().destroy();
             var table = $('#table').DataTable({
                 scrollX: true,

@@ -1,6 +1,7 @@
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 from django.forms.models import inlineformset_factory
+from django.urls import reverse_lazy
 
 from . import models
 
@@ -67,24 +68,39 @@ class PersonFilterForm(forms.Form):
 
 
 class CaseFilterForm(forms.Form):
+    # use reverse_lazy to get urls for ajax dropdowns to add as attributes to form fields. JQuery will pick these up on
+    # change and use them to find the appropriately updated list.
+    case_types_url = reverse_lazy('case:ajax_case_types')
+    verdict_types_url = reverse_lazy('case:ajax_verdict_types')
     select_village = forms.ChoiceField(
         label='Village',
         choices=(),
         widget=forms.Select(
             attrs={
                 'class':'selector',
+                'data_case_types_url': case_types_url,
             }
         )
     )
     select_case_type = forms.ChoiceField(
-        label='Type',
+        label='Case Filter',
         choices=(),
         widget=forms.Select(
             attrs={
                 'class':'selector',
+                'data_verdict_types_url': verdict_types_url,
             }
         )
     )
+    select_verdict_type = forms.ChoiceField(
+            label='Verdict Filter',
+            choices=(),
+            widget=forms.Select(
+                attrs={
+                    'class':'selector',
+                }
+            )
+        )
 
     def __init__(self, *args, **kwargs):
         super(CaseFilterForm, self).__init__(*args, **kwargs)
@@ -95,7 +111,6 @@ class CaseFilterForm(forms.Form):
 
         # set up a list of tuples as additional options
         CASE_TYPE_CHOICES = [
-            ('None', 'Select a Case Type'),
             ('All', 'All Case Types'),
             ('None', '––––––––––––––––––––––––'),
         ]
@@ -103,6 +118,11 @@ class CaseFilterForm(forms.Form):
         EXTRA_VILLAGE_CHOICES = [
             ('None', 'Select a Village'),
             ('All', 'All Villages'),
+            ('None', '––––––––––––––––––––––––'),
+        ]
+
+        VERDICT_CHOICES = [
+            ('All', 'All Verdicts'),
             ('None', '––––––––––––––––––––––––'),
         ]
 
@@ -116,6 +136,7 @@ class CaseFilterForm(forms.Form):
         # assign the concatted choices to the form fields.
         self.fields['select_case_type'].choices = CASE_TYPE_CHOICES
         self.fields['select_village'].choices = additional_village_choices
+        self.fields['select_verdict_type'].choices = VERDICT_CHOICES
 
 
 
