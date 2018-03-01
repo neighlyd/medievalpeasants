@@ -4,8 +4,10 @@
             <div class="col-4"><a href="{% url 'person:detail' litigant.person.id %}"><h6>{{ litigant.person.full_name }}</h6></a></div>
             <div class="col-4 text-center"><h6>{{ litigant.role.role }}</h6></div>
             <div class="col-4">
-
-            <button class="btn btn-warning edit_litigant float-right" type="button" data-url="{% url 'case:edit_litigant' pk=case.id litigant_pk=litigant.id %}"><i class="fas fa-pencil-alt"></i> Edit</button>
+                <div class="d-flex flex-wrap justify-content-around">
+                    <button class="btn btn-danger delete_litigant" type="button" data-url="{% url 'litigant:delete' litigant.id %}"><i class="fas fa-trash-alt"></i> Remove</button>
+                    <button class="btn btn-warning edit_litigant" type="button" data-url="{% url 'litigant:edit' litigant.id %}"><i class="fas fa-pencil-alt"></i> Edit</button>
+                </div>
             </div>
         </div>
 

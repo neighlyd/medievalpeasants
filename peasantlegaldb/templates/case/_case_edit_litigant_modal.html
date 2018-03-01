@@ -1,7 +1,7 @@
 {% load crispy_forms_tags %}
 {% load widget_tweaks %}
 
-<form method="post" action="{% url 'case:edit_litigant' pk=case.id litigant_pk=litigant.id %}" class="edit_litigant_form">
+<form method="post" action="{% url 'litigant:edit' litigant.id %}" class="edit_litigant_form">
     {% csrf_token %}
 
     <div class="modal-header">

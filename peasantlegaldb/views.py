@@ -317,10 +317,32 @@ def add_litigant(request, pk):
 
     return JsonResponse(data)
 
+def delete_litigant(request, pk):
+    litigant = get_object_or_404(models.Litigant, pk=pk)
+    case_instance = litigant.case
+    data = dict()
+    if request.method == 'POST':
+        litigant.delete()
+        data['form_is_valid'] = True
+        litigant_list = models.Litigant.objects.filter(case=case_instance).prefetch_related('person') \
+            .order_by('person__first_name', 'person__last_name')
+        data['html_litigant_list'] = render_to_string('case/litigant_table_body_for_case.html',
+                                                      {'litigant_list': litigant_list,
+                                                       'case': case_instance
+                                                       }
+                                                      )
+    else:
+        context = {'litigant': litigant}
+        data['html_form'] = render_to_string('case/litigant_delete_confirm.html',
+                                             context,
+                                             request=request,
+                                             )
+    return JsonResponse(data)
 
-def edit_litigant(request, pk, litigant_pk):
+
+def edit_litigant(request, pk):
     # See add_litigant for comments.
-    litigant = get_object_or_404(models.Litigant, pk=litigant_pk)
+    litigant = get_object_or_404(models.Litigant, pk=pk)
     case_instance = litigant.case
 
     data = dict()
@@ -363,7 +385,8 @@ def edit_litigant(request, pk, litigant_pk):
                 .order_by('person__first_name', 'person__last_name')
             data['html_litigant_list'] = render_to_string('case/litigant_table_body_for_case.html',
                                                           {'litigant_list': litigant_list,
-                                                           'case': case_instance}
+                                                           'case': case_instance
+                                                           }
                                                           )
         else:
             data['form_is_valid'] = False

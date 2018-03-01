@@ -84,130 +84,60 @@
 
     {{ block.super }}
     <script src="{% static '/js/formset.js' %}"></script>
+    <script src="{% static '/js/case_edit.js' %}"></script>
     <script>
-        $(document).ready(function(){
-            $('#add_litigant').click(function(){
-               var url = $(this).attr('data-url');
-               $.ajax({
-                   url: url,
-                   type: 'get',
-                   dataType: 'json',
-                   success: function(data){
-                       $('#modal-litigant .modal-content').html(data.html_form);
-                   },
-                   complete: function(){
-                       $('#modal-litigant').modal('show');
-                   }
-               })
-            });
+        $(document).ready(function() {
 
-            $('#ajax_litigant_list').on('click', '.edit_litigant', function(){
-                var url = $(this).attr('data-url');
-                $.ajax({
-                    url: url,
-                    type: 'get',
-                    dataType: 'json',
-                    success: function(data){
-                        $('#modal-litigant .modal-content').html(data.html_form);
-                    },
-                    complete: function(){
-                        $('#modal-litigant').modal('show');
-                    }
-                })
+            // Need to run formset functions when the modal is created, otherwise, the formset function can't pick up the
+            // creation of the formset.
+            $('#modal-litigant').on('shown.bs.modal', function () {
+                $('#add_amercement_collapse tbody tr').formset({
+                    prefix: 'amercement',
+                    addText: 'Add Another',
+                    deleteText: 'Delete Amercement',
+                });
             });
-
-            $('#modal-litigant').on('submit', '.add-litigant-form', function(){
-               var form = $(this);
-               var data = form.serialize();
-               $.ajax({
-                   url: form.attr('action'),
-                   data: form.serialize(),
-                   type: form.attr('method'),
-                   dataType: 'json',
-                   success: function(data){
-                       if(data.form_is_valid) {
-                           $('#ajax_litigant_list ul').html(data.html_litigant_list);
-                           $('#modal-litigant').modal('hide');
-                       } else {
-                           $('#modal-litigant .modal-content').html(data.html_form);
-                       }
-                   }
-               });
-                // return false to prevent submission of POST and refreshing of page.
-                return false;
+            $('#modal-litigant').on('shown.bs.modal', function () {
+                $('#add_fine_collapse tbody tr').formset({
+                    prefix: 'fine',
+                    addText: 'Add Another',
+                    deleteText: 'Delete Fine',
+                });
             });
-
-            $('#modal-litigant').on('submit', '.edit_litigant_form', function(){
-               var form = $(this);
-               var data = form.serialize();
-               $.ajax({
-                   url: form.attr('action'),
-                   data: form.serialize(),
-                   type: form.attr('method'),
-                   dataType: 'json',
-                   success: function(data){
-                       if(data.form_is_valid) {
-                           $('#ajax_litigant_list ul').html(data.html_litigant_list);
-                           $('#modal-litigant').modal('hide');
-                       } else {
-                           $('#modal-litigant .modal-content').html(data.html_form);
-                       }
-                   }
-               });
-                // return false to prevent submission of POST and refreshing of page.
-                return false;
+            $('#modal-litigant').on('shown.bs.modal', function () {
+                $('#add_damage_collapse tbody tr').formset({
+                    prefix: 'fine',
+                    addText: 'Add Another',
+                    deleteText: 'Delete Damage',
+                });
             });
-        });
-
-        // Need to run formset functions when the modal is created, otherwise, the formset function can't pick up the
-        // creation of the formset.
-        $('#modal-litigant').on('shown.bs.modal', function(){
-            $('#add_amercement_collapse tbody tr').formset({
-                prefix: 'amercement',
-                addText: 'Add Another',
-                deleteText: 'Delete Amercement',
+            $('#modal-litigant').on('shown.bs.modal', function () {
+                $('#add_heriot_collapse tbody tr').formset({
+                    prefix: 'fine',
+                    addText: 'Add Another',
+                    deleteText: 'Delete Heriot',
+                });
             });
-        });
-        $('#modal-litigant').on('shown.bs.modal', function(){
-            $('#add_fine_collapse tbody tr').formset({
-                prefix: 'fine',
-                addText: 'Add Another',
-                deleteText: 'Delete Fine',
+            $('#modal-litigant').on('shown.bs.modal', function () {
+                $('#add_capitagium_collapse tbody tr').formset({
+                    prefix: 'fine',
+                    addText: 'Add Another',
+                    deleteText: 'Delete Capitagium',
+                });
             });
-        });
-        $('#modal-litigant').on('shown.bs.modal', function(){
-            $('#add_damage_collapse tbody tr').formset({
-                prefix: 'fine',
-                addText: 'Add Another',
-                deleteText: 'Delete Damage',
+            $('#modal-litigant').on('shown.bs.modal', function () {
+                $('#add_impercamentum_collapse tbody tr').formset({
+                    prefix: 'fine',
+                    addText: 'Add Another',
+                    deleteText: 'Delete Impercamentum',
+                });
             });
-        });
-        $('#modal-litigant').on('shown.bs.modal', function(){
-            $('#add_heriot_collapse tbody tr').formset({
-                prefix: 'fine',
-                addText: 'Add Another',
-                deleteText: 'Delete Heriot',
-            });
-        });
-        $('#modal-litigant').on('shown.bs.modal', function(){
-            $('#add_capitagium_collapse tbody tr').formset({
-                prefix: 'fine',
-                addText: 'Add Another',
-                deleteText: 'Delete Capitagium',
-            });
-        });
-        $('#modal-litigant').on('shown.bs.modal', function(){
-            $('#add_impercamentum_collapse tbody tr').formset({
-                prefix: 'fine',
-                addText: 'Add Another',
-                deleteText: 'Delete Impercamentum',
-            });
-        });
-        $('#modal-litigant').on('shown.bs.modal', function(){
-            $('#add_land_collapse tbody tr').formset({
-                prefix: 'fine',
-                addText: 'Add Another',
-                deleteText: 'Delete Land',
+            $('#modal-litigant').on('shown.bs.modal', function () {
+                $('#add_land_collapse tbody tr').formset({
+                    prefix: 'fine',
+                    addText: 'Add Another',
+                    deleteText: 'Delete Land',
+                });
             });
         });
 
