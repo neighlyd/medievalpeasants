@@ -208,6 +208,25 @@
                     </div>
                 {% endif %}
 
+                {% if litigant.pledge_exists %}
+                    <div class="card">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <td scope="col">Pledge Giver</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for pledge in litigant.pledges.all %}
+                                <tr>
+                                    <td>{{ pledge.giver.full_name }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif %}
+
 
             </div>
     </li>

@@ -384,7 +384,7 @@ class Person(models.Model):
 
     @property
     def pledges_received_count(self):
-        return self.pledge_receiver.all().count()
+        return self.cases.aggregate(pledge_count='pledges')
 
     @property
     def relationship_count(self):
@@ -419,8 +419,12 @@ class Person(models.Model):
 
     @property
     def pledge_exists(self):
+        pledge_exists = False
         pledge_given = self.pledge_giver.exists()
-        pledge_received = self.pledge_receiver.exists()
+        pledge_received = False
+        for case in self.cases.all():
+            if case.pledges.exists():
+                pledge_received = True
         if pledge_given or pledge_received:
             return True
         else:
@@ -711,7 +715,12 @@ class Case(models.Model):
 
     @property
     def pledge_count(self):
-        pledge_count = len(set(self.case_to_pledge.all()))
+        pledge_count = []
+        for case in self.litigants.all():
+            for pledge in case.pledges.all():
+                pledge_count.append(pledge.giver_id)
+                pledge_count.append(pledge.receiver_id)
+        pledge_count = len(set(pledge_count))
         return pledge_count
 
     @property
@@ -740,7 +749,11 @@ class Case(models.Model):
 
     @property
     def pledge_exist(self):
-        return self.case_to_pledge.filter(case=self).exists()
+        pledge_exists = False
+        for case in self.litigants.all():
+            if case.pledges.exists():
+                pledge_exists = True
+        return pledge_exists
 
     def __str__(self):
         return 'Case %s | %s (%s / %s)' % (self.id, self.session.village.name, self.session.get_law_term_display(), self.session.date.year)
@@ -838,6 +851,10 @@ class Litigant(models.Model):
     def land_exists(self):
         return self.lands.exists()
 
+    @property
+    def pledge_exists(self):
+        return self.pledges.exists()
+
     def save(self, *args, **kwargs):
         person = Person.objects.get(id=self.person_id)
         try:
@@ -909,12 +926,11 @@ class LandtoCase(models.Model):
 
 
 class Pledge(models.Model):
-    case = models.ForeignKey(Case, on_delete=models.CASCADE, related_name='case_to_pledge')
-    pledge_giver = models.ForeignKey(Person, on_delete=models.CASCADE, related_name='pledge_giver')
-    pledge_receiver = models.ForeignKey(Person, on_delete=models.CASCADE, related_name='pledge_receiver')
+    giver = models.ForeignKey(Person, on_delete=models.CASCADE, related_name='pledge_giver')
+    receiver = models.ForeignKey(Litigant, on_delete=models.CASCADE, related_name='pledges')
 
     def __str__(self):
-        return "%s pledged %s, Case %s" % (self.pledge_giver, self.pledge_receiver, self.case)
+        return "%s pledged %s" % (self.giver.full_name, self.receiver.person.full_name)
 
 
 class LandSplit(models.Model):

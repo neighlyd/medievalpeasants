@@ -178,7 +178,7 @@ class CaseForm(forms.ModelForm):
 
     class Meta:
         model = models.Case
-        fields = ['summary', 'session', 'case_type', 'court_type', 'verdict', 'of_interest', 'ad_legem',
+        fields = ['summary', 'session', 'court_type', 'case_type', 'verdict', 'of_interest', 'ad_legem',
                   'villeinage_mention', 'active_sale', 'incidental_land',]
         labels = {
             'case_type': _('Case Type'),

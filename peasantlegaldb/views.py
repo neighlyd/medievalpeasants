@@ -200,6 +200,11 @@ def CaseEditView(request, pk):
 
     if request.method == 'POST':
         form = forms.CaseForm(request.POST, instance=case)
+        form.save()
+        if 'finish_editing' in request.POST:
+            return redirect(reverse('case:detail', kwargs={"pk" : case.id}))
+        elif 'add_another' in request.POST:
+            return redirect(reverse('case:add'))
     else:
         form = forms.CaseForm(instance=case)
 
@@ -212,7 +217,7 @@ def CaseEditView(request, pk):
     return render(request, 'case/case_edit.html', context)
 
 
-# TODO: Convert add_litigant and edit_litigant to class based views and add in GroupRequiredMixin.
+# TODO: Convert add_litigant, delete_litigant, and edit_litigant to class based views and add in GroupRequiredMixin.
 
 def add_litigant(request, pk):
 
@@ -427,7 +432,7 @@ def add_case(request):
             if form.is_valid():
                 case = form.save(commit=False)
                 case.save()
-                return redirect('edit_case', pk=case.pk)
+                return redirect(reverse('case:edit', kwargs={"pk" : case.id }))
         elif 'add_another' in request.POST:
             if form.is_valid():
                 case = form.save(commit=False)
