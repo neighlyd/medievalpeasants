@@ -384,7 +384,9 @@ class Person(models.Model):
 
     @property
     def pledges_received_count(self):
-        return self.cases.aggregate(pledge_count='pledges')
+        pledge_count = self.cases.aggregate(pledge_count=Count('pledges', distinct=True))
+        pledge_count = pledge_count['pledge_count']
+        return pledge_count
 
     @property
     def relationship_count(self):
@@ -432,59 +434,64 @@ class Person(models.Model):
 
     @property
     def monetary_counts(self):
-        return self.cases.aggregate(amercement_count=Count('amercement'),
-                                             amercement_max=Max('amercement__in_denarius'),
-                                             amercement_min=Min('amercement__in_denarius'),
-                                             amercement_avg=Avg('amercement__in_denarius'),
-                                             amercement_sum=Sum('amercement__in_denarius'), fine_count=Count('fine'),
-                                             fine_max=Max('fine__in_denarius'), fine_min=Min('fine__in_denarius'),
-                                             fine_avg=Avg('fine__in_denarius'), fine_sum=Sum('fine__in_denarius'),
-                                             damage_count=Count('damage'), damage_max=Max('damage__in_denarius'),
-                                             damage_min=Min('damage__in_denarius'),
-                                             damage_avg=Avg('damage__in_denarius'),
-                                             damage_sum=Sum('damage__in_denarius'), chevage_count=Count('chevage'),
-                                             chevage_max=Max('chevage__in_denarius'),
-                                             chevage_min=Min('chevage__in_denarius'),
-                                             chevage_avg=Avg('chevage__in_denarius'),
-                                             chevage_sum=Sum('chevage__in_denarius'), heriot_count=Count('heriot'),
-                                             heriot_max=Max('heriot__in_denarius'),
-                                             heriot_min=Min('heriot__in_denarius'),
-                                             heriot_avg=Avg('heriot__in_denarius'),
-                                             heriot_sum=Sum('heriot__in_denarius'),
-                                             impercamentum_count=Count('impercamentum'),
-                                             impercamentum_max=Max('impercamentum__in_denarius'),
-                                             impercamentum_min=Min('impercamentum__in_denarius'),
-                                             impercamentum_avg=Avg('impercamentum__in_denarius'),
-                                             impercamentum_sum=Sum('impercamentum__in_denarius') )
+        return self.cases.aggregate(amercement_count=Count('amercements'),
+                                             amercement_max=Max('amercements__in_denarius'),
+                                             amercement_min=Min('amercements__in_denarius'),
+                                             amercement_avg=Avg('amercements__in_denarius'),
+                                             amercement_sum=Sum('amercements__in_denarius'), fine_count=Count('fines'),
+                                             fine_max=Max('fines__in_denarius'), fine_min=Min('fines__in_denarius'),
+                                             fine_avg=Avg('fines__in_denarius'), fine_sum=Sum('fines__in_denarius'),
+                                             damage_count=Count('damages'), damage_max=Max('damages__in_denarius'),
+                                             damage_min=Min('damages__in_denarius'),
+                                             damage_avg=Avg('damages__in_denarius'),
+                                             damage_sum=Sum('damages__in_denarius'), capitagium_count=Count('capitagia'),
+                                             capitagium_max=Max('capitagia__in_denarius'),
+                                             capitagium_min=Min('capitagia__in_denarius'),
+                                             capitagium_avg=Avg('capitagia__in_denarius'),
+                                             capitagium_sum=Sum('capitagia__in_denarius'), heriot_count=Count('heriots'),
+                                             heriot_max=Max('heriots__in_denarius'),
+                                             heriot_min=Min('heriots__in_denarius'),
+                                             heriot_avg=Avg('heriots__in_denarius'),
+                                             heriot_sum=Sum('heriots__in_denarius'),
+                                             impercamentum_count=Count('impercamenta'),
+                                             impercamentum_max=Max('impercamenta__in_denarius'),
+                                             impercamentum_min=Min('impercamenta__in_denarius'),
+                                             impercamentum_avg=Avg('impercamenta__in_denarius'),
+                                             impercamentum_sum=Sum('impercamenta__in_denarius') )
 
     @property
     def amercement_exists(self):
-        return self.cases.filter(amercement__isnull=False).exists()
+        return self.cases.filter(amercements__isnull=False).exists()
 
     @property
     def fine_exists(self):
-        return self.cases.filter(fine__isnull=False).exists()
+        return self.cases.filter(fines__isnull=False).exists()
 
     @property
     def damage_exists(self):
-        return self.cases.filter(damage__isnull=False).exists()
+        return self.cases.filter(damages__isnull=False).exists()
 
     @property
     def chevage_exists(self):
-        return self.cases.filter(chevage__isnull=False).exists()
+        return self.cases.filter(capitagia__isnull=False).exists()
 
     @property
     def impercamentum_exists(self):
-        return self.cases.filter(impercamentum__isnull=False).exists()
+        return self.cases.filter(impercamenta__isnull=False).exists()
 
     @property
     def heriot_exists(self):
-        return self.cases.filter(heriot__isnull=False).exists()
+        return self.cases.filter(heriots__isnull=False).exists()
 
     @property
     def case_count_litigation(self):
-        case_count = self.cases.exclude(chevage__isnull=False).values_list('case').distinct().count()
+        case_count = self.cases.exclude(capitagia__isnull=False).values_list('case').distinct().count()
         return case_count
+
+    @property
+    def capitagium_count(self):
+        capitagium_count = self.cases.exclude(capitagia__isnull=True).values_list('case').distinct().count()
+        return capitagium_count
 
     @property
     def case_count_all(self):

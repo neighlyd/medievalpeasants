@@ -96,7 +96,8 @@ litigant_urls = [
 ]
 
 person_detail_urls = [
-    url(r'^(?P<pk>\d+)/$', views.PersonDetailView.as_view(template_name='person/_person_detail.html'), name='detail'),
+    url(r'^(?P<pk>\d+)/$', views.PersonDetailView.as_view(template_name='person/_person_detail.html'),
+        name='detail'),
     url(r'^(?P<pk>\d+)/amercement_list', views.person_lists,
         name='amercements'),
     url(r'^(?P<pk>\d+)/case_list', views.person_lists,
@@ -110,16 +111,20 @@ person_detail_urls = [
     url(r'^(?P<pk>\d+)/heriot_list', views.PersonDetailView.as_view(template_name='person/heriot_list.html'),
         name='heriots'),
     url(r'^(?P<pk>\d+)/impercamentum_list', views.PersonDetailView.as_view(
-        template_name='person/impercamentum_list.html'), name='impercamenta'),
+        template_name='person/impercamentum_list.html'),
+        name='impercamenta'),
     url(r'^(?P<pk>\d+)/land_list', views.person_lists,
         name='lands'),
-    url(r'^(?P<pk>\d+)/pledge_list', views.PeopleListView.as_view(template_name='person/pledge_list.html'), name='pledges'),
+    url(r'^(?P<pk>\d+)/pledge_list', views.person_lists,
+        name='pledges'),
     url(r'^(?P<pk>\d+)/position_list', views.PeopleListView.as_view(template_name='person/position_list.html'),
         name='positions'),
     url(r'^(?P<pk>\d+)/relationship_list', views.person_lists,
         name='relationships'),
-    url(r'^(?P<pk>\d+)/stats_list', views.PersonDetailView.as_view(template_name='person/stats_list.html'), name='stats'),
-    url(r'^list/$', views.PeopleListView.as_view(template_name='person/_person_list.html'), name='list'),
+    url(r'^(?P<pk>\d+)/stats_list', views.PersonDetailView.as_view(template_name='person/stats_list.html'),
+        name='stats'),
+    url(r'^list/$', views.PeopleListView.as_view(template_name='person/_person_list.html'),
+        name='list'),
 ]
 
 record_urls = [

@@ -4,28 +4,40 @@
     <div class="card-body">
             <table class="table table-bordered table-hover" id="table" data-page-length="25">
                 <thead>
-                    <th>Info</th>
+                    <th>Case</th>
+                    <th>Session</th>
+                    <th>Village</th>
                     <th>Land ID</th>
                     <th>Parcels</th>
-                    <th>Session</th>
-                    <th>Case</th>
-                    <th>Role</th>
                     <th>Villeinage?</th>
-                    <th>Village</th>
-                    <th>Notes</th>
+                    <th>Role</th>
+                    <th>Case Type</th>
+                    <th>Verdict</th>
                 </thead>
                 <tbody>
                         {% for case in list %}
                             {% for land in case.lands.all %}
                     <tr>
-                                <td></td>
-                                <td><a href="{% url 'land:detail' land.id %}">{{ land.id }}</a></td>
-                                <td>{{ land.land.parcel_list }}</td>
-                                <td>{{ land.litigants.case }}</td>
-                                <td>{{ land.litigants.role.role }}</td>
-                                <td>{{ land.villeinage }}</td>
-                                <td>{{ land.notes|linebreaks }}</td>
+                        <td><a href="{% url 'case:detail' land.litigant.case.id %}">{{ land.litigant.case.id }}</a></td>
+                        <td><a href="{% url 'session:detail' land.litigant.case.session.id %}">{{ land.litigant.case.session.date }}</a></td>
+                        <td><a href="{% url 'village:detail' land.litigant.case.session.village.id %}">{{ land.litigant.case.session.village.name }}</a></td>
+                        <td><a href="{% url 'land:detail' land.id %}">{{ land.id }}</a></td>
+                        <td>{% for parcel in land.land.parcels.all %}
+                            {% if forloop.first %}{{ parcel.amount }} {{ parcel.parcel_type.parcel_type}} of {{ parcel.parcel_tenure.tenure }}
+                            {% else %}<hr>{{ parcel.amount }} {{ parcel.parcel_type.parcel_type}} of {{ parcel.parcel_tenure.tenure }}{% endif %}
+                            {% endfor %}</td>
+                        <td>{{ land.villeinage }}</td>
+                        <td>{{ land.litigant.role.role }}</td>
+                        <td>{{ land.litigant.case.case_type.case_type }}</td>
+                        <td>{{ land.litigant.case.verdict.verdict }}</td>
                     </tr>
+                    {% if land.notes %}
+                    <tr>
+                        <td colspan="1">Notes:</td>
+                        <td colspan="8">{{ land.notes|linebreaks }}</td>
+                    </tr>
+                        <tr><td colspan="9"></td></tr>
+                                {% endif %}
                             {% endfor %}
                         {% endfor %}
                 </tbody>

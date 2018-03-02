@@ -14,6 +14,8 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from braces.views import GroupRequiredMixin
 
+from itertools import chain
+
 from . import models
 from . import forms
 
@@ -171,6 +173,7 @@ def load_case_types(request):
         case_types = models.CaseType.objects.filter(case__session__village_id=village_id).order_by('case_type').distinct()
     return render(request, 'case/case_type_dropdown.html', {'case_types': case_types})
 
+
 def load_verdict_types(request):
     case_type_id = request.GET.get('case_type')
     if (case_type_id == "All"):
@@ -180,6 +183,7 @@ def load_verdict_types(request):
     else:
         verdicts = models.Verdict.objects.filter(case__case_type=case_type_id).order_by('verdict').distinct()
     return render(request, 'case/verdict_type_dropdown.html', {'verdicts': verdicts})
+
 
 class CaseDetailView(DetailView):
 
@@ -661,34 +665,41 @@ def person_lists(request, pk):
     person = models.Person.objects.get(id=pk)
 
     # Depending on the last element, assign the query
-    if (path == 'case_list'):
-        list = models.Litigant.objects.filter(person=pk).distinct().prefetch_related('case__session').order_by('case__session__date')
-    elif (path == 'damage_list'):
-        list = models.Litigant.objects.filter(person=pk, damages__damage__isnull=False).distinct().prefetch_related('case__session').order_by('case__session__date')
-    elif (path == 'relationship_list'):
-        list = models.Relationship.objects.filter(Q(person_one=pk) | Q(person_two=pk))
-    elif (path == 'land_list'):
-        list = models.Litigant.objects.filter(person=pk, lands__isnull=False).prefetch_related('case__session').order_by('case__session__date')
+    if path == 'case_list':
+        query_list = models.Litigant.objects.filter(person=pk).distinct().prefetch_related('case__session').order_by('case__session__date')
+    elif path == 'damage_list':
+        query_list = models.Litigant.objects.filter(person=pk, damages__damage__isnull=False).distinct().prefetch_related('case__session').order_by('case__session__date')
+    elif path == 'relationship_list':
+        query_list = models.Relationship.objects.filter(Q(person_one=pk) | Q(person_two=pk))
+    elif path == 'land_list':
+        query_list = models.Litigant.objects.filter(person=pk, lands__isnull=False).prefetch_related('case__session').order_by('case__session__date')
+    elif path == 'pledge_list':
+        # generate two querysets. One where the person pk is the giver and one where they are the receiver.
+        giver_list = models.Pledge.objects.filter(giver=pk).prefetch_related('receiver__person').order_by('receiver__person__last_name', 'receiver__person__first_name')
+        litigant_ids = models.Litigant.objects.filter(person=pk).values_list('id', flat=True)
+        receiver_list = models.Pledge.objects.filter(receiver__in=litigant_ids).prefetch_related('giver').order_by('giver__first_name', 'giver__last_name')
+        # use chain from itertools to join them together and then unite them into a list
+        query_list = list(chain(giver_list, receiver_list))
 
     # TODO: lists - amercement, capitagium, fine, heriot, impercamentum, land, pledge, position.
 
     # Check which page the url is on by getting the `?page=` param. If it is not 1, assign 1
     page = request.GET.get('page', 1)
     # Limit the list to 15 items.
-    paginator = Paginator(list, 10)
+    paginator = Paginator(query_list, 10)
 
     try:
-        list = paginator.page(page)
+        query_list = paginator.page(page)
     except PageNotAnInteger:
-        list = paginator.page(1)
+        query_list = paginator.page(1)
     except EmptyPage:
-        list = paginator.page(paginator.num_pages)
+        query_list = paginator.page(paginator.num_pages)
 
     template = 'person/' + path + '.html'
 
     # Need to assign person context for in-page links and data-urls, such as the pagination buttons.
     context={
-        'list': list,
+        'list': query_list,
         'person': person,
         'path': path,
     }
