@@ -44,15 +44,15 @@
 
             function checkMaker(data, type, row, col) {
                 if (data){
-                    return "<i class='fa fa-check' style='color:forestgreen'></i>";
+                    return "<i class='fas fa-check' style='color:forestgreen'></i>";
                 }
             }
 
             function checkNotes(cellData) {
                 if (cellData === "") {
-                    return '<i class="fa fa-plus-square" aria-hidden="true" style="color: gray"></i>';
+                    return '<i class="fas fa-plus-square" aria-hidden="true" style="color: gray"></i>';
                 } else {
-                    return '<i class="fa fa-plus-square" aria-hidden="true"></i>';
+                    return '<i class="fas fa-plus-square" aria-hidden="true"></i>';
                 }
             }
 

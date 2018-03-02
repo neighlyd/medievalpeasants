@@ -3,15 +3,17 @@
     <div class="card-body">
             <table class="table table-bordered table-hover" id="person_relationship_list" data-page-length="25">
                 <thead>
-                    <th>Person One</th>
-                    <th>Person Two</th>
+                    <th>Relation</th>
                     <th>Relationship</th>
                     <th>Definitive</th>
                 </thead>
                     {% for relation in list %}
                         <tr>
-                            <td><a href="{% url 'person:detail' relation.person_one.id %}">{{ relation.person_one.full_name }}</a></td>
-                            <td><a href="{% url 'person:detail' relation.person_two.id %}">{{ relation.person_two.full_name }}</a></td>
+                            {% if relation.person_one.id != person.id %}
+                                <td><a href="{% url 'person:detail' relation.person_one.id %}">{{ relation.person_one.full_name }}</a></td>
+                            {% else %}
+                                <td><a href="{% url 'person:detail' relation.person_two.id %}">{{ relation.person_two.full_name }}</a></td>
+                            {% endif %}
                             <td>{{ relation.relationship.relation }}</td>
                             <td>{{ relation.definitive }}</td>
                         </tr>

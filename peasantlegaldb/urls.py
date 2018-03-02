@@ -111,7 +111,7 @@ person_detail_urls = [
         name='heriots'),
     url(r'^(?P<pk>\d+)/impercamentum_list', views.PersonDetailView.as_view(
         template_name='person/impercamentum_list.html'), name='impercamenta'),
-    url(r'^(?P<pk>\d+)/land_list', views.PeopleListView.as_view(template_name='person/land_list.html'),
+    url(r'^(?P<pk>\d+)/land_list', views.person_lists,
         name='lands'),
     url(r'^(?P<pk>\d+)/pledge_list', views.PeopleListView.as_view(template_name='person/pledge_list.html'), name='pledges'),
     url(r'^(?P<pk>\d+)/position_list', views.PeopleListView.as_view(template_name='person/position_list.html'),

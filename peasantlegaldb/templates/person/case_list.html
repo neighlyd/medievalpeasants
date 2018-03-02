@@ -1,9 +1,9 @@
 <div class="card">
     <h3 class="card-header text-center">Case List</h3>
     <div class="card-body">
-            <table class="table table-bordered table-hover" id="table" data-page-length="25">
+            <table class="table table-hover" id="table" data-page-length="25">
                 <thead>
-                    <th></th>
+                    <th>Summary</th>
                     <th>Case</th>
                     <th>Session</th>
                     <th>Court</th>
@@ -14,8 +14,13 @@
                 </thead>
                 <tbody>
                     {% for cases in list %}
+                        {% if cases.case.summary %}
+                        <tr data-toggle="collapse" data-target=".case_{{ cases.case.id }}_summary">
+                            <td class="details-control"><i class="fas fa-plus-square"></i></td>
+                        {% else %}
                         <tr>
-                            <td></td>
+                        <td></td>
+                        {% endif %}
                             <td><a href="{% url 'case:detail' cases.case.id %}">{{ cases.case.id }}</a></td>
                             <td><a href="{% url 'session:detail' cases.case.session.id %}">{{ cases.case.session }}</a></td>
                             <td>{{ cases.case.case_type.case_type }}</td>
@@ -24,6 +29,13 @@
                             <td>{{ cases.case.verdict.verdict }}</td>
                             <td>{{ cases.case.litigant_count }}</td>
                         </tr>
+                        {% if cases.case.summary %}
+                            <tr>
+                                <td colspan="8" class="hiddenRow">
+                                    <div class="collapse case_{{ cases.case.id }}_summary tab"><p>{{ cases.case.summary | linebreaks }}</p></div>
+                                </td>
+                            </tr>
+                        {% endif %}
                     {% endfor %}
                 </tbody>
             </table>
@@ -32,7 +44,7 @@
             <nav aria-label="Case list navigation">
                 <ul class="pagination">
                     {% if list.has_previous %}
-                        <li class="page-item" name="test"><a class="page-link" data-url="{% url 'person:cases' person %}?page={{ list.previous_page_number }}">&laquo;</a></li>
+                        <li class="page-item" name="test"><a class="page-link" data-url="{% url 'person:cases' person.id %}?page={{ list.previous_page_number }}">&laquo;</a></li>
                     {% else %}
                         <li class="page-item disabled" name="test"><span class="page-link">&laquo;</span></li>
                     {% endif %}
@@ -40,11 +52,11 @@
                     {% if list.number == i %}
                         <li class="page-item active" name="test"><span class="page-link">{{ i }}</span><span class="sr-only">(current)</span></li>
                     {% else %}
-                        <li class="page-item" name="test"><a class="page-link" data-url="{% url 'person:cases' person %}?page={{ i }}">{{ i }}</a></li>
+                        <li class="page-item" name="test"><a class="page-link" data-url="{% url 'person:cases' person.id %}?page={{ i }}">{{ i }}</a></li>
                     {% endif %}
                 {% endfor %}
                 {% if list.has_next %}
-                    <li class="page-item" name="test"><a class="page-link" data-url="{% url 'person:cases' person %}?page={{ list.next_page_number }}">&raquo;</a></li>
+                    <li class="page-item" name="test"><a class="page-link" data-url="{% url 'person:cases' person.id %}?page={{ list.next_page_number }}">&raquo;</a></li>
                 {% else %}
                     <li class="page-item disabled" name="test"><span class="page-link">&raquo;</span></li>
                 {% endif %}
@@ -55,6 +67,7 @@
     </div>
 </div>
 
+<!-- used to navigate pagination -->
 <script>
     $('.page-link').click(function(){
             var url = $(this).attr('data-url');

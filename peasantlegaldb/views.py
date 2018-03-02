@@ -658,6 +658,8 @@ def person_lists(request, pk):
     # get the last element of the requesting URL.
     path = request.path.split('/').pop()
 
+    person = models.Person.objects.get(id=pk)
+
     # Depending on the last element, assign the query
     if (path == 'case_list'):
         list = models.Litigant.objects.filter(person=pk).distinct().prefetch_related('case__session').order_by('case__session__date')
@@ -665,6 +667,8 @@ def person_lists(request, pk):
         list = models.Litigant.objects.filter(person=pk, damages__damage__isnull=False).distinct().prefetch_related('case__session').order_by('case__session__date')
     elif (path == 'relationship_list'):
         list = models.Relationship.objects.filter(Q(person_one=pk) | Q(person_two=pk))
+    elif (path == 'land_list'):
+        list = models.Litigant.objects.filter(person=pk, lands__isnull=False).prefetch_related('case__session').order_by('case__session__date')
 
     # TODO: lists - amercement, capitagium, fine, heriot, impercamentum, land, pledge, position.
 
@@ -685,7 +689,7 @@ def person_lists(request, pk):
     # Need to assign person context for in-page links and data-urls, such as the pagination buttons.
     context={
         'list': list,
-        'person': pk,
+        'person': person,
         'path': path,
     }
 

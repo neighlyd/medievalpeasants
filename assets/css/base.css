@@ -147,7 +147,7 @@ body {
     width: 100%;
 }
 
-td.details-control {
+.details-control {
     text-align:center;
     color:forestgreen;
     cursor: pointer;
@@ -156,4 +156,16 @@ td.details-control {
 tr.shown td.details-control {
     text-align:center;
     color:red;
+}
+
+/*
+  css for hiding the table-row when adding in collapsing rows. See: https://stackoverflow.com/questions/16389775/twitter-bootstrap-use-collapse-js-on-table-cells-almost-done
+ */
+
+.hiddenRow {
+    padding: 0 !important;
+}
+
+.tab {
+   text-indent: 40px;
 }
