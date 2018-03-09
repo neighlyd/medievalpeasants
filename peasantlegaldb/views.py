@@ -673,20 +673,20 @@ def person_lists(request, pk):
         query_list = models.Relationship.objects.filter(Q(person_one=pk) | Q(person_two=pk))
     elif path == 'land_list':
         query_list = models.Litigant.objects.filter(person=pk, lands__isnull=False).prefetch_related('case__session').order_by('case__session__date')
-    elif path == 'pledge_list':
-        # generate two querysets. One where the person pk is the giver and one where they are the receiver.
-        giver_list = models.Pledge.objects.filter(giver=pk).prefetch_related('receiver__person').order_by('receiver__person__last_name', 'receiver__person__first_name')
+    elif path == 'pledges_given_list':
+        query_list = models.Pledge.objects.filter(giver=pk).prefetch_related('receiver__person').order_by('receiver__case__session__date')
+    elif path == 'pledges_received_list':
         litigant_ids = models.Litigant.objects.filter(person=pk).values_list('id', flat=True)
-        receiver_list = models.Pledge.objects.filter(receiver__in=litigant_ids).prefetch_related('giver').order_by('giver__first_name', 'giver__last_name')
-        # use chain from itertools to join them together and then unite them into a list
-        query_list = list(chain(giver_list, receiver_list))
+        query_list = models.Pledge.objects.filter(receiver__in=litigant_ids).prefetch_related('giver').order_by('receiver__case__session__date')
+    elif path == 'amercement_list':
+        query_list = models.Litigant.objects.filter(person=pk, amercements__amercement__isnull=False).distinct().prefetch_related('case').order_by('case__session__date')
 
     # TODO: lists - amercement, capitagium, fine, heriot, impercamentum, land, pledge, position.
 
     # Check which page the url is on by getting the `?page=` param. If it is not 1, assign 1
     page = request.GET.get('page', 1)
     # Limit the list to 15 items.
-    paginator = Paginator(query_list, 10)
+    paginator = Paginator(query_list, 5)
 
     try:
         query_list = paginator.page(page)
@@ -701,7 +701,6 @@ def person_lists(request, pk):
     context={
         'list': query_list,
         'person': person,
-        'path': path,
     }
 
     data['html_list'] = render_to_string(template, context, request=request)

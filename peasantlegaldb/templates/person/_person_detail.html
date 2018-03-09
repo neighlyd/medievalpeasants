@@ -191,16 +191,36 @@
         $("#selection_list a").click(function(e){
             e.preventDefault();
             var url = $(this).attr('data-url');
+            var path = url.split('/').pop();
+            var personID = url.split('/')[2];
 
             $(this).addClass('active').siblings().removeClass('active');
 
-            if (url.split('/').pop() === "stats_list"){
+            if (path === "stats_list"){
                 $.ajax({
                    url: url,
                    type: 'get',
                    dataType: 'html',
                     success: function(data){
                        $('#list_info').html(data)
+                    }
+                });
+            } else if (path === "pledges"){
+                $('#list_info').html('<div id="pledges_given"></div><div id="pledges_received"></div>');
+                $.ajax({
+                    url: Urls['person:pledges_given'](personID),
+                    type: 'get',
+                    dataType: 'json',
+                    success: function(data){
+                        $('#pledges_given').html(data.html_list);
+                    }
+                });
+                $.ajax({
+                    url: Urls['person:pledges_received'](personID),
+                    type: 'get',
+                    dataType: 'json',
+                    success: function(data){
+                        $('#pledges_received').html(data.html_list)
                     }
                 });
             } else {
@@ -214,7 +234,6 @@
                 })
             }
         });
-
     });
 </script>
 
