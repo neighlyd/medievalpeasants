@@ -19,7 +19,7 @@
                     <td>{{ pledge.receiver.person.get_status_display }}</td>
                     <td>{{ pledge.receiver.person.get_gender_display }}</td>
                     <td><a href="{% url 'case:detail' pledge.receiver.case.id %}">{{ pledge.receiver.case.id }}</a></td>
-                    <td><a href="{% url 'session:detail' pledge.receiver.case.session.id %}">{{ pledge.receiver.case.session.date }}</a></td>
+                    <td><a href="{% url 'session:detail' pledge.receiver.case.session.id %}">{{ pledge.receiver.case.session }}</a></td>
                     <td>{{ pledge.receiver.case.get_court_type_display }}</td>
                     <td>{{ pledge.receiver.case.case_type.case_type }}</td>
                     <td>{{ pledge.receiver.case.verdict.verdict }}</td>

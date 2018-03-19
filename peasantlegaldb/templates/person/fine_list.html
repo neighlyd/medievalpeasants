@@ -4,8 +4,8 @@
             <table class="table table-bordered" id="table" data-page-length="25">
                 <thead>
                     <th>Case</th>
-                    <th>Fine</th>
                     <th>Session</th>
+                    <th>Fine</th>
                     <th>Court</th>
                     <th>Case Type</th>
                     <th>Role</th>
@@ -19,8 +19,8 @@
                             {% if forloop.first %}
                             <tr>
                                 <td rowspan="{{ length }}"><a href="{% url 'case:detail' fine.litigant.case.id %}">{{ fine.litigant.case.id }}</a></td>
-                                <td>{{ fine.fine }}</td>
                                 <td rowspan="{{ length }}"><a href="{% url 'case:detail' fine.litigant.case.session.id %}">{{ fine.litigant.case.session }}</a></td>
+                                <td>{{ fine.fine }}</td>
                                 <td rowspan="{{ length }}">{{ fine.litigant.case.get_court_type_display }}</td>
                                 <td rowspan="{{ length }}">{{ fine.litigant.case.case_type.case_type }}</td>
                                 <td rowspan="{{ length }}">{{ fine.litigant.role.role }}</td>

@@ -4,10 +4,10 @@
             <table class="table table-bordered" id="table" data-page-length="25">
                 <thead>
                     <th>Case</th>
+                    <th>Session</th>
                     <th>Animal</th>
                     <th>Amercement</th>
                     <th>Notes</th>
-                    <th>Session</th>
                     <th>Court</th>
                     <th>Case Type</th>
                     <th>Verdict</th>
@@ -19,11 +19,11 @@
                     {% for impercamentum in cases.impercamenta.all %}
                         {% if forloop.first %}
                             <tr>
-                                <td rowspan="{{ length }}">{{ impercamentum.litigant.case.id }}</td>
+                                <td rowspan="{{ length }}"><a href="{% url 'case:detail' impercamentum.litigant.case.id %}">{{ impercamentum.litigant.case.id }}</a></td>
+                                <td rowspan="{{ length }}"><a href="{% url 'session:detail' impercamentum.litigant.case.session.id %}">{{ impercamentum.litigant.case.session }}</a></td>
                                 <td>{{ impercamentum.quantity }} {{ impercamentum.animal }}</td>
                                 <td>{{ impercamentum.impercamentum }}</td>
                                 <td>{{ impercamentum.notes|linebreaksbr }}</td>
-                                <td rowspan="{{ length }}">{{ impercamentum.litigant.case.session }}</td>
                                 <td rowspan="{{ length }}">{{ impercamentum.litigant.case.get_court_type_display }}</td>
                                 <td rowspan="{{ length }}">{{ impercamentum.litigant.case.case_type.case_type }}</td>
                                 <td rowspan="{{ length }}">{{ impercamentum.litigant.case.verdict.verdict }}</td>

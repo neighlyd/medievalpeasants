@@ -4,9 +4,9 @@
             <table class="table table-bordered" id="table" data-page-length="25">
                 <thead>
                     <th>Case</th>
+                    <th>Session</th>
                     <th>Animal</th>
                     <th>Assessment</th>
-                    <th>Session</th>
                     <th>Court</th>
                     <th>Case Type</th>
                     <th>Role</th>
@@ -20,9 +20,9 @@
                             {% if forloop.first %}
                                 <tr>
                                     <td rowspan="{{ length }}"><a href="{% url 'case:detail' heriot.litigant.case.id %}">{{ heriot.litigant.case.id }}</a></td>
+                                    <td rowspan="{{ length }}"><a href="{% url 'session:detail' heriot.litigant.case.session.id %}">{{ heriot.litigant.case.session }}</a></td>
                                     <td>{{ heriot.quantity }} {{ heriot.animal }}</td>
                                     <td>{{ heriot.heriot }}</td>
-                                    <td rowspan="{{ length }}"><a href="{% url 'session:detail' heriot.litigant.case.session.id %}">{{ heriot.litigant.case.session }}</a></td>
                                     <td rowspan="{{ length }}">{{ heriot.litigant.case.get_court_type_display }}</td>
                                     <td rowspan="{{ length }}">{{ heriot.litigant.case.case_type.case_type }}</td>
                                     <td rowspan="{{ length }}">{{ heriot.litigant.role.role }}</td>
