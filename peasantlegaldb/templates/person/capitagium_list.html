@@ -1,120 +1,87 @@
 <div class="card">
-    <h3 class="card-header text-center">Chevage List</h3>
+    <h3 class="card-header text-center bg-grey">Chevage List</h3>
     <div class="card-body">
-            <table class="table table-bordered table-hover" id="table" data-page-length="25">
+            <table class="table table-bordered" id="table" data-page-length="25">
                 <thead>
                     <th>Case</th>
                     <th>Session</th>
-                    <th>Capitagium</th>
+                    <th>Assessment</th>
                     <th>Notes</th>
                     <th>Recessit</th>
                     <th>Crossed</th>
-                    <th>Habet Terram</th>
+                    <th>H. Terram</th>
+                    <th>Mortuus</th>
+                    <th>Litigants</th>
                 </thead>
+                    {% for cases in list %}
+                        {% with length=cases.capitagia.all|length %}
+                            {% for capitagium in cases.capitagia.all %}
+                <tbody>
+                                {% if forloop.first %}
+                                    <tr>
+                                        <td rowspan="{{ length }}"><a href="{% url 'case:detail' capitagium.litigant.case.id %}">{{ capitagium.litigant.case.id }}</a></td>
+                                        <td rowspan="{{ length }}"><a href="{% url 'session:detail' capitagium.litigant.case.session.id %}">{{ capitagium.litigant.case.session }}</a></td>
+                                        <td>{{ capitagium.capitagium }}</td>
+                                        <td>{{ capitagium.notes|linebreaksbr }}</td>
+                                        <td class="text-center">{% if capitagium.recessit %} X {% endif %}</td>
+                                        <td class="text-center">{% if capitagium.crossed %} X {% endif %}</td>
+                                        <td class="text-center">{% if capitagium.habet_terram %} X {% endif %}</td>
+                                        <td class="text-center">{% if capitagium.mortuus %} X {% endif %}</td>
+                                        <td rowspan="{{ length }}" class="text-center">{{ capitagium.litigant.case.litigant_count }}</td>
+                                    </tr>
+                                {% else %}
+                                    <tr>
+                                        <td>{{ capitagium.capitagium }}</td>
+                                        <td>{{ capitagium.notes|linebreaksbr }}</td>
+                                        <td class="text-center">{% if capitagium.recessit %} X {% endif %}</td>
+                                        <td class="text-center">{% if capitagium.crossed %} X {% endif %}</td>
+                                        <td class="text-center">{% if capitagium.habet_terram %} X {% endif %}</td>
+                                        <td class="text-center">{% if capitagium.mortuus %} X {% endif %}</td>
+                                    </tr>
+                                {% endif %}
+                </tbody>
+                            {% endfor %}
+                        {% endwith %}
+                    {% endfor %}
             </table>
-    </div>
 
+           {% if list.has_other_pages %}
+            <nav aria-label="Case list navigation">
+                <ul class="pagination">
+                    {% if list.has_previous %}
+                        <li class="page-item" name="test"><a class="page-link" data-url="{% url 'person:capitagium' person.id %}?page={{ list.previous_page_number }}">&laquo;</a></li>
+                    {% else %}
+                        <li class="page-item disabled" name="test"><span class="page-link">&laquo;</span></li>
+                    {% endif %}
+                {% for i in list.paginator.page_range %}
+                    {% if list.number == i %}
+                        <li class="page-item active" name="test"><span class="page-link">{{ i }}</span><span class="sr-only">(current)</span></li>
+                    {% else %}
+                        <li class="page-item" name="test"><a class="page-link" data-url="{% url 'person:capitagium' person.id %}?page={{ i }}">{{ i }}</a></li>
+                    {% endif %}
+                {% endfor %}
+                {% if list.has_next %}
+                    <li class="page-item" name="test"><a class="page-link" data-url="{% url 'person:capitagium' person.id %}?page={{ list.next_page_number }}">&raquo;</a></li>
+                {% else %}
+                    <li class="page-item disabled" name="test"><span class="page-link">&raquo;</span></li>
+                {% endif %}
+                </ul>
+            </nav>
+        {% endif %}
+
+    </div>
 </div>
 
 <script>
-    // provides format for nested table that displays when + sign is clicked.
-    function format( data ) {
-        return "<table class='table'>" +
-            "<tr>" +
-            "<td><b>Litigant Count:</b></td>" +
-            "<td>" + data.case.litigant_count + "</td>" +
-            "<td><b>Summary:</b></td>" +
-            "<td>"+data.case.summary+"</td>" +
-            "</tr>" +
-            "<tr>" +
-            "<td><b>Litigant List:</b></td>" +
-            "<td colspan='3'>" + list_litigants(data.case.litigant_list) + "</td>" +
-            "</tr>" +
-        "</table>"
-    }
-
-    $(document).ready(function () {
-        var url = window.location.pathname;
-        var id = url.split('/').reverse()[1];
-        url = Urls['api:person-detail'](id);
-        var api_url = url + "?include[]=cases.case.session.village&include[]=cases.case.litigant_list&include[]=cases.case.litigant_count&filter{cases|chevage.isnull}=false";
-        var table = $("#table").DataTable({
-            fixedHeader:{ headerOffset: 50 },
-            scrollX: true,
-            order: [2, "asc"],
-            ajax: {
-                url: api_url,
-                type: "GET",
-                dataSrc: "person.cases.",
-            },
-            "columns": [
-                {
-                    "class": "details-control",
-                    "orderable": false,
-                    "data": null,
-                    "defaultContent": "case",
-                    "render": checkNotes,
-                    width:"15px"
-                },
-                {data: "case.id",
-                    fnCreatedCell: function(nTd, cellData, rowData, row, col){
-                        $(nTd).html("<a href='" + Urls['case:detail'](rowData.case.id) + "'target='_blank'>" + rowData.case.id + "</a>");
-                    }
-                },
-                {data: "case.session",
-                    defaultContent: '',
-                    render: {
-                        display: formatSessionDate,
-                        sort: "date"
-                    }
-                },
-                {data: "chevage",
-                    defaultContent: '',
-                    render: {
-                        display: formatMoney,
-                        sort: "in_denarius"
-                    }
-                },
-                {data: "chevage_notes"},
-                {data: "recessit",
-                    defaultContent: '',
-                    render: {
-                        display: checkMaker,
-                    }
-                },
-                {data: "crossed",
-                    defaultContent: '',
-                    render: {
-                        display: checkMaker,
-                    },
-                },
-                {data: "habet_terram",
-                    defaultContent: '',
-                    render: {
-                        display: checkMaker,
-                    },
-                },
-            ]
+    $('.page-link').click(function(){
+            var url = $(this).attr('data-url');
+            $.ajax({
+                url: url,
+                type: 'get',
+                dataType: 'json',
+                success: function(data){
+                    $('#list_info').html(data.html_list);
+                }
+            })
         });
-
-        $('#table tbody').on('click', 'td.details-control', function(){
-            var tr = $(this).closest('tr');
-            var tdi = tr.find("i.fa");
-            var row = table.row( tr );
-
-            if ( row.child.isShown() ) {
-                row.child.hide();
-                tr.removeClass('shown');
-                tdi.first().removeClass('fa-minus-square');
-                tdi.first().addClass('fa-plus-square');
-            } else{
-                row.child( format( row.data() ) ).show();
-                tr.addClass('shown');
-                tdi.first().removeClass('fa-plus-square');
-                tdi.first().addClass('fa-minus-square');
-            }
-        });
-
-    });
-
 </script>

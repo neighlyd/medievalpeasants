@@ -15,6 +15,7 @@ TODO:
             end date certainty, notes, references (one-to-many?)]
 2) Move Village from Session to Manor
 3) Move Session counts to Manor from Village
+4) Fix multiple litigant instances of impercamentum, amercement, fines, damages, etc. 
 '''
 
 def median_value(queryset, term):
@@ -435,29 +436,29 @@ class Person(models.Model):
     @property
     def monetary_counts(self):
         return self.cases.aggregate(amercement_count=Count('amercements'),
-                                             amercement_max=Max('amercements__in_denarius'),
-                                             amercement_min=Min('amercements__in_denarius'),
-                                             amercement_avg=Avg('amercements__in_denarius'),
-                                             amercement_sum=Sum('amercements__in_denarius'), fine_count=Count('fines'),
-                                             fine_max=Max('fines__in_denarius'), fine_min=Min('fines__in_denarius'),
-                                             fine_avg=Avg('fines__in_denarius'), fine_sum=Sum('fines__in_denarius'),
-                                             damage_count=Count('damages'), damage_max=Max('damages__in_denarius'),
-                                             damage_min=Min('damages__in_denarius'),
-                                             damage_avg=Avg('damages__in_denarius'),
-                                             damage_sum=Sum('damages__in_denarius'), capitagium_count=Count('capitagia'),
-                                             capitagium_max=Max('capitagia__in_denarius'),
-                                             capitagium_min=Min('capitagia__in_denarius'),
-                                             capitagium_avg=Avg('capitagia__in_denarius'),
-                                             capitagium_sum=Sum('capitagia__in_denarius'), heriot_count=Count('heriots'),
-                                             heriot_max=Max('heriots__in_denarius'),
-                                             heriot_min=Min('heriots__in_denarius'),
-                                             heriot_avg=Avg('heriots__in_denarius'),
-                                             heriot_sum=Sum('heriots__in_denarius'),
+                                             amercement_max=Max('amercements__amercement__in_denarius'),
+                                             amercement_min=Min('amercements__amercement__in_denarius'),
+                                             amercement_avg=Avg('amercements__amercement__in_denarius'),
+                                             amercement_sum=Sum('amercements__amercement__in_denarius'), fine_count=Count('fines'),
+                                             fine_max=Max('fines__fine__in_denarius'), fine_min=Min('fines__fine__in_denarius'),
+                                             fine_avg=Avg('fines__fine__in_denarius'), fine_sum=Sum('fines__fine__in_denarius'),
+                                             damage_count=Count('damages'), damage_max=Max('damages__damage__in_denarius'),
+                                             damage_min=Min('damages__damage__in_denarius'),
+                                             damage_avg=Avg('damages__damage__in_denarius'),
+                                             damage_sum=Sum('damages__damage__in_denarius'), capitagium_count=Count('capitagia'),
+                                             capitagium_max=Max('capitagia__capitagium__in_denarius'),
+                                             capitagium_min=Min('capitagia__capitagium__in_denarius'),
+                                             capitagium_avg=Avg('capitagia__capitagium__in_denarius'),
+                                             capitagium_sum=Sum('capitagia__capitagium__in_denarius'), heriot_count=Count('heriots'),
+                                             heriot_max=Max('heriots__heriot__in_denarius'),
+                                             heriot_min=Min('heriots__heriot__in_denarius'),
+                                             heriot_avg=Avg('heriots__heriot__in_denarius'),
+                                             heriot_sum=Sum('heriots__heriot__in_denarius'),
                                              impercamentum_count=Count('impercamenta'),
-                                             impercamentum_max=Max('impercamenta__in_denarius'),
-                                             impercamentum_min=Min('impercamenta__in_denarius'),
-                                             impercamentum_avg=Avg('impercamenta__in_denarius'),
-                                             impercamentum_sum=Sum('impercamenta__in_denarius') )
+                                             impercamentum_max=Max('impercamenta__impercamentum__in_denarius'),
+                                             impercamentum_min=Min('impercamenta__impercamentum__in_denarius'),
+                                             impercamentum_avg=Avg('impercamenta__impercamentum__in_denarius'),
+                                             impercamentum_sum=Sum('impercamenta__impercamentum__in_denarius') )
 
     @property
     def amercement_exists(self):
@@ -828,6 +829,18 @@ class Litigant(models.Model):
     land = models.ForeignKey(Land, null=True, blank=True, on_delete=models.CASCADE, related_name='case_to_land')
     land_villeinage = models.NullBooleanField()
     land_notes = models.TextField(blank=True,)
+
+    @property
+    def impercamentum_denarius_total(self):
+        total = self.impercamenta.aggregate(total=Sum('impercamentum__in_denarius'))
+        total = total['total']
+        return total
+
+    @property
+    def impercamentum_animal_total(self):
+        total = self.impercamenta.aggregate(total=Sum('quantity'))
+        total = total['total']
+        return total
 
     # Used to check if a litigant has amercements, fines, etc. in templates.
     @property

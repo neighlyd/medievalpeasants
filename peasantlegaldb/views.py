@@ -665,28 +665,38 @@ def person_lists(request, pk):
     person = models.Person.objects.get(id=pk)
 
     # Depending on the last element, assign the query
-    if path == 'case_list':
-        query_list = models.Litigant.objects.filter(person=pk).distinct().prefetch_related('case__session').order_by('case__session__date')
+    if path == 'amercement_list':
+        query_list = models.Litigant.objects.filter(person=pk, amercements__amercement__isnull=False).distinct().prefetch_related('case').order_by('case__session__date')
+    elif path == 'capitagium_list':
+        query_list = models.Litigant.objects.filter(person=pk, capitagia__capitagium__isnull=False).distinct().prefetch_related('case').order_by('case__session__date')
+    elif path == 'case_list':
+        query_list = models.Litigant.objects.filter(person=pk).distinct().prefetch_related('case').order_by('case__session__date')
     elif path == 'damage_list':
-        query_list = models.Litigant.objects.filter(person=pk, damages__damage__isnull=False).distinct().prefetch_related('case__session').order_by('case__session__date')
-    elif path == 'relationship_list':
-        query_list = models.Relationship.objects.filter(Q(person_one=pk) | Q(person_two=pk))
+        query_list = models.Litigant.objects.filter(person=pk, damages__damage__isnull=False).distinct().prefetch_related('case').order_by('case__session__date')
+    elif path == 'fine_list':
+        query_list = models.Litigant.objects.filter(person=pk, fines__fine__isnull=False).distinct().prefetch_related('case').order_by('case__session__date')
+    elif path == 'heriot_list':
+        query_list = models.Litigant.objects.filter(person=pk, heriots__heriot__isnull=False).distinct().prefetch_related('case').order_by('case__session__date')
+    elif path == 'impercamentum_list':
+        query_list = models.Litigant.objects.filter(person=pk, impercamenta__impercamentum__isnull=False).distinct().prefetch_related('case').order_by('case__session__date')
     elif path == 'land_list':
-        query_list = models.Litigant.objects.filter(person=pk, lands__isnull=False).prefetch_related('case__session').order_by('case__session__date')
+        query_list = models.Litigant.objects.filter(person=pk, lands__isnull=False).distinct().prefetch_related('case').order_by('case__session__date')
     elif path == 'pledges_given_list':
         query_list = models.Pledge.objects.filter(giver=pk).prefetch_related('receiver__person').order_by('receiver__case__session__date')
     elif path == 'pledges_received_list':
         litigant_ids = models.Litigant.objects.filter(person=pk).values_list('id', flat=True)
         query_list = models.Pledge.objects.filter(receiver__in=litigant_ids).prefetch_related('giver').order_by('receiver__case__session__date')
-    elif path == 'amercement_list':
-        query_list = models.Litigant.objects.filter(person=pk, amercements__amercement__isnull=False).distinct().prefetch_related('case').order_by('case__session__date')
+    elif path == 'position_list':
+        query_list = models.Position.objects.filter(person=pk).prefetch_related('session').order_by('session__date')
+    elif path == 'relationship_list':
+        query_list = models.Relationship.objects.filter(Q(person_one=pk) | Q(person_two=pk))
 
-    # TODO: lists - amercement, capitagium, fine, heriot, impercamentum, land, pledge, position.
+    # TODO: lists - capitagium, fine, heriot, impercamentum, land, pledge, position.
 
     # Check which page the url is on by getting the `?page=` param. If it is not 1, assign 1
     page = request.GET.get('page', 1)
     # Limit the list to 15 items.
-    paginator = Paginator(query_list, 5)
+    paginator = Paginator(query_list, 10)
 
     try:
         query_list = paginator.page(page)
@@ -710,36 +720,36 @@ def person_lists(request, pk):
 class PersonDetailView(DetailView):
 
     model = models.Person
-    queryset = models.Person.objects.all().annotate(amercement_count=Count('cases__amercement'),
-                                                    amercement_max=Max('cases__amercement__in_denarius'),
-                                                    amercement_min=Min('cases__amercement__in_denarius'),
-                                                    amercement_avg=Avg('cases__amercement__in_denarius'),
-                                                    amercement_sum=Sum('cases__amercement__in_denarius'),
-                                                    fine_count=Count('cases__fine'),
-                                                    fine_max=Max('cases__fine__in_denarius'),
-                                                    fine_min=Min('cases__fine__in_denarius'),
-                                                    fine_avg=Avg('cases__fine__in_denarius'),
-                                                    fine_sum=Sum('cases__fine__in_denarius'),
-                                                    damage_count=Count('cases__damage'),
-                                                    damage_max=Max('cases__damage__in_denarius'),
-                                                    damage_min=Min('cases__damage__in_denarius'),
-                                                    damage_avg=Avg('cases__damage__in_denarius'),
-                                                    damage_sum=Sum('cases__damage__in_denarius'),
-                                                    chevage_count=Count('cases__chevage'),
-                                                    chevage_max=Max('cases__chevage__in_denarius'),
-                                                    chevage_min=Min('cases__chevage__in_denarius'),
-                                                    chevage_avg=Avg('cases__chevage__in_denarius'),
-                                                    chevage_sum=Sum('cases__chevage__in_denarius'),
-                                                    heriot_count=Count('cases__heriot'),
-                                                    heriot_max=Max('cases__heriot__in_denarius'),
-                                                    heriot_min=Min('cases__heriot__in_denarius'),
-                                                    heriot_avg=Avg('cases__heriot__in_denarius'),
-                                                    heriot_sum=Sum('cases__heriot__in_denarius'),
-                                                    impercamentum_count=Count('cases__impercamentum'),
-                                                    impercamentum_max=Max('cases__impercamentum__in_denarius'),
-                                                    impercamentum_min=Min('cases__impercamentum__in_denarius'),
-                                                    impercamentum_avg=Avg('cases__impercamentum__in_denarius'),
-                                                    impercamentum_sum=Sum('cases__impercamentum__in_denarius'))
+    queryset = models.Person.objects.all().annotate(amercement_count=Count('cases__amercements'),
+                                                    amercement_max=Max('cases__amercements__amercement__in_denarius'),
+                                                    amercement_min=Min('cases__amercements__amercement__in_denarius'),
+                                                    amercement_avg=Avg('cases__amercements__amercement__in_denarius'),
+                                                    amercement_sum=Sum('cases__amercements__amercement__in_denarius'),
+                                                    fine_count=Count('cases__fines'),
+                                                    fine_max=Max('cases__fines__fine__in_denarius'),
+                                                    fine_min=Min('cases__fines__fine__in_denarius'),
+                                                    fine_avg=Avg('cases__fines__fine__in_denarius'),
+                                                    fine_sum=Sum('cases__fines__fine__in_denarius'),
+                                                    damage_count=Count('cases__damages'),
+                                                    damage_max=Max('cases__damages__damage__in_denarius'),
+                                                    damage_min=Min('cases__damages__damage__in_denarius'),
+                                                    damage_avg=Avg('cases__damages__damage__in_denarius'),
+                                                    damage_sum=Sum('cases__damages__damage__in_denarius'),
+                                                    chevage_count=Count('cases__capitagia'),
+                                                    chevage_max=Max('cases__capitagia__capitagium__in_denarius'),
+                                                    chevage_min=Min('cases__capitagia__capitagium__in_denarius'),
+                                                    chevage_avg=Avg('cases__capitagia__capitagium__in_denarius'),
+                                                    chevage_sum=Sum('cases__capitagia__capitagium__in_denarius'),
+                                                    heriot_count=Count('cases__heriots'),
+                                                    heriot_max=Max('cases__heriots__heriot__in_denarius'),
+                                                    heriot_min=Min('cases__heriots__heriot__in_denarius'),
+                                                    heriot_avg=Avg('cases__heriots__heriot__in_denarius'),
+                                                    heriot_sum=Sum('cases__heriots__heriot__in_denarius'),
+                                                    impercamentum_count=Count('cases__impercamenta'),
+                                                    impercamentum_max=Max('cases__impercamenta__impercamentum__in_denarius'),
+                                                    impercamentum_min=Min('cases__impercamenta__impercamentum__in_denarius'),
+                                                    impercamentum_avg=Avg('cases__impercamenta__impercamentum__in_denarius'),
+                                                    impercamentum_sum=Sum('cases__impercamenta__impercamentum__in_denarius'))
 
     def get_context_data(self, **kwargs):
         context = super(PersonDetailView, self).get_context_data(**kwargs)

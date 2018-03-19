@@ -1,47 +1,86 @@
 <div class="card">
 
-    <h3 class="card-header text-center">Land History</h3>
+    <h3 class="card-header text-center bg-grey">Land History</h3>
     <div class="card-body">
-            <table class="table table-bordered table-hover" id="table" data-page-length="25">
+            <table class="table table-bordered" id="table" data-page-length="25">
                 <thead>
                     <th>Case</th>
                     <th>Session</th>
-                    <th>Village</th>
                     <th>Land ID</th>
                     <th>Parcels</th>
-                    <th>Villeinage?</th>
+                    <th>Villeinage</th>
                     <th>Role</th>
                     <th>Case Type</th>
                     <th>Verdict</th>
+                    <th>Litigants</th>
                 </thead>
                 <tbody>
-                        {% for case in list %}
+                    {% for case in list %}
                             {% for land in case.lands.all %}
-                    <tr>
-                        <td><a href="{% url 'case:detail' land.litigant.case.id %}">{{ land.litigant.case.id }}</a></td>
-                        <td><a href="{% url 'session:detail' land.litigant.case.session.id %}">{{ land.litigant.case.session.date }}</a></td>
-                        <td><a href="{% url 'village:detail' land.litigant.case.session.village.id %}">{{ land.litigant.case.session.village.name }}</a></td>
-                        <td><a href="{% url 'land:detail' land.id %}">{{ land.id }}</a></td>
-                        <td>{% for parcel in land.land.parcels.all %}
-                            {% if forloop.first %}{{ parcel.amount }} {{ parcel.parcel_type.parcel_type}} of {{ parcel.parcel_tenure.tenure }}
-                            {% else %}<hr>{{ parcel.amount }} {{ parcel.parcel_type.parcel_type}} of {{ parcel.parcel_tenure.tenure }}{% endif %}
-                            {% endfor %}</td>
-                        <td>{{ land.villeinage }}</td>
-                        <td>{{ land.litigant.role.role }}</td>
-                        <td>{{ land.litigant.case.case_type.case_type }}</td>
-                        <td>{{ land.litigant.case.verdict.verdict }}</td>
-                    </tr>
+                        <tr>
+                            <td><a href="{% url 'case:detail' land.litigant.case.id %}">{{ land.litigant.case.id }}</a></td>
+                            <td><a href="{% url 'session:detail' land.litigant.case.session.id %}">{{ land.litigant.case.session }}</a></td>
+                            <td><a href="{% url 'land:detail' land.id %}">{{ land.id }}</a></td>
+                            <td>{% for parcel in land.land.parcels.all %}
+                                {% if forloop.first %}{{ parcel.amount }} {{ parcel.parcel_type.parcel_type}} of {{ parcel.parcel_tenure.tenure }}
+                                {% else %}<hr>{{ parcel.amount }} {{ parcel.parcel_type.parcel_type}} of {{ parcel.parcel_tenure.tenure }}{% endif %}
+                                {% endfor %}</td>
+                            <td class="text-center">{% if land.villeinage %}X{% endif %}</td>
+                            <td>{{ land.litigant.role.role }}</td>
+                            <td>{{ land.litigant.case.case_type.case_type }}</td>
+                            <td>{{ land.litigant.case.verdict.verdict }}</td>
+                            <td class="text-center">{{ land.litigant.case.litigant_count }}</td>
+                        </tr>
                     {% if land.notes %}
                     <tr>
                         <td colspan="1">Notes:</td>
-                        <td colspan="8">{{ land.notes|linebreaks }}</td>
+                        <td colspan="9">{{ land.notes|linebreaks }}</td>
                     </tr>
-                        <tr><td colspan="9"></td></tr>
                                 {% endif %}
                             {% endfor %}
                         {% endfor %}
                 </tbody>
             </table>
+
+        {% if list.has_other_pages %}
+            <nav aria-label="Amercement list navigation">
+                <ul class="pagination">
+                    {% if list.has_previous %}
+                        <li class="page-item"><a class="page-link" data-url="{% url 'person:lands' person.id %}?page={{ list.previous_page_number }}">&laquo;</a></li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
+                    {% endif %}
+                {% for i in list.paginator.page_range %}
+                    {% if list.number == i %}
+                        <li class="page-item active"><span class="page-link">{{ i }}</span><span class="sr-only">(current)</span></li>
+                    {% else %}
+                        <li class="page-item"><a class="page-link" data-url="{% url 'person:lands' person.id %}?page={{ i }}">{{ i }}</a></li>
+                    {% endif %}
+                {% endfor %}
+                {% if list.has_next %}
+                    <li class="page-item"><a class="page-link" data-url="{% url 'person:lands' person.id %}?page={{ list.next_page_number }}">&raquo;</a></li>
+                {% else %}
+                    <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
+                {% endif %}
+                </ul>
+            </nav>
+        {% endif %}
+
     </div>
 
 </div>
+
+<!-- used to navigate pagination -->
+<script>
+    $('.page-link').click(function(){
+            var url = $(this).attr('data-url');
+            $.ajax({
+                url: url,
+                type: 'get',
+                dataType: 'json',
+                success: function(data){
+                    $('#list_info').html(data.html_list);
+                }
+            })
+        });
+</script>

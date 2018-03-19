@@ -36,7 +36,7 @@
     {% endif %}
         <br>
     {% if person.chevage_exists %}
-        <a class="list-group-item list-group-item-action" data-target="list_info" data-url="{% url 'person:capitagium' person.id %}">Chevage Cases</a>
+        <a class="list-group-item list-group-item-action" data-target="list_info" data-url="{% url 'person:capitagium' person.id %}">Capitagium Cases</a>
     {% endif %}
     {% if person.impercamentum_exists %}
         <a class="list-group-item list-group-item-action" data-target="list_info" data-url="{% url 'person:impercamenta' person.id %}">Impercamenta Cases</a>
@@ -50,7 +50,7 @@
 
 {% block center_bar %}
 
-<div class="card-header text-center">
+<div class="card-header text-center bg-grey">
     <h2 class="card-title">{{ person.full_name }}</h2>
     <h3 class="card-subtitle mb-2 text-muted">{{ person.village.name }}</h3>
 </div>
@@ -59,7 +59,7 @@
     <div class="d-flex justify-content-between flex-wrap">
 
         <div class="card p-0 col-lg-5">
-            <h3 class="card-header">Person Info:</h3>
+            <h3 class="card-header bg-grey">Person Info:</h3>
             <div class="card-body">
                 <table class="table table-sm">
                     <tr class="row m-0">
@@ -116,7 +116,7 @@
         </div>
 
         <div class="card p-0 col-lg-6">
-            <h3 class="card-header">Notes:</h3>
+            <h3 class="card-header bg-grey">Notes:</h3>
                 <div class="card-body">
 
                     <h6 class="card-text">
@@ -193,6 +193,7 @@
             var url = $(this).attr('data-url');
             var path = url.split('/').pop();
             var personID = url.split('/')[2];
+            console.log(path);
 
             $(this).addClass('active').siblings().removeClass('active');
 

@@ -1,6 +1,6 @@
-<h3 class="card-header text-center">Pledges Received</h3>
+<h3 class="card-header text-center bg-grey">Pledges Received</h3>
 <div class="card-body">
-    <table class="table table-bordered table-hover" id="pledges_received_list" data-page-length="25">
+    <table class="table table-bordered">
         <thead>
             <th>Grantor</th>
             <th>Status</th>
@@ -24,6 +24,10 @@
                     <td>{{ pledge.receiver.case.case_type.case_type }}</td>
                     <td>{{ pledge.receiver.case.verdict.verdict }}</td>
                     <td>{{ pledge.receiver.case.litigant_count }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="9" class="text-center">None</td>
                 </tr>
             {% endfor %}
         </tbody>

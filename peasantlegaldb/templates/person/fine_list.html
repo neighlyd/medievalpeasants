@@ -1,9 +1,8 @@
 <div class="card">
-    <h3 class="card-header text-center">Fine List</h3>
+    <h3 class="card-header text-center bg-grey">Fine List</h3>
     <div class="card-body">
-            <table class="table table-bordered table-hover" id="table" data-page-length="25">
+            <table class="table table-bordered" id="table" data-page-length="25">
                 <thead>
-                    <th></th>
                     <th>Case</th>
                     <th>Fine</th>
                     <th>Session</th>
@@ -11,96 +10,73 @@
                     <th>Case Type</th>
                     <th>Role</th>
                     <th>Verdict</th>
-                    <th>Litigant Count</th>
+                    <th>Litigants</th>
                 </thead>
+                <tbody>
+                {% for cases in list %}
+                    {% with length=cases.fines.all|length %}
+                        {% for fine in cases.fines.all %}
+                            {% if forloop.first %}
+                            <tr>
+                                <td rowspan="{{ length }}"><a href="{% url 'case:detail' fine.litigant.case.id %}">{{ fine.litigant.case.id }}</a></td>
+                                <td>{{ fine.fine }}</td>
+                                <td rowspan="{{ length }}"><a href="{% url 'case:detail' fine.litigant.case.session.id %}">{{ fine.litigant.case.session }}</a></td>
+                                <td rowspan="{{ length }}">{{ fine.litigant.case.get_court_type_display }}</td>
+                                <td rowspan="{{ length }}">{{ fine.litigant.case.case_type.case_type }}</td>
+                                <td rowspan="{{ length }}">{{ fine.litigant.role.role }}</td>
+                                <td rowspan="{{ length }}">{{ fine.litigant.case.verdict.verdict }}</td>
+                                <td rowspan="{{ length }}" class="text-center">{{ fine.litigant.case.litigant_count }}</td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td>{{ fine.fine }}</td>
+                            </tr>
+                            {% endif %}
+                        {% endfor %}
+                    {% endwith %}
+                {% endfor %}
+                </tbody>
             </table>
+
+        {% if list.has_other_pages %}
+            <nav aria-label="Amercement list navigation">
+                <ul class="pagination">
+                    {% if list.has_previous %}
+                        <li class="page-item"><a class="page-link" data-url="{% url 'person:fines' person.id %}?page={{ list.previous_page_number }}">&laquo;</a></li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
+                    {% endif %}
+                {% for i in list.paginator.page_range %}
+                    {% if list.number == i %}
+                        <li class="page-item active"><span class="page-link">{{ i }}</span><span class="sr-only">(current)</span></li>
+                    {% else %}
+                        <li class="page-item"><a class="page-link" data-url="{% url 'person:fines' person.id %}?page={{ i }}">{{ i }}</a></li>
+                    {% endif %}
+                {% endfor %}
+                {% if list.has_next %}
+                    <li class="page-item"><a class="page-link" data-url="{% url 'person:fines' person.id %}?page={{ list.next_page_number }}">&raquo;</a></li>
+                {% else %}
+                    <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
+                {% endif %}
+                </ul>
+            </nav>
+        {% endif %}
+
     </div>
 
 </div>
 
+<!-- used to navigate pagination -->
 <script>
-    // provides format for nested table that displays when + sign is clicked.
-    function format( data ) {
-        return "<table class='table'>" +
-            "<tr>" +
-            "<td><b>Summary:</b></td>" +
-            "<td>"+data.case.summary+"</td>" +
-            "</tr>" +
-            "<tr>" +
-            "<td><b>Litigant List:</b></td>" +
-            "<td>" + list_litigants(data.case.litigant_list) + "</td>" +
-            "</tr>" +
-        "</table>"
-    }
-
-    $(document).ready(function () {
-        var url = window.location.pathname;
-        var id = url.split('/').reverse()[1];
-        url = Urls['api:person-detail'](id);
-        var api_url = url + "?include[]=cases.case.session.village&include[]=cases.case.litigant_list&include[]=cases.case.litigant_count&filter{cases|fine.isnull}=false";
-        var table = $("#table").DataTable({
-            fixedHeader:{ headerOffset: 50 },
-            scrollX: true,
-            order: [4, "asc"],
-            ajax: {
-                url: api_url,
-                type: "GET",
-                dataSrc: "person.cases.",
-            },
-            "columns": [
-                {
-                    "class": "details-control",
-                    "orderable": false,
-                    "data": null,
-                    "defaultContent": "case",
-                    "render": checkNotes,
-                    width:"15px"
-                },
-                {data: "case.id",
-                    fnCreatedCell: function(nTd, cellData, rowData, row, col){
-                        $(nTd).html("<a href='" + Urls['case:detail'](rowData.case.id) + "'target='_blank'>" + rowData.case.id + "</a>");
-                    }
-                },
-                {data: "fine",
-                    defaultContent: '',
-                    render: {
-                        display: formatMoney,
-                        sort: "in_denarius"
-                    }
-                },
-                {data: "case.session",
-                    defaultContent: '',
-                    render: {
-                        display: formatSessionDate,
-                        sort: "date"
-                    }
-                },
-                {data: "case.court_type"},
-                {data: "case.case_type.case_type"},
-                {data: "role.role"},
-                {data: "case.verdict.verdict"},
-                {data: "case.litigant_count"}
-            ]
+    $('.page-link').click(function(){
+            var url = $(this).attr('data-url');
+            $.ajax({
+                url: url,
+                type: 'get',
+                dataType: 'json',
+                success: function(data){
+                    $('#list_info').html(data.html_list);
+                }
+            })
         });
-
-        $('#table tbody').on('click', 'td.details-control', function(){
-            var tr = $(this).closest('tr');
-            var tdi = tr.find("i.fa");
-            var row = table.row( tr );
-
-            if ( row.child.isShown() ) {
-                row.child.hide();
-                tr.removeClass('shown');
-                tdi.first().removeClass('fa-minus-square');
-                tdi.first().addClass('fa-plus-square');
-            } else{
-                row.child( format( row.data() ) ).show();
-                tr.addClass('shown');
-                tdi.first().removeClass('fa-plus-square');
-                tdi.first().addClass('fa-minus-square');
-            }
-        });
-
-    });
-
 </script>

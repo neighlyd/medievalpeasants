@@ -169,3 +169,11 @@ tr.shown td.details-control {
 .tab {
    text-indent: 40px;
 }
+
+/*
+  css for custom card backgrounds
+ */
+
+.bg-grey {
+  background-color: #bababa;
+}

@@ -1,51 +1,60 @@
 <div class="card">
-
-    <h3 class="card-header text-center">Positions</h3>
+    <h3 class="card-header text-center bg-grey">Positions</h3>
     <div class="card-body">
-            <table class="table table-bordered table-hover" id="person_position_list" data-page-length="25">
+            <table class="table table-bordered" id="person_position_list" data-page-length="25">
                 <thead>
                     <th>Title</th>
                     <th>Session</th>
                     <th>Definitive</th>
                 </thead>
+                <tbody>
+                    {% for position in list %}
+                        <td>{{ position.title }}</td>
+                        <td><a href="{% url 'session:detail' position.session.id %}">{{ position.session }}</a></td>
+                        <td class="text-center">{% if position.definitive %}X{% endif %}</td>
+                    {% endfor %}
+                </tbody>
             </table>
+
+        {% if list.has_other_pages %}
+            <nav aria-label="Amercement list navigation">
+                <ul class="pagination">
+                    {% if list.has_previous %}
+                        <li class="page-item"><a class="page-link" data-url="{% url 'person:positions' person.id %}?page={{ list.previous_page_number }}">&laquo;</a></li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
+                    {% endif %}
+                {% for i in list.paginator.page_range %}
+                    {% if list.number == i %}
+                        <li class="page-item active"><span class="page-link">{{ i }}</span><span class="sr-only">(current)</span></li>
+                    {% else %}
+                        <li class="page-item"><a class="page-link" data-url="{% url 'person:positions' person.id %}?page={{ i }}">{{ i }}</a></li>
+                    {% endif %}
+                {% endfor %}
+                {% if list.has_next %}
+                    <li class="page-item"><a class="page-link" data-url="{% url 'person:positions' person.id %}?page={{ list.next_page_number }}">&raquo;</a></li>
+                {% else %}
+                    <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
+                {% endif %}
+                </ul>
+            </nav>
+        {% endif %}
+
     </div>
 
 </div>
 
+<!-- used to navigate pagination -->
 <script>
-    // provides format for nested table that displays when + sign is clicked.
-
-    $(document).ready(function () {
-        var url = window.location.pathname;
-        var id = url.split('/').reverse()[1];
-        url = Urls["api:person-detail"](id);
-        var api_url = url + "?include[]=positions.session";
-        var position_table = $("#person_position_list").DataTable({
-            fixedHeader:{ headerOffset: 50 },
-            order: [2, "asc"],
-            ajax: {
-                url: api_url,
-                type: "GET",
-                dataSrc: "person.positions.",
-            },
-            "columns": [
-                {data: "title.title"},
-                {data: "session",
-                    defaultContent: '',
-                    render: {
-                        display: formatSessionDateNoVillage,
-                        sort: "date"
-                    }
-                },
-                {data: "definitive",
-                    defaultContent: '',
-                    render: {
-                        display: checkMaker,
-                    }
+    $('.page-link').click(function(){
+            var url = $(this).attr('data-url');
+            $.ajax({
+                url: url,
+                type: 'get',
+                dataType: 'json',
+                success: function(data){
+                    $('#list_info').html(data.html_list);
                 }
-            ]
-        })
-    });
-
+            })
+        });
 </script>
