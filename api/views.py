@@ -205,7 +205,7 @@ class PersonViewSet(DynamicModelViewSet):
         chain_filter['cases__heriot'] = self.request.query_params.get('heriot')
         chain_filter['cases__damage'] = self.request.query_params.get('damage')
         chain_filter['pledge_giver'] = self.request.query_params.get('pledges_given')
-        chain_filter['pledge_receiver'] = self.request.query_params.get('pledges_received')
+        chain_filter['cases__pledges'] = self.request.query_params.get('pledges_received')
         
         if not chain_filter:
             return queryset
