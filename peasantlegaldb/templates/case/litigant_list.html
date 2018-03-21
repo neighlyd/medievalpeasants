@@ -1,0 +1,28 @@
+<h3 class="card-header text-center bg-grey">Litigants</h3>
+    <div class="card-body">
+        <table class="table table-bordered" id="table">
+            <thead>
+                <th></th>
+                <th>Name</th>
+                <th>Role</th>
+                <th>Capitagium</th>
+                <th>Amerced</th>
+                <th>Fined</th>
+                <th>Damaged</th>
+                <th>Notes</th>
+                <th>Distrained</th>
+                <th>Attached</th>
+                <th>Bailed</th>
+                <th>Heriot</th>
+                <th>Land</th>
+                <th>Impercamentum</th>
+            </thead>
+            <tbody>
+            {% for litigant in list %}
+                <tr>
+                    <td>{{ litigant.person.full_name }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
