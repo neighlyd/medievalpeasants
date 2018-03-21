@@ -8,6 +8,7 @@ register = template.Library()
 def obj_classname(obj):
     return obj.__class__.__name__
 
+
 @register.filter
 def qs_classname(obj):
     return obj.model.__name__
@@ -27,6 +28,7 @@ def input_class(bound_field):
         elif field_type(bound_field) != 'PasswordInput':
             css_class = 'is-valid'
     return 'form-control {}'.format(css_class)
+
 
 @register.filter
 def has_group(user, group_name):

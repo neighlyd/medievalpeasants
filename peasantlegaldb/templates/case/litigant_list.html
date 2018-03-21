@@ -1,28 +1,40 @@
 <h3 class="card-header text-center bg-grey">Litigants</h3>
     <div class="card-body">
         <table class="table table-bordered" id="table">
+            {% for case in list %}
             <thead>
-                <th></th>
                 <th>Name</th>
                 <th>Role</th>
-                <th>Capitagium</th>
-                <th>Amerced</th>
-                <th>Fined</th>
-                <th>Damaged</th>
-                <th>Notes</th>
-                <th>Distrained</th>
+                {% if case.amercement_count > 0 %}<th>Amerced</th>{% endif %}
+                {% if case.cap_count > 0 %}<th>Capitagium</th>{% endif %}
+                {% if case.damage_count > 0 %}<th>Damaged</th>{% endif %}
+                {% if case.fine_count > 0 %}<th>Fined</th>{% endif %}
+                {% if case.heriot_count > 0 %}<th>Heriot</th>{% endif %}
+                {% if case.imperc_count > 0 %}<th>Impercamentum</th>{% endif %}
+                {% if case.land_count > 0  %}<th>Land</th>{% endif %}
                 <th>Attached</th>
                 <th>Bailed</th>
-                <th>Heriot</th>
-                <th>Land</th>
-                <th>Impercamentum</th>
+                <th>Distrained</th>
             </thead>
             <tbody>
-            {% for litigant in list %}
+                {% for litigant in case.litigants.all %}
                 <tr>
-                    <td>{{ litigant.person.full_name }}</td>
+                    <td><a href="{% url 'person:detail' litigant.person.id %}">{{ litigant.person.full_name }}</a></td>
+                    <td>{{ litigant.role.role }}</td>
+                    {% if case.amercement_count > 0 %}<td class="text-center">{% if litigant.amercements.all %}<b>X</b>{% endif %}</td>{% endif %}
+                    {% if case.cap_count > 0 %}<td class="text-center">{% if litigant.capitagia.all %}<b>X</b>{% endif %}</td>{% endif %}
+                    {% if case.damage_count > 0 %}<td class="text-center">{% if litigant.damages.all %}<b>X</b>{% endif %}</td>{% endif %}
+                    {% if case.fine_count > 0 %}<td class="text-center">{% if litigant.fines.all %}<b>X</b>{% endif %}</td>{% endif %}
+                    {% if case.heriot_count > 0 %}<td class="text-center">{% if litigant.heriots.all %}<b>X</b>{% endif %}</td>{% endif %}
+                    {% if case.imperc_count > 0 %}<td class="text-center">{% if litigant.impercamenta.all %}<b>X</b>{% endif %}</td>{% endif %}
+                    {% if case.land_count > 0 %}<td class="text-center">{% if litigant.lands.all %}<b>X</b>{% endif %}</td>{% endif %}
+                    <td class="text-center">{% if litigant.attached %}X{% endif %}</td>
+                    <td class="text-center">{% if litigant.bail %}X{% endif %}</td>
+                    <td class="text-center">{% if litigant.distrained %}X{% endif %}</td>
+
                 </tr>
             {% endfor %}
             </tbody>
+        {% endfor %}
         </table>
     </div>

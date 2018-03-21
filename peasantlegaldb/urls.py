@@ -27,7 +27,7 @@ archive_urls = [
 case_urls = [
     url(r'^list/$', views.CaseListView.as_view(template_name='case/_case_list.html'), name='list'),
     url(r'^(?P<pk>\d+)/$', views.CaseDetailView.as_view(template_name='case/_case_detail.html'), name='detail'),
-    url(r'^(?P<pk>\d+)/litigant_list', views.LitigantListView.as_view(template_name='case/case_litigant_list.html'),
+    url(r'^(?P<pk>\d+)/litigant_list', views.case_lists,
         name='litigants'),
     url(r'^(?P<pk>\d+)/land_list', views.CaseListView.as_view(template_name='case/case_land_list.html'), name='land'),
     url(r'^(?P<pk>\d+)/extrahura_list', views.CaseListView.as_view(template_name='case/case_extrahura_list.html'),

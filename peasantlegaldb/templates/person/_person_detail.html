@@ -50,7 +50,7 @@
 
 {% block center_bar %}
 
-<div class="card-header text-center bg-grey">
+<div class="card-header text-center">
     <h2 class="card-title">{{ person.full_name }}</h2>
     <h3 class="card-subtitle mb-2 text-muted">{{ person.village.name }}</h3>
 </div>
@@ -193,7 +193,6 @@
             var url = $(this).attr('data-url');
             var path = url.split('/').pop();
             var personID = url.split('/')[2];
-            console.log(path);
 
             $(this).addClass('active').siblings().removeClass('active');
 

@@ -188,7 +188,11 @@ def load_verdict_types(request):
 class CaseDetailView(DetailView):
 
     model = models.Case
-    queryset = models.Case.objects.all()
+    queryset = models.Case.objects.all()..prefetch_related('litigants__person', 'litigants__amercements',
+                                                                        'litigants__capitagia', 'litigants__damages',
+                                                                        'litigants__fines', 'litigants__heriots',
+                                                                        'litigants__impercamenta', 'litigants__land')\
+            .order_by('litigants__person__last_name', 'litigants__person__first_name')
     
     def get_context_data(self, **kwargs):
         context = super(CaseDetailView, self).get_context_data(**kwargs)
@@ -695,7 +699,7 @@ def person_lists(request, pk):
 
     # Check which page the url is on by getting the `?page=` param. If it is not 1, assign 1
     page = request.GET.get('page', 1)
-    # Limit the list to 15 items.
+    # Limit the list to 10 items.
     paginator = Paginator(query_list, 10)
 
     try:
@@ -716,6 +720,44 @@ def person_lists(request, pk):
     data['html_list'] = render_to_string(template, context, request=request)
     return JsonResponse(data)
 
+
+def case_lists(request, pk):
+
+    # see person_lists for details on logic.
+    data = dict()
+    path = request.path.split('/').pop()
+    case = models.Case.objects.get(id=pk)
+    if path == 'litigant_list':
+        query_list = models.Case.objects.filter(id=pk).prefetch_related('litigants__person', 'litigants__amercements',
+                                                                        'litigants__capitagia', 'litigants__damages',
+                                                                        'litigants__fines', 'litigants__heriots',
+                                                                        'litigants__impercamenta', 'litigants__land')\
+            .order_by('litigants__person__last_name', 'litigants__person__first_name')\
+            .annotate(amercement_count=Count('litigants__amercements'), cap_count=Count('litigants__capitagia'),
+                      damage_count=Count('litigants__damages'), fine_count=Count('litigants__fines'),
+                      heriot_count=Count('litigants__heriots'), imperc_count=Count('litigants__impercamenta'),
+                      land_count=Count('litigants__lands'))
+
+    page = request.GET.get('page', 1)
+    paginator = Paginator(query_list, 10)
+
+    try:
+        query_list = paginator.page(page)
+    except PageNotAnInteger:
+        query_list = paginator.page(1)
+    except EmptyPage:
+        query_list = paginator.page(paginator.num_pages)
+
+    template = 'case/' + path + '.html'
+
+    context = {
+        'list': query_list,
+        'case': case,
+    }
+
+    data['html_list'] = render_to_string(template, context, request=request)
+
+    return JsonResponse(data)
 
 class PersonDetailView(DetailView):
 

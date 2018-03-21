@@ -13,36 +13,36 @@
                     <th>Mortuus</th>
                     <th>Litigants</th>
                 </thead>
+                <tbody>
                     {% for cases in list %}
                         {% with length=cases.capitagia.all|length %}
                             {% for capitagium in cases.capitagia.all %}
-                <tbody>
                                 {% if forloop.first %}
                                     <tr>
                                         <td rowspan="{{ length }}"><a href="{% url 'case:detail' capitagium.litigant.case.id %}">{{ capitagium.litigant.case.id }}</a></td>
                                         <td rowspan="{{ length }}"><a href="{% url 'session:detail' capitagium.litigant.case.session.id %}">{{ capitagium.litigant.case.session }}</a></td>
                                         <td>{{ capitagium.capitagium }}</td>
-                                        <td>{{ capitagium.notes|linebreaksbr }}</td>
-                                        <td class="text-center">{% if capitagium.recessit %} X {% endif %}</td>
-                                        <td class="text-center">{% if capitagium.crossed %} X {% endif %}</td>
-                                        <td class="text-center">{% if capitagium.habet_terram %} X {% endif %}</td>
-                                        <td class="text-center">{% if capitagium.mortuus %} X {% endif %}</td>
+                                        <td>{{ capitagium.notes }}</td>
+                                        <td class="text-center">{% if capitagium.recessit %}X{% endif %}</td>
+                                        <td class="text-center">{% if capitagium.crossed %}X{% endif %}</td>
+                                        <td class="text-center">{% if capitagium.habet_terram %}X{% endif %}</td>
+                                        <td class="text-center">{% if capitagium.mortuus %}X{% endif %}</td>
                                         <td rowspan="{{ length }}" class="text-center">{{ capitagium.litigant.case.litigant_count }}</td>
                                     </tr>
                                 {% else %}
                                     <tr>
                                         <td>{{ capitagium.capitagium }}</td>
-                                        <td>{{ capitagium.notes|linebreaksbr }}</td>
-                                        <td class="text-center">{% if capitagium.recessit %} X {% endif %}</td>
-                                        <td class="text-center">{% if capitagium.crossed %} X {% endif %}</td>
-                                        <td class="text-center">{% if capitagium.habet_terram %} X {% endif %}</td>
-                                        <td class="text-center">{% if capitagium.mortuus %} X {% endif %}</td>
+                                        <td>{{ capitagium.notes }}</td>
+                                        <td class="text-center">{% if capitagium.recessit %}X{% endif %}</td>
+                                        <td class="text-center">{% if capitagium.crossed %}X{% endif %}</td>
+                                        <td class="text-center">{% if capitagium.habet_terram %}X{% endif %}</td>
+                                        <td class="text-center">{% if capitagium.mortuus %}X{% endif %}</td>
                                     </tr>
                                 {% endif %}
-                </tbody>
                             {% endfor %}
                         {% endwith %}
                     {% endfor %}
+                </tbody>
             </table>
 
            {% if list.has_other_pages %}
