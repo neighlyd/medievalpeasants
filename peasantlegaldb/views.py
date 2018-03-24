@@ -188,11 +188,16 @@ def load_verdict_types(request):
 class CaseDetailView(DetailView):
 
     model = models.Case
-    queryset = models.Case.objects.all()..prefetch_related('litigants__person', 'litigants__amercements',
-                                                                        'litigants__capitagia', 'litigants__damages',
-                                                                        'litigants__fines', 'litigants__heriots',
-                                                                        'litigants__impercamenta', 'litigants__land')\
-            .order_by('litigants__person__last_name', 'litigants__person__first_name')
+    queryset = models.Case.objects.all().prefetch_related('litigants__person', 'litigants__amercements',
+                                                          'litigants__capitagia', 'litigants__damages',
+                                                          'litigants__fines', 'litigants__heriots',
+                                                          'litigants__impercamenta', 'litigants__land')\
+        .order_by('litigants__person__last_name', 'litigants__person__first_name')\
+        .annotate(amercement_count=Count('litigants__amercements'), cap_count=Count('litigants__capitagia'),
+                  damage_count=Count('litigants__damages'), fine_count=Count('litigants__fines'),
+                  heriot_count=Count('litigants__heriots'), imperc_count=Count('litigants__impercamenta'),
+                  land_count=Count('litigants__lands'), attached_count=Count('litigants__attached'),
+                  bail_count=Count('litigants__bail'), distrain_count=Count('litigants__distrained'))
     
     def get_context_data(self, **kwargs):
         context = super(CaseDetailView, self).get_context_data(**kwargs)
