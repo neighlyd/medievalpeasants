@@ -65,10 +65,10 @@
                             {% for cap in litigant.capitagia.all %}
                                 {% if forloop.first %}
                                     <td>{{ cap.capitagium }}</td>
-                                    <td>{% if cap.crossed %}<b>X</b>{% endif %}</td>
-                                    <td>{% if cap.recessit %}<b>X</b>{% endif %}</td>
-                                    <td>{% if cap.habet_terram %}<b>X</b>{% endif %}</td>
-                                    <td>{% if cap.mortuus %}<b>X</b>{% endif %}</td>
+                                    <td class="text-center">{% if cap.crossed %}<b>X</b>{% endif %}</td>
+                                    <td class="text-center">{% if cap.recessit %}<b>X</b>{% endif %}</td>
+                                    <td class="text-center">{% if cap.habet_terram %}<b>X</b>{% endif %}</td>
+                                    <td class="text-center">{% if cap.mortuus %}<b>X</b>{% endif %}</td>
                                     <td>{{ cap.notes }}</td>
                                 {% endif %}
                             {% endfor %}
@@ -145,7 +145,7 @@
                                             {% endfor %}
                                         </ul>
                                     </td>
-                                    <td>{% if land.villeinage %}<b>X</b>{% endif %}</td>
+                                    <td class="text-center">{% if land.villeinage %}<b>X</b>{% endif %}</td>
                                     <td>{{ land.notes }}</td>
                                 {% endif %}
                             {% endfor %}
@@ -181,10 +181,10 @@
                                     {% for cap in litigant.capitagia.all %}
                                         {% if forloop.counter0 == i %}
                                             <td>{{ cap.capitagium }}</td>
-                                            <td>{% if cap.crossed %}<b>X</b>{% endif %}</td>
-                                            <td>{% if cap.recessit %}<b>X</b>{% endif %}</td>
-                                            <td>{% if cap.habet_terram %}<b>X</b>{% endif %}</td>
-                                            <td>{% if cap.mortuus %}<b>X</b>{% endif %}</td>
+                                            <td class="text-center">{% if cap.crossed %}<b>X</b>{% endif %}</td>
+                                            <td class="text-center">{% if cap.recessit %}<b>X</b>{% endif %}</td>
+                                            <td class="text-center">{% if cap.habet_terram %}<b>X</b>{% endif %}</td>
+                                            <td class="text-center">{% if cap.mortuus %}<b>X</b>{% endif %}</td>
                                             <td>{{ cap.notes }}</td>
                                         {% endif %}
                                     {% endfor %}
@@ -266,7 +266,7 @@
                                                     {% endfor %}
                                                 </ul>
                                             </td>
-                                            <td>{% if land.villeinage %}<b>X</b>{% endif %}</td>
+                                            <td class="text-center">{% if land.villeinage %}<b>X</b>{% endif %}</td>
                                             <td>{{ land.notes }}</td>
                                         {% endif %}
                                     {% endfor %}

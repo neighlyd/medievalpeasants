@@ -12,19 +12,19 @@
         <a class="nav-link" data-toggle="pill" role="tab" href="#list_amercements" aria-controls="list_amercements" aria-selected="false">Show Amercements</a>
     {% endif %}
     {% if case.cornbot_exist %}
-        <a class="nav-link" data-toggle="pill" role="tab" href="#list_cornbot" aria-controls="list_cornbot" aria-selected="false" %}">Show Cornbot</a>
+        <a class="nav-link" data-toggle="pill" role="tab" href="#list_cornbot" aria-controls="list_cornbot" aria-selected="false">Show Cornbot</a>
     {% endif %}
     {% if case.extrahura_exist %}
-        <a class="nav-link" data-toggle="pill" role="tab" href="#list_extrahura" aria-controls="list_extrahura" aria-selected="false" %}">Show Extrahura</a>
+        <a class="nav-link" data-toggle="pill" role="tab" href="#list_extrahura" aria-controls="list_extrahura" aria-selected="false">Show Extrahura</a>
     {% endif %}
     {% if case.land_exist %}
-        <a class="nav-link" data-toggle="pill" role="tab" href="#list_lands" aria-controls="list_lands" aria-selected="false" %}">Show Land</a>
+        <a class="nav-link" data-toggle="pill" role="tab" href="#list_lands" aria-controls="list_lands" aria-selected="false">Show Land</a>
     {% endif %}
     {% if case.mentioned_exist %}
-        <a class="nav-link" data-toggle="pill" role="tab" href="#list_places" aria-controls="list_places" aria-selected="false" %}">Show Places Mentioned</a>
+        <a class="nav-link" data-toggle="pill" role="tab" href="#list_places" aria-controls="list_places" aria-selected="false">Show Places Mentioned</a>
     {% endif %}
     {% if case.murrain_exist %}
-        <a class="nav-link" data-toggle="pill" role="tab" href="#list_murrains" aria-controls="list_murrains" aria-selected="false" %}">Show Murrain</a>
+        <a class="nav-link" data-toggle="pill" role="tab" href="#list_murrains" aria-controls="list_murrains" aria-selected="false">Show Murrain</a>
     {% endif %}
     {% if case.pledge_exist %}
         <a class="nav-link" data-toggle="pill" role="tab" href="#list_pledges" aria-controls="list_pledges" aria-selected="false">Show Pledges</a>
@@ -70,56 +70,46 @@
                                     <td class="d-inline-block col-4"><b>Pledge Count:</b></td>
                                     <td class="d-inline-block col-8">{{ case.pledge_count }}</td>
                                 </tr>
+                                {% if case.of_interest %}
                                 <tr class="row m-0">
                                     <td class="d-inline-block col-4"><b>Case of Interest?</b></td>
                                     <td  class="d-inline-block col-8">
-                                        {% if case.of_interest %}
                                             Yes
-                                        {% else %}
-                                            No
-                                        {% endif %}
                                     </td>
+                                {% endif %}
                                 </tr>
+                                {% if case.ad_legem %}
                                 <tr class="row m-0">
                                     <td class="d-inline-block col-4"><b>At Law?</b></td>
                                     <td class="d-inline-block col-8">
-                                        {% if case.ad_legem %}
                                             Yes
-                                        {% else %}
-                                            No
-                                        {% endif %}
                                     </td>
                                 </tr>
+                                {% endif %}
+                                {% if case.villeinage_mention %}
                                 <tr class="row m-0">
                                     <td class="d-inline-block col-4"><b>Villeinage?</b></td>
                                     <td class="d-inline-block col-8">
-                                        {% if case.villeinage_mention %}
                                             Yes
-                                        {% else %}
-                                            No
-                                        {% endif %}
                                     </td>
                                 </tr>
+                                {% endif %}
+                                {% if case.active_sale%}
                                 <tr class="row m-0">
                                     <td class="d-inline-block col-4"><b>Active Sale?</b></td>
                                     <td class="d-inline-block col-8">
-                                        {% if case.active_sale%}
                                             Yes
-                                        {% else %}
-                                            No
-                                        {% endif %}
                                     </td>
                                 </tr>
+                                {% endif %}
+                                {% if case.incidental_land%}
                                 <tr class="row m-0">
                                     <td class="d-inline-block col-4"><b>Incidental Land?</b></td>
                                     <td class="d-inline-block col-8">
-                                        {% if case.incidental_land%}
                                             Yes
-                                        {% else %}
-                                            No
-                                        {% endif %}
                                     </td>
                                 </tr>
+                                {% endif %}
 
                             </table>
                         </div>

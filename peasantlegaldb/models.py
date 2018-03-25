@@ -691,7 +691,7 @@ class Case(models.Model):
         (1, 'Hallmoot'),
         (2, 'Tourn'),
         (3, 'Impercamentum'),
-        (4, 'Chevage'),
+        (4, 'Capitagium'),
         (5, 'Unknown'),
         (6, 'Account Roll'),
     }
