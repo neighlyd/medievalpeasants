@@ -724,8 +724,8 @@ class Case(models.Model):
     @property
     def pledge_count(self):
         pledge_count = []
-        for case in self.litigants.all():
-            for pledge in case.pledges.all():
+        for litigant in self.litigants.all():
+            for pledge in litigant.pledges.all():
                 pledge_count.append(pledge.giver_id)
                 pledge_count.append(pledge.receiver_id)
         pledge_count = len(set(pledge_count))

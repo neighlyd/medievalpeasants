@@ -1,0 +1,25 @@
+<h3 class="card-header text-center bg-grey">Pledges</h3>
+<div class="card-body">
+    <table class="table table-bordered table-hover" id="pledges_list" data-page-length="25">
+        <thead>
+            <th>Grantor</th>
+            <th>Grantor Status</th>
+            <th>Grantor Gender</th>
+            <th>Recipient</th>
+            <th>Recipient Status</th>
+            <th>Recipient Gender</th>
+        </thead>
+        <tbody>
+        {% for litigant in case.litigants.all %}
+            {% for pledge in litigant.pledges.all %}
+                <td><a href="{% url 'person:detail' pledge.giver.id %}">{{ pledge.giver.full_name }}</a></td>
+                <td>{{ pledge.giver.get_status_display }}</td>
+                <td>{{ pledge.giver.get_gender_display }}</td>
+                <td><a href="{% url 'person:detail' pledge.receiver.person.id %}">{{ pledge.receiver.person.full_name }}</a></td>
+                <td>{{ pledge.receiver.person.get_status_display }}</td>
+                <td>{{ pledge.receiver.person.get_gender_display }}</td>
+            {% endfor %}
+        {% endfor %}
+        </tbody>
+    </table>
+</div>

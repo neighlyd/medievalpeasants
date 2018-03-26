@@ -1,0 +1,31 @@
+<h3 class="card-header text-center bg-grey">Places Mentioned List</h3>
+    <div class="card-body">
+            <table class="table table-bordered" id="table" data-page-length="25">
+                <thead>
+                    <th>Village</th>
+                    <th>County</th>
+                    <th>Great Rumor</th>
+                    <th>Ancient Demesne</th>
+                    <th>Sessions</th>
+                    <th>Cases</th>
+                    <th>Residents</th>
+                    <th>Litigants</th>
+                    <th>Notes</th>
+                </thead>
+                <tbody>
+                    {% for place in case.placementioned_set.all %}
+                        <tr>
+                            <td><a href="{% url 'village:detail' place.village.id %}">{{ place.village.name }}</a></td>
+                            <td><a href="{% url 'county:detail' place.village.county.id %}">{{ place.village.county.name }}</a></td>
+                            <td class="text-center">{% if place.village.great_rumor %}<b>X</b>{% endif %}</td>
+                            <td class="text-center">{% if place.village.ancient_demesne %}<b>X</b>{% endif %}</td>
+                            <td>{{ place.village.session_count }}</td>
+                            <td>{{ place.village.case_count }}</td>
+                            <td>{{ place.village.resident_count }}</td>
+                            <td>{{ place.village.litigant_count }}</td>
+                            <td>{{ place.notes }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+    </div>

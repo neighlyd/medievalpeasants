@@ -5,29 +5,24 @@
 {% endblock %}
 
 {% block left_sidebar %}
-    {% if case.litigant_exist %}
-        <a class="nav-link active" data-toggle="pill" role="tab" href="#list_litigants" aria-controls="list_litigants" aria-selected="true">Show Litigants</a>
-    {% endif %}
-    {% if case.amercement_count > 0 %}
-        <a class="nav-link" data-toggle="pill" role="tab" href="#list_amercements" aria-controls="list_amercements" aria-selected="false">Show Amercements</a>
-    {% endif %}
+        <a class="list-group-item list-group-item-action active" data-toggle="list" role="tab" href="#list_litigants" aria-controls="list_litigants" aria-selected="true">Show Litigants</a>
     {% if case.cornbot_exist %}
-        <a class="nav-link" data-toggle="pill" role="tab" href="#list_cornbot" aria-controls="list_cornbot" aria-selected="false">Show Cornbot</a>
+        <a class="list-group-item list-group-item-action" data-toggle="list" role="tab" href="#list_cornbot" aria-controls="list_cornbot" aria-selected="false">Show Cornbot</a>
     {% endif %}
     {% if case.extrahura_exist %}
-        <a class="nav-link" data-toggle="pill" role="tab" href="#list_extrahura" aria-controls="list_extrahura" aria-selected="false">Show Extrahura</a>
+        <a class="list-group-item list-group-item-action" data-toggle="list" role="tab" href="#list_extrahura" aria-controls="list_extrahura" aria-selected="false">Show Extrahura</a>
     {% endif %}
     {% if case.land_exist %}
-        <a class="nav-link" data-toggle="pill" role="tab" href="#list_lands" aria-controls="list_lands" aria-selected="false">Show Land</a>
+        <a class="list-group-item list-group-item-action" data-toggle="list" role="tab" href="#list_lands" aria-controls="list_lands" aria-selected="false">Show Land</a>
     {% endif %}
     {% if case.mentioned_exist %}
-        <a class="nav-link" data-toggle="pill" role="tab" href="#list_places" aria-controls="list_places" aria-selected="false">Show Places Mentioned</a>
+        <a class="list-group-item list-group-item-action" data-toggle="list" role="tab" href="#list_places" aria-controls="list_places" aria-selected="false">Show Places Mentioned</a>
     {% endif %}
     {% if case.murrain_exist %}
-        <a class="nav-link" data-toggle="pill" role="tab" href="#list_murrains" aria-controls="list_murrains" aria-selected="false">Show Murrain</a>
+        <a class="list-group-item list-group-item-action" data-toggle="list" role="tab" href="#list_murrains" aria-controls="list_murrains" aria-selected="false">Show Murrain</a>
     {% endif %}
     {% if case.pledge_exist %}
-        <a class="nav-link" data-toggle="pill" role="tab" href="#list_pledges" aria-controls="list_pledges" aria-selected="false">Show Pledges</a>
+        <a class="list-group-item list-group-item-action" data-toggle="list" role="tab" href="#list_pledges" aria-controls="list_pledges" aria-selected="false">Show Pledges</a>
     {% endif %}
 {% endblock %}
 
@@ -62,14 +57,18 @@
                                     <td class="d-inline-block col-4"><b>Verdict:</b></td>
                                     <td class="d-inline-block col-8">{{ case.verdict.verdict}}</td>
                                 </tr>
+                                {% if case.litigant_count > 0 %}
                                 <tr class="row m-0">
                                     <td class="d-inline-block col-4"><b>Litigant Count:</b></td>
                                     <td class="d-inline-block col-8">{{ case.litigant_count }}</td>
                                 </tr>
+                                {% endif %}
+                                {% if case.pledges_count > 0 %}
                                 <tr class="row m-0">
                                     <td class="d-inline-block col-4"><b>Pledge Count:</b></td>
-                                    <td class="d-inline-block col-8">{{ case.pledge_count }}</td>
+                                    <td class="d-inline-block col-8">{{ case.pledges_count }}</td>
                                 </tr>
+                                {% endif %}
                                 {% if case.of_interest %}
                                 <tr class="row m-0">
                                     <td class="d-inline-block col-4"><b>Case of Interest?</b></td>
@@ -131,14 +130,12 @@
 
 <div class="tab-content" id="lists">
     <div class="tab-pane fade show active" id="list_litigants" role="tabpanel">{% include 'case/litigant_list.html' %}</div>
-    <div class="tab-pane fade" id="list_amercements" role="tabpanel">{% include 'case/amercement_list.html' %}</div>
-    <div class="tab-pane fade" id="list_lands" role="tabpanel">{% include 'case/litigant_list.html' %}</div>
-    <div class="tab-pane fade" id="list_cornbot" role="tabpanel">{% include 'case/litigant_list.html' %}</div>
-    <div class="tab-pane fade" id="list_extrahura" role="tabpanel">{% include 'case/litigant_list.html' %}</div>
-    <div class="tab-pane fade" id="list_lands" role="tabpanel">{% include 'case/litigant_list.html' %}</div>
-    <div class="tab-pane fade" id="list_places" role="tabpanel">{% include 'case/litigant_list.html' %}</div>
-    <div class="tab-pane fade" id="list_murrains" role="tabpanel">{% include 'case/litigant_list.html' %}</div>
-    <div class="tab-pane fade" id="list_pledges" role="tabpanel">{% include 'case/litigant_list.html' %}</div>
+    <div class="tab-pane fade" id="list_cornbot" role="tabpanel">{% include 'case/cornbot_list.html' %}</div>
+    <div class="tab-pane fade" id="list_extrahura" role="tabpanel">{% include 'case/extrahura_list.html' %}</div>
+    <div class="tab-pane fade" id="list_lands" role="tabpanel">{% include 'case/land_list.html' %}</div>
+    <div class="tab-pane fade" id="list_places" role="tabpanel">{% include 'case/mentioned_list.html' %}</div>
+    <div class="tab-pane fade" id="list_murrains" role="tabpanel">{% include 'case/murrain_list.html' %}</div>
+    <div class="tab-pane fade" id="list_pledges" role="tabpanel">{% include 'case/pledge_list.html' %}</div>
 </div>
 
 {% endblock %}

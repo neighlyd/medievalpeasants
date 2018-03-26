@@ -197,11 +197,14 @@ class CaseDetailView(DetailView):
                   damage_count=Count('litigants__damages'), fine_count=Count('litigants__fines'),
                   heriot_count=Count('litigants__heriots'), imperc_count=Count('litigants__impercamenta'),
                   land_count=Count('litigants__lands'), attached_count=Count('litigants__attached'),
-                  bail_count=Count('litigants__bail'), distrain_count=Count('litigants__distrained'))
+                  bail_count=Count('litigants__bail'), distrain_count=Count('litigants__distrained'),
+                  pledges_count=Count('litigants__pledges'))
     
     def get_context_data(self, **kwargs):
         context = super(CaseDetailView, self).get_context_data(**kwargs)
+        lands = models.Land.objects.filter(landtocase__litigant__case=self.object.id).distinct()
         context['page_title'] = 'Case'
+        context['lands'] = lands
         return context
 
 

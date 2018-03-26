@@ -1,0 +1,15 @@
+<h3 class="card-header text-center bg-grey">Murrain</h3>
+    <div class="card-body">
+            <table class="table table-bordered" id="table" data-page-length="25">
+                <thead>
+                    <th>Animal</th>
+                    <th>Notes</th>
+                </thead>
+                <tbody>
+                    {% for murrain in case.murrain.all %}
+                        <td>{{ murrain.amount }} {{ murrain.animal }}</td>
+                        <td>{{ murrain.notes }}</td>
+                    {% endfor %}
+                </tbody>
+            </table>
+    </div>

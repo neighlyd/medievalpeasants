@@ -1,0 +1,19 @@
+<h3 class="card-header text-center bg-grey">Cornbot</h3>
+    <div class="card-body">
+            <table class="table table-bordered" id="table" data-page-length="25">
+                <thead>
+                    <th>Cornbot</th>
+                    <th>Assessed Price</th>
+                    <th>Notes</th>
+                </thead>
+                <tbody>
+                    {% for cornbot in case.cornbot.all %}
+                        <tr>
+                            <td>{{ cornbot.amount }} of {{ cornbot.crop_type }}</td>
+                            <td>{{ cornbot.price }}</td>
+                            <td>{{ cornbot.notes }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+    </div>

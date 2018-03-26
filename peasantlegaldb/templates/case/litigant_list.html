@@ -1,6 +1,7 @@
 {% load template_tags %}
 <h3 class="card-header text-center bg-grey">Litigants</h3>
     <div class="card-body">
+        {% if case.litigants.all %}
         <table class="table table-bordered" id="table">
             <thead>
                 <th>Name</th>
@@ -43,246 +44,253 @@
                 {% if case.distrain_count > 0 %}<th>Distrained</th>{% endif %}
             </thead>
             <tbody>
-                {% for litigant in case.litigants.all %}
+            {% for litigant in case.litigants.all %}
                     {% with mcia_length=litigant.amercements.all|length cap_length=litigant.capitagia.all|length dam_length=litigant.damages.all|length fine_length=litigant.fines.all|length heriot_length=litigant.heriots.all|length imperc_length=litigant.impercamenta.all|length land_length=litigant.lands.all|length %}
                     {% max_length mcia_length cap_length dam_length fine_length heriot_length imperc_length land_length as max_length %}
-                <tr>
-                    <td rowspan="{{ max_length }}"><a href="{% url 'person:detail' litigant.person.id %}">{{ litigant.person.full_name }}</a></td>
-                    <td rowspan="{{ max_length }}">{{ litigant.role.role }}</td>
-                    {% if case.amercement_count > 0 %}
-                        {% if litigant.amercements.all %}
-                            {% for amercement in litigant.amercements.all %}
-                                {% if forloop.first %}
-                                    <td>{{ amercement.amercement }}</td>
-                                {% endif %}
-                            {% endfor %}
-                        {% else %}
-                            <td></td>
-                        {% endif %}
-                    {% endif %}
-                    {% if case.cap_count > 0 %}
-                        {% if litigant.capitagia.all %}
-                            {% for cap in litigant.capitagia.all %}
-                                {% if forloop.first %}
-                                    <td>{{ cap.capitagium }}</td>
-                                    <td class="text-center">{% if cap.crossed %}<b>X</b>{% endif %}</td>
-                                    <td class="text-center">{% if cap.recessit %}<b>X</b>{% endif %}</td>
-                                    <td class="text-center">{% if cap.habet_terram %}<b>X</b>{% endif %}</td>
-                                    <td class="text-center">{% if cap.mortuus %}<b>X</b>{% endif %}</td>
-                                    <td>{{ cap.notes }}</td>
-                                {% endif %}
-                            {% endfor %}
-                        {% else %}
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        {% endif %}
-                    {% endif %}
-                    {% if case.damage_count > 0 %}
-                        {% if litigant.damages.all %}
-                            {% for damage in litigant.damages.all %}
-                                {% if forloop.first %}
-                                    <td>{{ damage.damage }}</td>
-                                    <td>{{ damage.notes }}</td>
-                                {% endif %}
-                            {% endfor %}
-                        {% else %}
-                            <td></td>
-                            <td></td>
-                        {% endif %}
-                    {% endif %}
-                    {% if case.fine_count > 0 %}
-                        {% if litigant.fines.all %}
-                            {% for fine in litigant.fines.all %}
-                                {% if forloop.first %}
-                                    <td>{{ fine.fine }}</td>
-                                {% endif %}
-                            {% endfor %}
-                        {% else %}
-                            <td></td>
-                        {% endif %}
-                    {% endif %}
-                    {% if case.heriot_count > 0 %}
-                        {% if litigant.heriots.all %}
-                            {% for heriot in litigant.heriots.all %}
-                                {% if forloop.first %}
-                                    <td>{{ heriot.quantity }} {{ heriot.animal }}</td>
-                                    <td>{{ heriot.heriot }}</td>
-                                {% endif %}
-                            {% endfor %}
-                        {% else %}
-                            <td></td>
-                            <td></td>
-                        {% endif %}
-                    {% endif %}
-                    {% if case.imperc_count > 0 %}
-                        {% if litigant.impercamenta.all %}
-                            {% for imperc in litigant.impercamenta.all %}
-                                {% if forloop.first %}
-                                    <td>{{ imperc.quantity }} {{ imperc.animal }}</td>
-                                    <td>{{ imperc.impercamentum }}</td>
-                                    <td>{{ imperc.notes }}</td>
-                                {% endif %}
-                            {% endfor %}
-                        {% else %}
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        {% endif %}
-                    {% endif %}
-                    {% if case.land_count > 0 %}
-                        {% if litigant.lands.all %}
-                            {% for land in litigant.lands.all %}
-                                {% if forloop.first %}
-                                    <td><a href="{% url 'land:detail' land.id %}">{{ land.id }}</a></td>
-                                    <td>
-                                        <ul class="list-group">
-                                            {% for parcel in land.land.parcels.all %}
-                                                <li class="list-group-item">{{ parcel.amount }} {{ parcel.parcel_type.parcel_type }} of {{ parcel.parcel_tenure.tenure }}</li>
-                                            {% endfor %}
-                                        </ul>
-                                    </td>
-                                    <td class="text-center">{% if land.villeinage %}<b>X</b>{% endif %}</td>
-                                    <td>{{ land.notes }}</td>
-                                {% endif %}
-                            {% endfor %}
-                        {% else %}
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        {% endif %}
-                    {% endif %}
-                    {% if case.attached_count > 0  %}<td rowspan="{{ max_length }}" class="text-center">{% if litigant.attached %}<b>X</b>{% endif %}</td>{% endif %}
-                    {% if case.bail_count > 0 %}<td rowspan="{{ max_length }}" class="text-center">{% if litigant.bail %}<b>X</b>{% endif %}</td>{% endif %}
-                    {% if case.distrain_count > 0 %}<td rowspan="{{ max_length }}" class="text-center">{% if litigant.distrained %}<b>X</b>{% endif %}</td>{% endif %}
-                </tr>
-                {% if max_length > 0 %}
-                    {% for i in max_length|get_range %}
-                        {% if forloop.first %}
-                        {% else %}
-                            <tr>
-                            {% if case.amercement_count > 0 %}
-                                {% if mcia_length > i %}
-                                    {% for amercement in litigant.amercements.all %}
-                                        {% if forloop.counter0 == i %}
-                                            <td>{{ amercement.amercement }} - {{ i }}</td>
-                                        {% endif %}
-                                    {% endfor %}
-                                {% else %}
-                                    <td></td>
-                                {% endif %}
+                    <tr>
+                        <td rowspan="{{ max_length }}"><a href="{% url 'person:detail' litigant.person.id %}">{{ litigant.person.full_name }}</a></td>
+                        <td rowspan="{{ max_length }}">{{ litigant.role.role }}</td>
+                        {% if case.amercement_count > 0 %}
+                            {% if litigant.amercements.all %}
+                                {% for amercement in litigant.amercements.all %}
+                                    {% if forloop.first %}
+                                        <td>{{ amercement.amercement }}</td>
+                                    {% endif %}
+                                {% endfor %}
+                            {% else %}
+                                <td></td>
                             {% endif %}
-                            {% if case.cap_count > 0 %}
-                                {% if cap_length > i %}
-                                    {% for cap in litigant.capitagia.all %}
-                                        {% if forloop.counter0 == i %}
-                                            <td>{{ cap.capitagium }}</td>
-                                            <td class="text-center">{% if cap.crossed %}<b>X</b>{% endif %}</td>
-                                            <td class="text-center">{% if cap.recessit %}<b>X</b>{% endif %}</td>
-                                            <td class="text-center">{% if cap.habet_terram %}<b>X</b>{% endif %}</td>
-                                            <td class="text-center">{% if cap.mortuus %}<b>X</b>{% endif %}</td>
-                                            <td>{{ cap.notes }}</td>
-                                        {% endif %}
-                                    {% endfor %}
-                                {% else %}
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                {% endif %}
-                            {% endif %}
-                            {% if case.damage_count > 0 %}
-                                {% if dam_length > i %}
-                                    {% for damage in litigant.damages.all %}
-                                        {% if forloop.counter0 == i %}
-                                        {% else %}
-                                            <td>{{ damage.damage }}</td>
-                                            <td>{{ damage.notes }}</td>
-                                        {% endif %}
-                                    {% endfor %}
-                                {% else %}
-                                    <td></td>
-                                    <td></td>
-                                {% endif %}
-                            {% endif %}
-                            {% if case.fine_count > 0 %}
-                                {% if fine_length > i %}
-                                    {% for fine in litigant.fines.all %}
-                                        {% if forloop.counter0 == i %}
-                                        {% else %}
-                                            <td>{{ fine.fine }} - {{ i }}</td>
-                                        {% endif %}
-                                    {% endfor %}
-                                {% else %}
-                                    <td></td>
-                                {% endif %}
-                            {% endif %}
-                            {% if case.heriot_count > 0 %}
-                                {% if heriot_length > i %}
-                                    {% for heriot in litigant.heriots.all %}
-                                        {% if forloop.counter0 == i %}
-                                        {% else %}
-                                            <td>{{ heriot.quantity }} {{ heriot.animal }}</td>
-                                            <td>{{ heriot.heriot }}</td>
-                                        {% endif %}
-                                    {% endfor %}
-                                {% else %}
-                                    <td></td>
-                                    <td></td>
-                                {% endif %}
-                            {% endif %}
-                            {% if case.imperc_count > 0 %}
-                                {% if imperc_length > i %}
-                                    {% for imperc in litigant.impercamenta.all %}
-                                        {% if forloop.counter0 == i %}
-                                        {% else %}
-                                            <td>{{ imperc.quantity }} {{ imperc.animal }}</td>
-                                            <td>{{ imperc.impercamentum }}</td>
-                                            <td>{{ imperc.notes }}</td>
-                                        {% endif %}
-                                    {% endfor %}
-                                {% else %}
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                {% endif %}
-                            {% endif %}
-                            {% if case.land_count > 0 %}
-                                {% if land_length > i %}
-                                    {% for land in litigant.lands.all %}
-                                        {% if forloop.counter0 == i %}
-                                        {% else %}
-                                            <td><a href="{% url 'land:detail' land.id %}">{{ land.id }}</a></td>
-                                            <td>
-                                                <ul class="list-group">
-                                                    {% for parcel in land.land.parcels.all %}
-                                                        <li class="list-group-item">{{ parcel.amount }} {{ parcel.parcel_type.parcel_type }} of {{ parcel.parcel_tenure.tenure }}</li>
-                                                    {% endfor %}
-                                                </ul>
-                                            </td>
-                                            <td class="text-center">{% if land.villeinage %}<b>X</b>{% endif %}</td>
-                                            <td>{{ land.notes }}</td>
-                                        {% endif %}
-                                    {% endfor %}
-                                {% else %}
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                {% endif %}
-                            {% endif %}
-                            </tr>
                         {% endif %}
-                    {% endfor %}
-                {% endif %}
-                {% endwith %}
-            {% endfor %}
+                        {% if case.cap_count > 0 %}
+                            {% if litigant.capitagia.all %}
+                                {% for cap in litigant.capitagia.all %}
+                                    {% if forloop.first %}
+                                        <td>{{ cap.capitagium }}</td>
+                                        <td class="text-center">{% if cap.crossed %}<b>X</b>{% endif %}</td>
+                                        <td class="text-center">{% if cap.recessit %}<b>X</b>{% endif %}</td>
+                                        <td class="text-center">{% if cap.habet_terram %}<b>X</b>{% endif %}</td>
+                                        <td class="text-center">{% if cap.mortuus %}<b>X</b>{% endif %}</td>
+                                        <td>{{ cap.notes }}</td>
+                                    {% endif %}
+                                {% endfor %}
+                            {% else %}
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            {% endif %}
+                        {% endif %}
+                        {% if case.damage_count > 0 %}
+                            {% if litigant.damages.all %}
+                                {% for damage in litigant.damages.all %}
+                                    {% if forloop.first %}
+                                        <td>{{ damage.damage }}</td>
+                                        <td>{{ damage.notes }}</td>
+                                    {% endif %}
+                                {% endfor %}
+                            {% else %}
+                                <td></td>
+                                <td></td>
+                            {% endif %}
+                        {% endif %}
+                        {% if case.fine_count > 0 %}
+                            {% if litigant.fines.all %}
+                                {% for fine in litigant.fines.all %}
+                                    {% if forloop.first %}
+                                        <td>{{ fine.fine }}</td>
+                                    {% endif %}
+                                {% endfor %}
+                            {% else %}
+                                <td></td>
+                            {% endif %}
+                        {% endif %}
+                        {% if case.heriot_count > 0 %}
+                            {% if litigant.heriots.all %}
+                                {% for heriot in litigant.heriots.all %}
+                                    {% if forloop.first %}
+                                        <td>{{ heriot.quantity }} {{ heriot.animal }}</td>
+                                        <td>{{ heriot.heriot }}</td>
+                                    {% endif %}
+                                {% endfor %}
+                            {% else %}
+                                <td></td>
+                                <td></td>
+                            {% endif %}
+                        {% endif %}
+                        {% if case.imperc_count > 0 %}
+                            {% if litigant.impercamenta.all %}
+                                {% for imperc in litigant.impercamenta.all %}
+                                    {% if forloop.first %}
+                                        <td>{{ imperc.quantity }} {{ imperc.animal }}</td>
+                                        <td>{{ imperc.impercamentum }}</td>
+                                        <td>{{ imperc.notes }}</td>
+                                    {% endif %}
+                                {% endfor %}
+                            {% else %}
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            {% endif %}
+                        {% endif %}
+                        {% if case.land_count > 0 %}
+                            {% if litigant.lands.all %}
+                                {% for land in litigant.lands.all %}
+                                    {% if forloop.first %}
+                                        <td><a href="{% url 'land:detail' land.land.id %}">{{ land.land.id }}</a></td>
+                                        <td>
+                                            <ul class="list-group">
+                                                {% for parcel in land.land.parcels.all %}
+                                                    <li class="list-group-item">{{ parcel.amount }} {{ parcel.parcel_type.parcel_type }} of {{ parcel.parcel_tenure.tenure }}</li>
+                                                {% endfor %}
+                                            </ul>
+                                        </td>
+                                        <td class="text-center">{% if land.villeinage %}<b>X</b>{% endif %}</td>
+                                        <td>{{ land.notes }}</td>
+                                    {% endif %}
+                                {% endfor %}
+                            {% else %}
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            {% endif %}
+                        {% endif %}
+                        {% if case.attached_count > 0  %}<td rowspan="{{ max_length }}" class="text-center">{% if litigant.attached %}<b>X</b>{% endif %}</td>{% endif %}
+                        {% if case.bail_count > 0 %}<td rowspan="{{ max_length }}" class="text-center">{% if litigant.bail %}<b>X</b>{% endif %}</td>{% endif %}
+                        {% if case.distrain_count > 0 %}<td rowspan="{{ max_length }}" class="text-center">{% if litigant.distrained %}<b>X</b>{% endif %}</td>{% endif %}
+                    </tr>
+                    {% if max_length > 0 %}
+                        {% for i in max_length|get_range %}
+                            {% if forloop.first %}
+                            {% else %}
+                                <tr>
+                                {% if case.amercement_count > 0 %}
+                                    {% if mcia_length > i %}
+                                        {% for amercement in litigant.amercements.all %}
+                                            {% if forloop.counter0 == i %}
+                                                <td>{{ amercement.amercement }} - {{ i }}</td>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% else %}
+                                        <td></td>
+                                    {% endif %}
+                                {% endif %}
+                                {% if case.cap_count > 0 %}
+                                    {% if cap_length > i %}
+                                        {% for cap in litigant.capitagia.all %}
+                                            {% if forloop.counter0 == i %}
+                                                <td>{{ cap.capitagium }}</td>
+                                                <td class="text-center">{% if cap.crossed %}<b>X</b>{% endif %}</td>
+                                                <td class="text-center">{% if cap.recessit %}<b>X</b>{% endif %}</td>
+                                                <td class="text-center">{% if cap.habet_terram %}<b>X</b>{% endif %}</td>
+                                                <td class="text-center">{% if cap.mortuus %}<b>X</b>{% endif %}</td>
+                                                <td>{{ cap.notes }}</td>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% else %}
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    {% endif %}
+                                {% endif %}
+                                {% if case.damage_count > 0 %}
+                                    {% if dam_length > i %}
+                                        {% for damage in litigant.damages.all %}
+                                            {% if forloop.counter0 == i %}
+                                            {% else %}
+                                                <td>{{ damage.damage }}</td>
+                                                <td>{{ damage.notes }}</td>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% else %}
+                                        <td></td>
+                                        <td></td>
+                                    {% endif %}
+                                {% endif %}
+                                {% if case.fine_count > 0 %}
+                                    {% if fine_length > i %}
+                                        {% for fine in litigant.fines.all %}
+                                            {% if forloop.counter0 == i %}
+                                            {% else %}
+                                                <td>{{ fine.fine }} - {{ i }}</td>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% else %}
+                                        <td></td>
+                                    {% endif %}
+                                {% endif %}
+                                {% if case.heriot_count > 0 %}
+                                    {% if heriot_length > i %}
+                                        {% for heriot in litigant.heriots.all %}
+                                            {% if forloop.counter0 == i %}
+                                            {% else %}
+                                                <td>{{ heriot.quantity }} {{ heriot.animal }}</td>
+                                                <td>{{ heriot.heriot }}</td>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% else %}
+                                        <td></td>
+                                        <td></td>
+                                    {% endif %}
+                                {% endif %}
+                                {% if case.imperc_count > 0 %}
+                                    {% if imperc_length > i %}
+                                        {% for imperc in litigant.impercamenta.all %}
+                                            {% if forloop.counter0 == i %}
+                                            {% else %}
+                                                <td>{{ imperc.quantity }} {{ imperc.animal }}</td>
+                                                <td>{{ imperc.impercamentum }}</td>
+                                                <td>{{ imperc.notes }}</td>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% else %}
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    {% endif %}
+                                {% endif %}
+                                {% if case.land_count > 0 %}
+                                    {% if land_length > i %}
+                                        {% for land in litigant.lands.all %}
+                                            {% if forloop.counter0 == i %}
+                                            {% else %}
+                                                <td><a href="{% url 'land:detail' land.land.id %}">{{ land.land.id }}</a></td>
+                                                <td>
+                                                    <ul class="list-group">
+                                                        {% for parcel in land.land.parcels.all %}
+                                                            <li class="list-group-item">{{ parcel.amount }} {{ parcel.parcel_type.parcel_type }} of {{ parcel.parcel_tenure.tenure }}</li>
+                                                        {% endfor %}
+                                                    </ul>
+                                                </td>
+                                                <td class="text-center">{% if land.villeinage %}<b>X</b>{% endif %}</td>
+                                                <td>{{ land.notes }}</td>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% else %}
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    {% endif %}
+                                {% endif %}
+                                </tr>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                    {% endwith %}
+                    {% empty %}
+                    <tr>
+                        <td colspan="2">None</td>
+                    </tr>
+                {% endfor %}
             </tbody>
         </table>
+        {% else %}
+            <div class="text-center"><b>None</b></div>
+        {% endif %}
     </div>

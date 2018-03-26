@@ -56,6 +56,8 @@ def max_length(*args):
     See 'case/litigant_list.html for usage.
     '''
     maximum = max(args)
+    if maximum < 1:
+        maximum = 1
     return maximum
 
 @register.filter
