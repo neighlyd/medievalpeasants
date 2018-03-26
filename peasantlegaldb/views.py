@@ -202,7 +202,7 @@ class CaseDetailView(DetailView):
     
     def get_context_data(self, **kwargs):
         context = super(CaseDetailView, self).get_context_data(**kwargs)
-        lands = models.Land.objects.filter(landtocase__litigant__case=self.object.id).distinct()
+        lands = models.Land.objects.filter(landtocase__litigant__case=self.object.id).distinct().order_by('landtocase__litigant__case__session__date')
         context['page_title'] = 'Case'
         context['lands'] = lands
         return context

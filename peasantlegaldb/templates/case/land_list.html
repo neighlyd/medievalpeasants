@@ -23,23 +23,25 @@
                         {% for litigant in land.landtocase_set.all %}
                             {% if forloop.first %}
                             <tr>
-                                <th class="hiddenRow"><div class="collapse land_{{ land.id }}_summary">Tenant<hr></div></th>
-                                <th class="hiddenRow"><div class="collapse land_{{ land.id }}_summary">Role<hr></div></th>
-                                <th class="hiddenRow"><div class="collapse land_{{ land.id }}_summary">Case<hr></div></th>
-                                <th class="hiddenRow"><div class="collapse land_{{ land.id }}_summary">Session<hr></div></th>
+                                <th class="hiddenRow"><div class="collapse land_{{ land.id }}_summary"> Case<hr></div></th>
+                                <th class="hiddenRow"><div class="collapse land_{{ land.id }}_summary"> Date<hr></div></th>
+                                <th class="hiddenRow"><div class="collapse land_{{ land.id }}_summary"> Person<hr></div></th>
+                                <th class="hiddenRow"><div class="collapse land_{{ land.id }}_summary"> Role<hr></div></th>
+                            </tr>
+
                             </tr>
                             <tr>
-                                <td class="hiddenRow"><div class="collapse land_{{ land.id }}_summary"><a href="{% url 'person:detail' litigant.litigant.person.id %}">{{ litigant.litigant.person.full_name }}</a><hr></div></td>
-                                <td class="hiddenRow"><div class="collapse land_{{ land.id }}_summary">{{ litigant.litigant.role.role }}<hr></div></td>
-                                <td class="hiddenRow"><div class="collapse land_{{ land.id }}_summary"><a href="{% url 'case:detail' litigant.litigant.case.id %}">{{ litigant.litigant.case.id }}</a><hr></div></td>
-                                <td class="hiddenRow"><div class="collapse land_{{ land.id }}_summary"><a href="{% url 'session:detail' litigant.litigant.case.session.id %}">{{ litigant.litigant.case.session.date }}</a><hr></div></td>
+                                <td class="hiddenRow"><div class="collapse land_{{ land.id }}_summary"><a href="{% url 'case:detail' litigant.litigant.case.id %}"> {{ litigant.litigant.case.id }}</a><hr></div></td>
+                                <td class="hiddenRow"><div class="collapse land_{{ land.id }}_summary"><a href="{% url 'session:detail' litigant.litigant.case.session.id %}"> {{ litigant.litigant.case.session.date }}</a><hr></div></td>
+                                <td class="hiddenRow"><div class="collapse land_{{ land.id }}_summary"><a href="{% url 'person:detail' litigant.litigant.person.id %}"> {{ litigant.litigant.person.full_name }}</a><hr></div></td>
+                                <td class="hiddenRow"><div class="collapse land_{{ land.id }}_summary"> {{ litigant.litigant.role.role }}<hr></div></td>
                             </tr>
                             {% else %}
                             <tr>
-                                <td class="hiddenRow"><div class="collapse land_{{ land.id }}_summary"><a href="{% url 'person:detail' litigant.litigant.person.id %}">{{ litigant.litigant.person.full_name }}</a><hr></div></td>
-                                <td class="hiddenRow"><div class="collapse land_{{ land.id }}_summary">{{ litigant.litigant.role.role }}<hr></div></td>
-                                <td class="hiddenRow"><div class="collapse land_{{ land.id }}_summary"><a href="{% url 'case:detail' litigant.litigant.case.id %}">{{ litigant.litigant.case.id }}</a><hr></div></td>
-                                <td class="hiddenRow"><div class="collapse land_{{ land.id }}_summary"><a href="{% url 'session:detail' litigant.litigant.case.session.id %}">{{ litigant.litigant.case.session.date }}</a><hr></div></td>
+                                <td class="hiddenRow"><div class="collapse land_{{ land.id }}_summary"><a href="{% url 'case:detail' litigant.litigant.case.id %}"> {{ litigant.litigant.case.id }}</a><hr></div></td>
+                                <td class="hiddenRow"><div class="collapse land_{{ land.id }}_summary"><a href="{% url 'session:detail' litigant.litigant.case.session.id %}"> {{ litigant.litigant.case.session.date }}</a><hr></div></td>
+                                <td class="hiddenRow"><div class="collapse land_{{ land.id }}_summary"><a href="{% url 'person:detail' litigant.litigant.person.id %}"> {{ litigant.litigant.person.full_name }}</a><hr></div></td>
+                                <td class="hiddenRow"><div class="collapse land_{{ land.id }}_summary"> {{ litigant.litigant.role.role }}<hr></div></td>
                             </tr>
                             {% endif %}
                         {% endfor %}
