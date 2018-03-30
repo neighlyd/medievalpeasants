@@ -6,7 +6,7 @@
 
 {% block left_sidebar %}
     <div id="selection_list">
-        <a class="list-group-item list-group-item-action active" href="{% url 'session:cases' session.id %}">Cases</a>
+        <a class="list-group-item list-group-item-action active" data-toggle="list" role="tab" href="#list_cases" aria-controls="list_cases" aria-selected="true">Cases</a>
 
     </div>
 {% endblock %}
@@ -80,8 +80,8 @@
 
 <br>
 
-<div id="list_info">
-
+<div class="tab-content" id="list_info">
+    <div class="tab-pane fade show active" id="list_cases" role="tabpanel">{% include 'session/case_list.html' %}</div>
 </div>
 
 {% endblock %}
@@ -110,16 +110,4 @@
         {% endif %}
     </div>
 
-{% endblock %}
-
-{% block scripts %}
-    {{ block.super }}
-
-    <script>
-        $(document).ready(function(){
-             var url = window.location.pathname;
-            var id = url.split('/').reverse()[1]
-            $("#list_info").load(Urls['session:cases'](id))
-        })
-    </script>
 {% endblock %}

@@ -942,6 +942,7 @@ class LandtoCase(models.Model):
     litigant = models.ForeignKey(Litigant, on_delete=models.CASCADE, related_name='lands')
     land = models.ForeignKey(Land, null=True, blank=True, on_delete=models.CASCADE)
     villeinage = models.NullBooleanField()
+    role = models.ForeignKey(Role, on_delete=models.CASCADE)
     notes = models.TextField(blank=True,)
 
 

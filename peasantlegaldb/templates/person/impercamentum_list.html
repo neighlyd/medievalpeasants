@@ -1,7 +1,7 @@
 <div class="card">
     <h3 class="card-header text-center bg-grey">Impercamentum List</h3>
     <div class="card-body">
-            <table class="table table-bordered" id="table" data-page-length="25">
+            <table class="table table-bordered" id="table">
                 <thead>
                     <th>Details</th>
                     <th>Case</th>
@@ -42,19 +42,19 @@
                     {% for litigant in cases.case.litigants.all %}
                             {% if forloop.first %}
                                 <tr>
-                                    <th colspan="4" class="hiddenRow"><div class="hiddenRow collapse case_{{ litigant.case.id }}_summary">Notes<hr></div></th>
-                                    <th colspan="3" class="hiddenRow"><div class="hiddenRow collapse case_{{ litigant.case.id }}_summary">Litigant<hr></div></th>
-                                    <th colspan="3" class="hiddenRow"><div class="hiddenRow collapse case_{{ litigant.case.id }}_summary">Role<hr></div></th>
+                                    <td colspan="4" class="hiddenRow"><div class="collapse case_{{ litigant.case.id }}_summary"><b>Notes</b></div></td>
+                                    <td colspan="3" class="hiddenRow"><div class="collapse case_{{ litigant.case.id }}_summary"><b>Litigant</b></div></td>
+                                    <td colspan="3" class="hiddenRow"><div class="collapse case_{{ litigant.case.id }}_summary"><b>Role</b></div></td>
                                 </tr>
                                 <tr>
-                                    <td rowspan="{{ lit_count }}" colspan="4" class="hiddenRow"><div class="hiddenRow collapse case_{{ litigant.case.id }}_summary">{{ litigant.case.summary|wordwrap:55|linebreaksbr }}</div></td>
-                                    <td colspan="3" class="hiddenRow"><div class="hiddenRow collapse case_{{ litigant.case.id }}_summary"><a href="{% url 'person:detail' litigant.person.id %}">{{ litigant.person.full_name }}</a><hr></div></td>
-                                    <td colspan="3" class="hiddenRow"><div class="hiddenRow collapse case_{{ litigant.case.id }}_summary">{{ litigant.role.role }}<hr></div></td>
+                                    <td rowspan="{{ lit_count }}" colspan="4" class="hiddenRow"><div class="collapse case_{{ litigant.case.id }}_summary">{{ litigant.case.summary|wordwrap:55|linebreaksbr }}</div></td>
+                                    <td colspan="3" class="hiddenRow"><div class="collapse case_{{ litigant.case.id }}_summary"><a href="{% url 'person:detail' litigant.person.id %}">{{ litigant.person.full_name }}</a></div></td>
+                                    <td colspan="3" class="hiddenRow"><div class="collapse case_{{ litigant.case.id }}_summary">{{ litigant.role.role }}</div></td>
                                 </tr>
                                 {% else %}
                                 <tr>
-                                    <td colspan="3" class="hiddenRow"><div class="hiddenRow collapse case_{{ litigant.case.id }}_summary"><a href="{% url 'person:detail' litigant.person.id %}">{{ litigant.person.full_name }}</a><hr></div></td>
-                                    <td colspan="3" class="hiddenRow"><div class="hiddenRow collapse case_{{ litigant.case.id }}_summary">{{ litigant.role.role }}<hr></div></td>
+                                    <td colspan="3" class="hiddenRow"><div class="collapse case_{{ litigant.case.id }}_summary"><a href="{% url 'person:detail' litigant.person.id %}">{{ litigant.person.full_name }}</a></div></td>
+                                    <td colspan="3" class="hiddenRow"><div class="collapse case_{{ litigant.case.id }}_summary">{{ litigant.role.role }}</div></td>
                                 </tr>
                             {% endif %}
                         {% endfor %}
@@ -104,4 +104,10 @@
                 }
             })
         });
+    $('#table td').on('show.bs.collapse', function(){
+        $(this).removeClass('hiddenRow');
+    });
+    $('#table td').on('hide.bs.collapse', function() {
+        $(this).addClass('hiddenRow');
+    });
 </script>

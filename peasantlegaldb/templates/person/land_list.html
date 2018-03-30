@@ -29,7 +29,7 @@
                                 {% else %}<hr>{{ parcel.amount }} {{ parcel.parcel_type.parcel_type}} of {{ parcel.parcel_tenure.tenure }}{% endif %}
                                 {% endfor %}</td>
                             <td class="text-center">{% if land.villeinage %}X{% endif %}</td>
-                            <td>{{ land.litigant.role.role }}</td>
+                            <td>{{ land.role.role }}</td>
                             <td>{{ land.litigant.case.case_type.case_type }}</td>
                             <td>{{ land.litigant.case.verdict.verdict }}</td>
                             <td class="text-center">{{ land.litigant.case.litigant_count }}</td>
@@ -46,7 +46,7 @@
                                     <tr>
                                         <th colspan="4" class="hiddenRow"><div class="hiddenRow collapse case_{{ litigant.case.id }}_summary">Notes<hr></div></th>
                                         <th colspan="2" class="hiddenRow"><div class="hiddenRow collapse case_{{ litigant.case.id }}_summary">Litigant<hr></div></th>
-                                        <th colspan="3" class="hiddenRow"><div class="hiddenRow collapse case_{{ litigant.case.id }}_summary">Role<hr></div></th>
+                                        <th colspan="3" class="hiddenRow"><div class="hiddenRow collapse case_{{ litigant.case.id }}_summary">Case Role<hr></div></th>
                                     </tr>
                                     <tr>
                                         <td rowspan="{{ lit_count }}" colspan="4" class="hiddenRow"><div class="hiddenRow collapse case_{{ litigant.case.id }}_summary">{{ litigant.case.summary|wordwrap:55|linebreaksbr }}</div></td>

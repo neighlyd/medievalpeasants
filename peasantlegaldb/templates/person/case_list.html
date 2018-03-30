@@ -1,7 +1,7 @@
 <div class="card">
     <h3 class="card-header text-center bg-grey">Cases</h3>
     <div class="card-body">
-            <table class="table table-bordered">
+            <table class="table table-bordered" id="table">
                 <thead>
                     <th>Details</th>
                     <th>Case</th>
@@ -14,7 +14,8 @@
                 </thead>
                 <tbody>
                     {% for cases in list %}
-                        {% with length=cases.case.litigants.all|length %}<tr>
+                        {% with length=cases.case.litigants.all|length %}
+                        <tr>
                             <td data-toggle="collapse" data-target=".case_{{ cases.case.id }}_summary" class="details-control"><i class="fas fa-plus-square"></i></td>
                             <td><a href="{% url 'case:detail' cases.case.id %}">{{ cases.case.id }}</a></td>
                             <td><a href="{% url 'session:detail' cases.case.session.id %}">{{ cases.case.session }}</a></td>
@@ -26,21 +27,21 @@
                         </tr>
                         {% for litigant in cases.case.litigants.all %}
                             {% if forloop.first %}
-                            <tr>
-                                <th colspan="3" class="hiddenRow"><div class="hiddenRow collapse case_{{ litigant.case.id }}_summary">Notes<hr></div></th>
-                                <th colspan="2" class="hiddenRow"><div class="hiddenRow collapse case_{{ litigant.case.id }}_summary">Litigant<hr></div></th>
-                                <th colspan="3" class="hiddenRow"><div class="hiddenRow collapse case_{{ litigant.case.id }}_summary">Role<hr></div></th>
-                            </tr>
-                            <tr>
-                                <td rowspan="{{ length }}" colspan="3" class="hiddenRow"><div class="hiddenRow collapse case_{{ litigant.case.id }}_summary">{{ litigant.case.summary|wordwrap:55|linebreaksbr }}</div></td>
-                                <td colspan="2" class="hiddenRow"><div class="hiddenRow collapse case_{{ litigant.case.id }}_summary"><a href="{% url 'person:detail' litigant.person.id %}">{{ litigant.person.full_name }}</a><hr></div></td>
-                                <td colspan="3" class="hiddenRow"><div class="hiddenRow collapse case_{{ litigant.case.id }}_summary">{{ litigant.role.role }}<hr></div></td>
-                            </tr>
-                            {% else %}
-                            <tr>
-                                <td colspan="2" class="hiddenRow"><div class="hiddenRow collapse case_{{ litigant.case.id }}_summary"><a href="{% url 'person:detail' litigant.person.id %}">{{ litigant.person.full_name }}</a><hr></div></td>
-                                <td colspan="3" class="hiddenRow"><div class="hiddenRow collapse case_{{ litigant.case.id }}_summary">{{ litigant.role.role }}<hr></div></td>
-                            </tr>
+                                <tr>
+                                    <td colspan="3" class="hiddenRow"><div class="collapse case_{{ cases.case.id }}_summary"><b>Notes</b></div></td>
+                                    <td colspan="2" class="hiddenRow"><div class="collapse case_{{ cases.case.id }}_summary"><b>Litigant</b></div></td>
+                                    <td colspan="3" class="hiddenRow"><div class="collapse case_{{ cases.case.id }}_summary"><b>Role</b></div></td>
+                                </tr>
+                                <tr>
+                                    <td rowspan="{{ length }}" colspan="3" class="hiddenRow"><div class="collapse case_{{ cases.case.id }}_summary">{{ litigant.case.summary|wordwrap:55|linebreaksbr }}</div></td>
+                                    <td colspan="2" class="hiddenRow"><div class="collapse case_{{ cases.case.id }}_summary"><a href="{% url 'person:detail' litigant.person.id %}">{{ litigant.person.full_name }}</a></div></td>
+                                    <td colspan="3" class="hiddenRow"><div class="collapse case_{{ cases.case.id }}_summary">{{ litigant.role.role }}</div></td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="2" class="hiddenRow"><div class="collapse case_{{ cases.case.id }}_summary"><a href="{% url 'person:detail' litigant.person.id %}">{{ litigant.person.full_name }}</a></div></td>
+                                    <td colspan="3" class="hiddenRow"><div class="collapse case_{{ cases.case.id }}_summary">{{ litigant.role.role }}</div></td>
+                                </tr>
                             {% endif %}
                         {% endfor %}
                         {% endwith %}
@@ -88,4 +89,11 @@
                 }
             })
         });
+    $('#table td').on('show.bs.collapse', function(){
+        console.log('blorop');
+        $(this).removeClass('hiddenRow');
+    });
+    $('#table td').on('hide.bs.collapse', function(){
+        $(this).addClass('hiddenRow');
+    })
 </script>

@@ -6,6 +6,10 @@
             <thead>
                 <th>Name</th>
                 <th>Role</th>
+                {% if case.ad_proximum_count > 0 %}<th>Ad Prox.</th>{% endif %}
+                {% if case.attached_count > 0 %}<th>Attached</th>{% endif %}
+                {% if case.bail_count > 0 %}<th>Bailed</th>{% endif %}
+                {% if case.distrain_count > 0 %}<th>Distrained</th>{% endif %}
                 {% if case.amercement_count > 0 %}
                     <th>Amercement</th>
                 {% endif %}
@@ -35,13 +39,12 @@
                 {% endif %}
                 {% if case.land_count > 0  %}
                     <th>Land ID</th>
+                    <th>Land Role</th>
                     <th>Parcels</th>
                     <th>Villein</th>
                     <th>Notes</th>
                 {% endif %}
-                {% if case.attached_count > 0 %}<th>Attached</th>{% endif %}
-                {% if case.bail_count > 0 %}<th>Bailed</th>{% endif %}
-                {% if case.distrain_count > 0 %}<th>Distrained</th>{% endif %}
+
             </thead>
             <tbody>
             {% for litigant in case.litigants.all %}
@@ -50,6 +53,34 @@
                     <tr>
                         <td rowspan="{{ max_length }}"><a href="{% url 'person:detail' litigant.person.id %}">{{ litigant.person.full_name }}</a></td>
                         <td rowspan="{{ max_length }}">{{ litigant.role.role }}</td>
+                        {% if case.ad_proximum_count > 0  %}
+                            {% if litigant.ad_proximum %}
+                                <td rowspan="{{ max_length }}" class="text-center"><b>X</b></td>
+                            {% else %}
+                                <td rowspan="{{ max_length }}" class="bg-grey"></td>
+                            {% endif %}
+                        {% endif %}
+                        {% if case.attached_count > 0  %}
+                            {% if litigant.attached %}
+                                <td rowspan="{{ max_length }}" class="text-center"><b>X</b></td>
+                            {% else %}
+                                <td rowspan="{{ max_length }}" class="bg-grey"></td>
+                            {% endif %}
+                        {% endif %}
+                        {% if case.bail_count > 0 %}
+                            {% if litigant.bail %}
+                                <td rowspan="{{ max_length }}" class="text-center"><b>X</b></td>
+                            {% else %}
+                                <td rowspan="{{ max_length }}" class="bg-grey"></td>
+                            {% endif %}
+                        {% endif %}
+                        {% if case.distrain_count > 0 %}
+                            {% if litigant.distrained %}
+                                <td rowspan="{{ max_length }}" class="text-center"><b>X</b></td>
+                            {% else %}
+                                <td rowspan="{{ max_length }}" class="bg-grey"></td>
+                            {% endif %}
+                        {% endif %}
                         {% if case.amercement_count > 0 %}
                             {% if litigant.amercements.all %}
                                 {% for amercement in litigant.amercements.all %}
@@ -58,7 +89,7 @@
                                     {% endif %}
                                 {% endfor %}
                             {% else %}
-                                <td></td>
+                                <td class="bg-grey"></td>
                             {% endif %}
                         {% endif %}
                         {% if case.cap_count > 0 %}
@@ -74,12 +105,12 @@
                                     {% endif %}
                                 {% endfor %}
                             {% else %}
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
+                                <td class="bg-grey"></td>
+                                <td class="bg-grey"></td>
+                                <td class="bg-grey"></td>
+                                <td class="bg-grey"></td>
+                                <td class="bg-grey"></td>
+                                <td class="bg-grey"></td>
                             {% endif %}
                         {% endif %}
                         {% if case.damage_count > 0 %}
@@ -91,8 +122,8 @@
                                     {% endif %}
                                 {% endfor %}
                             {% else %}
-                                <td></td>
-                                <td></td>
+                                <td class="bg-grey"></td>
+                                <td class="bg-grey"></td>
                             {% endif %}
                         {% endif %}
                         {% if case.fine_count > 0 %}
@@ -103,7 +134,7 @@
                                     {% endif %}
                                 {% endfor %}
                             {% else %}
-                                <td></td>
+                                <td class="bg-grey"></td>
                             {% endif %}
                         {% endif %}
                         {% if case.heriot_count > 0 %}
@@ -115,8 +146,8 @@
                                     {% endif %}
                                 {% endfor %}
                             {% else %}
-                                <td></td>
-                                <td></td>
+                                <td class="bg-grey"></td>
+                                <td class="bg-grey"></td>
                             {% endif %}
                         {% endif %}
                         {% if case.imperc_count > 0 %}
@@ -129,9 +160,9 @@
                                     {% endif %}
                                 {% endfor %}
                             {% else %}
-                                <td></td>
-                                <td></td>
-                                <td></td>
+                                <td class="bg-grey"></td>
+                                <td class="bg-grey"></td>
+                                <td class="bg-grey"></td>
                             {% endif %}
                         {% endif %}
                         {% if case.land_count > 0 %}
@@ -139,6 +170,7 @@
                                 {% for land in litigant.lands.all %}
                                     {% if forloop.first %}
                                         <td><a href="{% url 'land:detail' land.land.id %}">{{ land.land.id }}</a></td>
+                                        <td>{{ land.role.role }}</td>
                                         <td>
                                             <ul class="list-group">
                                                 {% for parcel in land.land.parcels.all %}
@@ -151,15 +183,14 @@
                                     {% endif %}
                                 {% endfor %}
                             {% else %}
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
+                                <td class="bg-grey"></td>
+                                <td class="bg-grey"></td>
+                                <td class="bg-grey"></td>
+                                <td class="bg-grey"></td>
+                                <td class="bg-grey"></td>
                             {% endif %}
                         {% endif %}
-                        {% if case.attached_count > 0  %}<td rowspan="{{ max_length }}" class="text-center">{% if litigant.attached %}<b>X</b>{% endif %}</td>{% endif %}
-                        {% if case.bail_count > 0 %}<td rowspan="{{ max_length }}" class="text-center">{% if litigant.bail %}<b>X</b>{% endif %}</td>{% endif %}
-                        {% if case.distrain_count > 0 %}<td rowspan="{{ max_length }}" class="text-center">{% if litigant.distrained %}<b>X</b>{% endif %}</td>{% endif %}
+
                     </tr>
                     {% if max_length > 0 %}
                         {% for i in max_length|get_range %}
@@ -169,18 +200,18 @@
                                 {% if case.amercement_count > 0 %}
                                     {% if mcia_length > i %}
                                         {% for amercement in litigant.amercements.all %}
-                                            {% if forloop.counter0 == i %}
+                                            {% if forloop.counter == i %}
                                                 <td>{{ amercement.amercement }} - {{ i }}</td>
                                             {% endif %}
                                         {% endfor %}
                                     {% else %}
-                                        <td></td>
+                                        <td class="bg-grey"></td>
                                     {% endif %}
                                 {% endif %}
                                 {% if case.cap_count > 0 %}
                                     {% if cap_length > i %}
                                         {% for cap in litigant.capitagia.all %}
-                                            {% if forloop.counter0 == i %}
+                                            {% if forloop.counter == i %}
                                                 <td>{{ cap.capitagium }}</td>
                                                 <td class="text-center">{% if cap.crossed %}<b>X</b>{% endif %}</td>
                                                 <td class="text-center">{% if cap.recessit %}<b>X</b>{% endif %}</td>
@@ -190,34 +221,34 @@
                                             {% endif %}
                                         {% endfor %}
                                     {% else %}
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
+                                        <td class="bg-grey"></td>
+                                        <td class="bg-grey"></td>
+                                        <td class="bg-grey"></td>
+                                        <td class="bg-grey"></td>
+                                        <td class="bg-grey"></td>
+                                        <td class="bg-grey"></td>
                                     {% endif %}
                                 {% endif %}
                                 {% if case.damage_count > 0 %}
                                     {% if dam_length > i %}
                                         {% for damage in litigant.damages.all %}
-                                            {% if forloop.counter0 == i %}
+                                            {% if forloop.counter == i %}
                                             {% else %}
                                                 <td>{{ damage.damage }}</td>
                                                 <td>{{ damage.notes }}</td>
                                             {% endif %}
                                         {% endfor %}
                                     {% else %}
-                                        <td></td>
-                                        <td></td>
+                                        <td class="bg-grey"></td>
+                                        <td class="bg-grey"></td>
                                     {% endif %}
                                 {% endif %}
                                 {% if case.fine_count > 0 %}
                                     {% if fine_length > i %}
                                         {% for fine in litigant.fines.all %}
-                                            {% if forloop.counter0 == i %}
+                                            {% if forloop.counter == i %}
                                             {% else %}
-                                                <td>{{ fine.fine }} - {{ i }}</td>
+                                                <td>{{ fine.fine }}</td>
                                             {% endif %}
                                         {% endfor %}
                                     {% else %}
@@ -227,21 +258,21 @@
                                 {% if case.heriot_count > 0 %}
                                     {% if heriot_length > i %}
                                         {% for heriot in litigant.heriots.all %}
-                                            {% if forloop.counter0 == i %}
+                                            {% if forloop.counter == i %}
                                             {% else %}
                                                 <td>{{ heriot.quantity }} {{ heriot.animal }}</td>
                                                 <td>{{ heriot.heriot }}</td>
                                             {% endif %}
                                         {% endfor %}
                                     {% else %}
-                                        <td></td>
-                                        <td></td>
+                                        <td class="bg-grey"></td>
+                                        <td class="bg-grey"></td>
                                     {% endif %}
                                 {% endif %}
                                 {% if case.imperc_count > 0 %}
                                     {% if imperc_length > i %}
                                         {% for imperc in litigant.impercamenta.all %}
-                                            {% if forloop.counter0 == i %}
+                                            {% if forloop.counter == i %}
                                             {% else %}
                                                 <td>{{ imperc.quantity }} {{ imperc.animal }}</td>
                                                 <td>{{ imperc.impercamentum }}</td>
@@ -249,17 +280,18 @@
                                             {% endif %}
                                         {% endfor %}
                                     {% else %}
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
+                                        <td class="bg-grey"></td>
+                                        <td class="bg-grey"></td>
+                                        <td class="bg-grey"></td>
                                     {% endif %}
                                 {% endif %}
                                 {% if case.land_count > 0 %}
                                     {% if land_length > i %}
                                         {% for land in litigant.lands.all %}
-                                            {% if forloop.counter0 == i %}
+                                            {% if forloop.counter == i %}
                                             {% else %}
                                                 <td><a href="{% url 'land:detail' land.land.id %}">{{ land.land.id }}</a></td>
+                                                <td>{{ land.role.role }}</td>
                                                 <td>
                                                     <ul class="list-group">
                                                         {% for parcel in land.land.parcels.all %}
@@ -272,10 +304,11 @@
                                             {% endif %}
                                         {% endfor %}
                                     {% else %}
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
+                                        <td class="bg-grey"></td>
+                                        <td class="bg-grey"></td>
+                                        <td class="bg-grey"></td>
+                                        <td class="bg-grey"></td>
+                                        <td class="bg-grey"></td>
                                     {% endif %}
                                 {% endif %}
                                 </tr>

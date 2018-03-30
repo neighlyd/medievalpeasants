@@ -1,0 +1,33 @@
+<h3 class="card-header text-center bg-grey">Case List</h3>
+    <div class="card-body">
+            <table class="table table-bordered table-hover" id="table">
+                <thead>
+                    <th></th>
+                    <th>Case</th>
+                    <th>Court Type</th>
+                    <th>Case Type</th>
+                    <th>Verdict</th>
+                    <th>Litigant Count</th>
+                    <th>Of Note</th>
+                    <th>Villein</th>
+                    <th>Active Sale</th>
+                    <th>Incidental Land</th>
+                </thead>
+                <tbody>
+                {% for case in session.case_set.all %}
+                    <tr>
+                        <td></td>
+                        <td><a href="{% url 'case:detail' case.id %}">{{ case.id }}</a></td>
+                        <td>{{ case.get_court_type_display }}</td>
+                        <td>{{ case.case_type.case_type }}</td>
+                        <td>{{ case.verdict.verdict }}</td>
+                        <td>{{ case.litigant_count }}</td>
+                        <td class="text-center">{% if case.of_note %}<b>X</b>{% endif %}</td>
+                        <td class="text-center">{% if case.villeinage_mention %}<b>X</b>{% endif %}</td>
+                        <td class="text-center">{% if case.active_sale %}<b>X</b>{% endif %}</td>
+                        <td class="text-center">{% if case.incidental_land %}<b>X</b>{% endif %}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+    </div>

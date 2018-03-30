@@ -7,7 +7,7 @@ from django.template.loader import render_to_string
 from django.http import JsonResponse
 
 from django.urls import reverse_lazy, reverse
-from django.db.models import Count, Max, Min, Avg, Sum, Q
+from django.db.models import Count, Max, Min, Avg, Sum, Q, Case, When
 from django.core.urlresolvers import resolve
 from django.http import HttpResponseRedirect
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -20,6 +20,9 @@ from . import models
 from . import forms
 
 import pdb
+
+# TODO: Finish comparison of case/litigant/person btwn litigant table and amercements, damages, fines, impercamentum, landtocase
+# TODO: Merge litigant btwn Litigant table and landtocase, fixing Role between the two.
 
 
 Delete = [u"Full Editor"]
@@ -196,8 +199,11 @@ class CaseDetailView(DetailView):
         .annotate(amercement_count=Count('litigants__amercements'), cap_count=Count('litigants__capitagia'),
                   damage_count=Count('litigants__damages'), fine_count=Count('litigants__fines'),
                   heriot_count=Count('litigants__heriots'), imperc_count=Count('litigants__impercamenta'),
-                  land_count=Count('litigants__lands'), attached_count=Count('litigants__attached'),
-                  bail_count=Count('litigants__bail'), distrain_count=Count('litigants__distrained'),
+                  land_count=Count('litigants__lands'),
+                  ad_proximum_count=Count(Case(When(litigants__ad_proximum=True, then=1))),
+                  attached_count=Count(Case(When(litigants__attached=True, then=1))),
+                  bail_count=Count(Case(When(litigants__bail=True, then=1))),
+                  distrain_count=Count(Case(When(litigants__distrained=True, then=1))),
                   pledges_count=Count('litigants__pledges'))
     
     def get_context_data(self, **kwargs):
@@ -682,7 +688,7 @@ def person_lists(request, pk):
     elif path == 'capitagium_list':
         query_list = models.Litigant.objects.filter(person=pk, capitagia__capitagium__isnull=False).distinct().prefetch_related('case').order_by('case__session__date')
     elif path == 'case_list':
-        query_list = models.Litigant.objects.filter(person=pk).distinct().prefetch_related('case').order_by('case__session__date')
+        query_list = models.Litigant.objects.filter(person=pk).prefetch_related('case').order_by('case__session__date')
     elif path == 'damage_list':
         query_list = models.Litigant.objects.filter(person=pk, damages__damage__isnull=False).distinct().prefetch_related('case').order_by('case__session__date')
     elif path == 'fine_list':
@@ -816,6 +822,33 @@ class SessionDetailView(DetailView):
         context = super(SessionDetailView, self).get_context_data(**kwargs)
         context['page_title'] = 'Session'
         return context
+
+
+def session_case_list(request, pk):
+    data = dict()
+    path = request.path.split('/').pop()
+    queryset = models.Session.objects.filter(id=pk).prefetch_related('case_set')
+
+    page = request.GET.get('page', 1)
+    paginator = Paginator(queryset, 10)
+
+    try:
+        queryset = paginator.page(page)
+    except PageNotAnInteger:
+        queryset = paginator.page(1)
+    except EmptyPage:
+        queryset = paginator.page(paginator.num_pages)
+
+    template = 'session/' + path + '.html'
+
+    context = {
+        'list': queryset,
+    }
+
+    data['html_list'] = render_to_string(template, context, request=request)
+
+    return JsonResponse(data)
+    return
 
 
 class SessionListView(ListView):

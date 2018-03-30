@@ -131,7 +131,7 @@ session_urls = [
     url(r'^list/$', views.SessionListView.as_view(template_name='session/_session_list.html'),
         name='list'),
     url(r'^(?P<pk>\d+)/$', views.SessionDetailView.as_view(template_name='session/_session_detail.html'), name='detail'),
-    url(r'^(?P<pk>\d+)/case_list$', views.CaseListView.as_view(template_name='session/session_case_list.html'),
+    url(r'^(?P<pk>\d+)/case_list$', views.session_case_list,
         name='cases'),
     url(r'^add/$', views.SessionAddView.as_view(), name='add'),
     url(r'^(?P<pk>\d+)/edit/$', views.SessionEditView.as_view(), name='edit'),
