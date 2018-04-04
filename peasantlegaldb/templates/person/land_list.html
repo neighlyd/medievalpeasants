@@ -23,7 +23,7 @@
                             <td data-toggle="collapse" data-target=".case_{{ land.litigant.case.id }}_summary" class="details-control"><i class="fas fa-plus-square"></i></td>
                             <td><a href="{% url 'case:detail' land.litigant.case.id %}">{{ land.litigant.case.id }}</a></td>
                             <td><a href="{% url 'session:detail' land.litigant.case.session.id %}">{{ land.litigant.case.session }}</a></td>
-                            <td><a href="{% url 'land:detail' land.id %}">{{ land.id }}</a></td>
+                            <td><a href="{% url 'land:detail' land.land.id %}">{{ land.land.id }}</a></td>
                             <td>{% for parcel in land.land.parcels.all %}
                                 {% if forloop.first %}{{ parcel.amount }} {{ parcel.parcel_type.parcel_type}} of {{ parcel.parcel_tenure.tenure }}
                                 {% else %}<hr>{{ parcel.amount }} {{ parcel.parcel_type.parcel_type}} of {{ parcel.parcel_tenure.tenure }}{% endif %}
