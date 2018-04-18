@@ -745,9 +745,7 @@ class Case(models.Model):
 
     @property
     def litigant_count(self):
-        litigants = [(x) for x in self.litigants.values_list('person_id', flat=True)]
-        number_of_litigants = len(set(litigants))
-        return number_of_litigants
+        return len(set([(x) for x in self.litigants.values_list('person_id', flat=True)]))
 
     @property
     def pledge_count(self):

@@ -294,25 +294,23 @@ class PersonSerializer(DynamicModelSerializer):
 
     counts = DynamicMethodField(
         requires = [
-            'person_to_case__case__session', 'pledge_giver', 'pledge_receiver', 'position', 'relationship_person_one',
-            'relationship_person_two', 'case_set'
+            'cases__case__session', 'pledge_giver', 'position', 'relationship_person_one',
+            'relationship_person_two', 'case_set',
         ],
         deferred=True
     )
     earliest_case = DynamicRelationField('CaseSerializer', deferred=True, embed=True)
     latest_case = DynamicRelationField('CaseSerializer', deferred=True, embed=True)
     village = DynamicRelationField('VillageSerializer', embed=True, deferred=True)
-    cases = DynamicRelationField('LitigantSerializer', deferred=True, source='person_to_case', many=True, embed=True)
+    cases = DynamicRelationField('LitigantSerializer', deferred=True, many=True, embed=True)
     pledges_given = DynamicRelationField('PledgeSerializer', deferred=True, source='pledge_giver', many=True,
                                          embed=True)
-    pledges_received = DynamicRelationField('PledgeSerializer', deferred=True, source='pledge_receiver', many=True,
-                                            embed=True)
     positions = DynamicRelationField('PositionSerializer', deferred=True, source='position', many=True, embed=True)
 
     class Meta:
         model = models.Person
         fields = ('id', 'first_name', 'relation_name', 'last_name', 'status', 'gender', 'tax_1332', 'tax_1379', 'notes',
-                  'full_name', 'counts', 'village', 'cases', 'pledges_given', 'pledges_received', 'positions',
+                  'full_name', 'counts', 'village', 'cases', 'pledges_given', 'positions',
                   'gender_display', 'status_display', 'earliest_case', 'latest_case')
 
     def get_counts(self, record):
@@ -320,7 +318,7 @@ class PersonSerializer(DynamicModelSerializer):
 
         pledge_counts = {}
         pledge_counts['given'] = record.pledges_given_count
-        pledge_counts['received'] = record.pledges_received_count
+        #pledge_counts['received'] = record.pledges_received_count
 
         counts['pledge'] = pledge_counts
         counts['monetary'] = record.monetary_counts
@@ -365,7 +363,7 @@ class CaseSerializer(DynamicModelSerializer):
     court_type = serializers.SerializerMethodField()
     litigant_count = DynamicMethodField(
         requires=[
-            'case_to_person'
+            'litigants'
         ],
         deferred=True
     )
@@ -377,7 +375,7 @@ class CaseSerializer(DynamicModelSerializer):
     )
     pledge_count = DynamicMethodField(
         requires=[
-            'case_to_pledge'
+            'pledges'
         ],
         deferred=True
     )
@@ -391,8 +389,8 @@ class CaseSerializer(DynamicModelSerializer):
     murrain = DynamicRelationField('MurrainSerializer', deferred=True, many=True, embed=True)
     places_mentioned = DynamicRelationField('PlaceMentionedSerializer', source='placementioned_set', deferred=True,
                                             many=True, embed=True)
-    people = DynamicRelationField('LitigantSerializer', source='case_to_person', deferred=True, many=True, embed=True)
-    pledges = DynamicRelationField('PledgeSerializer', source='case_to_pledge', deferred=True, many=True, embed=True)
+    people = DynamicRelationField('LitigantSerializer', source='litigants', deferred=True, many=True, embed=True)
+    pledges = DynamicRelationField('PledgeSerializer', source='pledges', deferred=True, many=True, embed=True)
 
 
     class Meta:

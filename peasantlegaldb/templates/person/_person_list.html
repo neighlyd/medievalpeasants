@@ -89,6 +89,7 @@
 
             var village = $("#select_village").val();
             var filter = $('#select_filter').val();
+            var api_call = 'exclude[]=village.*&include[]=village.name&exclude[]=earliest_case.*&exclude[]=earliest_case.session.*&exclude[]=earliest_case.session.village.*&include[]=earliest_case.session.village.name&include[]=earliest_case.session.law_term&include[]=earliest_case.session.year&exclude[]=latest_case.*&exclude[]=latest_case.session.*&exclude[]=latest_case.session.village.*&include[]=latest_case.session.village.name&include[]=latest_case.session.law_term&include[]=latest_case.session.year'
             var btnClicked = e.target.id;
             var url = Urls["api:person-list"]();
 
@@ -101,20 +102,20 @@
                 }
             } else if (village === "All"){
                     if (filter === "residents") {
-                        url = url + "?exclude[]=village.*&include[]=village.name&include[]=earliest_case.session.village&include[]=latest_case.session.village";
+                        url = url + '?' + api_call;
                     } else if (filter === "litigants") {
-                        url = url + "?exclude[]=village.*&include[]=village.name&include[]=earliest_case.session.village&include[]=latest_case.session.village";
+                        url = url + '?' + api_call;
                     } else {
-                        url = url + "?" + filter + "=true&exclude[]=village.*&include[]=village.name&include[]=earliest_case.session.village&include[]=latest_case.session.village";
+                        url = url + "?" + filter + "=true&" + api_call;
                     }
             }
             else {
                 if (filter === "residents") {
-                        url = url + "?filter{village.id}=" + village + "&exclude[]=village.*&include[]=village.name&include[]=earliest_case.session.village&include[]=latest_case.session.village";
+                        url = url + "?filter{village.id}=" + village + "&" + api_call;
                     } else if (filter === "litigants") {
-                        url = url + "?village_to_litigant=" + village + "&exclude[]=village.*&include[]=village.name&include[]=earliest_case.session.village&include[]=latest_case.session.village";
+                        url = url + "?village_to_litigant=" + village + "&" + api_call;
                     } else {
-                        url = url + "?" + filter + "=true&village_to_litigant=" + village + "&exclude[]=village.*&include[]=village.name&include[]=earliest_case.session.village&include[]=latest_case.session.village";
+                        url = url + "?" + filter + "=true&village_to_litigant=" + village + "&" + api_call;
                     }
             }
             $("#table").DataTable().destroy();
