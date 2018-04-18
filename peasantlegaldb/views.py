@@ -250,12 +250,13 @@ def add_litigant(request, pk):
     if request.method == "POST":
         form = forms.LitigantForm(request.POST)
         amercement_formset = forms.AmercementFormset(request.POST, prefix='amercement')
-        fine_formset = forms.FineFormset(request.POST, prefix='fine')
-        damage_formset = forms.DamageFormset(request.POST, prefix='damage')
-        heriot_formset = forms.HeriotFormset(request.POST, prefix='heriot')
         capitagium_formset = forms.CapitagiumFormset(request.POST, prefix='capitagium')
+        damage_formset = forms.DamageFormset(request.POST, prefix='damage')
+        fine_formset = forms.FineFormset(request.POST, prefix='fine')
+        heriot_formset = forms.HeriotFormset(request.POST, prefix='heriot')
         impercamentum_formset = forms.ImpercamentumFormset(request.POST, prefix='impercamentum')
         land_formset = forms.LandFormset(request.POST, prefix='land')
+        pledge_formset = forms.PledgeFormset(request.POST, prefix='land')
         if form.is_valid():
             new_litigant = form.save(commit=False)
             new_litigant.case = case_instance
@@ -304,7 +305,13 @@ def add_litigant(request, pk):
                     for form in land_formset:
                         new_land = form.save(commit=False)
                         new_land.litigant = new_litigant
-                        new_litigant.save()
+                        new_land.save()
+            if pledge_formset.has_changed():
+                if pledge_formset.is_valid():
+                    for form in pledge_formset:
+                        new_pledge = form.save(commit=False)
+                        new_pledge.litigant = new_litigant
+                        new_pledge.save()
             data['form_is_valid'] = True
             # Once litigant has been added, requery the Litigant model to retrieve an updated list of Litigants.
             litigant_list = models.Litigant.objects.filter(case=case_instance).prefetch_related('person')\
@@ -320,23 +327,25 @@ def add_litigant(request, pk):
     else:
         form = forms.LitigantForm(initial={'case' : case_instance})
         amercement_formset = forms.AmercementFormset(prefix='amercement')
-        fine_formset = forms.FineFormset(prefix='fine')
-        damage_formset = forms.DamageFormset(prefix='damage')
-        heriot_formset = forms.HeriotFormset(prefix='heriot')
         capitagium_formset = forms.CapitagiumFormset(prefix='capitagium')
+        damage_formset = forms.DamageFormset(prefix='damage')
+        fine_formset = forms.FineFormset(prefix='fine')
+        heriot_formset = forms.HeriotFormset(prefix='heriot')
         impercamentum_formset = forms.ImpercamentumFormset(prefix='impercamentum')
         land_formset = forms.LandFormset(prefix='land')
+        pledge_formset = forms.PledgeFormset(prefix='pledge')
 
     context = {
         'form': form, 
         'case': case_instance,
         'amercement_formset': amercement_formset,
-        'fine_formset': fine_formset,
-        'damage_formset': damage_formset,
-        'heriot_formset': heriot_formset,
         'capitagium_formset': capitagium_formset,
+        'damage_formset': damage_formset,
+        'fine_formset': fine_formset,
+        'heriot_formset': heriot_formset,
         'impercamentum_formset': impercamentum_formset,
         'land_formset': land_formset,
+        'pledge_formset': pledge_formset,
     }
 
     # Before passing template and context along, render it as a string so that it can be serialized and sent as JSON data.
@@ -377,12 +386,13 @@ def edit_litigant(request, pk):
     if request.method == 'POST':
         form = forms.LitigantForm(data=request.POST, instance=litigant)
         amercement_formset = forms.AmercementFormset(request.POST, instance=litigant, prefix='amercement')
-        fine_formset = forms.FineFormset(request.POST, instance=litigant, prefix='fine')
-        damage_formset = forms.DamageFormset(request.POST, instance=litigant, prefix='damage')
-        heriot_formset = forms.HeriotFormset(request.POST, instance=litigant, prefix='heriot')
         capitagium_formset = forms.CapitagiumFormset(request.POST, instance=litigant, prefix='capitagium')
+        damage_formset = forms.DamageFormset(request.POST, instance=litigant, prefix='damage')
+        fine_formset = forms.FineFormset(request.POST, instance=litigant, prefix='fine')
+        heriot_formset = forms.HeriotFormset(request.POST, instance=litigant, prefix='heriot')
         impercamentum_formset = forms.ImpercamentumFormset(request.POST, instance=litigant, prefix='impercamentum')
         land_formset = forms.LandFormset(request.POST, instance=litigant, prefix='land')
+        pledge_formset = forms.PledgeFormset(request.POST, instance=litigant, prefix='pledge')
         if form.is_valid():
             litigant = form.save(commit=False)
             litigant.save()
@@ -407,6 +417,9 @@ def edit_litigant(request, pk):
             if land_formset.has_changed():
                 if land_formset.is_valid():
                     land_formset.save()
+            if pledge_formset.has_changed():
+                if pledge_formset.is_valid():
+                    pledge_formset.save()
             data['form_is_valid'] = True
             litigant_list = models.Litigant.objects.filter(case=case_instance).prefetch_related('person') \
                 .order_by('person__first_name', 'person__last_name')
@@ -420,24 +433,26 @@ def edit_litigant(request, pk):
     else:
         form = forms.LitigantForm(instance=litigant)
         amercement_formset = forms.AmercementFormset(instance=litigant, prefix='amercement')
-        fine_formset = forms.FineFormset(instance=litigant, prefix='fine')
-        damage_formset = forms.DamageFormset(instance=litigant, prefix='damage')
-        heriot_formset = forms.HeriotFormset(instance=litigant, prefix='heriot')
         capitagium_formset = forms.CapitagiumFormset(instance=litigant, prefix='capitagium')
+        damage_formset = forms.DamageFormset(instance=litigant, prefix='damage')
+        fine_formset = forms.FineFormset(instance=litigant, prefix='fine')
+        heriot_formset = forms.HeriotFormset(instance=litigant, prefix='heriot')
         impercamentum_formset = forms.ImpercamentumFormset(instance=litigant, prefix='impercamentum')
         land_formset = forms.LandFormset(instance=litigant, prefix='land')
+        pledge_formset = forms.PledgeFormset(instance=litigant, prefix='pledge')
 
     context = {
         'form': form,
         'litigant': litigant,
         'case': case_instance,
         'amercement_formset': amercement_formset,
-        'fine_formset': fine_formset,
-        'damage_formset': damage_formset,
-        'heriot_formset': heriot_formset,
         'capitagium_formset': capitagium_formset,
+        'damage_formset': damage_formset,
+        'fine_formset': fine_formset,
+        'heriot_formset': heriot_formset,
         'impercamentum_formset': impercamentum_formset,
         'land_formset': land_formset,
+        'pledge_formset': pledge_formset,
     }
     data['html_form'] = render_to_string('case/_case_edit_litigant_modal.html', context, request=request)
 

@@ -78,6 +78,14 @@
     </div>
 </div>
 
+<div class="modal fade" id="modal-delete-litigant">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+        </div>
+    </div>
+</div>
+
 {% endblock %}
 
 {% block scripts %}
@@ -98,6 +106,20 @@
                 });
             });
             $('#modal-litigant').on('shown.bs.modal', function () {
+                $('#add_capitagium_collapse tbody tr').formset({
+                    prefix: 'capitagium',
+                    addText: 'Add Another',
+                    deleteText: 'Delete Capitagium',
+                });
+            });
+            $('#modal-litigant').on('shown.bs.modal', function () {
+                $('#add_damage_collapse tbody tr').formset({
+                    prefix: 'damage',
+                    addText: 'Add Another',
+                    deleteText: 'Delete Damage',
+                });
+            });
+            $('#modal-litigant').on('shown.bs.modal', function () {
                 $('#add_fine_collapse tbody tr').formset({
                     prefix: 'fine',
                     addText: 'Add Another',
@@ -105,40 +127,34 @@
                 });
             });
             $('#modal-litigant').on('shown.bs.modal', function () {
-                $('#add_damage_collapse tbody tr').formset({
-                    prefix: 'fine',
-                    addText: 'Add Another',
-                    deleteText: 'Delete Damage',
-                });
-            });
-            $('#modal-litigant').on('shown.bs.modal', function () {
                 $('#add_heriot_collapse tbody tr').formset({
-                    prefix: 'fine',
+                    prefix: 'heriot',
                     addText: 'Add Another',
                     deleteText: 'Delete Heriot',
                 });
             });
             $('#modal-litigant').on('shown.bs.modal', function () {
-                $('#add_capitagium_collapse tbody tr').formset({
-                    prefix: 'fine',
-                    addText: 'Add Another',
-                    deleteText: 'Delete Capitagium',
-                });
-            });
-            $('#modal-litigant').on('shown.bs.modal', function () {
                 $('#add_impercamentum_collapse tbody tr').formset({
-                    prefix: 'fine',
+                    prefix: 'impercamentum',
                     addText: 'Add Another',
                     deleteText: 'Delete Impercamentum',
                 });
             });
             $('#modal-litigant').on('shown.bs.modal', function () {
                 $('#add_land_collapse tbody tr').formset({
-                    prefix: 'fine',
+                    prefix: 'land',
                     addText: 'Add Another',
                     deleteText: 'Delete Land',
                 });
             });
+            $('#modal-litigant').on('shown.bs.modal', function () {
+                $('#add_pledge_collapse tbody tr').formset({
+                    prefix: 'pledge',
+                    addText: 'Add Another',
+                    deleteText: 'Delete Pledge',
+                });
+            });
+
         });
 
     </script>

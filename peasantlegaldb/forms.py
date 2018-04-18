@@ -338,3 +338,7 @@ ImpercamentumFormset = inlineformset_factory(models.Litigant, models.Impercament
 LandFormset = inlineformset_factory(models.Litigant, models.LandtoCase,
                                     fields=('land', 'role', 'villeinage', 'notes'),
                                     extra=1, can_delete=True)
+
+PledgeFormset = inlineformset_factory(models.Litigant, models.Pledge,
+                                      fields=('giver',),
+                                      extra=1, can_delete=True)

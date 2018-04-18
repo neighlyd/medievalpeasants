@@ -399,50 +399,6 @@ class Person(models.Model):
     earliest_case = models.ForeignKey('Case', null=True, blank=True, related_name='person_to_earliest_case+')
     latest_case = models.ForeignKey('Case', null=True, blank=True, related_name='person_to_latest_case+')
 
-    def save(self, *args, **kwargs):
-        try:
-            earliest_litigation = Case.objects.filter(litigants__person=self).order_by('session__date')[0]
-        except:
-            earliest_litigation = None
-        try:
-            earliest_pledge = Case.objects.filter(litigants__pledges__giver=self).order_by('receiver__case__session__date')[0]
-        except:
-            earliest_pledge = None
-
-        if earliest_litigation and earliest_pledge:
-            if earliest_litigation.session.date > earliest_pledge.session.date:
-                self.earliest_case = earliest_litigation
-            elif earliest_pledge.receiver.session.date > earliest_litigation.session.date:
-                self.earliest_case = earliest_pledge
-        elif earliest_litigation:
-            self.earliest_case = earliest_litigation
-        elif earliest_pledge:
-            self.earliest_case = earliest_pledge
-        else:
-            self.earliest_case = None
-
-        try:
-            latest_litigation = Case.objects.filter(litigants__person=self).order_by('-session__date')[0]
-        except:
-            latest_litigation = None
-        try:
-            latest_pledge = Case.objects.filter(litigants__pledges__giver=self).order_by('-receiver__case__session__date')[0]
-        except:
-            latest_pledge = None
-
-        if latest_litigation and latest_pledge:
-            if latest_litigation.session.date > latest_pledge.session.date:
-                self.latest_case = latest_litigation
-            elif latest_pledge.session.date > latest_litigation.session.date:
-                self.latest_case = latest_pledge
-        elif latest_litigation:
-            self.latest_case = latest_litigation
-        elif latest_pledge:
-            self.latest_case = latest_pledge
-        else:
-            self.latest_case = None
-        super(Person, self).save(*args, **kwargs)
-
     def get_absolute_url(self):
         return reverse('person:detail', args=[str(self.id)])
 
@@ -901,7 +857,7 @@ class Litigant(models.Model):
     land = models.ForeignKey(Land, null=True, blank=True, on_delete=models.CASCADE, related_name='case_to_land')
     land_villeinage = models.NullBooleanField()
     land_notes = models.TextField(blank=True,)
-    
+
     @property
     def impercamentum_denarius_total(self):
         total = self.impercamenta.aggregate(total=Sum('impercamentum__in_denarius'))
@@ -946,26 +902,6 @@ class Litigant(models.Model):
     @property
     def pledge_exists(self):
         return self.pledges.exists()
-
-    def save(self, *args, **kwargs):
-        person = Person.objects.get(id=self.person_id)
-        try:
-            earliest_case = person.earliest_case
-            if self.case.session.date <= earliest_case.session.date:
-                person.earliest_case = self.case
-                person.save()
-        except:
-            person.earliest_case = self.case
-            person.save()
-        try:
-            latest_case = person.latest_case
-            if self.case.session.date >= latest_case.session.date:
-                person.latest_case = self.case
-                person.save()
-        except:
-            person.latest_case = self.case
-            person.save()
-        super(Litigant, self).save(*args, **kwargs)
 
 
 class Fine(models.Model):
