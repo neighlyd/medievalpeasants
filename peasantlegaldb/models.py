@@ -1,5 +1,6 @@
 from django.db import models
 from django.db.models import Count, Max, Min, Avg, Sum
+from django.urls import reverse
 
 from decimal import *
 
@@ -34,6 +35,9 @@ class Archive(models.Model):
     website = models.URLField(blank=True)
     notes = models.TextField(blank=True)
 
+    def get_absolute_url(self):
+        return reverse('archive:detail', args=[str(self.id)])
+
     @property
     def record_count(self):
         return self.record_set.count()
@@ -53,6 +57,10 @@ class Archive(models.Model):
 
 
 class Money(models.Model):
+
+    class Meta:
+        ordering = ['in_denarius']
+
     amount = models.CharField(max_length=150)
     in_denarius = models.IntegerField(null=True, blank=True)
 
@@ -66,6 +74,9 @@ class Money(models.Model):
 class Chattel(models.Model):
     name = models.CharField(max_length=250)
 
+    class Meta:
+        ordering = ['name']
+
     def __str__(self):
         return self.name
 
@@ -75,6 +86,7 @@ class CaseType(models.Model):
     class Meta:
         verbose_name = "Case Type"
         verbose_name_plural = "Case Types"
+        ordering = ['case_type']
 
     case_type = models.CharField(max_length=150)
 
@@ -86,6 +98,7 @@ class County(models.Model):
 
     class Meta:
         verbose_name_plural = "Counties"
+        ordering = ['name']
 
     name = models.CharField(max_length=20)
     abbreviation = models.CharField(max_length=15)
@@ -151,7 +164,7 @@ class Land(models.Model):
         return parcel_list
 
     def __str__(self):
-        return "Land ID: %s" % (self.id)
+        return "%s" % (self.id)
 
 
 class ParcelTenure(models.Model):
@@ -215,6 +228,9 @@ class Relation(models.Model):
 class Role(models.Model):
     role = models.CharField(max_length=50)
 
+    class Meta:
+        ordering = ['role']
+
     def __str__(self):
         return self.role
 
@@ -240,6 +256,9 @@ class Hundred(models.Model):
 
 class Village(models.Model):
 
+    class Meta:
+        ordering = ['name',]
+
     name = models.CharField(max_length=50)
     latitude = models.DecimalField(max_digits=10, decimal_places=7)
     longitude = models.DecimalField(max_digits=10, decimal_places=7)
@@ -251,6 +270,9 @@ class Village(models.Model):
     # Part of the "Great Rumor" petition of 1377.
     great_rumor = models.BooleanField(default=False)
     notes = models.TextField(blank=True)
+
+    def get_absolute_url(self):
+        return reverse('case:detail', args=[str(self.id)])
 
     @property
     def case_count(self):
@@ -377,6 +399,53 @@ class Person(models.Model):
     earliest_case = models.ForeignKey('Case', null=True, blank=True, related_name='person_to_earliest_case+')
     latest_case = models.ForeignKey('Case', null=True, blank=True, related_name='person_to_latest_case+')
 
+    def save(self, *args, **kwargs):
+        try:
+            earliest_litigation = Case.objects.filter(litigants__person=self).order_by('session__date')[0]
+        except:
+            earliest_litigation = None
+        try:
+            earliest_pledge = Case.objects.filter(litigants__pledges__giver=self).order_by('receiver__case__session__date')[0]
+        except:
+            earliest_pledge = None
+
+        if earliest_litigation and earliest_pledge:
+            if earliest_litigation.session.date > earliest_pledge.session.date:
+                self.earliest_case = earliest_litigation
+            elif earliest_pledge.receiver.session.date > earliest_litigation.session.date:
+                self.earliest_case = earliest_pledge
+        elif earliest_litigation:
+            self.earliest_case = earliest_litigation
+        elif earliest_pledge:
+            self.earliest_case = earliest_pledge
+        else:
+            self.earliest_case = None
+
+        try:
+            latest_litigation = Case.objects.filter(litigants__person=self).order_by('-session__date')[0]
+        except:
+            latest_litigation = None
+        try:
+            latest_pledge = Case.objects.filter(litigants__pledges__giver=self).order_by('-receiver__case__session__date')[0]
+        except:
+            latest_pledge = None
+
+        if latest_litigation and latest_pledge:
+            if latest_litigation.session.date > latest_pledge.session.date:
+                self.latest_case = latest_litigation
+            elif latest_pledge.session.date > latest_litigation.session.date:
+                self.latest_case = latest_pledge
+        elif latest_litigation:
+            self.latest_case = latest_litigation
+        elif latest_pledge:
+            self.latest_case = latest_pledge
+        else:
+            self.latest_case = None
+        super(Person, self).save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        return reverse('person:detail', args=[str(self.id)])
+
     # Used to check if a person has amercements, fines, etc. in templates.
     # TODO: Update to reflect change in amercement, fines, etc. model structure.
     @property
@@ -405,7 +474,7 @@ class Person(models.Model):
 
     @property
     def land_exists(self):
-        return self.cases.filter(land__isnull=False).exists()
+        return self.cases.filter(lands__isnull=False).exists()
 
     @property
     def relationship_exists(self):
@@ -649,6 +718,9 @@ class Session(models.Model):
     village = models.ForeignKey(Village)
     notes = models.TextField(blank=True)
 
+    def get_absolute_url(self):
+        return reverse('session:detail', args=[str(self.id)])
+
     @property
     def case_count(self):
         return self.case_set.count()
@@ -829,7 +901,7 @@ class Litigant(models.Model):
     land = models.ForeignKey(Land, null=True, blank=True, on_delete=models.CASCADE, related_name='case_to_land')
     land_villeinage = models.NullBooleanField()
     land_notes = models.TextField(blank=True,)
-
+    
     @property
     def impercamentum_denarius_total(self):
         total = self.impercamenta.aggregate(total=Sum('impercamentum__in_denarius'))

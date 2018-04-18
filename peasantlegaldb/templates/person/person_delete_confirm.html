@@ -1,0 +1,32 @@
+{% extends '_layout/__base.html' %}
+{% load template_tags %}
+
+{% block navbar %}
+    {% include '_layout/__navbar.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="col-4 offset-4" style="padding-top: 15px">
+    <div class="card">
+        <div class="card-header text-center">
+            <h4>Confirm Delete Person</h4>
+        </div>
+
+        <div class="card-body text-center">
+        <form method="post" action="{% url 'person:delete' person.id %}" class="delete_person_form">
+            {% csrf_token %}
+            <p class="lead">Are you sure you want to remove <strong>{{ person.full_name }}</strong> from the database?</p>
+            <p class="center-text">All of their associated data will be lost.</p>
+        </div>
+
+        <div class="card-footer">
+            <div class="d-flex justify-content-between pt-2">
+                <a class="btn btn-secondary" href="{{ request.META.HTTP_REFERER }}">Cancel</a>
+                <button type="submit" class="btn btn-danger">Remove Person</button>
+            </div>
+        </div>
+        </form>
+    </div>
+
+</div>
+{% endblock %}

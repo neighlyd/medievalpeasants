@@ -149,7 +149,7 @@ class CaseForm(forms.ModelForm):
         self.fields['summary'].label = False
         # adjust size of summary field widget.
         self.fields['summary'].widget.attrs['rows'] = 15
-        self.fields['summary'].widget.attrs['columns'] = 55
+        self.fields['summary'].widget.attrs['columns'] = 75
         # set form_tag to False to prevent crispy forms from auto-creating a <form> tag. This will allow us to add
         # multiple forms to a single template, though we need to manually add the <form> tag ourselves.
         self.helper.form_tag = False
@@ -190,6 +190,52 @@ class CaseForm(forms.ModelForm):
             'incidental_land': _('Incidental Land'),
         }
 
+
+class PersonForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        super(PersonForm, self).__init__(*args, **kwargs)
+        # organize status and gender alphabetically.
+        self.fields['status'].choices = sorted(models.Person.STATUS_CHOICES, key=lambda x: x[1])
+        self.fields['gender'].choices = sorted(models.Person.GENDER_CHOICES, key=lambda x: x[1])
+        self.helper = FormHelper()
+        # remove label for 'notes' to be replaced by 'Notes' in Fieldset
+        self.fields['notes'].label = False
+        # adjust size of notes field widget.
+        self.fields['notes'].widget.attrs['rows'] = 15
+        self.fields['notes'].widget.attrs['columns'] = 55
+        # set form_tag to False to prevent crispy forms from auto-creating a <form> tag. This will allow us to add
+        # multiple forms to a single template, though we need to manually add the <form> tag ourselves.
+        self.helper.form_tag = False
+        # Disable CSRF so that way Crispy forms doesn't create multiple CSRF tokens for each subform generated. Need to
+        # manually add CSRF token generation to template.
+        self.helper.disable_csrf = True
+        self.helper.form_id = 'id-personForm'
+        self.helper.wrapper_class = 'form-row'
+        self.helper.label_class = 'col-4'
+        self.helper.field_class = 'col-8'
+        self.helper.layout = Layout(
+            'first_name',
+            'relation_name',
+            'last_name',
+            'gender',
+            'status',
+            'village',
+            'tax_1332',
+            'tax_1379',
+        )
+
+    class Meta:
+        model = models.Person
+        fields = ['notes', 'first_name', 'relation_name', 'last_name', 'gender', 'status', 'village', 'tax_1332',
+                  'tax_1379']
+        labels = {
+            'first_name': _('First Name'),
+            'relation_name': _('Relation'),
+            'last_name': _('Last Name'),
+            'tax_1332': _('1332 Poll Tax'),
+            'tax_1379': _('1379 Poll Tax'),
+        }
 
 class LitigantForm(forms.ModelForm):
 

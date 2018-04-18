@@ -6,22 +6,22 @@
 {% endblock %}
 
 {% block additional_title %}
-    <div class="form-inline d-flex justify-content-center" id="select_cases"">
+    <div class="form-inline d-flex justify-content-center" id="select_cases">
             <div class="form-group" style="padding-top: 5px">
             {% for field in filter_case_form.visible_fields %}
-                <div class="col-2">
+                <div class="col-1">
                     <h4>{{ field.label_tag }}</h4>
                 </div>
-                <div class="col-4">
+                <div class="col-3">
                     {% render_field field class="form-control" id=field.name %}
                 </div>
         {% endfor %}
         </div>
-        <div class="col-2">
-
-        <button type="button" class="btn btn-primary" id="get_cases">Get Cases</button>
-        </div>
     </div>
+    <br>
+        <div class="text-center">
+            <button type="button" class="btn btn-primary" id="get_cases">Get Cases</button>
+        </div>
 {% endblock %}
 
 {% block center_bar %}

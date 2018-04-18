@@ -1,0 +1,63 @@
+{% extends '_layout/_l_form_input.html' %}
+{% load template_tags %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block navbar %}
+    {% include '_layout/__navbar.html' %}
+{% endblock %}
+
+    {% block left_sidebar %}
+        <div class="container" style="position: sticky; top: 65px">
+            <button type="button" class="btn btn-success pull-right" id="add_relation" data-url="#"><i class="fas fa-plus"></i>  Add Relationship</button>
+        </div>
+    {% endblock %}
+
+
+{% block center_block %}
+<div class="p-0 col-lg-8">
+    <div class="card">
+    <form id="case" action="" method="post">
+        {% csrf_token %}
+
+    <div class="card-header text-center">
+        <h2 class="card-title">Add Person</h2>
+    </div>
+
+    <div class="card-body clearfix" id="main_form">
+        <div class="d-flex justify-content-between flex-wrap">
+
+                        <div class="card p-0 col-lg-5">
+                            <h3 class="card-header">Person Info:</h3>
+                                <div class="card-body">
+                                    {% for field in form %}
+                                        {% if field.name != 'notes' %}
+                                            {{ field | as_crispy_field }}
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                        </div>
+                        <div class="card p-0 col-lg-6">
+                            <h3 class="card-header">Notes:</h3>
+                            <div class="card-body">
+                                {{ form.notes | as_crispy_field }}
+                            </div>
+                        </div>
+        </div>
+    </div>
+
+    </div>
+</div>
+
+<div class="p-0 col-lg-2">
+    <div class="container" style="position: sticky; top: 65px">
+        <button type="submit" class="btn btn-success" name="save">Save Person</button>
+        <br>
+        <br>
+</form>
+        <a class="btn btn-danger" href="{{ request.META.HTTP_REFERER }}">Cancel</a>
+    </div>
+</div>
+
+
+{% endblock %}

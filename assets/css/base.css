@@ -178,3 +178,11 @@ tr.shown td.details-control {
 .bg-grey {
   background-color: #bababa;
 }
+
+/*
+  changing modal size.
+ */
+
+.case-modal {
+  max-width: 85%;
+}

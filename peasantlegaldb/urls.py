@@ -1,5 +1,6 @@
 from django.conf.urls import url, include
 from django.views.generic import TemplateView
+from django.urls import reverse_lazy
 
 from peasantlegaldb import views
 
@@ -115,6 +116,12 @@ person_detail_urls = [
         name='stats'),
     url(r'^list/$', views.PeopleListView.as_view(template_name='person/_person_list.html'),
         name='list'),
+    url(r'^add/$', views.PersonAddView.as_view(),
+        name='add'),
+    url(r'^(?P<pk>\d+)/edit', views.PersonEditView.as_view(),
+        name='edit'),
+    url(r'^(?P<pk>\d+)/delete', views.PersonDeleteView.as_view(),
+        name='delete'),
 ]
 
 record_urls = [
@@ -171,10 +178,4 @@ urlpatterns = [
     url(r'^session/', include(session_urls, namespace='session')),
     url(r'^village/', include(village_urls, namespace='village')),
     url(r'^analysis/', include(analysis_urls))
-]
-
-# list views.
-urlpatterns += [
-
-
 ]

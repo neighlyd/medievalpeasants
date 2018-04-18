@@ -17,10 +17,12 @@
                     {% render_field field class="form-control" id=field.name %}
                 </div>
         {% endfor %}
-
+        </div>
     </div>
+    <br>
+    <div class="text-center">
+        <button type="button" class="btn btn-primary" id="get_people">Get People</button>
 
-    <button type="button" class="btn btn-primary" id="get_people">Get People</button>
     </div>
 {% endblock %}
 
@@ -49,7 +51,7 @@
     <div class="container" style="position: sticky; top: 65px">
         {% if perms.peasantlegaldb.add_person %}
             <div class="btn-group" role="group">
-                <a class="btn btn-success" href="#">Add Person</a>
+                <a class="btn btn-success" href="{% url 'person:add' %}">Add Person</a>
             </div>
             <br>
             <br>

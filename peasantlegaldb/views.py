@@ -1,5 +1,5 @@
 from django.views.generic.detail import DetailView
-from django.views.generic.edit import UpdateView, CreateView, DeleteView
+from django.views.generic.edit import UpdateView, CreateView, DeleteView, FormView
 from django.views.generic import ListView
 
 from django.shortcuts import render, get_object_or_404, redirect
@@ -811,6 +811,35 @@ class PersonDetailView(DetailView):
         context = super(PersonDetailView, self).get_context_data(**kwargs)
         context['page_title'] = 'Person'
         return context
+
+
+class PersonAddView(GroupRequiredMixin, CreateView):
+
+    model = models.Person
+    form_class = forms.PersonForm
+    template_name = 'person/person_add.html'
+
+    group_required = Add
+
+
+class PersonEditView(GroupRequiredMixin, UpdateView):
+
+    model = models.Person
+    form_class = forms.PersonForm
+    template_name = 'person/person_edit.html'
+
+    group_required = Edit
+
+
+class PersonDeleteView(GroupRequiredMixin, DeleteView):
+
+    model = models.Person
+    template_name = 'person/person_delete_confirm.html'
+
+    group_required = Delete
+
+    def get_success_url(self):
+        return reverse('person:list')
 
 
 class SessionDetailView(DetailView):

@@ -2,7 +2,7 @@
     <li class="list-group-item">
         <div class="row">
             <div class="col-4"><a href="{% url 'person:detail' litigant.person.id %}"><h6>{{ litigant.person.full_name }}</h6></a></div>
-            <div class="col-4 text-center"><h6>{{ litigant.role.role }}</h6></div>
+            <div class="col-4 text-center"><h6>Role: <b>{{ litigant.role.role }}</b></h6></div>
             <div class="col-4">
                 <div class="d-flex flex-wrap justify-content-around">
                     <button class="btn btn-danger delete_litigant" type="button" data-url="{% url 'litigant:delete' litigant.id %}"><i class="fas fa-trash-alt"></i> Remove</button>
@@ -11,8 +11,10 @@
             </div>
         </div>
 
-        <div class="col-3">
-            <table class="table table-bordered table-sm">
+        {% if litigant.ad_proximum or litigant.distrained or litigant.attached or litigant.bail %}
+        <div class="d-flex flex-wrap justify-content-center" style="padding-bottom: 5px">
+            <div class="card">
+            <table class="table table-sm">
                 <thead>
                     <tr>
                         {% if litigant.ad_proximum %}
@@ -33,26 +35,27 @@
                 <tbody>
                     <tr>
                         {% if litigant.ad_proximum %}
-                            <td><i class="fas fa-check"></i></td>
+                            <td class="text-center"><i class="fas fa-check"></i></td>
                         {% endif %}
                         {% if litigant.distrained %}
-                            <td><i class="fas fa-check"></i></td>
+                            <td class="text-center"><i class="fas fa-check"></i></td>
                         {% endif %}
                         {% if litigant.attached %}
-                            <td><i class="fas fa-check"></i></td>
+                            <td class="text-center"><i class="fas fa-check"></i></td>
                         {% endif %}
                         {% if litigant.bail %}
-                            <td><i class="fas fa-check"></i></td>
+                            <td class="text-center"><i class="fas fa-check"></i></td>
                         {% endif %}
 
                     </tr>
                 </tbody>
             </table>
+            </div>
         </div>
+        {% endif %}
 
-            <div class="d-flex flex-wrap justify-content-around">
-
-                {% if litigant.amercement_exists %}
+            {% if litigant.amercement_exists %}
+                <div class="d-flex flex-wrap justify-content-center" style="padding-bottom: 5px">
                     <div class="card">
                         <table class="table">
                             <thead>
@@ -69,9 +72,10 @@
                             </tbody>
                         </table>
                     </div>
-                {% endif %}
-
-                {% if litigant.fine_exists %}
+                </div>
+            {% endif %}
+            {% if litigant.fine_exists %}
+                <div class="d-flex flex-wrap justify-content-center" style="padding-bottom: 5px">
                     <div class="card">
                         <table class="table">
                             <thead>
@@ -88,9 +92,10 @@
                             </tbody>
                         </table>
                     </div>
-                {% endif %}
-
-                {% if litigant.damage_exists %}
+                </div>
+            {% endif %}
+            {% if litigant.damage_exists %}
+                <div class="d-flex flex-wrap justify-content-center" style="padding-bottom: 5px">
                     <div class="card">
                         <table class="table">
                             <thead>
@@ -109,9 +114,10 @@
                             </tbody>
                         </table>
                     </div>
-                {% endif %}
-            
-                {% if litigant.capitagium_exists %}
+                </div>
+            {% endif %}
+            {% if litigant.capitagium_exists %}
+                <div class="d-flex flex-wrap justify-content-center" style="padding-bottom:5px">
                     <div class="card">
                         <table class="table">
                             <thead>
@@ -129,19 +135,20 @@
                                 {% for capitagium in litigant.capitagia.all %}
                                 <tr>
                                     <td>{{ capitagium.capitagium }}</td>
-                                    <td>{{ capitagium.crossed }}</td>
-                                    <td>{{ capitagium.recessit }}</td>
-                                    <td>{{ capitagium.habet_terram }}</td>
-                                    <td>{{ capitagium.mortuus }}</td>
-                                    <td>{{ capitagium.notes }}</td>                                
+                                    <td class="text-center">{% if capitagium.crossed %}<b>X</b>{% endif %}</td>
+                                    <td class="text-center">{% if capitagium.recessit %}<b>X</b>{% endif %}</td>
+                                    <td class="text-center">{% if capitagium.habet_terram %}<b>X</b>{% endif %}</td>
+                                    <td class="text-center">{% if capitagium.mortuus %}<b>X</b>{% endif %}</td>
+                                    <td>{{ capitagium.notes|linebreaks }}</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
                         </table>
                     </div>
-                {% endif %}
-            
-                {% if litigant.heriot_exists %}
+                </div>
+            {% endif %}
+            {% if litigant.heriot_exists %}
+                <div class="d-flex flex-wrap justify-content-center" style="padding-bottom: 5px">
                     <div class="card">
                         <table class="table">
                             <thead>
@@ -160,10 +167,10 @@
                             </tbody>
                         </table>
                     </div>
-                {% endif %}
-
-
-                {% if litigant.impercamentum_exists %}
+                </div>
+            {% endif %}
+            {% if litigant.impercamentum_exists %}
+                <div class="d-flex flex-wrap justify-content-center" style="padding-bottom: 5px">
                     <div class="card">
                         <table class="table">
                             <thead>
@@ -183,32 +190,36 @@
                             </tbody>
                         </table>
                     </div>
-                {% endif %}
-
-                {% if litigant.land_exists %}
+                </div>
+            {% endif %}
+            {% if litigant.land_exists %}
+                <div class="d-flex flex-wrap justify-content-center" style="padding-bottom: 5px">
                     <div class="card">
                         <table class="table">
                             <thead>
                                 <tr>
-                                    <td scope="col">Land</td>
-                                    <td scope="col">Villeinage</td>
-                                    <td scope="col">Notes</td>
+                                    <td>Land</td>
+                                    <td>Role</td>
+                                    <td>Villeinage</td>
+                                    <td>Notes</td>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for land in litigant.lands.all %}
                                 <tr>
                                     <td>{{ land.land }}</td>
-                                    <td>{{ land.villeinage}} </td>
+                                    <td>{{ land.role.role }}</td>
+                                    <td class="text-center">{% if land.villeinage == True %}<b>√</b>{% elif land.villeinage == None %}<b>?</b>{% endif %}</td>
                                     <td>{{ land.notes }}</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
                         </table>
                     </div>
-                {% endif %}
-
-                {% if litigant.pledge_exists %}
+                </div>
+            {% endif %}
+            {% if litigant.pledge_exists %}
+                <div class="d-flex flex-wrap justify-content-center" style="padding-bottom: 5px">
                     <div class="card">
                         <table class="table">
                             <thead>
@@ -225,10 +236,8 @@
                             </tbody>
                         </table>
                     </div>
-                {% endif %}
-
-
-            </div>
+                </div>
+            {% endif %}
     </li>
 {% endfor %}
 

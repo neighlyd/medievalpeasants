@@ -142,8 +142,8 @@ class PersonFactory(factory.DjangoModelFactory):
     status = factory.Faker('random_choice', choices=Person.STATUS_CHOICES)
     village = factory.SubFactory(VillageFactory)
     gender = factory.Faker('random_choice', choices=Person.GENDER_CHOICES)
-    tax_1332 = 0
-    tax_1379 = 0
+    tax_1332 = random.randint(0,1)
+    tax_1379 = random.randint(0,1)
     notes = factory.Faker('paragraph')
 
 
@@ -325,7 +325,13 @@ class Full_Test_PeasantLegalDB(TestCase):
         c = CaseFactory.create()
         self.assertTrue(isinstance(c, Case))
 
+    def test_person_creation(self):
+        p = PersonFactory.create()
+        self.assertTrue(isinstance(p, Person))
 
+    def test_add_litigant(self):
+        l = LitigantFactory.create()
+        self.assertTrue(isinstance(l, Litigant))
 
 
 '''

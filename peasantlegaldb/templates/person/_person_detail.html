@@ -86,14 +86,18 @@
                         <td class="d-inline-block col-4"><b>Home Village:</b></td>
                         <td class="d-inline-block col-8"><a href="{% url 'village:detail' person.village.id %}">{{ person.village.name }}</a></td>
                     </tr>
+                    {% if person.tax_1332 %}
                     <tr class="row m-0">
                         <td class="d-inline-block col-4"><b>1332 Tax</b></td>
                         <td class="d-inline-block col-8">{{ person.tax_1332 }}</td>
                     </tr>
+                    {% endif %}
+                    {% if person.tax_1379 %}
                     <tr class="row m-0">
                         <td class="d-inline-block col-4"><b>1379 Tax</b></td>
                         <td class="d-inline-block col-8">{{ person.tax_1379 }}</td>
                     </tr>
+                    {% endif %}
                     <tr class="row m-0">
                         <td class="d-inline-block col-4"><b>Earliest Case</b></td>
                         {% if person.earliest_case.id is not None %}
@@ -153,21 +157,21 @@
     <div class="container" style="position: sticky; top: 65px">
         {% if perms.peasantlegaldb.add_person %}
             <div class="btn-group" role="group">
-                <a class="btn btn-success" href="#">Add Person</a>
+                <a class="btn btn-success" href="{% url 'person:add' %}">Add Person</a>
             </div>
             <br>
             <br>
         {% endif %}
         {% if perms.peasantlegaldb.change_person %}
             <div class="btn-group" role="group">
-                <a class="btn btn-warning" href="#">Edit Person</a>
+                <a class="btn btn-warning" href="{% url 'person:edit' person.id %}">Edit Person</a>
             </div>
             <br>
             <br>
         {% endif %}
         {% if perms.peasantlegaldb.delete_person %}
             <div class="btn-group" role="group">
-                <a class="btn btn-danger" href="#">Delete Person</a>
+                <a class="btn btn-danger" href="{% url 'person:delete' person.id %}">Delete Person</a>
             </div>
         {% endif %}
     </div>
@@ -234,7 +238,9 @@
                 })
             }
         });
-    });
+
+        });
+
 </script>
 
 

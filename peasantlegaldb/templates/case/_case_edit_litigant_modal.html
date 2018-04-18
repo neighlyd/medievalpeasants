@@ -13,7 +13,6 @@
 
     <div class="modal-body">
         <div class="row">
-
             <div class="col-3">
                 <div style="position: sticky;">
                         <ul class="list-group">
@@ -25,17 +24,17 @@
                           <button type="button" class="list-group-item list-group-item-action" data-toggle="collapse" data-target="#add_capitagium_collapse">Capitagium</button>
                           <button type="button" class="list-group-item list-group-item-action" data-toggle="collapse" data-target="#add_impercamentum_collapse">Impercamentum</button>
                           <button type="button" class="list-group-item list-group-item-action" data-toggle="collapse" data-target="#add_land_collapse">Land</button>
+                            <li class="list-group-item text-center">Items Added in List Order</li>
                         </ul>
                 </div>
             </div>
-            <div class="col">
-                <div class="container">
+            <div class="col-9">
 
-                    <div class="col-11 offset-1">
+                    <div class="col-12">
                         {% crispy form %}
                     </div>
 
-                    <div class="col-11 offset-1">
+                    <div class="col-12" style="padding-bottom: 5px">
                         {% if litigant.amercement_exists %}
                             <div class="collase show" id="add_amercement_collapse">
                         {% else %}
@@ -81,70 +80,63 @@
                             </div>
 
                         </div>
-                    </div>
 
-                    
-
-                    <div class="col-11 offset-1">
+                    <div class="col-12" style="padding-bottom: 5px">
                         {% if litigant.fine_exists %}
                             <div class="collase show" id="add_fine_collapse">
                         {% else %}
                             <div class="collapse" id="add_fine_collapse">
                         {% endif %}
                                 <div class="card">
-                                <div class="card-header text-center">
-                                    <h5>Fines</h5>
-                                </div>
-                                <div class="card-body">
-                                    <table class="table table-striped">
-                                        <tbody>
-                                            {{ fine_formset.management_form }}
-                                                {% for form in fine_formset %}
-                                                    {% if forloop.first %}
-                                                    <thead>
-                                                    <tr>
+                                    <div class="card-header text-center">
+                                        <h5>Fines</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <table class="table table-striped">
+                                            <tbody>
+                                                {{ fine_formset.management_form }}
+                                                    {% for form in fine_formset %}
+                                                        {% if forloop.first %}
+                                                        <thead>
+                                                        <tr>
+                                                            {% for field in form.visible_fields %}
+                                                                <th>{{ field.label|capfirst }}</th>
+                                                            {% endfor %}
+                                                        </tr>
+                                                        </thead>
+                                                        {% endif %}
+                                                        <tr class="{% cycle row1 row2 %} formset_row">
                                                         {% for field in form.visible_fields %}
-                                                            <th>{{ field.label|capfirst }}</th>
+                                                            <td>
+                                                                {# Include the hidden fields in the form #}
+                                                                {% if forloop.first %}
+                                                                    {% for hidden in form.hidden_fields %}
+                                                                        {{ hidden }}
+                                                                    {% endfor %}
+                                                                {% endif %}
+                                                                {{ field.errors.as_ul }}
+                                                                {% render_field field class="form-control" %}
+                                                            </td>
                                                         {% endfor %}
                                                     </tr>
-                                                    </thead>
-                                                    {% endif %}
-                                                    <tr class="{% cycle row1 row2 %} formset_row">
-                                                    {% for field in form.visible_fields %}
-                                                        <td>
-                                                            {# Include the hidden fields in the form #}
-                                                            {% if forloop.first %}
-                                                                {% for hidden in form.hidden_fields %}
-                                                                    {{ hidden }}
-                                                                {% endfor %}
-                                                            {% endif %}
-                                                            {{ field.errors.as_ul }}
-                                                            {% render_field field class="form-control" %}
-                                                        </td>
                                                     {% endfor %}
-                                                </tr>
-                                                {% endfor %}
-                                        </tbody>
-                                    </table>
-                                </div>
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
                             </div>
-
-                        </div>
                     </div>
 
-                    
-
-                    <div class="col-11 offset-1">
+                    <div class="col-12" style="padding-bottom: 5px">
                         {% if litigant.damage_exists %}
                             <div class="collase show" id="add_damage_collapse">
                         {% else %}
                             <div class="collapse" id="add_damage_collapse">
                         {% endif %}
                                 <div class="card">
-                                <div class="card-header text-center">
-                                    <h5>Damages</h5>
-                                </div>
+                                    <div class="card-header text-center">
+                                        <h5>Damages</h5>
+                                    </div>
                                 <div class="card-body">
                                     <table class="table table-striped">
                                         <tbody>
@@ -181,11 +173,8 @@
                             </div>
 
                         </div>
-                    </div>
 
-                    
-
-                    <div class="col-11 offset-1">
+                    <div class="col-12" style="padding-bottom: 5px">
                         {% if litigant.heriot_exists %}
                             <div class="collase show" id="add_heriot_collapse">
                         {% else %}
@@ -231,11 +220,8 @@
                             </div>
 
                         </div>
-                    </div>
 
-                    
-
-                    <div class="col-11 offset-1">
+                    <div class="col-12" style="padding-bottom: 5px">
                         {% if litigant.capitagium_exists %}
                             <div class="collase show" id="add_capitagium_collapse">
                         {% else %}
@@ -281,11 +267,8 @@
                             </div>
 
                         </div>
-                    </div>
 
-                    
-
-                    <div class="col-11 offset-1">
+                    <div class="col-12" style="padding-bottom: 5px">
                         {% if litigant.impercamentum_exists %}
                             <div class="collase show" id="add_impercamentum_collapse">
                         {% else %}
@@ -331,11 +314,8 @@
                             </div>
 
                         </div>
-                    </div>
 
-                    
-
-                    <div class="col-11 offset-1">
+                    <div class="col-12" style="padding-bottom: 5px">
                         {% if litigant.land_exists %}
                             <div class="collase show" id="add_land_collapse">
                         {% else %}
@@ -381,7 +361,6 @@
                             </div>
 
                         </div>
-                    </div>
 
                 </div>
             </div>
