@@ -75,7 +75,6 @@ land_urls = [
         name='split_history'),
     url(r'^(?P<pk>\d+)/case_history', views.LandDetailView.as_view(template_name='land/land_case_history.html'),
         name='cases'),
-    url(r'^list/$', views.LandListView.as_view(template_name='land/_land_list.html'), name='list'),
 ]
 
 litigant_urls = [
@@ -147,17 +146,19 @@ session_urls = [
 
 village_urls = [
     url(r'^(?P<pk>\d+)/$', views.VillageDetailView.as_view(template_name='village/_village_detail.html'), name='detail'),
-    url(r'^(?P<pk>\d+)/case_list$', views.CaseListView.as_view(template_name='village/village_case_list.html'),
+    url(r'^(?P<pk>\d+)/case_list$', views.village_case_list,
         name='cases'),
-    url(r'^(?P<pk>\d+)/resident_list$', views.PersonDetailView.as_view(template_name='village/village_resident_list.html'),
-        name='residents'),
-    url(r'^(?P<pk>\d+)/litigant_list$', views.PersonDetailView.as_view(template_name='village/village_litigant_list.html'),
+    url(r'^(?P<pk>\d+)/land_list$', views.LandListView.as_view(template_name='village/land_list.html'),
+        name='lands'),
+    url(r'^(?P<pk>\d+)/litigant_list$', views.PersonDetailView.as_view(template_name='village/litigant_list.html'),
         name='litigants'),
     url(r'^(?P<pk>\d+)/places_mentioned_list$', views.VillageListView.as_view(
-        template_name='village/village_place_mentioned_list.html'), name='places_mentioned'),
-    url(r'^(?P<pk>\d+)/related_places$', views.VillageListView.as_view(template_name='village/village_related_places_list.html'),
+        template_name='village/place_mentioned_list.html'), name='places_mentioned'),
+    url(r'^(?P<pk>\d+)/related_places$', views.VillageListView.as_view(template_name='village/related_places_list.html'),
         name='related_places'),
-    url(r'^(?P<pk>\d+)/session_list$', views.SessionListView.as_view(template_name='village/village_session_list.html'),
+    url(r'^(?P<pk>\d+)/resident_list$', views.PersonDetailView.as_view(template_name='village/resident_list.html'),
+        name='residents'),
+    url(r'^(?P<pk>\d+)/session_list$', views.SessionListView.as_view(template_name='village/session_list.html'),
         name='sessions'),
     url(r'^list/$', views.VillageListView.as_view(template_name='village/_village_list.html'),
         name='list'),

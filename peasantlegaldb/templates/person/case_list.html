@@ -19,8 +19,8 @@
                             <td data-toggle="collapse" data-target=".case_{{ cases.case.id }}_summary" class="details-control"><i class="fas fa-plus-square"></i></td>
                             <td><a href="{% url 'case:detail' cases.case.id %}">{{ cases.case.id }}</a></td>
                             <td><a href="{% url 'session:detail' cases.case.session.id %}">{{ cases.case.session }}</a></td>
-                            <td>{{ cases.case.case_type.case_type }}</td>
                             <td>{{ cases.case.get_court_type_display }}</td>
+                            <td>{{ cases.case.case_type.case_type }}</td>
                             <td>{{ cases.role.role }}</td>
                             <td>{{ cases.case.verdict.verdict }}</td>
                             <td class="text-center">{{ cases.case.litigant_count }}</td>
@@ -78,7 +78,7 @@
 
 <!-- used to navigate pagination -->
 <script>
-    $('.page-link').click(function(){
+    $('.page-link').on('click', function(){
             var url = $(this).attr('data-url');
             $.ajax({
                 url: url,
@@ -90,7 +90,6 @@
             })
         });
     $('#table td').on('show.bs.collapse', function(){
-        console.log('blorop');
         $(this).removeClass('hiddenRow');
     });
     $('#table td').on('hide.bs.collapse', function(){

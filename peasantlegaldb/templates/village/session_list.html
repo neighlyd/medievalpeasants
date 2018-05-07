@@ -23,7 +23,7 @@
     {{ block.super }}
 <script>
 
-    $(document).ready(function () {
+    $('#list_sessions').on('show.bs.tab', function () {
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1];
         url = Urls['api:session-list']();

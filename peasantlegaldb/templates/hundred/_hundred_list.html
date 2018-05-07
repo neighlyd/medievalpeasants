@@ -9,7 +9,7 @@
     {{ block.super }}
 
 <div class="card-body clearfix" id="main_info">
-    <table class="table table-bordered table-hover" id="table" data-page-length="25">
+    <table class="table table-bordered table-hover" id="table" data-page-length="10">
         <thead>
             <th>Hundred</th>
             <th>County</th>
@@ -32,7 +32,7 @@
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1];
         url = Urls['api:hundred-list']();
-        var api_url = url + "?include[]=county&include[]=counts";
+        var api_url = url + "?include[]=county.*&include[]=counts";
         var table = $("#table").DataTable({
             fixedHeader:{ headerOffset: 50 },
             scrollX: true,
@@ -43,15 +43,25 @@
             },
             "columns": [
                 {data: "name",
-                    fnCreatedCell: function(nTd, cellData, rowData, row, col){
-                        url = Urls['hundred:detail'](rowData.id);
-                        $(nTd).html("<a href='"+ url +"'>" + rowData.name + "</a>");
+                    render: {
+                        display: function(data, type, row){
+                            var url = Urls['hundred:detail'](row.id);
+                            return '<a href="' + url + '">' + data + '</a>';
+                        }
                     }
                 },
-                {data: "county.id",
-                    fnCreatedCell: function(nTd, cellData, rowData, row, col){
-                        url = Urls['county:detail'](rowData.county.id);
-                        $(nTd).html("<a href='"+ url +"'>" + rowData.county.name + "</a>");
+                {data: "county",
+                    defaultContent: '',
+                    render: {
+                        display: function(data, type, row, meta){
+                            if (data){
+                                var countyData = meta.settings.json.counties.find(x => x.id === data);
+                                var url = Urls['county:detail'](data);
+                                return '<a href="' + url + '">' + countyData.name + '</a>';
+                            } else {
+                                return 'N/A'
+                            }
+                        }
                     }
                 },
                 {data: "counts.village"}

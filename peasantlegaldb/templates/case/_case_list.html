@@ -111,6 +111,7 @@
             var caseType = $("#select_case_type").val();
             var village = $("#select_village").val();
             var verdictType = $("#select_verdict_type").val();
+            var apiCall = 'include[]=session.*&include[]=session.village.*&include[]=litigant_count&include[]=pledge_count';
             var url = Urls['api:case-list']();
             if (caseType === 'None' || village === 'None' || verdictType === 'None') {
                 if ($("#list_cases").is(":visible")) {
@@ -124,30 +125,30 @@
             if ( village === "All" ){
                 if ( caseType === "All" ){
                     if ( verdictType === "All" ){
-                        url = url + "?exclude[]=session.*&include[]=litigant_count&include[]=session.village.name&include[]=session.law_term&include[]=session.date&include[]=session.human_date&include[]=pledge_count";
+                        url = url + '?' + apiCall;
                     } else {
-                        url = url + "?verdict=" + verdictType + "&exclude[]=session.*&include[]=litigant_count&include[]=session.village.name&include[]=session.law_term&include[]=session.date&include[]=session.human_date&include[]=pledge_count";
+                        url = url + "?verdict=" + verdictType + '&' + apiCall;
                     }
                 } else {
                     if ( verdictType === "All" ){
-                        url = url + "?case_type=" + caseType + "&exclude[]=session.*&include[]=litigant_count&include[]=session.village.name&include[]=session.law_term&include[]=session.date&include[]=session.human_date&include[]=pledge_count";
+                        url = url + "?case_type=" + caseType + '&' + apiCall;
                     } else {
-                        url = url + "?case_type=" + caseType + "&verdict=" + verdictType + "&exclude[]=session.*&include[]=litigant_count&include[]=session.village.name&include[]=session.law_term&include[]=session.date&include[]=session.human_date&include[]=pledge_count";
+                        url = url + "?case_type=" + caseType + "&verdict=" + verdictType + '&' + apiCall;
 
                     }
                 }
             } else {
                 if ( caseType === "All" ){
                     if ( verdictType === "All" ){
-                        url = url + "?village=" + village + "&exclude[]=session.*&include[]=litigant_count&include[]=session.village.name&include[]=session.law_term&include[]=session.date&include[]=session.human_date&include[]=pledge_count";
+                        url = url + "?village=" + village + '&' + apiCall;
                     } else {
-                        url = url + "?village=" + village + "&verdict=" + verdictType + "&exclude[]=session.*&include[]=litigant_count&include[]=session.village.name&include[]=session.law_term&include[]=session.date&include[]=session.human_date&include[]=pledge_count";
+                        url = url + "?village=" + village + "&verdict=" + verdictType + '&' + apiCall;
                     }
                 } else {
                     if ( verdictType === "All" ){
-                        url = url + "?village=" + village + "&case_type=" + caseType + "&exclude[]=session.*&include[]=litigant_count&include[]=session.village.name&include[]=session.law_term&include[]=session.date&include[]=session.human_date&include[]=pledge_count";
+                        url = url + "?village=" + village + "&case_type=" + caseType + '&' + apiCall;
                     } else {
-                        url = url + "?village=" + village + "&case_type=" + caseType + "&verdict=" + verdictType + "&exclude[]=session.*&include[]=litigant_count&include[]=session.village.name&include[]=session.law_term&include[]=session.date&include[]=session.human_date&include[]=pledge_count";
+                        url = url + "?village=" + village + "&case_type=" + caseType + "&verdict=" + verdictType + '&' + apiCall;
                     }
                 }
             }
@@ -157,7 +158,7 @@
                 scrollX: true,
                 scrollY: 500,
                 scrollCollapse: true,
-                paging: false,
+                paging: true,
                 ajax: {
                     processing: true,
                     url: url,
@@ -167,37 +168,40 @@
                 order: [[3, "asc"], [4, "asc"]],
                 "columns": [
                     {
-                        "class": "details-control",
-                        "orderable": "false",
-                        "data": "summary",
-                        "defaultContent": "",
-                        "render": checkNotes,
-                        width:"15px"
+                        'class': 'details-control',
+                        'orderable': 'false',
+                        'data': 'summary',
+                        'defaultContent': '',
+                        'render': checkNotes,
+                        width:'15px'
                     },
                     {data: "id",
                         defaultContent: '',
                         render: {
-                            display: function(data, type, row, col){
+                            display: function(data, type, row){
                             var url = Urls['case:detail'](data);
                             return "<a href='"+ url +"'>" + data + "</a>"
-                            }
-                        }
-                    },
-                    {data: "session.village.name",
-                        defaultContent: '',
-                        render:{
-                            display: function(data, type, row, col){
-                                var url = Urls['village:detail'](row.session.village.id);
-                                return "<a href='" + url + "'>" + data + "</a>";
                             }
                         }
                     },
                     {data: "session",
                         defaultContent: '',
                         render:{
-                            display: function(data, type, row, col){
-                                var url = Urls['session:detail'](data.id);
-                                return "<a href'" + url + "'>" + data.human_date + "</a>";
+                            display: function(data, type, row, meta){
+                                var sessionData = meta.settings.json.sessions.find(x => x.id === data);
+                                var villageData = meta.settings.json.villages.find(x => x.id === sessionData.village);
+                                var url = Urls['village:detail'](villageData.id);
+                                return "<a href='" + url + "'>" + villageData.name + "</a>";
+                            }
+                        }
+                    },
+                    {data: "session",
+                        defaultContent: '',
+                        render:{
+                            display: function(data, type, row, meta){
+                                var sessionData = meta.settings.json.sessions.find(x => x.id === data);
+                                var url = Urls['session:detail'](sessionData.id);
+                                return "<a href'" + url + "'>" + sessionData.human_date + "</a>";
 
                             },
                         sort: "date"
@@ -221,22 +225,23 @@
             // Used to activate the + expansion and trigger the format function.
              $('#table tbody').on('click', 'td.details-control', function(){
                 var tr = $(this).closest('tr');
-                var tdi = tr.find("i.fa");
+                var tdi = tr.find('#check');
                 var row = table.row( tr );
-                console.log('click');
-
-                if ( row.child.isShown()) {
-                    row.child.hide();
-                    tr.removeClass('shown');
-                    tdi.first().removeClass('fa-minus-square');
-                    tdi.first().addClass('fa-plus-square');
-                } else {
-                    row.child( format( row.data() ) ).show();
-                    tr.addClass('shown');
-                    tdi.first().removeClass('fa-plus-square');
-                    tdi.first().addClass('fa-minus-square');
+                if (tdi.prop('style').color !== 'gray'){
+                    if ( row.child.isShown()) {
+                        row.child.hide();
+                        tr.removeClass('shown');
+                        tdi.first().removeClass('fa-minus-square');
+                        tdi.first().addClass('fa-plus-square');
+                    } else {
+                        row.child( format( row.data() ) ).show();
+                        tr.addClass('shown');
+                        tdi.first().removeClass('fa-plus-square');
+                        tdi.first().addClass('fa-minus-square');
+                    }
                 }
             });
+
             if ($("#list_cases").not(":visible")){
                 $("#list_cases").show();
             }

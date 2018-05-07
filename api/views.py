@@ -181,17 +181,18 @@ class VillageViewSet(DynamicModelViewSet):
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     serializer_class = serializers.VillageSerializer
-    queryset = models.Village.objects.all().order_by('county__name', 'name')
+    queryset = models.Village.objects.all().prefetch_related('person_set').order_by('county__name', 'name')
 
 
 class PersonViewSet(DynamicModelViewSet):
 
     # Must be logged in to edit
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
-
     serializer_class = serializers.PersonSerializer
 
-    def get_queryset(self, queryset=models.Person.objects.all().select_related('village')):
+    def get_queryset(self, queryset=models.Person.objects.all().select_related('village',
+                                                                               'earliest_case__session__village',
+                                                                               'latest_case__session__village')):
         chain_filter = {}
         chain_filter['cases__case__session__village__county_id'] = self.request.query_params.get('county_to_litigant')
         chain_filter['village__county_id'] = self.request.query_params.get('county_to_resident')
@@ -206,7 +207,7 @@ class PersonViewSet(DynamicModelViewSet):
         chain_filter['cases__damages'] = self.request.query_params.get('damage')
         chain_filter['pledge_giver'] = self.request.query_params.get('pledges_given')
         chain_filter['cases__pledges'] = self.request.query_params.get('pledges_received')
-        
+
         if not chain_filter:
             return queryset
         else:
@@ -229,7 +230,8 @@ class SessionViewSet(DynamicModelViewSet):
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     serializer_class = serializers.SessionSerializer
-    queryset = models.Session.objects.all().order_by('village__name', 'record__record_type', 'date')
+    queryset = models.Session.objects.all().order_by('village__name', 'record__record_type', 'date')\
+        .prefetch_related('village', 'record')
 
     def get_queryset(self, queryset=models.Session.objects.all()):
         chain_filter = {}
@@ -254,7 +256,8 @@ class CaseViewSet(DynamicModelViewSet):
 
     serializer_class = serializers.CaseSerializer
 
-    def get_queryset(self, queryset=models.Case.objects.all()):
+    def get_queryset(self, queryset=models.Case.objects.all().select_related('session__village', 'case_type', 'verdict')
+                     .prefetch_related('litigants', 'litigants__pledges')):
         chain_filter={}
         chain_filter['session__village_id'] = self.request.query_params.get('village')
         chain_filter['session__village__hundred_id'] = self.request.query_params.get('hundred')
@@ -307,7 +310,7 @@ class PlaceMentionedViewSet(DynamicModelViewSet):
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     serializer_class = serializers.PlaceMentionedSerializer
-    queryset = models.PlaceMentioned.objects.all()
+    queryset = models.PlaceMentioned.objects.all().prefetch_related('village')
 
     def get_queryset(self, queryset=models.PlaceMentioned.objects.all()):
         chain_filter={}
@@ -335,7 +338,7 @@ class LitigantViewSet(DynamicModelViewSet):
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     serializer_class = serializers.LitigantSerializer
-    queryset = models.Litigant.objects.all()
+    queryset = models.Litigant.objects.all().prefetch_related('person', 'case')
 
 
 class PledgeViewSet(DynamicModelViewSet):

@@ -11,7 +11,7 @@ class ParcelTenureSerializer(DynamicModelSerializer):
 
     class Meta:
         model = models.ParcelTenure
-        name = 'parcel tenure'
+        name = 'parcel_tenure'
         fields = ('id', 'tenure',)
 
 
@@ -19,7 +19,7 @@ class ParcelTypeSerializer(DynamicModelSerializer):
 
     class Meta:
         model = models.ParcelType
-        name = 'parcel type'
+        name = 'parcel_type'
         fields = ('id', 'parcel_type',)
 
 
@@ -27,7 +27,7 @@ class PositionTypeSerializer(DynamicModelSerializer):
 
     class Meta:
         model = models.PositionType
-        name = 'position title'
+        name = 'position_title'
         fields = ('id', 'title',)
 
 
@@ -35,7 +35,7 @@ class RelationSerializer(DynamicModelSerializer):
 
     class Meta:
         model = models.Relation
-        name = 'relation title'
+        name = 'relation_title'
         fields = ('id', 'relation',)
 
 
@@ -75,7 +75,7 @@ class CaseTypeSerializer(DynamicModelSerializer):
 
     class Meta:
         model = models.CaseType
-        name = 'case type'
+        name = 'case_type'
         fields = ('id', 'case_type',)
 
 
@@ -183,7 +183,7 @@ class CountySerializer(DynamicModelSerializer):
 
 class HundredSerializer(DynamicModelSerializer):
 
-    county = DynamicRelationField('CountySerializer', deferred=True, embed=True)
+    county = DynamicRelationField('CountySerializer', deferred=True)
     counts = DynamicMethodField(
         requires = [
             'village'
@@ -204,12 +204,12 @@ class HundredSerializer(DynamicModelSerializer):
 
 class VillageSerializer(DynamicModelSerializer):
 
-    hundred = DynamicRelationField('HundredSerializer', deferred=True, embed=True)
-    county = DynamicRelationField('CountySerializer', deferred=True, embed=True)
+    hundred = DynamicRelationField('HundredSerializer', deferred=True)
+    county = DynamicRelationField('CountySerializer', deferred=True)
     sessions = DynamicRelationField('SessionSerializer', source='session_set', deferred=True, many=True, embed=True)
     counts = DynamicMethodField(
         requires = [
-            'person'
+            'person',
         ],
         deferred=True,
     )
@@ -255,7 +255,7 @@ class SessionSerializer(DynamicModelSerializer):
     law_term = serializers.SerializerMethodField()
     year = serializers.ReadOnlyField()
     human_date = serializers.ReadOnlyField()
-    village = DynamicRelationField('VillageSerializer', deferred=True, embed=True)
+    village = DynamicRelationField('VillageSerializer', deferred=True)
     record = DynamicRelationField('RecordSerializer', deferred=True)
     counts = DynamicMethodField(
         requires = [
@@ -299,13 +299,13 @@ class PersonSerializer(DynamicModelSerializer):
         ],
         deferred=True
     )
-    earliest_case = DynamicRelationField('CaseSerializer', deferred=True, embed=True)
-    latest_case = DynamicRelationField('CaseSerializer', deferred=True, embed=True)
-    village = DynamicRelationField('VillageSerializer', embed=True, deferred=True)
+    earliest_case = DynamicRelationField('CaseSerializer', deferred=True)
+    latest_case = DynamicRelationField('CaseSerializer', deferred=True)
+    village = DynamicRelationField('VillageSerializer', deferred=True)
     cases = DynamicRelationField('LitigantSerializer', deferred=True, many=True, embed=True)
     pledges_given = DynamicRelationField('PledgeSerializer', deferred=True, source='pledge_giver', many=True,
                                          embed=True)
-    positions = DynamicRelationField('PositionSerializer', deferred=True, source='position', many=True, embed=True)
+    positions = DynamicRelationField('PositionSerializer', deferred=True, many=True, embed=True)
 
     class Meta:
         model = models.Person
@@ -337,8 +337,8 @@ class LandSerializer(DynamicModelSerializer):
             'parcels__parcel_type', 'parcels__parcel_tenure'
         ]
     )
-    #earliest_date = DynamicRelationField('CaseSerializer', deferred=True, embed=True)
-    #latest_date = DynamicRelationField('CaseSerializer', deferred=True, embed=True)
+    earliest_case = DynamicRelationField('CaseSerializer', deferred=True)
+    latest_case = DynamicRelationField('CaseSerializer', deferred=True)
 
     tenant_history = DynamicRelationField(
         'LitigantSerializer',
@@ -352,7 +352,7 @@ class LandSerializer(DynamicModelSerializer):
     class Meta:
         model = models.Land
         name = 'land'
-        fields = ('id', 'notes', 'parcel_list', 'tenant_history')
+        fields = ('id', 'notes', 'parcel_list', 'tenant_history', 'earliest_case', 'latest_case')
 
     def get_parcel_list(self, record):
         return record.parcel_list
@@ -380,24 +380,23 @@ class CaseSerializer(DynamicModelSerializer):
         deferred=True
     )
 
-    session = DynamicRelationField('SessionSerializer', deferred=True, embed=True)
+    session = DynamicRelationField('SessionSerializer', deferred=True,)
     case_type = DynamicRelationField('CaseTypeSerializer', embed=True)
     verdict = DynamicRelationField('VerdictSerializer', embed=True)
-    litigants = DynamicRelationField('PersonSerializer', deferred=True, many=True, embed=True)
-    cornbot = DynamicRelationField('CornbotSerializer', deferred=True, many=True, embed=True)
-    extrahura = DynamicRelationField('ExtrahuraSerializer', deferred=True, many=True, embed=True)
-    murrain = DynamicRelationField('MurrainSerializer', deferred=True, many=True, embed=True)
+    litigants = DynamicRelationField('PersonSerializer', deferred=True, many=True)
+    cornbot = DynamicRelationField('CornbotSerializer', deferred=True, many=True)
+    extrahura = DynamicRelationField('ExtrahuraSerializer', deferred=True, many=True)
+    murrain = DynamicRelationField('MurrainSerializer', deferred=True, many=True)
     places_mentioned = DynamicRelationField('PlaceMentionedSerializer', source='placementioned_set', deferred=True,
-                                            many=True, embed=True)
-    people = DynamicRelationField('LitigantSerializer', source='litigants', deferred=True, many=True, embed=True)
-    pledges = DynamicRelationField('PledgeSerializer', source='pledges', deferred=True, many=True, embed=True)
+                                            many=True)
+    pledges = DynamicRelationField('PledgeSerializer', source='pledges', deferred=True, many=True)
 
 
     class Meta:
         model = models.Case
         fields = ('id', 'summary', 'court_type', 'of_interest', 'ad_legem', 'villeinage_mention', 'active_sale',
                   'incidental_land', 'session', 'case_type', 'verdict', 'litigants', 'litigant_count', 'litigant_list',
-                  'cornbot', 'extrahura', 'murrain', 'places_mentioned', 'people', 'pledges', 'pledge_count')
+                  'cornbot', 'extrahura', 'murrain', 'places_mentioned', 'pledges', 'pledge_count')
 
     def get_court_type(self, record):
         return record.get_court_type_display()

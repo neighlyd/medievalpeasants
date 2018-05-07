@@ -1,6 +1,9 @@
 function formatCaseDate(data, type, row, meta) {
     if (data) {
-        return "<a href='" + Urls['case:detail'](data.id) + "'>" + data.session.village.name + " | " + data.session.law_term + ", " + data.session.year + "</a>";
+        var caseData = meta.settings.json.cases.find(x => x.id === data);
+        var sessionData = meta.settings.json.sessions.find(x => x.id === caseData.session);
+        var villageData = meta.settings.json.villages.find(x => x.id === sessionData.village);
+        return "<a href='" + Urls['case:detail'](data) + "'>" + villageData.name + " | " + sessionData.law_term + ", " + sessionData.year + "</a>";
     } else {
         return "N/A";
     }
@@ -35,8 +38,9 @@ function formatSessionDate(data, type, row, meta) {
 }
 
 function formatSessionDateNoVillage(data, type, row, meta) {
-    if (data.id) {
-        return "<a href='" + Urls['session:detail'](data.id) + "'>" + data.law_term + ", " + data.year + "</a>";
+    if (data) {
+        var sessionData = meta.settings.json.sessions.find(x => x.id === data);
+        return "<a href='" + Urls['session:detail'](sessionData.id) + "'>" + sessionData.law_term + ", " + sessionData.year + "</a>";
     } else {
         return "N/A";
     }
@@ -50,9 +54,9 @@ function checkMaker(data, type, row, col) {
 
 function checkNotes(cellData) {
     if (cellData === "") {
-        return '<i class="fas fa-plus-square" aria-hidden="true" style="color: gray"></i>';
+        return '<i class="fas fa-plus-square" aria-hidden="true" style="color: gray" id="check"></i>';
     } else {
-        return '<i class="fas fa-plus-square" aria-hidden="true"></i>';
+        return '<i class="fas fa-plus-square" aria-hidden="true" id="check"></i>';
     }
 }
 

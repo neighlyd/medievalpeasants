@@ -1,7 +1,7 @@
 {% extends '_layout/_l_single_col.html' %}
 
 {% block single_col %}
-    <h3 class="card-header text-center">Related Places</h3>
+    <h3 class="card-header text-center">Mentioned Elsewhere</h3>
     <div class="card-body">
             <table class="table table-bordered table-hover" id="table" data-page-length="25">
                 <thead>
@@ -38,11 +38,11 @@
 
     }
 
-    $(document).ready(function () {
+    $('#list_mentioned_here').on('show.bs.tab', function () {
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1];
         url = Urls['api:places-mentioned-list']();
-        var api_url = url + "?related_to=" + id + "&include[]=case.session&include[]=case.litigant_count&include[]=village";
+        var api_url = url + "?village=" + id + "&include[]=case.session.village&include[]=case.litigant_count";
         var table = $("#table").DataTable({
             fixedHeader:{ headerOffset: 50 },
             scrollX: true,
@@ -58,15 +58,17 @@
                     "orderable": "false",
                     "data": 'case.summary',
                     "defaultContent": "",
-                    "render": checkNotes,
+                    "render": function(){
+                        return '<i class="fa fa-plus-square" aria-hidden="true"></i>';
+                    },
                     width:"15px"
                 },
-                {data: "village",
+                {data: "case.session.village",
                     defaultContent: '',
                     render: {
-                        display: function(data, type, row, meta){
+                        display: function(data, type, row, col){
                             url = Urls['village:detail'](data.id);
-                            return "<a href='" + url + "'>" + data.name +"</a>";
+                            return "<a href='" + url + "'>" + data.name  + "</a>";
                         },
                         sort: "name"
                     }
@@ -80,7 +82,7 @@
                         },
                         sort: "id"
                     }
-                },
+                 },
                 {data: "case.session",
                     defaultContent: '',
                     render: {

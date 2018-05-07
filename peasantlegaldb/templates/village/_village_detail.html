@@ -5,13 +5,14 @@
 {% endblock %}
 
 {% block left_sidebar %}
-    <div id="selection_list">
-        <a class="list-group-item list-group-item-action" href="{% url 'village:cases' village.id %}">Cases</a>
-        <a class="list-group-item list-group-item-action" href="{% url 'village:residents' village.id %}">Known Residents</a>
-        <a class="list-group-item list-group-item-action" href="{% url 'village:litigants' village.id %}">Litigants</a>
-        <a class="list-group-item list-group-item-action" href="{% url 'village:sessions' village.id %}">Sessions</a>
-        <a class="list-group-item list-group-item-action" href="{% url 'village:related_places' village.id %}">Places Mentioned Here</a>
-        <a class="list-group-item list-group-item-action" href="{% url 'village:places_mentioned' village.id %}">Mentioned Elsewhere</a>
+    <div class="list-group" id="selection_list" role="tablist">
+        <a class="list-group-item list-group-item-action active" data-toggle="list" role="tab" data-url="{% url 'village:cases' village.id %}" aria-controls="list_cases" aria-selected="false">Cases</a>
+        <a class="list-group-item list-group-item-action" data-toggle="list" role="tab" href="#list_residents" aria-controls="list_residents" aria-selected="false">Residents</a>
+        <a class="list-group-item list-group-item-action" data-toggle="list" role="tab" href="#list_litigants" aria-controls="list_litigants" aria-selected="false">Litigants</a>
+        <a class="list-group-item list-group-item-action" data-toggle="list" role="tab" href="#list_lands" aria-controls="list_lands" aria-selected="false">Lands</a>
+        <a class="list-group-item list-group-item-action" data-toggle="list" role="tab" href="#list_sessions" aria-controls="list_sessions" aria-selected="false">Sessions</a>
+        <a class="list-group-item list-group-item-action" data-toggle="list" role="tab" href="#list_mentioned_here" aria-controls="list_mentioned_here" aria-selected="false">Places Mentioned</a>
+        <a class="list-group-item list-group-item-action" data-toggle="list" role="tab" href="#list_mentioned_elsewhere" aria-controls="list_mentioned_elsewhere" aria-selected="false">Mentioned Elsewhere</a>
     </div>
 {% endblock %}
 
@@ -85,8 +86,14 @@
 
 <br>
 
-<div id="list_info">
-
+<div class="tab-content" id="list_info">
+    <div class="tab-pane fade show active" id="list_cases" role="tabpanel">{% include 'village/case_list.html' %}</div>
+    <div class="tab-pane fade" id="list_residents" role="tabpanel">{% include 'village/resident_list.html' %}</div>
+    <div class="tab-pane fade" id="list_litigants" role="tabpanel">{% include 'village/litigant_list.html' %}</div>
+    <div class="tab-pane fade" id="list_lands" role="tabpanel">{% include 'village/land_list.html' %}</div>
+    <div class="tab-pane fade" id="list_sessions" role="tabpanel">{% include 'village/session_list.html' %}</div>
+    <div class="tab-pane fade" id="list_mentioned_here" role="tabpanel">{% include 'village/place_mentioned_list.html' %}</div>
+    <div class="tab-pane fade" id="list_mentioned_elsewhere" role="tabpanel">{% include 'village/related_places_list.html' %}</div>
 </div>
 
 {% endblock %}
@@ -201,14 +208,29 @@
         google.maps.event.addDomListener(window, 'load', initialize);
     </script>
 
+<script>
+    $(document).ready(function(){
 
-    <!--
-    <script>
-        $(document).ready(function(){
-             var url = window.location.pathname;
-            var id = url.split('/').reverse()[1]
-            $("#list_info").load(Urls['session:cases'](id))
-        })
-    </script>
-    -->
+        $('#selection_list a').on('click', function(e){
+            e.preventDefault();
+            var url = $(this).attr('data-url');
+
+            $(this).addClass('active').siblings().removeClass('active');
+
+            $.ajax({
+                url: url,
+                type: 'get',
+                dataType: 'json',
+                success: function(data){
+                    $('#list_info').html(data.html_list);
+                }
+            })
+
+        });
+
+        });
+
+</script>
+
+
 {% endblock %}

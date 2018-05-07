@@ -75,7 +75,7 @@
                 alert("Please select a village");
                 return;
             } else if (village === 'All'){
-                alert("Chevage Analysis view is too slow when run with all villages. Please select only one village.")
+                alert("Chevage Analysis view is too slow when run with all villages. Please select only one village.");
                 return;
             } else {
                 var url = Urls.chevage_analysis({village_pk: village});
@@ -89,7 +89,7 @@
 
             var village = $("#select_village").val();
             var filter = $('#select_filter').val();
-            var api_call = 'exclude[]=village.*&include[]=village.name&exclude[]=earliest_case.*&exclude[]=earliest_case.session.*&exclude[]=earliest_case.session.village.*&include[]=earliest_case.session.village.name&include[]=earliest_case.session.law_term&include[]=earliest_case.session.year&exclude[]=latest_case.*&exclude[]=latest_case.session.*&exclude[]=latest_case.session.village.*&include[]=latest_case.session.village.name&include[]=latest_case.session.law_term&include[]=latest_case.session.year'
+            var apiCall = 'exclude[]=village.*&include[]=village.name&include[]=village.id&exclude[]=earliest_case.*&exclude[]=earliest_case.session.*&exclude[]=earliest_case.session.village.*&include[]=earliest_case.id&include[]=earliest_case.session.village.id&include[]=earliest_case.session.village.name&include[]=earliest_case.session.id&include[]=earliest_case.session.law_term&include[]=earliest_case.session.year&exclude[]=latest_case.*&exclude[]=latest_case.session.*&exclude[]=latest_case.session.village.*&include[]=latest_case.id&include[]=latest_case.session.village.id&include[]=latest_case.session.village.name&include[]=latest_case.session.id&include[]=latest_case.session.law_term&include[]=latest_case.session.year';
             var btnClicked = e.target.id;
             var url = Urls["api:person-list"]();
 
@@ -102,20 +102,20 @@
                 }
             } else if (village === "All"){
                     if (filter === "residents") {
-                        url = url + '?' + api_call;
+                        url = url + '?' + apiCall;
                     } else if (filter === "litigants") {
-                        url = url + '?' + api_call;
+                        url = url + '?' + apiCall;
                     } else {
-                        url = url + "?" + filter + "=true&" + api_call;
+                        url = url + "?" + filter + "=true&" + apiCall;
                     }
             }
             else {
                 if (filter === "residents") {
-                        url = url + "?filter{village.id}=" + village + "&" + api_call;
+                        url = url + "?filter{village.id}=" + village + "&" + apiCall;
                     } else if (filter === "litigants") {
-                        url = url + "?village_to_litigant=" + village + "&" + api_call;
+                        url = url + "?village_to_litigant=" + village + "&" + apiCall;
                     } else {
-                        url = url + "?" + filter + "=true&village_to_litigant=" + village + "&" + api_call;
+                        url = url + "?" + filter + "=true&village_to_litigant=" + village + "&" + apiCall;
                     }
             }
             $("#table").DataTable().destroy();
@@ -124,18 +124,18 @@
                 scrollX: true,
                 scrollY: 500,
                 scrollCollapse: true,
-                paging: false,
+                paging: true,
                 ajax: {
                     processing: true,
                     url: url,
                     type: "GET",
-                    dataSrc: "people.",
+                    dataSrc: 'people.',
                 },
                 "columns": [
                     {data: "full_name",
                         defaultContent: '',
                         render: {
-                            display: function(data, type, row, meta){
+                            display: function(data, type, row){
                                 return "<a href='" + Urls['person:detail'](row.id) + "'>" + row.full_name + "</a>";
                             },
                         }
@@ -144,7 +144,8 @@
                         defaultContent: '',
                         render: {
                             display: function(data, type, row, meta){
-                                return "<a href='" + Urls['village:detail'](row.village.id) + "'>" + row.village.name + "</a>";
+                                var village = meta.settings.json.villages.find(x => x.id === row.village);
+                                return "<a href='" + Urls['village:detail'](row.village) + "'>" + village.name + "</a>";
                             },
                         }
                     },

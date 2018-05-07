@@ -14,8 +14,6 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from braces.views import GroupRequiredMixin
 
-from itertools import chain
-
 from . import models
 from . import forms
 
@@ -208,7 +206,7 @@ class CaseDetailView(DetailView):
     
     def get_context_data(self, **kwargs):
         context = super(CaseDetailView, self).get_context_data(**kwargs)
-        lands = models.Land.objects.filter(landtocase__litigant__case=self.object.id).distinct().order_by('landtocase__litigant__case__session__date')
+        lands = models.Land.objects.filter(tenants__litigant__case=self.object.id).distinct().order_by('tenants__litigant__case__session__date')
         context['page_title'] = 'Case'
         context['lands'] = lands
         return context
@@ -724,8 +722,6 @@ def person_lists(request, pk):
     elif path == 'relationship_list':
         query_list = models.Relationship.objects.filter(Q(person_one=pk) | Q(person_two=pk))
 
-    # TODO: lists - capitagium, fine, heriot, impercamentum, land, pledge, position.
-
     # Check which page the url is on by getting the `?page=` param. If it is not 1, assign 1
     page = request.GET.get('page', 1)
     # Limit the list to 10 items.
@@ -747,6 +743,37 @@ def person_lists(request, pk):
     }
 
     data['html_list'] = render_to_string(template, context, request=request)
+    return JsonResponse(data)
+
+
+def village_case_list(request, pk):
+
+    data=dict()
+    path = request.path.split('/').pop()
+    village = models.Village.objects.get(id=pk)
+    if path == 'case_list':
+        query_list = models.Case.objects.filter(session__village=village).prefetch_related('session')\
+            .order_by('session__date')
+
+    page = request.GET.get('page', 1)
+    paginator = Paginator(query_list, 10)
+
+    try:
+        query_list = paginator.page(page)
+    except PageNotAnInteger:
+        query_list = paginator.page(1)
+    except EmptyPage:
+        query_list = paginator.page(paginator.num_pages)
+
+    template = 'village/' + path + '.html'
+
+    context = {
+        'list': query_list,
+        'village': village,
+    }
+
+    data['html_list'] = render_to_string(template, context, request=request)
+
     return JsonResponse(data)
 
 
@@ -787,6 +814,7 @@ def case_lists(request, pk):
     data['html_list'] = render_to_string(template, context, request=request)
 
     return JsonResponse(data)
+
 
 class PersonDetailView(DetailView):
 
@@ -871,7 +899,7 @@ class SessionDetailView(DetailView):
 def session_case_list(request, pk):
     data = dict()
     path = request.path.split('/').pop()
-    queryset = models.Session.objects.filter(id=pk).prefetch_related('case_set')
+    queryset = models.Case.objects.filter(session_id=pk)
 
     page = request.GET.get('page', 1)
     paginator = Paginator(queryset, 10)
@@ -892,7 +920,6 @@ def session_case_list(request, pk):
     data['html_list'] = render_to_string(template, context, request=request)
 
     return JsonResponse(data)
-    return
 
 
 class SessionListView(ListView):

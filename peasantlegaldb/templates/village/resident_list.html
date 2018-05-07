@@ -1,7 +1,7 @@
 {% extends '_layout/_l_single_col.html' %}
 
 {% block single_col %}
-    <h3 class="card-header text-center">Litigant List</h3>
+    <h3 class="card-header text-center">Known Resident List</h3>
     <div class="card-body">
             <table class="table table-bordered table-hover" id="table" data-page-length="25">
                 <thead>
@@ -31,17 +31,17 @@
         return "<table class='table'>" +
             "<tr>" +
             "<td><b>Notes</b></td>" +
-            "<td>" + data.person.notes + "</td>" +
+            "<td>" + data.notes + "</td>" +
             "</tr>" +
             "</table>"
 
     }
 
-    $(document).ready(function () {
+    $('#list_residents').on('show.bs.tab', function () {
         var url = window.location.pathname;
         var id = url.split('/').reverse()[1];
-        url = Urls['api:person-list']();
-        var api_url = url + "?village_to_litigant=" + id + "&include[]=counts&include[]=earliest_case.session.village&include[]=latest_case.session.village";
+        url = Urls["api:person-list"]();
+        var api_url = url + "?filter{village.id}=" + id + "&include[]=counts&include[]=earliest_case.session.village&include[]=latest_case.session.village";
         var table = $("#table").DataTable({
             fixedHeader:{ headerOffset: 50 },
             scrollX: true,
@@ -76,14 +76,14 @@
                 {data: "earliest_case",
                     defaultContent: '',
                     render: {
-                        display: formatCaseDateNoVillage,
+                        display: formatCaseDate,
                         sort: "session.date"
                     }
                 },
                 {data: "latest_case",
                     defaultContent: '',
                     render: {
-                        display: formatCaseDateNoVillage,
+                        display: formatCaseDate,
                         sort: "session.date"
                     }
                 },

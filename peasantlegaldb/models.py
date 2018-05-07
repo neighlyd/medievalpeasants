@@ -150,7 +150,7 @@ class Land(models.Model):
     def parcel_list(self):
         parcel_list = []
         queryset = self.parcels.all().prefetch_related('parcel_type', 'parcel_tenure')
-        try:
+        if queryset:
             for x in queryset:
                 new_entry = {
                     "amount": x.amount,
@@ -158,9 +158,6 @@ class Land(models.Model):
                     "tenure": x.parcel_tenure.tenure,
                 }
                 parcel_list.append(new_entry)
-        except:
-            pass
-
         return parcel_list
 
     def __str__(self):
@@ -237,6 +234,9 @@ class Role(models.Model):
 
 class Verdict(models.Model):
     verdict = models.CharField(max_length=150)
+
+    class Meta:
+        ordering = ['verdict']
 
     def __str__(self):
         return self.verdict
@@ -422,7 +422,7 @@ class Person(models.Model):
 
     @property
     def position_count(self):
-        return self.position.all().count()
+        return self.positions.all().count()
 
     @property
     def case_exists(self):
@@ -443,7 +443,7 @@ class Person(models.Model):
 
     @property
     def position_exists(self):
-        return self.position.exists()
+        return self.positions.exists()
 
     @property
     def pledge_exists(self):
@@ -745,7 +745,7 @@ class Case(models.Model):
 
     @property
     def litigant_count(self):
-        return len(set([(x) for x in self.litigants.values_list('person_id', flat=True)]))
+        return self.litigants.count()
 
     @property
     def pledge_count(self):
@@ -913,12 +913,6 @@ class Amercement(models.Model):
     amercement = models.ForeignKey(Money)
 
 
-class Damage(models.Model):
-    litigant = models.ForeignKey(Litigant, on_delete=models.CASCADE, related_name='damages')
-    damage = models.ForeignKey(Money)
-    notes = models.TextField(blank=True)
-
-
 class Capitagium(models.Model):
     litigant = models.ForeignKey(Litigant, on_delete=models.CASCADE, related_name='capitagia')
     capitagium = models.ForeignKey(Money)
@@ -928,6 +922,11 @@ class Capitagium(models.Model):
     habet_terram = models.NullBooleanField()
     mortuus = models.NullBooleanField()
 
+
+class Damage(models.Model):
+    litigant = models.ForeignKey(Litigant, on_delete=models.CASCADE, related_name='damages')
+    damage = models.ForeignKey(Money)
+    notes = models.TextField(blank=True)
 
 class Heriot(models.Model):
     litigant = models.ForeignKey(Litigant, on_delete=models.CASCADE, related_name='heriots')
@@ -946,7 +945,7 @@ class Impercamentum(models.Model):
 
 class LandtoCase(models.Model):
     litigant = models.ForeignKey(Litigant, on_delete=models.CASCADE, related_name='lands')
-    land = models.ForeignKey(Land, null=True, blank=True, on_delete=models.CASCADE)
+    land = models.ForeignKey(Land, null=True, blank=True, on_delete=models.CASCADE, related_name='tenants')
     villeinage = models.NullBooleanField()
     role = models.ForeignKey(Role, on_delete=models.CASCADE)
     notes = models.TextField(blank=True,)
@@ -975,14 +974,14 @@ class LandSplit(models.Model):
 
 
 class Position(models.Model):
-    person = models.ForeignKey(Person, on_delete=models.CASCADE, related_name='position')
+    person = models.ForeignKey(Person, on_delete=models.CASCADE, related_name='positions')
     title = models.ForeignKey(PositionType)
     # rework so this is per case not per session.
     session = models.ForeignKey(Session, on_delete=models.CASCADE)
     definitive = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.PositionType.title
+        return self.title.title
 
 
 class Relationship(models.Model):
