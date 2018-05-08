@@ -16,7 +16,6 @@ TODO:
             end date certainty, notes, references (one-to-many?)]
 2) Move Village from Session to Manor
 3) Move Session counts to Manor from Village
-4) Fix multiple litigant instances of impercamentum, amercement, fines, damages, etc. 
 '''
 
 def median_value(queryset, term):

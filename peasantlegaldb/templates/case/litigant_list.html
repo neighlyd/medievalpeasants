@@ -1,329 +1,231 @@
 {% load template_tags %}
+{% if case.litigants.all %}
 <h3 class="card-header text-center bg-grey">Litigants</h3>
     <div class="card-body">
-        {% if case.litigants.all %}
-        <table class="table table-bordered" id="table">
-            <thead>
-                <th>Name</th>
-                <th>Role</th>
-                {% if case.ad_proximum_count > 0 %}<th>Ad Prox.</th>{% endif %}
-                {% if case.attached_count > 0 %}<th>Attached</th>{% endif %}
-                {% if case.bail_count > 0 %}<th>Bailed</th>{% endif %}
-                {% if case.distrain_count > 0 %}<th>Distrained</th>{% endif %}
-                {% if case.amercement_count > 0 %}
-                    <th>Amercement</th>
-                {% endif %}
-                {% if case.cap_count > 0 %}
-                    <th>Capitagium</th>
-                    <th>Crossed</th>
-                    <th>Recessit</th>
-                    <th>Habet Terram</th>
-                    <th>Mortuus</th>
-                    <th>Notes</th>
-                {% endif %}
-                {% if case.damage_count > 0 %}
-                    <th>Damages</th>
-                    <th>Notes</th>
-                {% endif %}
-                {% if case.fine_count > 0 %}
-                    <th>Fine</th>
-                {% endif %}
-                {% if case.heriot_count > 0 %}
-                    <th>Heriot</th>
-                    <th>Assessment</th>
-                {% endif %}
-                {% if case.imperc_count > 0 %}
-                    <th>Impercamentum</th>
-                    <th>Assessment</th>
-                    <th>Notes</th>
-                {% endif %}
-                {% if case.land_count > 0  %}
-                    <th>Land ID</th>
-                    <th>Land Role</th>
-                    <th>Parcels</th>
-                    <th>Villein</th>
-                    <th>Notes</th>
-                {% endif %}
-
-            </thead>
-            <tbody>
+        <div class="accordion">
             {% for litigant in case.litigants.all %}
-                    {% with mcia_length=litigant.amercements.all|length cap_length=litigant.capitagia.all|length dam_length=litigant.damages.all|length fine_length=litigant.fines.all|length heriot_length=litigant.heriots.all|length imperc_length=litigant.impercamenta.all|length land_length=litigant.lands.all|length %}
-                    {% max_length mcia_length cap_length dam_length fine_length heriot_length imperc_length land_length as max_length %}
-                    <tr>
-                        <td rowspan="{{ max_length }}"><a href="{% url 'person:detail' litigant.person.id %}">{{ litigant.person.full_name }}</a></td>
-                        <td rowspan="{{ max_length }}">{{ litigant.role.role }}</td>
-                        {% if case.ad_proximum_count > 0  %}
-                            {% if litigant.ad_proximum %}
-                                <td rowspan="{{ max_length }}" class="text-center"><b>X</b></td>
-                            {% else %}
-                                <td rowspan="{{ max_length }}" class="bg-grey"></td>
-                            {% endif %}
-                        {% endif %}
-                        {% if case.attached_count > 0  %}
-                            {% if litigant.attached %}
-                                <td rowspan="{{ max_length }}" class="text-center"><b>X</b></td>
-                            {% else %}
-                                <td rowspan="{{ max_length }}" class="bg-grey"></td>
-                            {% endif %}
-                        {% endif %}
-                        {% if case.bail_count > 0 %}
-                            {% if litigant.bail %}
-                                <td rowspan="{{ max_length }}" class="text-center"><b>X</b></td>
-                            {% else %}
-                                <td rowspan="{{ max_length }}" class="bg-grey"></td>
-                            {% endif %}
-                        {% endif %}
-                        {% if case.distrain_count > 0 %}
-                            {% if litigant.distrained %}
-                                <td rowspan="{{ max_length }}" class="text-center"><b>X</b></td>
-                            {% else %}
-                                <td rowspan="{{ max_length }}" class="bg-grey"></td>
-                            {% endif %}
-                        {% endif %}
-                        {% if case.amercement_count > 0 %}
-                            {% if litigant.amercements.all %}
-                                {% for amercement in litigant.amercements.all %}
-                                    {% if forloop.first %}
-                                        <td>{{ amercement.amercement }}</td>
-                                    {% endif %}
-                                {% endfor %}
-                            {% else %}
-                                <td class="bg-grey"></td>
-                            {% endif %}
-                        {% endif %}
-                        {% if case.cap_count > 0 %}
-                            {% if litigant.capitagia.all %}
-                                {% for cap in litigant.capitagia.all %}
-                                    {% if forloop.first %}
-                                        <td>{{ cap.capitagium }}</td>
-                                        <td class="text-center">{% if cap.crossed %}<b>X</b>{% endif %}</td>
-                                        <td class="text-center">{% if cap.recessit %}<b>X</b>{% endif %}</td>
-                                        <td class="text-center">{% if cap.habet_terram %}<b>X</b>{% endif %}</td>
-                                        <td class="text-center">{% if cap.mortuus %}<b>X</b>{% endif %}</td>
-                                        <td>{{ cap.notes }}</td>
-                                    {% endif %}
-                                {% endfor %}
-                            {% else %}
-                                <td class="bg-grey"></td>
-                                <td class="bg-grey"></td>
-                                <td class="bg-grey"></td>
-                                <td class="bg-grey"></td>
-                                <td class="bg-grey"></td>
-                                <td class="bg-grey"></td>
-                            {% endif %}
-                        {% endif %}
-                        {% if case.damage_count > 0 %}
-                            {% if litigant.damages.all %}
-                                {% for damage in litigant.damages.all %}
-                                    {% if forloop.first %}
-                                        <td>{{ damage.damage }}</td>
-                                        <td>{{ damage.notes }}</td>
-                                    {% endif %}
-                                {% endfor %}
-                            {% else %}
-                                <td class="bg-grey"></td>
-                                <td class="bg-grey"></td>
-                            {% endif %}
-                        {% endif %}
-                        {% if case.fine_count > 0 %}
-                            {% if litigant.fines.all %}
-                                {% for fine in litigant.fines.all %}
-                                    {% if forloop.first %}
-                                        <td>{{ fine.fine }}</td>
-                                    {% endif %}
-                                {% endfor %}
-                            {% else %}
-                                <td class="bg-grey"></td>
-                            {% endif %}
-                        {% endif %}
-                        {% if case.heriot_count > 0 %}
-                            {% if litigant.heriots.all %}
-                                {% for heriot in litigant.heriots.all %}
-                                    {% if forloop.first %}
-                                        <td>{{ heriot.quantity }} {{ heriot.animal }}</td>
-                                        <td>{{ heriot.heriot }}</td>
-                                    {% endif %}
-                                {% endfor %}
-                            {% else %}
-                                <td class="bg-grey"></td>
-                                <td class="bg-grey"></td>
-                            {% endif %}
-                        {% endif %}
-                        {% if case.imperc_count > 0 %}
-                            {% if litigant.impercamenta.all %}
-                                {% for imperc in litigant.impercamenta.all %}
-                                    {% if forloop.first %}
-                                        <td>{{ imperc.quantity }} {{ imperc.animal }}</td>
-                                        <td>{{ imperc.impercamentum }}</td>
-                                        <td>{{ imperc.notes }}</td>
-                                    {% endif %}
-                                {% endfor %}
-                            {% else %}
-                                <td class="bg-grey"></td>
-                                <td class="bg-grey"></td>
-                                <td class="bg-grey"></td>
-                            {% endif %}
-                        {% endif %}
-                        {% if case.land_count > 0 %}
-                            {% if litigant.lands.all %}
-                                {% for land in litigant.lands.all %}
-                                    {% if forloop.first %}
-                                        <td><a href="{% url 'land:detail' land.land.id %}">{{ land.land.id }}</a></td>
-                                        <td>{{ land.role.role }}</td>
-                                        <td>
-                                            <ul class="list-group">
-                                                {% for parcel in land.land.parcels.all %}
-                                                    <li class="list-group-item">{{ parcel.amount }} {{ parcel.parcel_type.parcel_type }} of {{ parcel.parcel_tenure.tenure }}</li>
-                                                {% endfor %}
-                                            </ul>
-                                        </td>
-                                        <td class="text-center">{% if land.villeinage %}<b>X</b>{% endif %}</td>
-                                        <td>{{ land.notes }}</td>
-                                    {% endif %}
-                                {% endfor %}
-                            {% else %}
-                                <td class="bg-grey"></td>
-                                <td class="bg-grey"></td>
-                                <td class="bg-grey"></td>
-                                <td class="bg-grey"></td>
-                                <td class="bg-grey"></td>
-                            {% endif %}
-                        {% endif %}
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="row">
 
-                    </tr>
-                    {% if max_length > 0 %}
-                        {% for i in max_length|get_range %}
-                            {% if forloop.first %}
-                            {% else %}
-                                <tr>
-                                {% if case.amercement_count > 0 %}
-                                    {% if mcia_length > i %}
-                                        {% for amercement in litigant.amercements.all %}
-                                            {% if forloop.counter == i %}
-                                                <td>{{ amercement.amercement }} - {{ i }}</td>
+                                <div class="col-4"><h6 style="color:blue"><a href="{% url 'person:detail' litigant.person.id %}">{{ litigant.person.full_name }}</a></h6></div>
+                                <div class="col-4 text-center" id="litigant_{{ litigant.person.full_name }}" data-toggle="collapse" data-target="#{{ litigant.id }}_collapse" aria-expanded="true" aria-controls="{{ litigant.id }}_collapse" style="color:darkgray"><u>(click here to see details)</u></div>
+                                <div class="col-4"><h6 class="float-right" style="color:blue">Role: {{ litigant.role.role }}</h6></div>
+                            </div>
+                        </div>
+                        <div class="collapse" id="{{ litigant.id }}_collapse" aria-labelledby="litigant_{{ litigant.person.full_name }}" data-parent="#accordion">
+                            <div class="card-body">
+
+                                {% if litigant.ad_proximum or litigant.attached or litigant.bail or litigant.distrained %}
+                                    <table class="table table-bordered" id="standard_table">
+                                        <thead>
+                                            <th>Ad. Prox</th>
+                                            <th>Attached</th>
+                                            <th>Bailed</th>
+                                            <th>Distrained</th>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                            {% if litigant.ad_proximum %}
+                                                <td class="text-center"><b>√</b></td>
                                             {% endif %}
-                                        {% endfor %}
-                                    {% else %}
-                                        <td class="bg-grey"></td>
-                                    {% endif %}
-                                {% endif %}
-                                {% if case.cap_count > 0 %}
-                                    {% if cap_length > i %}
-                                        {% for cap in litigant.capitagia.all %}
-                                            {% if forloop.counter == i %}
-                                                <td>{{ cap.capitagium }}</td>
-                                                <td class="text-center">{% if cap.crossed %}<b>X</b>{% endif %}</td>
-                                                <td class="text-center">{% if cap.recessit %}<b>X</b>{% endif %}</td>
-                                                <td class="text-center">{% if cap.habet_terram %}<b>X</b>{% endif %}</td>
-                                                <td class="text-center">{% if cap.mortuus %}<b>X</b>{% endif %}</td>
-                                                <td>{{ cap.notes }}</td>
+                                            {% if litigant.attached %}
+                                                <td class="text-center"><b>√</b></td>
                                             {% endif %}
-                                        {% endfor %}
-                                    {% else %}
-                                        <td class="bg-grey"></td>
-                                        <td class="bg-grey"></td>
-                                        <td class="bg-grey"></td>
-                                        <td class="bg-grey"></td>
-                                        <td class="bg-grey"></td>
-                                        <td class="bg-grey"></td>
-                                    {% endif %}
-                                {% endif %}
-                                {% if case.damage_count > 0 %}
-                                    {% if dam_length > i %}
-                                        {% for damage in litigant.damages.all %}
-                                            {% if forloop.counter == i %}
-                                            {% else %}
-                                                <td>{{ damage.damage }}</td>
-                                                <td>{{ damage.notes }}</td>
+                                            {% if litigant.bail %}
+                                                <td class="text-center"><b>√</b></td>
                                             {% endif %}
-                                        {% endfor %}
-                                    {% else %}
-                                        <td class="bg-grey"></td>
-                                        <td class="bg-grey"></td>
-                                    {% endif %}
-                                {% endif %}
-                                {% if case.fine_count > 0 %}
-                                    {% if fine_length > i %}
-                                        {% for fine in litigant.fines.all %}
-                                            {% if forloop.counter == i %}
-                                            {% else %}
-                                                <td>{{ fine.fine }}</td>
+                                            {% if litigant.distrained %}
+                                                <td class="text-center"><b>√</b></td>
                                             {% endif %}
-                                        {% endfor %}
-                                    {% else %}
-                                        <td></td>
-                                    {% endif %}
+                                            </tr>
+                                        </tbody>
+                                    </table>
                                 {% endif %}
-                                {% if case.heriot_count > 0 %}
-                                    {% if heriot_length > i %}
-                                        {% for heriot in litigant.heriots.all %}
-                                            {% if forloop.counter == i %}
-                                            {% else %}
-                                                <td>{{ heriot.quantity }} {{ heriot.animal }}</td>
-                                                <td>{{ heriot.heriot }}</td>
-                                            {% endif %}
-                                        {% endfor %}
-                                    {% else %}
-                                        <td class="bg-grey"></td>
-                                        <td class="bg-grey"></td>
-                                    {% endif %}
+
+                                {% if litigant.amercement.all %}
+                                    <table class="table table-bordered" id="amercements_table">
+                                        <thead>
+                                            <tr>
+                                                <th class="text-center">Amercement</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for amercement in litigant.amercements.all %}
+                                                <tr>
+                                                    <td>{{ amercement.amercement }}</td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
                                 {% endif %}
-                                {% if case.imperc_count > 0 %}
-                                    {% if imperc_length > i %}
-                                        {% for imperc in litigant.impercamenta.all %}
-                                            {% if forloop.counter == i %}
-                                            {% else %}
+
+                                {% if litigant.capitagia.all %}
+                                    <table class="table table-bordered" id="capitagia_table">
+                                        <thead>
+                                            <tr>
+                                                <th class="text-center" colspan="6">Capitagium</th>
+                                            </tr>
+                                            <th>Assessment</th>
+                                            <th>Crossed</th>
+                                            <th>Recessit</th>
+                                            <th>Habet Terram</th>
+                                            <th>Mortuus</th>
+                                            <th>Notes</th>
+                                        </thead>
+                                        <tbody>
+                                            {% for cap in litigant.capitagia.all %}
+                                                <tr>
+                                                    <td>{{ cap.capitagium }}</td>
+                                                    <td class="text-center">{% if cap.crossed %}<b>√</b>{% endif %}</td>
+                                                    <td class="text-center">{% if cap.recessit %}<b>√</b>{% endif %}</td>
+                                                    <td class="text-center">{% if cap.habet_terram %}<b>√</b>{% endif %}</td>
+                                                    <td class="text-center">{% if cap.mortuus %}<b>√</b>{% endif %}</td>
+                                                    <td>{{ cap.notes|linebreaks }}</td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                {% endif %}
+
+                                {% if litigant.damages.all %}
+                                    <table class="table table-bordered" id="damages_table">
+                                        <thead>
+                                            <tr>
+                                                <th class="text-center" colspan="2">Damages</th>
+                                            </tr>
+                                            <th>Assessment</th>
+                                            <th>Notes</th>
+                                        </thead>
+                                        <tbody>
+                                            {% for damage in litigant.damages.all %}
+                                                <tr>
+                                                    <td>{{ damage.damage|linebreaks }}</td>
+                                                    <td>{{ damage.notes }}</td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                {% endif %}
+
+                                {% if litigant.fines.all %}
+                                    <table class="table table-bordered" id="fines_table">
+                                        <thead>
+                                            <th class="text-center">Fine</th>
+                                        </thead>
+                                        <tbody>
+                                            {% for fine in litigant.fines.all %}
+                                                <tr>
+                                                    <td>{{ fine.fine }}</td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                {% endif %}
+
+                                {% if litigant.heriots.all %}
+                                    <table class="table table-bordered" id="heriot_table">
+                                        <thead>
+                                            <tr>
+                                                <th class="text-center" colspan="2">Heriot</th>
+                                            </tr>
+                                            <th>Chattel</th>
+                                            <th>Assessment</th>
+                                        </thead>
+                                        <tbody>
+                                            {% for heriot in litigant.heriots.all %}
+                                                <tr>
+                                                    <td>{{ heriot.quantity }} {{ heriot.animal }}</td>
+                                                    <td>{{ heriot.heriot }}</td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                {% endif %}
+
+                                {% if litigant.impercamenta.all %}
+                                    <table class="table table-bordered" id="impercamenta_table">
+                                        <thead>
+                                            <tr>
+                                                <th class="text-center" colspan="3">Impercamentum</th>
+                                            </tr>
+                                            <th>Chattel</th>
+                                            <th>Assessment</th>
+                                            <th>Notes</th>
+                                        </thead>
+                                        <tbody>
+                                            {% for imperc in litigant.impercamenta.all %}
+                                            <tr>
                                                 <td>{{ imperc.quantity }} {{ imperc.animal }}</td>
                                                 <td>{{ imperc.impercamentum }}</td>
-                                                <td>{{ imperc.notes }}</td>
-                                            {% endif %}
-                                        {% endfor %}
-                                    {% else %}
-                                        <td class="bg-grey"></td>
-                                        <td class="bg-grey"></td>
-                                        <td class="bg-grey"></td>
-                                    {% endif %}
+                                                <td>{{ imperc.notes|linebreaks }}</td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
                                 {% endif %}
-                                {% if case.land_count > 0 %}
-                                    {% if land_length > i %}
-                                        {% for land in litigant.lands.all %}
-                                            {% if forloop.counter == i %}
-                                            {% else %}
-                                                <td><a href="{% url 'land:detail' land.land.id %}">{{ land.land.id }}</a></td>
-                                                <td>{{ land.role.role }}</td>
-                                                <td>
-                                                    <ul class="list-group">
-                                                        {% for parcel in land.land.parcels.all %}
-                                                            <li class="list-group-item">{{ parcel.amount }} {{ parcel.parcel_type.parcel_type }} of {{ parcel.parcel_tenure.tenure }}</li>
-                                                        {% endfor %}
-                                                    </ul>
-                                                </td>
-                                                <td class="text-center">{% if land.villeinage %}<b>X</b>{% endif %}</td>
-                                                <td>{{ land.notes }}</td>
-                                            {% endif %}
-                                        {% endfor %}
-                                    {% else %}
-                                        <td class="bg-grey"></td>
-                                        <td class="bg-grey"></td>
-                                        <td class="bg-grey"></td>
-                                        <td class="bg-grey"></td>
-                                        <td class="bg-grey"></td>
-                                    {% endif %}
+
+                                {% if litigant.lands.all %}
+                                    <table class="table table-bordered" id="lands_table">
+                                        <thead>
+                                            <tr>
+                                                <th class="text-center" colspan="5">Land</th>
+                                            </tr>
+                                            <th>ID</th>
+                                            <th>Land Role</th>
+                                            <th>Parcels</th>
+                                            <th>Villein</th>
+                                            <th>Notes</th>
+                                        </thead>
+                                        <tbody>
+                                            {% for land in litigant.lands.all %}
+                                                <tr>
+                                                    <td><a href="{% url 'land:detail' land.land.id %}">{{ land.land.id }}</a></td>
+                                                    <td>{{ land.role.role }}</td>
+                                                    <td>
+                                                        <ul class="list-group">
+                                                            {% for parcel in land.land.parcels.all %}
+                                                                <li class="list-group-item">{{ parcel.amount }} {{ parcel.parcel_type.parcel_type }} of {{ parcel.parcel_tenure.tenure }}</li>
+                                                            {% endfor %}
+                                                        </ul>
+                                                    </td>
+                                                    <td class="text-center">{% if land.villeinage %}<b>√</b>{% endif %}</td>
+                                                    <td>{{ land.notes|linebreaks }}</td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
                                 {% endif %}
-                                </tr>
-                            {% endif %}
-                        {% endfor %}
-                    {% endif %}
-                    {% endwith %}
-                    {% empty %}
-                    <tr>
-                        <td colspan="2">None</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        {% else %}
-            <div class="text-center"><b>None</b></div>
-        {% endif %}
+
+                                {% if litigant.pledges.all %}
+                                    <table class="table table-bordered" id="pledges_table">
+                                        <thead>
+                                            <tr>
+                                                <th colspan="4" class="text-center">Pledges</th>
+                                            </tr>
+                                            <tr>
+                                            <th>Name</th>
+                                            <th>Status</th>
+                                            <th>Gender</th>
+
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for pledge in litigant.pledges.all %}
+                                                <tr>
+                                                    <td><a href="{% url 'person:detail' pledge.giver.id %}">{{ pledge.giver.full_name }}</a></td>
+                                                    <td>{{ pledge.giver.get_status_display }}</td>
+                                                    <td>{{ pledge.giver.get_gender_display }}</td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                {% endif %}
+
+                            </div>
+                        </div>
+                    </div>
+            {% endfor %}
+        </div>
     </div>
+{% endif %}
