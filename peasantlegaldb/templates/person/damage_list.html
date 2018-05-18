@@ -1,110 +1,130 @@
 <div class="card">
     <h3 class="card-header text-center bg-grey">Damages</h3>
     <div class="card-body">
-            <table class="table table-bordered" id="table">
+            <table class="table table-bordered table-hover" id="damage_table" data-ajax="{% url 'api:litigant-list' %}?litigant={{ person.id }}&damages=true&expand=damages,case&format=datatables" data-table-length="10">
                 <thead>
                     <th>Details</th>
                     <th>Case</th>
                     <th>Session</th>
-                    <th>Damages</th>
-                    <th>Notes</th>
+                    <th class="text-center">Damages</th>
                     <th>Court</th>
                     <th>Case Type</th>
                     <th>Role</th>
                     <th>Verdict</th>
                     <th>Litigants</th>
                 </thead>
-                <tbody>
-                    {% for cases in list %}
-                        {% with length=cases.damages.all|length lit_count=cases.case.litigants.all|length%}
-                            {% for damage in cases.damages.all %}
-                                {% if forloop.first %}
-                                    <tr>
-                                        <td rowspan="{{ length }}" data-toggle="collapse" data-target=".case_{{ damage.litigant.case.id }}_summary" class="details-control"><i class="fas fa-plus-square"></i></td>
-                                        <td rowspan="{{ length }}"><a href="{% url 'case:detail' damage.litigant.case.id %}">{{ damage.litigant.case.id }}</a></td>
-                                        <td rowspan="{{ length }}"><a href="{% url 'session:detail' damage.litigant.case.session.id %}">{{ damage.litigant.case.session }}</a></td>
-                                        <td>{{ damage.damage }}</td>
-                                        <td>{{ damage.notes|linebreaksbr }}</td>
-                                        <td rowspan="{{ length }}">{{ damage.litigant.case.get_court_type_display }}</td>
-                                        <td rowspan="{{ length }}">{{ damage.litigant.case.case_type.case_type }}
-                                        <td rowspan="{{ length }}">{{ damage.litigant.role.role }}</td>
-                                        <td rowspan="{{ length }}">{{ damage.litigant.case.verdict.verdict }}</td>
-                                        <td rowspan="{{ length }}" class="text-center">{{ damage.litigant.case.litigant_count }}</td>
-                                    </tr>
-                                {% else %}
-                                    <tr>
-                                        <td>{{ damage.damage }}</td>
-                                        <td>{{ damage.notes|linebreaksbr }}</td>
-                                    </tr>
-                                {% endif %}
-                            {% endfor %}
-                            {% for litigant in cases.case.litigants.all %}
-                                {% if forloop.first %}
-                                    <tr>
-                                        <td colspan="4" class="hiddenRow"><div class="collapse case_{{ litigant.case.id }}_summary"><b>Notes</b>Notes</div></td>
-                                        <td colspan="2" class="hiddenRow"><div class="collapse case_{{ litigant.case.id }}_summary"><b>Litigant</b></div></td>
-                                        <td colspan="3" class="hiddenRow"><div class="collapse case_{{ litigant.case.id }}_summary"><b>Role</b></div></td>
-                                    </tr>
-                                    <tr>
-                                        <td rowspan="{{ lit_count }}" colspan="4" class="hiddenRow"><div class="collapse case_{{ litigant.case.id }}_summary">{{ litigant.case.summary|wordwrap:55|linebreaks }}</div></td>
-                                        <td colspan="2" class="hiddenRow"><div class="collapse case_{{ litigant.case.id }}_summary"><a href="{% url 'person:detail' litigant.person.id %}">{{ litigant.person.full_name }}</a></div></td>
-                                        <td colspan="3" class="hiddenRow"><div class="collapse case_{{ litigant.case.id }}_summary">{{ litigant.role.role }}</div></td>
-                                    </tr>
-                                    {% else %}
-                                    <tr>
-                                        <td colspan="2" class="hiddenRow"><div class="hiddenRow collapse case_{{ litigant.case.id }}_summary"><a href="{% url 'person:detail' litigant.person.id %}">{{ litigant.person.full_name }}</a></div></td>
-                                        <td colspan="3" class="hiddenRow"><div class="hiddenRow collapse case_{{ litigant.case.id }}_summary">{{ litigant.role.role }}</div></td>
-                                    </tr>
-                                {% endif %}
-                            {% endfor %}
-                        {% endwith %}
-                    {% endfor %}
-                </tbody>
             </table>
-
-        {% if list.has_other_pages %}
-            <nav aria-label="Case list navigation">
-                <ul class="pagination">
-                    {% if list.has_previous %}
-                        <li class="page-item" name="test"><a class="page-link" data-url="{% url 'person:damages' person.id %}?page={{ list.previous_page_number }}">&laquo;</a></li>
-                    {% else %}
-                        <li class="page-item disabled" name="test"><span class="page-link">&laquo;</span></li>
-                    {% endif %}
-                {% for i in list.paginator.page_range %}
-                    {% if list.number == i %}
-                        <li class="page-item active" name="test"><span class="page-link">{{ i }}</span><span class="sr-only">(current)</span></li>
-                    {% else %}
-                        <li class="page-item" name="test"><a class="page-link" data-url="{% url 'person:damages' person.id %}?page={{ i }}">{{ i }}</a></li>
-                    {% endif %}
-                {% endfor %}
-                {% if list.has_next %}
-                    <li class="page-item" name="test"><a class="page-link" data-url="{% url 'person:damages' person.id %}?page={{ list.next_page_number }}">&raquo;</a></li>
-                {% else %}
-                    <li class="page-item disabled" name="test"><span class="page-link">&raquo;</span></li>
-                {% endif %}
-                </ul>
-            </nav>
-        {% endif %}
 
     </div>
 </div>
 
 <script>
-    $('.page-link').click(function(){
-            var url = $(this).attr('data-url');
-            $.ajax({
-                url: url,
-                type: 'get',
-                dataType: 'json',
-                success: function(data){
-                    $('#list_info').html(data.html_list);
-                }
-            })
+    var format_damage_summary = function( d ) {
+        return "<table class='table'>" +
+            "<tr>" +
+            "<td><b>Summary:</b></td>" +
+            "<td>" + d.case.summary + "</td>" +
+            "</tr>"
+    };
+
+    var format_damages = function(data){
+        var cell = "<table class='table'>" + "<tr><th>Damage</th><th>Notes</th></tr>";
+        $.each(data, function(index, item){
+            cell = cell + "<tr>"+
+            "<td>" + item.damage.amount + ' (' + item.damage.in_denarius + ')' + "</td>" +
+            "<td>" + item.notes + "</td>" +
+            "</tr>"
         });
-    $('#table td').on('show.bs.collapse', function(){
-        $(this).removeClass('hiddenRow');
+        cell = cell + "</table>";
+        return cell
+    };
+
+    var damage_table = $('#damage_table').DataTable({
+        serverSide: true,
+        order: [[2, 'asc']],
+        ajax: {
+            source: 'cases.'
+        },
+        columns: [
+            {
+                class: 'details-control',
+                orderable: false,
+                data: 'case.summary',
+                name: 'case.summary',
+                defaultContent: '',
+                render: checkNotes,
+                width:'15px'
+            },
+            {data: 'case.id',
+                searchable: false,
+                orderable: false,
+                render: {
+                    display: function(data){
+                        var url = Urls['case:detail'](data);
+                        return "<a href='" + url + "'>" + data + "</a>";
+                    }
+                }
+            },
+            {data: 'case.session',
+                name: 'case.session.date',
+                render:{
+                    display: function(data, type, row){
+                        if (data){
+                            var url = Urls['session:detail'](data.id);
+                            return "<a href='" + url + "'>" + data.law_term + ', ' + data.human_date + "</a>";
+                        } else {
+                            return "N/A";
+                        }
+                    }
+                }
+            },
+            {data: 'damages',
+                searchable: false,
+                orderable: false,
+                render: {
+                    display: function(data){
+                        if (data){
+                            return format_damages(data);
+                        }
+                    }
+                }
+            },
+            {data: 'case.court_type',
+                searchable: false,
+            },
+            {data: 'case.case_type.case_type',
+                name: 'case.case_type.case_type',
+            },
+            {data: 'case.verdict.verdict',
+                name: 'case.verdict.verdict',
+            },
+            {data: 'role.role',
+                name: 'role.role',
+            },
+            {data: 'case.litigant_count',
+                searchable: false,
+                orderable: false
+            },
+        ]
     });
-    $('#table td').on('hide.bs.collapse', function() {
-        $(this).addClass('hiddenRow');
+
+    // Used to activate the + expansion and trigger the format function.
+     $('#damage_table').on('click', 'td.details-control', function(){
+        var tr = $(this).closest('tr');
+        var tdi = tr.find('#check');
+        var row = damage_table.row( tr );
+        if (tdi.prop('style').color !== 'gray'){
+            if ( row.child.isShown()) {
+                row.child.hide();
+                tr.removeClass('shown');
+                tdi.first().removeClass('fa-minus-square');
+                tdi.first().addClass('fa-plus-square');
+            } else {
+                row.child( format_damage_summary( row.data() ) ).show();
+                tr.addClass('shown');
+                tdi.first().removeClass('fa-plus-square');
+                tdi.first().addClass('fa-minus-square');
+            }
+        }
     });
 </script>

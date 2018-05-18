@@ -43,18 +43,30 @@
                     {% else %}
                         <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
                     {% endif %}
-                {% for i in list.paginator.page_range %}
-                    {% if list.number == i %}
-                        <li class="page-item active"><span class="page-link">{{ i }}</span><span class="sr-only">(current)</span></li>
-                    {% else %}
-                        <li class="page-item"><a class="page-link" data-url="{% url 'village:cases' village.id %}?page={{ i }}">{{ i }}</a></li>
+
+                    {% if list.number|add:'-3' > 1 %}
+                        <li class="page-item"><a class="page-link" data-url="{% url 'village:cases' village.id %}?page={{ list.number|add:'-4' }}">&hellip;</a></li>
                     {% endif %}
-                {% endfor %}
-                {% if list.has_next %}
-                    <li class="page-item"><a class="page-link" data-url="{% url 'village:cases' village.id %}?page={{ list.next_page_number }}">&raquo;</a></li>
-                {% else %}
-                    <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
-                {% endif %}
+
+
+                    {% for i in list.paginator.page_range %}
+                        {% if list.number == i %}
+                            <li class="page-item active"><span class="page-link">{{ i }}</span><span class="sr-only">(current)</span></li>
+                        {% elif i > list.number|add:'-4' and i < list.number|add:'4'%}
+                            <li class="page-item"><a class="page-link" data-url="{% url 'village:cases' village.id %}?page={{ i }}">{{ i }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if list.number|add:'3' > 1 %}
+                        <li class="page-item"><a class="page-link" data-url="{% url 'village:cases' village.id %}?page={{ list.number|add:'4' }}">&hellip;</a></li>
+                    {% endif %}
+
+
+                    {% if list.has_next %}
+                        <li class="page-item"><a class="page-link" data-url="{% url 'village:cases' village.id %}?page={{ list.next_page_number }}">&raquo;</a></li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
+                    {% endif %}
                 </ul>
             </nav>
         {% endif %}

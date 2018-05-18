@@ -6,7 +6,7 @@
 
 {% block left_sidebar %}
     <div class="list-group" id="selection_list" role="tablist">
-        <a class="list-group-item list-group-item-action active" data-toggle="list" role="tab" data-url="{% url 'village:cases' village.id %}" aria-controls="list_cases" aria-selected="false">Cases</a>
+        <a class="list-group-item list-group-item-action" data-toggle="list" role="tab" data-url="{% url 'village:cases' village.id %}" aria-controls="list_cases" aria-selected="false">Cases</a>
         <a class="list-group-item list-group-item-action" data-toggle="list" role="tab" href="#list_residents" aria-controls="list_residents" aria-selected="false">Residents</a>
         <a class="list-group-item list-group-item-action" data-toggle="list" role="tab" href="#list_litigants" aria-controls="list_litigants" aria-selected="false">Litigants</a>
         <a class="list-group-item list-group-item-action" data-toggle="list" role="tab" href="#list_lands" aria-controls="list_lands" aria-selected="false">Lands</a>
@@ -87,7 +87,7 @@
 <br>
 
 <div class="tab-content" id="list_info">
-    <div class="tab-pane fade show active" id="list_cases" role="tabpanel">{% include 'village/case_list.html' %}</div>
+    <div class="tab-pane fade" id="list_cases" role="tabpanel">{% include 'village/case_list.html' %}</div>
     <div class="tab-pane fade" id="list_residents" role="tabpanel">{% include 'village/resident_list.html' %}</div>
     <div class="tab-pane fade" id="list_litigants" role="tabpanel">{% include 'village/litigant_list.html' %}</div>
     <div class="tab-pane fade" id="list_lands" role="tabpanel">{% include 'village/land_list.html' %}</div>

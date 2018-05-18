@@ -1,62 +1,56 @@
 <div class="card">
     <h3 class="card-header text-center bg-grey">Relationships</h3>
     <div class="card-body">
-            <table class="table table-bordered">
+            <table class="table table-bordered table-hover" id="relationship_table" data-ajax="{% url 'api:relationship-list' %}?relations={{ person.id }}&expand=person_one,person_two&format=datatables&keep=person_one,person_two" data-table-length="10">
                 <thead>
                     <th>Relation</th>
                     <th>Relationship</th>
                     <th>Definitive</th>
                 </thead>
-                    {% for relation in list %}
-                        <tr>
-                            {% if relation.person_one.id != person.id %}
-                                <td><a href="{% url 'person:detail' relation.person_one.id %}">{{ relation.person_one.full_name }}</a></td>
-                            {% else %}
-                                <td><a href="{% url 'person:detail' relation.person_two.id %}">{{ relation.person_two.full_name }}</a></td>
-                            {% endif %}
-                            <td>{{ relation.relationship.relation }}</td>
-                            <td>{{ relation.definitive }}</td>
-                        </tr>
-                    {% endfor %}
-            </table>
-
-        {% if list.has_other_pages %}
-            <nav aria-label="Case list navigation">
-                <ul class="pagination">
-                    {% if list.has_previous %}
-                        <li class="page-item" name="test"><a class="page-link" data-url="{% url 'person:relationships' person.id %}?page={{ list.previous_page_number }}">&laquo;</a></li>
-                    {% else %}
-                        <li class="page-item disabled" name="test"><span class="page-link">&laquo;</span></li>
-                    {% endif %}
-                {% for i in list.paginator.page_range %}
-                    {% if list.number == i %}
-                        <li class="page-item active" name="test"><span class="page-link">{{ i }}</span><span class="sr-only">(current)</span></li>
-                    {% else %}
-                        <li class="page-item" name="test"><a class="page-link" data-url="{% url 'person:relationships' person.id %}?page={{ i }}">{{ i }}</a></li>
-                    {% endif %}
-                {% endfor %}
-                {% if list.has_next %}
-                    <li class="page-item" name="test"><a class="page-link" data-url="{% url 'person:relationships' person.id %}?page={{ list.next_page_number }}">&raquo;</a></li>
-                {% else %}
-                    <li class="page-item disabled" name="test"><span class="page-link">&raquo;</span></li>
-                {% endif %}
-                </ul>
-            </nav>
-        {% endif %}
-
     </div>
 </div>
 
 <script>
-    $('.page-link').click(function(){
-            var url = $(this).attr('data-url');
-            $.ajax({
-                url: url,
-                type: 'get',
-                dataType: 'json',
-                success: function(data){
-                    $('#list_info').html(data.html_list);
+
+    var url = window.location.pathname;
+    var person = url.split('/').reverse()[1];
+
+    var relationship_table = $('#relationship_table').DataTable({
+        serverSide: true,
+        columns: [
+            {data: 'person_one',
+                defaultContent: '',
+                name: 'person_one.first_name, person_one.relation_name, person_one.last_name, person_two.first_name, person_two.relation_name, person_two.last_name',
+                orderable: false,
+                render: {
+                    display: function (data, type, row) {
+                        console.log(row);
+                        if (row.person_one.id == person) {
+                            var url = Urls['person:detail'](row.person_two.id);
+                            return "<a href='" + url + "'>" + row.person_two.full_name + "</a>";
+                        } else {
+                            var url = Urls['person:detail'](row.person_one.id);
+                            return "<a href='" + url + "'>" + row.person_one.full_name + "</a>";
+                        }
+                    },
+                },
+            },
+            {data: 'relationship.relation',
+                name: 'relationship.relation',
+            },
+            {data: 'definitive',
+                searchable: false,
+                orderable: false,
+                render: {
+                    display: function(data){
+                        if (data){
+                            return "Yes"
+                        } else {
+                            return "No"
+                        }
+                    }
                 }
-            })
-        });
+            },
+        ]
+    });
 </script>

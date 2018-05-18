@@ -111,7 +111,7 @@
             var caseType = $("#select_case_type").val();
             var village = $("#select_village").val();
             var verdictType = $("#select_verdict_type").val();
-            var apiCall = 'include[]=session.*&include[]=session.village.*&include[]=litigant_count&include[]=pledge_count';
+            var apiCall = 'format=datatables&expand=session';
             var url = Urls['api:case-list']();
             if (caseType === 'None' || village === 'None' || verdictType === 'None') {
                 if ($("#list_cases").is(":visible")) {
@@ -159,20 +159,16 @@
                 scrollY: 500,
                 scrollCollapse: true,
                 paging: true,
-                ajax: {
-                    processing: true,
-                    url: url,
-                    type: "GET",
-                    dataSrc: "cases.",
-                },
+                serverSide: true,
+                ajax: url,
                 order: [[3, "asc"], [4, "asc"]],
                 "columns": [
                     {
-                        'class': 'details-control',
-                        'orderable': 'false',
-                        'data': 'summary',
-                        'defaultContent': '',
-                        'render': checkNotes,
+                        class: 'details-control',
+                        orderable: false,
+                        data: 'summary',
+                        defaultContent: '',
+                        render: checkNotes,
                         width:'15px'
                     },
                     {data: "id",
@@ -184,36 +180,48 @@
                             }
                         }
                     },
-                    {data: "session",
+                    {data: "session.village",
                         defaultContent: '',
+                        name: 'session.village.name',
                         render:{
                             display: function(data, type, row, meta){
-                                var sessionData = meta.settings.json.sessions.find(x => x.id === data);
-                                var villageData = meta.settings.json.villages.find(x => x.id === sessionData.village);
-                                var url = Urls['village:detail'](villageData.id);
-                                return "<a href='" + url + "'>" + villageData.name + "</a>";
+                                var url = Urls['village:detail'](data.id);
+                                return "<a href='" + url + "'>" + data.name + "</a>";
                             }
                         }
                     },
                     {data: "session",
                         defaultContent: '',
+                        name: 'session.date, session.village.name',
                         render:{
                             display: function(data, type, row, meta){
-                                var sessionData = meta.settings.json.sessions.find(x => x.id === data);
-                                var url = Urls['session:detail'](sessionData.id);
-                                return "<a href'" + url + "'>" + sessionData.human_date + "</a>";
+                                var url = Urls['session:detail'](data.id);
+                                return "<a href='" + url + "'>" + data.law_term + ', ' + data.human_date + "</a>";
 
                             },
-                        sort: "date"
                         }
                     },
-                    {data: "court_type"},
-                    {data: "case_type.case_type"},
-                    {data: "verdict.verdict"},
-                    {data: "litigant_count"},
-                    {data: "pledge_count"},
+                    {data: "court_type",
+                        searchable: false,
+                    },
+                    {data: "case_type.case_type",
+                        name: 'case_type.case_type',
+                    },
+                    {data: "verdict.verdict",
+                        name: 'verdict.verdict',
+                    },
+                    {data: "litigant_count",
+                        searchable: false,
+                        orderable: false,
+                    },
+                    {data: "pledge_count",
+                        searchable: false,
+                        orderable: false,
+                    },
                     {data: "of_interest",
                         defaultContent: '',
+                        searchable: false,
+                        orderable: false,
                         render:{
                             display: checkMaker,
                         }

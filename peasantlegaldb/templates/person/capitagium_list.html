@@ -1,87 +1,124 @@
 <div class="card">
     <h3 class="card-header text-center bg-grey">Chevage List</h3>
     <div class="card-body">
-            <table class="table table-bordered" id="table">
+            <table class="table table-bordered table-hover" id="capitagium_table" data-ajax="{% url 'api:litigant-list' %}?litigant={{ person.id }}&capitagia=true&expand=capitagia,case&format=datatables" data-table-length="10">
                 <thead>
+                    <th>Details</th>
                     <th>Case</th>
                     <th>Session</th>
-                    <th>Assessment</th>
-                    <th>Notes</th>
-                    <th>Recessit</th>
-                    <th>Crossed</th>
-                    <th>H. Terram</th>
-                    <th>Mortuus</th>
+                    <th>Capitagia</th>
                     <th>Litigants</th>
                 </thead>
-                <tbody>
-                    {% for cases in list %}
-                        {% with length=cases.capitagia.all|length %}
-                            {% for capitagium in cases.capitagia.all %}
-                                {% if forloop.first %}
-                                    <tr>
-                                        <td rowspan="{{ length }}"><a href="{% url 'case:detail' capitagium.litigant.case.id %}">{{ capitagium.litigant.case.id }}</a></td>
-                                        <td rowspan="{{ length }}"><a href="{% url 'session:detail' capitagium.litigant.case.session.id %}">{{ capitagium.litigant.case.session }}</a></td>
-                                        <td>{{ capitagium.capitagium }}</td>
-                                        <td>{{ capitagium.notes }}</td>
-                                        <td class="text-center">{% if capitagium.recessit %}X{% endif %}</td>
-                                        <td class="text-center">{% if capitagium.crossed %}X{% endif %}</td>
-                                        <td class="text-center">{% if capitagium.habet_terram %}X{% endif %}</td>
-                                        <td class="text-center">{% if capitagium.mortuus %}X{% endif %}</td>
-                                        <td rowspan="{{ length }}" class="text-center">{{ capitagium.litigant.case.litigant_count }}</td>
-                                    </tr>
-                                {% else %}
-                                    <tr>
-                                        <td>{{ capitagium.capitagium }}</td>
-                                        <td>{{ capitagium.notes }}</td>
-                                        <td class="text-center">{% if capitagium.recessit %}X{% endif %}</td>
-                                        <td class="text-center">{% if capitagium.crossed %}X{% endif %}</td>
-                                        <td class="text-center">{% if capitagium.habet_terram %}X{% endif %}</td>
-                                        <td class="text-center">{% if capitagium.mortuus %}X{% endif %}</td>
-                                    </tr>
-                                {% endif %}
-                            {% endfor %}
-                        {% endwith %}
-                    {% endfor %}
-                </tbody>
-            </table>
-
-           {% if list.has_other_pages %}
-            <nav aria-label="Case list navigation">
-                <ul class="pagination">
-                    {% if list.has_previous %}
-                        <li class="page-item" name="test"><a class="page-link" data-url="{% url 'person:capitagium' person.id %}?page={{ list.previous_page_number }}">&laquo;</a></li>
-                    {% else %}
-                        <li class="page-item disabled" name="test"><span class="page-link">&laquo;</span></li>
-                    {% endif %}
-                {% for i in list.paginator.page_range %}
-                    {% if list.number == i %}
-                        <li class="page-item active" name="test"><span class="page-link">{{ i }}</span><span class="sr-only">(current)</span></li>
-                    {% else %}
-                        <li class="page-item" name="test"><a class="page-link" data-url="{% url 'person:capitagium' person.id %}?page={{ i }}">{{ i }}</a></li>
-                    {% endif %}
-                {% endfor %}
-                {% if list.has_next %}
-                    <li class="page-item" name="test"><a class="page-link" data-url="{% url 'person:capitagium' person.id %}?page={{ list.next_page_number }}">&raquo;</a></li>
-                {% else %}
-                    <li class="page-item disabled" name="test"><span class="page-link">&raquo;</span></li>
-                {% endif %}
-                </ul>
-            </nav>
-        {% endif %}
 
     </div>
 </div>
 
 <script>
-    $('.page-link').click(function(){
-            var url = $(this).attr('data-url');
-            $.ajax({
-                url: url,
-                type: 'get',
-                dataType: 'json',
-                success: function(data){
-                    $('#list_info').html(data.html_list);
-                }
-            })
+
+    var format_capitagium_summary = function format( d ) {
+        return "<table class='table'>" +
+            "<tr>" +
+            "<td><b>Summary:</b></td>" +
+            "<td>" + d.case.summary + "</td>" +
+            "</tr>"
+            };
+
+    var format_capitagia = function(data){
+        var cell = "<table class='table'>" + "<tr><th>Assessment</th>"+
+            "<th>Recessit</th>" +
+            "<th>Crossed</th>" +
+            "<th>H. Terram</th>" +
+            "<th>Mortuus</th>" +
+            "<th>Notes</th>" +
+            "</tr>";
+        $.each(data, function(index, item){
+            cell = cell + "<tr>"+
+                    "<td>" + item.capitagium.amount + "(" + item.capitagium.in_denarius + ")" + "</td>" +
+                    "<td>" + item.recessit + "</td>" +
+                    "<td>" + item.crossed + "</td>" +
+                    "<td>" + item.habet_terram + "</td>" +
+                    "<td>" + item.mortuus + "</td>" +
+                    "<td>" + item.notes + "</td>" +
+                    "</tr>"
         });
+        cell = cell + "</table>";
+        return cell
+    };
+
+    var capitagium_table = $('#capitagium_table').DataTable({
+        serverSide: true,
+        order: [[2, 'asc']],
+        ajax: {
+            source: 'cases.'
+        },
+        columns: [
+            {
+                class: 'details-control',
+                orderable: false,
+                data: 'case.summary',
+                name: 'case.summary',
+                defaultContent: '',
+                render: checkNotes,
+                width:'15px'
+            },
+            {data: 'case.id',
+                searchable: false,
+                orderable: false,
+                render: {
+                    display: function(data){
+                        var url = Urls['case:detail'](data);
+                        return "<a href='" + url + "'>" + data + "</a>";
+                    }
+                }
+            },
+            {data: 'case.session',
+                name: 'case.session.date',
+                render:{
+                    display: function(data, type, row){
+                        if (data){
+                            var url = Urls['session:detail'](data.id);
+                            return "<a href='" + url + "'>" + data.law_term + ', ' + data.human_date + "</a>";
+                        } else {
+                            return "N/A";
+                        }
+                    }
+                }
+            },
+            {data: 'capitagia',
+                searchable: false,
+                orderable: false,
+                render: {
+                    display: function(data){
+                        if (data){
+                            return format_capitagia(data);
+                        }
+                    }
+                }
+            },
+            {data: 'case.litigant_count',
+                searchable: false,
+                orderable: false
+            },
+        ]
+    });
+
+    // Used to activate the + expansion and trigger the format function.
+     $('#capitagium_table').on('click', 'td.details-control', function(){
+        var tr = $(this).closest('tr');
+        var tdi = tr.find('#check');
+        var row = capitagium_table.row( tr );
+        if (tdi.prop('style').color !== 'gray'){
+            if ( row.child.isShown()) {
+                row.child.hide();
+                tr.removeClass('shown');
+                tdi.first().removeClass('fa-minus-square');
+                tdi.first().addClass('fa-plus-square');
+            } else {
+                row.child( format_capitagium_summary( row.data() ) ).show();
+                tr.addClass('shown');
+                tdi.first().removeClass('fa-plus-square');
+                tdi.first().addClass('fa-minus-square');
+            }
+        }
+    });
 </script>

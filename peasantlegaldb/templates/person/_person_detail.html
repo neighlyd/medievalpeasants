@@ -6,43 +6,43 @@
 
 {% block left_sidebar %}
     <div class="list-group" id="selection_list" role="tablist">
-        <a class="list-group-item list-group-item-action active" data-target="list_info" data-url="{% url 'person:stats' person.id %}" role="tab" data-toggle="list">Stats</a>
+        <a class="list-group-item list-group-item-action" href="#stats_list" data-url="{% url 'person:stats' person.id %}" role="tab" data-toggle="list">Stats</a>
     {% if person.case_exists %}
-        <a class="list-group-item list-group-item-action" data-target="list_info" data-url="{% url 'person:cases' person.id %}" >Case List</a>
+        <a class="list-group-item list-group-item-action" href="#case_list" data-url="{% url 'person:cases' person.id %}" role="tab" data-toggle="list">Case List</a>
     {% endif %}
     {% if person.pledge_exists %}
-        <a class="list-group-item list-group-item-action" data-target="list_info" data-url="{% url 'person:pledges' person.id %}">Pledge List</a>
+        <a class="list-group-item list-group-item-action" href="#pledge_list" data-url="{% url 'person:pledges' person.id %}" role="tab" data-toggle="list">Pledge List</a>
     {% endif %}
     {% if person.land_exists %}
-        <a class="list-group-item list-group-item-action" data-target="list_info" data-url="{% url 'person:lands' person.id %}">Land List</a>
+        <a class="list-group-item list-group-item-action" href="#pledge_list" data-url="{% url 'person:lands' person.id %}" role="tab" data-toggle="list">Land List</a>
     {% endif %}
     {% if person.relationship_exists %}
-        <a class="list-group-item list-group-item-action" data-target="list_info" data-url="{% url 'person:relationships' person.id %}">Relationship List</a>
+        <a class="list-group-item list-group-item-action" href="#relationship_list" data-url="{% url 'person:relationships' person.id %}" role="tab" data-toggle="list">Relationship List</a>
     {% endif %}
     {% if person.position_exists %}
-        <a class="list-group-item list-group-item-action" data-target="list_info" data-url="{% url 'person:positions' person.id %}">Position List</a>
+        <a class="list-group-item list-group-item-action" href="#position_list" data-url="{% url 'person:positions' person.id %}" role="tab" data-toggle="list">Position List</a>
     {% endif %}
 
 
         <br>
     {% if person.amercement_exists %}
-        <a class="list-group-item list-group-item-action" data-target="list_info" data-url="{% url 'person:amercements' person.id %}">Amercement Cases</a>
-    {% endif %}
-    {% if person.fine_exists %}
-        <a class="list-group-item list-group-item-action" data-target="list_info" data-url="{% url 'person:fines' person.id %}">Fine Cases</a>
+        <a class="list-group-item list-group-item-action" href="#amercement_list" data-url="{% url 'person:amercements' person.id %}" role="tab" data-toggle="list">Amercement Cases</a>
     {% endif %}
     {% if person.damage_exists %}
-        <a class="list-group-item list-group-item-action" data-target="list_info" data-url="{% url 'person:damages' person.id %}">Damage Cases</a>
+        <a class="list-group-item list-group-item-action" href="#damage_list" data-url="{% url 'person:damages' person.id %}" role="tab" data-toggle="list">Damage Cases</a>
+    {% endif %}
+    {% if person.fine_exists %}
+        <a class="list-group-item list-group-item-action" href="#fine_list" data-url="{% url 'person:fines' person.id %}" role="tab" data-toggle="list">Fine Cases</a>
     {% endif %}
         <br>
-    {% if person.chevage_exists %}
-        <a class="list-group-item list-group-item-action" data-target="list_info" data-url="{% url 'person:capitagium' person.id %}">Capitagium Cases</a>
+    {% if person.capitagia_exists %}
+        <a class="list-group-item list-group-item-action" href="#capitagium_list" data-url="{% url 'person:capitagia' person.id %}" role="tab" data-toggle="list">Capitagium Cases</a>
     {% endif %}
     {% if person.impercamentum_exists %}
-        <a class="list-group-item list-group-item-action" data-target="list_info" data-url="{% url 'person:impercamenta' person.id %}">Impercamenta Cases</a>
+        <a class="list-group-item list-group-item-action" href="#impercamentum_list" data-url="{% url 'person:impercamenta' person.id %}" role="tab" data-toggle="list">Impercamenta Cases</a>
     {% endif %}
     {% if person.heriot_exists %}
-        <a class="list-group-item list-group-item-action" data-target="list_info" data-url="{% url 'person:heriots' person.id %}">Heriot Cases</a>
+        <a class="list-group-item list-group-item-action" href="#heriot_list" data-url="{% url 'person:heriots' person.id %}" role="tab" data-toggle="list">Heriot Cases</a>
     {% endif %}
 
     </div>
@@ -135,18 +135,40 @@
 <br>
 
 <div class="tab-content" id="list_info">
-    <div class="tab-pane fade show active" id="stats_list" role="tabpanel"></div>
+    <div class="tab-pane fade" id="stats_list" role="tabpanel">
+    </div>
+
     <div class="tab-pane fade" id="case_list" role="tabpanel"></div>
+
     <div class="tab-pane fade" id="pledge_list" role="tabpanel"></div>
+
+    {% if person.land_exists %}
     <div class="tab-pane fade" id="land_list" role="tabpanel"></div>
+    {% endif %}
+
+    {% if person.relationship_exists %}
     <div class="tab-pane fade" id="relationship_list" role="tabpanel"></div>
+    {% endif %}
+
+    {% if person.relationship_exists %}
     <div class="tab-pane fade" id="position_list" role="tabpanel"></div>
+    {% endif %}
+
     <div class="tab-pane fade" id="amercement_list" role="tabpanel"></div>
-    <div class="tab-pane fade" id="fine_list" role="tabpanel"></div>
+
     <div class="tab-pane fade" id="damage_list" role="tabpanel"></div>
+
+    <div class="tab-pane fade" id="fine_list" role="tabpanel"></div>
+
+    {% if person.capitagia_exists %}
     <div class="tab-pane fade" id="capitagium_list" role="tabpanel"></div>
+    {% endif %}
+
     <div class="tab-pane fade" id="impercamentum_list" role="tabpanel"></div>
+
+    {% if person.heriot_exists %}
     <div class="tab-pane fade" id="heriot_list" role="tabpanel"></div>
+    {% endif %}
 
 </div>
 
@@ -186,6 +208,29 @@
     javascript for editing goes here. Change person.id to user verification.
 {% endif %}
 
+<script>
+    $(document).ready(function(){
+        $("#selection_list").on('click', 'a', function(e){
+           e.preventDefault();
+           var url = $(this).attr("data-url");
+
+           if (typeof url !== "undefined"){
+               var pane = $(this), href = this.hash;
+
+               $(href).load(url, function(result){
+                   pane.tab('show');
+               });
+           } else {
+               $(this).tab('show');
+           }
+        });
+        $('a[data-toggle="tab"').on('shown.bs.tab', function(e){
+            $.fn.dataTable.tables({visible: true, api: true}).columns.adjust().responsive.recalc();
+        });
+    })
+
+</script>
+    <!--
 <script>
     $(document).ready(function(){
         var url = window.location.pathname;
@@ -242,6 +287,6 @@
         });
 
 </script>
-
+-->
 
 {% endblock %}

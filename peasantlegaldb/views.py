@@ -27,6 +27,8 @@ Delete = [u"Full Editor"]
 Edit = [u"Full Editor", u"Editor"]
 Add = [u"Full Editor", u"Editor", u"Contributor"]
 
+def nested_test(request):
+    return render(request, 'case/_case_test.html')
 
 class ArchiveDetailView(DetailView):
 
@@ -695,50 +697,10 @@ def person_lists(request, pk):
 
     person = models.Person.objects.get(id=pk)
 
-    # Depending on the last element, assign the query
-    if path == 'amercement_list':
-        query_list = models.Litigant.objects.filter(person=pk, amercements__amercement__isnull=False).distinct().prefetch_related('case').order_by('case__session__date')
-    elif path == 'capitagium_list':
-        query_list = models.Litigant.objects.filter(person=pk, capitagia__capitagium__isnull=False).distinct().prefetch_related('case').order_by('case__session__date')
-    elif path == 'case_list':
-        query_list = models.Litigant.objects.filter(person=pk).prefetch_related('case').order_by('case__session__date')
-    elif path == 'damage_list':
-        query_list = models.Litigant.objects.filter(person=pk, damages__damage__isnull=False).distinct().prefetch_related('case').order_by('case__session__date')
-    elif path == 'fine_list':
-        query_list = models.Litigant.objects.filter(person=pk, fines__fine__isnull=False).distinct().prefetch_related('case').order_by('case__session__date')
-    elif path == 'heriot_list':
-        query_list = models.Litigant.objects.filter(person=pk, heriots__heriot__isnull=False).distinct().prefetch_related('case').order_by('case__session__date')
-    elif path == 'impercamentum_list':
-        query_list = models.Litigant.objects.filter(person=pk, impercamenta__impercamentum__isnull=False).distinct().prefetch_related('case').order_by('case__session__date')
-    elif path == 'land_list':
-        query_list = models.Litigant.objects.filter(person=pk, lands__isnull=False).distinct().prefetch_related('case').order_by('case__session__date')
-    elif path == 'pledges_given_list':
-        query_list = models.Pledge.objects.filter(giver=pk).prefetch_related('receiver__person').order_by('receiver__case__session__date')
-    elif path == 'pledges_received_list':
-        litigant_ids = models.Litigant.objects.filter(person=pk).values_list('id', flat=True)
-        query_list = models.Pledge.objects.filter(receiver__in=litigant_ids).prefetch_related('giver').order_by('receiver__case__session__date')
-    elif path == 'position_list':
-        query_list = models.Position.objects.filter(person=pk).prefetch_related('session').order_by('session__date')
-    elif path == 'relationship_list':
-        query_list = models.Relationship.objects.filter(Q(person_one=pk) | Q(person_two=pk))
-
-    # Check which page the url is on by getting the `?page=` param. If it is not 1, assign 1
-    page = request.GET.get('page', 1)
-    # Limit the list to 10 items.
-    paginator = Paginator(query_list, 10)
-
-    try:
-        query_list = paginator.page(page)
-    except PageNotAnInteger:
-        query_list = paginator.page(1)
-    except EmptyPage:
-        query_list = paginator.page(paginator.num_pages)
-
     template = 'person/' + path + '.html'
 
     # Need to assign person context for in-page links and data-urls, such as the pagination buttons.
     context={
-        'list': query_list,
         'person': person,
     }
 

@@ -1,6 +1,6 @@
 <h3 class="card-header text-center bg-grey">Pledges Given</h3>
 <div class="card-body">
-    <table class="table table-bordered" id="table">
+    <table class="table table-bordered table-hover" id="pledges_given_table" data-ajax="{% url 'api:pledge-list' %}?giver={{ person.id }}&expand=giver,receiver&format=datatables" data-page-length="10">
         <thead>
             <th>Details</th>
             <th>Receiver</th>
@@ -13,91 +13,102 @@
             <th>Verdict</th>
             <th>Litigants</th>
         </thead>
-        <tbody>
-            {% for pledge in list %}
-                {% with lit_count=pledge.receiver.case.litigants.all|length %}
-                <tr>
-                    <td rowspan="{{ length }}" data-toggle="collapse" data-target=".case_{{ pledge.receiver.case.id }}_summary" class="details-control"><i class="fas fa-plus-square"></i></td>
-                    <td><a href="{% url 'person:detail' pledge.receiver.person.id %}">{{ pledge.receiver.person.full_name }}</a></td>
-                    <td>{{ pledge.receiver.person.get_status_display }}</td>
-                    <td>{{ pledge.receiver.person.get_gender_display }}</td>
-                    <td><a href="{% url 'case:detail' pledge.receiver.case.id %}">{{ pledge.receiver.case.id }}</a></td>
-                    <td><a href="{% url 'session:detail' pledge.receiver.case.session.id %}">{{ pledge.receiver.case.session }}</a></td>
-                    <td>{{ pledge.receiver.case.get_court_type_display }}</td>
-                    <td>{{ pledge.receiver.case.case_type.case_type }}</td>
-                    <td>{{ pledge.receiver.case.verdict.verdict }}</td>
-                    <td>{{ pledge.receiver.case.litigant_count }}</td>
-                </tr>
-                {% for litigant in pledge.receiver.case.litigants.all %}
-                    {% if forloop.first %}
-                        <tr>
-                            <td colspan="4" class="hiddenRow"><div class="collapse case_{{ litigant.case.id }}_summary"><b>Notes</b></div></td>
-                            <td colspan="2" class="hiddenRow"><div class="collapse case_{{ litigant.case.id }}_summary"><b>Litigant</b></div></td>
-                            <td colspan="3" class="hiddenRow"><div class="collapse case_{{ litigant.case.id }}_summary"><b>Role</b></div></td>
-                        </tr>
-                        <tr>
-                            <td rowspan="{{ lit_count }}" colspan="4" class="hiddenRow"><div class="collapse case_{{ litigant.case.id }}_summary">{{ litigant.case.summary|wordwrap:55|linebreaksbr }}</div></td>
-                            <td colspan="2" class="hiddenRow"><div class="collapse case_{{ litigant.case.id }}_summary"><a href="{% url 'person:detail' litigant.person.id %}">{{ litigant.person.full_name }}</a></div></td>
-                            <td colspan="3" class="hiddenRow"><div class="collapse case_{{ litigant.case.id }}_summary">{{ litigant.role.role }}</div></td>
-                        </tr>
-                        {% else %}
-                        <tr>
-                            <td colspan="2" class="hiddenRow"><div class="collapse case_{{ litigant.case.id }}_summary"><a href="{% url 'person:detail' litigant.person.id %}">{{ litigant.person.full_name }}</a></div></td>
-                            <td colspan="3" class="hiddenRow"><div class="collapse case_{{ litigant.case.id }}_summary">{{ litigant.role.role }}</div></td>
-                        </tr>
-                    {% endif %}
-                {% endfor %}
-                {% endwith %}
-            {% empty %}
-                <tr>
-                    <td colspan="9" class="text-center">None</td>
-                </tr>
-            {% endfor %}
-        </tbody>
     </table>
-
-{% if list.has_other_pages %}
-    <nav aria-label="list navigation">
-        <ul class="pagination">
-            {% if list.has_previous %}
-                <li class="page-item" ><a class="page-link given" data-url="{% url 'person:pledges_given' person.id %}?page={{ list.previous_page_number }}">&laquo;</a></li>
-            {% else %}
-                <li class="page-item disabled" ><span class="page-link given">&laquo;</span></li>
-            {% endif %}
-        {% for i in list.paginator.page_range %}
-            {% if list.number == i %}
-                <li class="page-item active" ><span class="page-link given">{{ i }}</span><span class="sr-only">(current)</span></li>
-            {% else %}
-                <li class="page-item" ><a class="page-link given" data-url="{% url 'person:pledges_given' person.id %}?page={{ i }}">{{ i }}</a></li>
-            {% endif %}
-        {% endfor %}
-        {% if list.has_next %}
-            <li class="page-item" ><a class="page-link given" data-url="{% url 'person:pledges_given' person.id %}?page={{ list.next_page_number }}">&raquo;</a></li>
-        {% else %}
-            <li class="page-item disabled" ><span class="page-link given">&raquo;</span></li>
-        {% endif %}
-        </ul>
-    </nav>
-{% endif %}
 </div>
 
 
 <script>
-        $('.given').click(function(){
-            var url = $(this).attr('data-url');
-            $.ajax({
-                url: url,
-                type: 'get',
-                dataType: 'json',
-                success: function(data){
-                    $('#pledges_given').html(data.html_list);
+
+    var format_pledges_given_summary = function format( data ) {
+        return "<table class='table'>" +
+            "<tr>" +
+            "<td><b>Summary:</b></td>" +
+            "<td>" + data.receiver.case.summary + "</td>" +
+            "</tr>"
+            };
+
+
+    var pledges_given_table = $('#pledges_given_table').DataTable({
+        serverSide: true,
+        order: [[5, 'asc']],
+        columns: [
+            {
+                class: 'details-control',
+                orderable: false,
+                data: 'receiver.case.summary',
+                name: 'receiver.case.summary',
+                defaultContent: '',
+                render: checkNotes,
+                width:'15px'
+            },
+            {data: 'receiver.person.full_name',
+                name: 'receiver.person.first_name, receiver.person.relation_name, receiver.person.last_name',
+                render: {
+                    display: function(data, type, row){
+                        var url = Urls['person:detail'](row.receiver.person.id);
+                        return "<a href='" + url + "'>" + data + "</a>";
+                    }
                 }
-            })
-        });
-    $('#table td').on('show.bs.collapse', function(){
-        $(this).removeClass('hiddenRow');
+            },
+            {data: 'receiver.person.status_display',
+                searchable: false,
+                orderable: false,
+            },
+            {data: 'receiver.person.gender_display',
+                searchable: false,
+                orderable: false,
+            },
+            {data: 'receiver.case.id',
+                render: {
+                    display: function(data){
+                        var url = Urls['case:detail'](data);
+                        return "<a href='" + url + "'>" + data + "</a>";
+                    }
+                }
+            },
+            {data: 'receiver.case.session',
+                name: 'receiver.case.session.date, receiver.case.session.village.name',
+                render: {
+                    display: function(data, type, row){
+                        var url = Urls['session:detail'](data.id);
+                        return "<a href='" + url + "'>" + data.law_term + ', ' + data.year + "</a>";
+                    }
+                }
+            },
+            {data: 'receiver.case.court_type',
+                searchable: false,
+            },
+            {data: 'receiver.case.case_type.case_type',
+                name: 'receiver.case.case_type.case_type',
+            },
+            {data: 'receiver.case.verdict.verdict',
+                name: 'receiver.case.verdict.verdict',
+            },
+            {data: 'receiver.case.litigant_count',
+                searchable: false,
+                orderable: false
+            },
+        ]
     });
-    $('#table td').on('hide.bs.collapse', function() {
-        $(this).addClass('hiddenRow');
+
+    // Used to activate the + expansion and trigger the format function.
+     $('#pledges_given_table').on('click', 'td.details-control', function(){
+        var tr = $(this).closest('tr');
+        var tdi = tr.find('#check');
+        var row = pledges_given_table.row( tr );
+        if (tdi.prop('style').color !== 'gray'){
+            if ( row.child.isShown()) {
+                row.child.hide();
+                tr.removeClass('shown');
+                tdi.first().removeClass('fa-minus-square');
+                tdi.first().addClass('fa-plus-square');
+            } else {
+                row.child( format_pledges_given_summary( row.data() ) ).show();
+                tr.addClass('shown');
+                tdi.first().removeClass('fa-plus-square');
+                tdi.first().addClass('fa-minus-square');
+            }
+        }
     });
+
 </script>

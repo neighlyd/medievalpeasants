@@ -293,23 +293,23 @@ class Village(models.Model):
     
     @property
     def chevage_payer_count(self):
-        return len(set(Litigant.objects.all().filter(chevage__isnull=False, case__session__village_id=self.id).values_list('person', flat=True)))
+        return len(set(Litigant.objects.all().filter(capitagia__isnull=False, case__session__village_id=self.id).values_list('person', flat=True)))
 
     @property
     def fine_payer_count(self):
-        return len(set(Litigant.objects.all().filter(fine__isnull=False, case__session__village_id=self.id).values_list('person', flat=True)))
+        return len(set(Litigant.objects.all().filter(fines__isnull=False, case__session__village_id=self.id).values_list('person', flat=True)))
 
     @property
     def impercamentum_payer_count(self):
-        return len(set(Litigant.objects.all().filter(impercamentum__isnull=False, case__session__village_id=self.id).values_list('person', flat=True)))
+        return len(set(Litigant.objects.all().filter(impercamenta__isnull=False, case__session__village_id=self.id).values_list('person', flat=True)))
 
     @property
     def heriot_payer_count(self):
-        return len(set(Litigant.objects.all().filter(heriot__isnull=False, case__session__village_id=self.id).values_list('person', flat=True)))
+        return len(set(Litigant.objects.all().filter(heriots__isnull=False, case__session__village_id=self.id).values_list('person', flat=True)))
 
     @property
     def damaged_party_count(self):
-        return len(set(Litigant.objects.all().filter(damage__isnull=False, case__session__village_id=self.id).values_list('person', flat=True)))
+        return len(set(Litigant.objects.all().filter(damages__isnull=False, case__session__village_id=self.id).values_list('person', flat=True)))
 
     @property
     def monetary_counts(self):
@@ -497,7 +497,7 @@ class Person(models.Model):
         return self.cases.filter(damages__isnull=False).exists()
 
     @property
-    def chevage_exists(self):
+    def capitagia_exists(self):
         return self.cases.filter(capitagia__isnull=False).exists()
 
     @property
@@ -902,7 +902,6 @@ class Litigant(models.Model):
 
 
 class Fine(models.Model):
-
     litigant = models.ForeignKey(Litigant, on_delete=models.CASCADE, related_name='fines')
     fine = models.ForeignKey(Money)
 
