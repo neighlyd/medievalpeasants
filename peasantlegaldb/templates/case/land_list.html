@@ -1,61 +1,106 @@
 <h3 class="card-header text-center">Land</h3>
     <div class="card-body">
-            <table class="table table-bordered" id="table">
+            <table class="table table-bordered table-hover" id="land_table" data-ajax="{% url 'api:land-list' %}?case={{ case.id }}&expand=tenants.litigant.person,tenants.litigant.case&format=datatables">
                 <thead>
                     <th>History</th>
                     <th>Land ID</th>
                     <th>Parcels</th>
                     <th>Notes</th>
                 </thead>
-                <tbody>
-                    {% for land in lands %}
-                        <tr>
-                            <td data-toggle="collapse" data-target=".land_{{ land.id }}_summary" class="details-control"><i class="fas fa-plus-square"></i></td>
-                            <td><a href="{% url 'land:detail' land.id %}">{{ land.id }}</a></td>
-                            <td><ul class="list-group">
-                                {% for parcel in land.parcels.all %}
-                                    <li class="list-group-item">{{ parcel.amount }} {{ parcel.parcel_type.parcel_type }} of {{ parcel.parcel_tenure.tenure }}</li>
-                                {% endfor %}
-                            </ul></td>
-                            <td>{{ land.notes }}</td>
-                        </tr>
-                        {% with length=land.landtocase_set.all|length %}
-                        {% for litigant in land.landtocase_set.all %}
-                            {% if forloop.first %}
-                            <tr>
-                                <td class="hiddenRow"><div class="collapse land_{{ land.id }}_summary"><b>Case</b></div></td>
-                                <td class="hiddenRow"><div class="collapse land_{{ land.id }}_summary"><b>Date</b></div></td>
-                                <td class="hiddenRow"><div class="collapse land_{{ land.id }}_summary"><b>Person</b></div></td>
-                                <td class="hiddenRow"><div class="collapse land_{{ land.id }}_summary"><b>Role</b></div></td>
-                            </tr>
-
-                            </tr>
-                            <tr>
-                                <td class="hiddenRow"><div class="collapse land_{{ land.id }}_summary"><a href="{% url 'case:detail' litigant.litigant.case.id %}">{{ litigant.litigant.case.id }}</a></div></td>
-                                <td class="hiddenRow"><div class="collapse land_{{ land.id }}_summary"><a href="{% url 'session:detail' litigant.litigant.case.session.id %}">{{ litigant.litigant.case.session.date }}</a></div></td>
-                                <td class="hiddenRow"><div class="collapse land_{{ land.id }}_summary"><a href="{% url 'person:detail' litigant.litigant.person.id %}">{{ litigant.litigant.person.full_name }}</a></div></td>
-                                <td class="hiddenRow"><div class="collapse land_{{ land.id }}_summary">{{ litigant.role.role }}</div></td>
-                            </tr>
-                            {% else %}
-                            <tr>
-                                <td class="hiddenRow"><div class="collapse land_{{ land.id }}_summary"><a href="{% url 'case:detail' litigant.litigant.case.id %}">{{ litigant.litigant.case.id }}</a></div></td>
-                                <td class="hiddenRow"><div class="collapse land_{{ land.id }}_summary"><a href="{% url 'session:detail' litigant.litigant.case.session.id %}">{{ litigant.litigant.case.session.date }}</a></div></td>
-                                <td class="hiddenRow"><div class="collapse land_{{ land.id }}_summary"><a href="{% url 'person:detail' litigant.litigant.person.id %}">{{ litigant.litigant.person.full_name }}</a></div></td>
-                                <td class="hiddenRow"><div class="collapse land_{{ land.id }}_summary">{{ litigant.role.role }}</div></td>
-                            </tr>
-                            {% endif %}
-                        {% endfor %}
-                        {% endwith %}
-                    {% endfor %}
-                </tbody>
             </table>
     </div>
 
 <script>
-    $('#table td').on('show.bs.collapse', function(){
-        $(this).removeClass('hiddenRow');
+
+    var format_tenant_history = function format( data ) {
+        var cell = "<table class='table'>" +
+            "<tr>" +
+            "<th>Case</th>" +
+            "<th>Date</th>" +
+            "<th>Person</th>" +
+            "<th>Role</th>" +
+            "</tr>";
+        $.each(data.tenants, function(index, item){
+            cell = cell +
+                "<tr>" +
+                "<td>" + "<a href='" + Urls['case:detail'](item.litigant.case.id) + "'>" + item.litigant.case.id + "</a></td>" +
+                "<td>" + "<a href='" + Urls['session:detail'](item.litigant.case.session.id) + "'>" + item.litigant.case.session.law_term + ", " + item.litigant.case.session.year +  "</a></td>" +
+                "<td>" + "<a href='" + Urls['person:detail'](item.litigant.person.id) + "'>" + item.litigant.person.full_name + "</a></td>" +
+                "<td>" + item.role.role + "</td>"
+        });
+        cell = cell + "</table>";
+        return cell;
+    };
+
+
+    var format_parcels = function(data){
+        var cell = "<ul class='list-group list-group-flush'>";
+        $.each(data, function(index, item){
+            cell = cell + "<tr>"+
+            "<li class='list-group-item'>" + item.amount + ' ' + item.type + ' of ' + item.tenure + "</li>"
+        });
+        cell = cell + "</ul>";
+        return cell
+    };
+
+    var land_table = $('#land_table').DataTable({
+        serverSide: true,
+        columns: [
+            {
+                class: 'details-control',
+                orderable: false,
+                data: 'tenants',
+                name: 'tenants',
+                defaultContent: '',
+                render: checkNotes,
+                width:'15px'
+            },
+            {data: 'id',
+                searchable: false,
+                orderable: false,
+                render: {
+                    display: function(data){
+                        var url = Urls['land:detail'](data);
+                        return "<a href='" + url + "'>" + data + "</a>";
+                    }
+                }
+            },
+            {data: 'parcel_list',
+                defaultContent: '',
+                name: 'parcel_list.type, parcel_list.tenure',
+                render:{
+                    display: function(data, type, row){
+                        if(data){
+                            return format_parcels(data)
+                        } else {
+                            return " "
+                        }
+                    }
+                }
+            },
+            {data: 'notes',
+                orderable: false,
+            },
+        ]
     });
-    $('#table td').on('hide.bs.collapse', function(){
-        $(this).addClass('hiddenRow');
-    })
+
+    // Used to activate the + expansion and trigger the format function.
+     $('#land_table').on('click', 'td.details-control', function(){
+        var tr = $(this).closest('tr');
+        var tdi = tr.find('#check');
+        var row = land_table.row( tr );
+        if (tdi.prop('style').color !== 'gray'){
+            if ( row.child.isShown()) {
+                row.child.hide();
+                tr.removeClass('shown');
+                tdi.first().removeClass('fa-minus-square');
+                tdi.first().addClass('fa-plus-square');
+            } else {
+                row.child( format_tenant_history( row.data() ) ).show();
+                tr.addClass('shown');
+                tdi.first().removeClass('fa-plus-square');
+                tdi.first().addClass('fa-minus-square');
+            }
+        }
+    });
 </script>

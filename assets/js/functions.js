@@ -46,9 +46,11 @@ function formatSessionDateNoVillage(data, type, row, meta) {
     }
 }
 
-function checkMaker(data, type, row, col) {
+function checkMaker(data) {
     if (data){
         return "<i class='fas fa-check' style='color:forestgreen'></i>";
+    } else {
+        return " ";
     }
 }
 

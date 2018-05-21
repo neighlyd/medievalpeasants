@@ -1,0 +1,91 @@
+<div class="card">
+    <div class="card-header text-center bg-grey">
+        <h3>Session List</h3>
+        {% if perms.peasantlegaldb.add_session %}
+            <a href="{% url 'session:add' %}?record={{ record.id }}" class="btn btn-sm btn-success">Add Session</a>
+        {% endif %}
+    </div>
+
+    <div class="card-body">
+        <table class="table table-bordered table-hover" id="session_table" data-ajax="{% url 'api:session-list' %}?record={{ record.id }}&expand=village&format=datatables" data-page-length="25">
+            <thead>
+                <th>Notes</th>
+                <th>Session ID</th>
+                <th>Village</th>
+                <th>Law Term</th>
+                <th>Date</th>
+                <th>Cases</th>
+                <th>Litigants</th>
+            </thead>
+        </table>
+    </div>
+
+</div>
+
+<script>
+
+    function format( data ) {
+        return "<table class='table'>" +
+            "<tr>" +
+            "<td>Notes</td>" +
+            "<td>" + data.notes + "</td>" +
+            "</tr>" +
+        "</table>"
+    }
+
+    var session_table = $("#session_table").DataTable({
+        fixedHeader:{ headerOffset: 50 },
+        scrollX: true,
+        order: [2, "asc"],
+        "columns": [
+            {
+                "class": "details-control",
+                "orderable": false,
+                "data": "notes",
+                "defaultContent": "",
+                "render": checkNotes,
+                width:"15px"
+            },
+            {data: "id",
+                fnCreatedCell: function(nTd, cellData, rowData, row, col) {
+                    url = Urls['session:detail'](rowData.id);
+                    $(nTd).html("<a href='"+ url +"'>" + rowData.id + "</a>");
+                }
+            },
+            {data: "village.name",
+                fnCreatedCell: function(nTd, cellData, rowData, row, col) {
+                    url = Urls['village:detail'](rowData.id);
+                    $(nTd).html("<a href='"+ url +"'>" + rowData.village.name + "</a>");
+                }
+            },
+            {data: "law_term"},
+            {data: "date",
+                fnCreatedCell: function(nTd, cellData, rowData, row, col) {
+                    $(nTd).html(rowData.human_date);
+                }
+            },
+            {data: "counts.case"},
+            {data: "counts.litigant"},
+        ]
+    });
+    // Used to activate the + expansion and trigger the format function.
+     $('#session_table tbody').on('click', 'td.details-control', function(){
+        var tr = $(this).closest('tr');
+        var tdi = tr.find("#check");
+        var row = session_table.row( tr );
+        if (tdi.prop('style').color !== 'gray') {
+            if (row.child.isShown()) {
+                row.child.hide();
+                tr.removeClass('shown');
+                tdi.first().removeClass('fa-minus-square');
+                tdi.first().addClass('fa-plus-square');
+            } else {
+                row.child(format(row.data())).show();
+                tr.addClass('shown');
+                tdi.first().removeClass('fa-plus-square');
+                tdi.first().addClass('fa-minus-square');
+            }
+        }
+    });
+
+</script>

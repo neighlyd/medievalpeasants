@@ -1,0 +1,115 @@
+<div class="card">
+    <div class="card-header text-center bg-grey">
+        <h3>Case List</h3>
+    </div>
+
+    <div class="card-body">
+        <table class="table table-bordered table-hover" id="session_table" data-ajax="{% url 'api:session-list' %}?archive={{ archive.id }}&expand=village,record&keep=law_term,year&format=datatables" data-page-length="10">
+            <thead>
+                <th>Notes</th>
+                <th>ID</th>
+                <th>Village</th>
+                <th>Date</th>
+                <th>Record</th>
+                <th>Record Type</th>
+                <th>Cases</th>
+                <th>Litigants</th>
+            </thead>
+        </table>
+    </div>
+
+</div>
+
+<script>
+
+    function format( data ) {
+        return "<table class='table'>" +
+            "<tr>" +
+            "<td>Notes</td>" +
+            "<td>" + data.notes + "</td>" +
+            "</tr>" +
+        "</table>"
+    }
+
+    var session_table = $("#session_table").DataTable({
+        serverSide: true,
+        order: [2, "asc"],
+        "columns": [
+            {
+                class: "details-control",
+                orderable: false,
+                data: "notes",
+                defaultContent: "",
+                render: checkNotes,
+                width:"15px"
+            },
+            {data: "id",
+                render: {
+                    display: function(data){
+                        var url = Urls['session:detail'](data);
+                        return "<a href='"+ url +"'>" + data + "</a>"
+                    }
+                }
+            },
+            {data: "village",
+                name: "village.name",
+                render:{
+                    display: function(data){
+                        var url = Urls['village:detail'](data.id);
+                        return "<a href='" + url + "'>" + data.name + "</a>"
+                    }
+                }
+            },
+            {data: "date",
+                name: "date",
+                render: {
+                    display: function(data, type, row){
+                        var url = Urls['session:detail'](row.id);
+                        return "<a href='" + url + "'>" + row.law_term + ", " + row.year + "</a>"
+                    }
+                }
+            },
+            {data: "record",
+                name: "record.name",
+                render: {
+                    display: function(data, type, row){
+                        var url = Urls['record:detail'](data.id);
+                        return "<a href='" + url + "'>" + data.name + "</a>"
+                    }
+                }
+            },
+            {data: "record.record_type",
+                searchable: false,
+                orderable: false,
+            },
+            {data: "counts.case",
+                searchable: false,
+                orderable: false,
+            },
+            {data: "counts.litigant",
+                searchable: false,
+                orderable: false,
+            },
+        ]
+    });
+    // Used to activate the + expansion and trigger the format function.
+     $('#session_table tbody').on('click', 'td.details-control', function(){
+        var tr = $(this).closest('tr');
+        var tdi = tr.find("#check");
+        var row = session_table.row( tr );
+        if (tdi.prop('style').color !== 'gray') {
+            if (row.child.isShown()) {
+                row.child.hide();
+                tr.removeClass('shown');
+                tdi.first().removeClass('fa-minus-square');
+                tdi.first().addClass('fa-plus-square');
+            } else {
+                row.child(format(row.data())).show();
+                tr.addClass('shown');
+                tdi.first().removeClass('fa-plus-square');
+                tdi.first().addClass('fa-minus-square');
+            }
+        }
+    });
+
+</script>

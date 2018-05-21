@@ -9,7 +9,7 @@
     {{ block.super }}
 
 <div class="card-body clearfix" id="main_info">
-    <table class="table table-bordered table-hover" id="table" data-page-length="25">
+    <table class="table table-bordered table-hover" id="archive_table" data-ajax="{% url 'api:archive-list' %}?format=datatables" data-page-length="25">
         <thead>
             <th>Name</th>
             <th>Website</th>
@@ -37,20 +37,13 @@
 {{ block.super }}
 <script>
     $(document).ready(function(){
-        var url = Urls['api:archive-list']();
-        url = url + '?include[]=counts';
-        var table = $('#table').DataTable({
+        var archive_table = $('#archive_table').DataTable({
             fixedHeader: {
                 headerOffset: 50
             },
+            serverSide: true,
             scrollX: true,
-            ajax: {
-                processing: true,
-                url: url,
-                type: "GET",
-                dataSrc: "archives.",
-            },
-            "columns": [
+            columns: [
                 {data: "name",
                     fnCreatedCell: function(nTd, cellData, rowData, row, col) {
                         $(nTd).html("<a href='" + '/archive/' + rowData.id + "'>" + rowData.name + "</a>");

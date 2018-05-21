@@ -272,7 +272,7 @@ class VillageSerializer(FlexFieldsModelSerializer):
 
     @staticmethod
     def get_chevage_payer_count(record):
-        return record.chevage_payer_count
+        return record.capitagium_payer_count
 
     @staticmethod
     def get_fine_payer_count(record):
@@ -322,51 +322,13 @@ class SessionSerializer(FlexFieldsModelSerializer):
         counts['case'] = record.case_count
         counts['litigant'] = record.litigant_count
         counts['land'] = record.land_case_count
-        counts['chevage_payer'] = record.chevage_payer_count
+        counts['chevage_payer'] = record.capitagium_payer_count
         counts['impercamentum_payer'] = record.impercamentum_payer_count
         return counts
 
     @staticmethod
     def get_law_term(record):
         return record.get_law_term_display()
-
-
-class NestedCaseSerializer(FlexFieldsModelSerializer):
-
-    court_type = serializers.SerializerMethodField()
-    case_type = CaseTypeSerializer()
-    verdict = VerdictSerializer()
-
-    class Meta:
-        model = models.Case
-        fields = ('id', 'active_sale', 'ad_legem', 'case_type', 'court_type', 'incidental_land', 'of_interest',
-                  'session', 'summary', 'verdict', 'villeinage_mention')
-
-    expandable_fields = {
-        'session': (SessionSerializer, {'source': 'session', 'expand': ['village'],
-                                        'fields': ['id', 'human_date', 'law_term', 'village', 'year']}),
-    }
-
-    @staticmethod
-    def get_court_type(record):
-        return record.get_court_type_display()
-
-
-class NestedLitigantSerializerforPerson(FlexFieldsModelSerializer):
-
-    role = RoleSerializer()
-
-    class Meta:
-        model = models.Litigant
-        fields = ('id', 'case', 'role')
-
-    expandable_fields = {
-        'case': (NestedCaseSerializer, {'source': 'case',
-                                        'fields': ['id', 'active_sale', 'ad_legem', 'case_type', 'court_type',
-                                                   'incidental_land', 'of_interest', 'session', 'summary', 'verdict',
-                                                   'villeinage_mention']})
-    }
-
 
 
 class PersonSerializer(FlexFieldsModelSerializer):
@@ -384,10 +346,10 @@ class PersonSerializer(FlexFieldsModelSerializer):
                   'latest_case')
 
     expandable_fields = {
-        'earliest_case': (NestedCaseSerializer, {'source': 'earliest_case', 'expand': ['session'], 'fields': ['id', 'session']}),
-        'latest_case': (NestedCaseSerializer, {'source': 'latest_case', 'expand': ['session'], 'fields': ['id', 'session']}),
+        'earliest_case': ('api.CaseSerializer', {'source': 'earliest_case', 'expand': ['session'], 'fields': ['id', 'session']}),
+        'latest_case': ('api.CaseSerializer', {'source': 'latest_case', 'expand': ['session'], 'fields': ['id', 'session']}),
         'village': (VillageSerializer, {'source': 'village', 'fields': ['id', 'name']}),
-        'cases': (NestedLitigantSerializerforPerson, {'source': 'cases', 'many': True, 'read_only': True,
+        'cases': ('api.LitigantSerializer', {'source': 'cases', 'many': True, 'read_only': True,
                                                       'fields': ['case', 'role'],
                                                       'expand': ['case']}),
     }
@@ -508,8 +470,9 @@ class LandSerializer(FlexFieldsModelSerializer):
         fields = ('id', 'notes', 'parcel_list', 'earliest_case', 'latest_case')
 
     expandable_fields = {
-        'earliest_case': ('CaseSerializer', {'source': 'earliest_case'}),
-        'latest_case': ('CaseSerializer', {'source': 'latest_case'}),
+        'earliest_case': ('api.CaseSerializer', {'source': 'earliest_case'}),
+        'latest_case': ('api.CaseSerializer', {'source': 'latest_case'}),
+        'tenants': ('api.LandtoCaseSerializer', {'source': 'tenants', 'many': True, 'expand': ['litigant',]})
     }
 
     @staticmethod
@@ -530,23 +493,16 @@ class LandSplitSerializer(FlexFieldsModelSerializer):
 
 class LandtoCaseSerializer(FlexFieldsModelSerializer):
 
+    role = RoleSerializer()
+
     class Meta:
         model = models.LandtoCase
         fields = '__all__'
 
     expandable_fields = {
-        'land': (LandSerializer, {'source': 'land'})
+        'land': (LandSerializer, {'source': 'land'}),
+        'litigant': ('api.LitigantSerializer', {'source': 'litigant'}),
     }
-
-
-class NestedPledgeSerializerforLitigant(FlexFieldsModelSerializer):
-
-    giver = PersonSerializer()
-
-    class Meta:
-        model = models.Pledge
-        fields = '__all__'
-
 
 
 class LitigantSerializer(FlexFieldsModelSerializer):
@@ -568,7 +524,7 @@ class LitigantSerializer(FlexFieldsModelSerializer):
         'impercamenta': (ImpercamentumSerializer, {'source': 'impercamenta', 'many': True,
                                                    'expand': ['impercamentum', 'animal']}),
         'lands': (LandtoCaseSerializer, {'source': 'lands', 'many': True, 'expand': ['land']}),
-        'pledges': (NestedPledgeSerializerforLitigant, {'source': 'pledges', 'many': True, 'expand': ['giver']})
+        'pledges': ('api.PledgeSerializer', {'source': 'pledges', 'many': True, 'expand': ['giver']})
     }
 
 

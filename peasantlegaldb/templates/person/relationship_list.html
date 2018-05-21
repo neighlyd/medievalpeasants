@@ -24,7 +24,6 @@
                 orderable: false,
                 render: {
                     display: function (data, type, row) {
-                        console.log(row);
                         if (row.person_one.id == person) {
                             var url = Urls['person:detail'](row.person_two.id);
                             return "<a href='" + url + "'>" + row.person_two.full_name + "</a>";
@@ -42,14 +41,8 @@
                 searchable: false,
                 orderable: false,
                 render: {
-                    display: function(data){
-                        if (data){
-                            return "Yes"
-                        } else {
-                            return "No"
-                        }
+                    display: checkMaker
                     }
-                }
             },
         ]
     });

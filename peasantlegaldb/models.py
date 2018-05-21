@@ -686,15 +686,15 @@ class Session(models.Model):
 
     @property
     def land_case_count(self):
-        return len(set(Litigant.objects.filter(case__session=self.id, land__isnull=False).values_list('case', flat=True)))
+        return len(set(Litigant.objects.filter(case__session=self.id, lands__isnull=False).values_list('case', flat=True)))
 
     @property
-    def chevage_payer_count(self):
-        return len(set(Litigant.objects.filter(case__session=self.id, chevage__isnull=False).values_list('person', flat=True)))
+    def capitagium_payer_count(self):
+        return len(set(Litigant.objects.filter(case__session=self.id, capitagia__isnull=False).values_list('person', flat=True)))
 
     @property
     def impercamentum_payer_count(self):
-        return len(set(Litigant.objects.filter(case__session=self.id, impercamentum__isnull=False).values_list('person', flat=True)))
+        return len(set(Litigant.objects.filter(case__session=self.id, impercamenta__isnull=False).values_list('person', flat=True)))
 
 
     @property
@@ -942,6 +942,10 @@ class Impercamentum(models.Model):
 
 
 class LandtoCase(models.Model):
+
+    class Meta:
+        ordering = ['litigant__case__session__date']
+
     litigant = models.ForeignKey(Litigant, on_delete=models.CASCADE, related_name='lands')
     land = models.ForeignKey(Land, null=True, blank=True, on_delete=models.CASCADE, related_name='tenants')
     villeinage = models.NullBooleanField()
