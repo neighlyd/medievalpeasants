@@ -9,7 +9,7 @@
     {{ block.super }}
 
 <div class="card-body clearfix" id="main_info">
-    <table class="table table-bordered table-hover" id="table" data-page-length="25">
+    <table class="table table-bordered table-hover" id="table" data-ajax="{% url 'api:village-list' %}?format=datatables&keep=id&expand=hundred,county" data-page-length="25">
         <thead>
             <th>Notes</th>
             <th>Village</th>
@@ -44,56 +44,47 @@
 
 
     $(document).ready(function () {
-        var url = window.location.pathname;
-        var id = url.split('/').reverse()[1];
-        url = Urls["api:village-list"]();
-        var api_url = url + "?include[]=hundred.*&include[]=county.*";
         var table = $("#table").DataTable({
-            fixedHeader:{ headerOffset: 50 },
             scrollX: true,
+            serverSide: true,
             order: [1, "asc"],
-            ajax: {
-                url: api_url,
-                type: "GET",
-                dataSrc: "villages.",
-            },
             "columns": [
                 {
                     "class": "details-control",
-                    "orderable": "false",
+                    "orderable": false,
                     "data": "notes",
                     "defaultContent": "",
                     "render": checkNotes,
                     width:"15px"
                 },
                 {data: "name",
-                    fnCreatedCell: function(nTd, cellData, rowData, row, col) {
-                        url = Urls['village:detail'](rowData.id);
-                        $(nTd).html("<a href='"+ url +"'>" + rowData.name + "</a>");
+                    render: {
+                        display: function(data, type, row, meta){
+                            var url = Urls['village:detail'](row.id);
+                            return '<a href="' + url + '">' + row.name + '</a>';
+                        }
                     }
                 },
-                {data: "county",
+                {data: "county.name",
                     defaultContent: '',
                     render: {
                         display: function(data, type, row, meta){
                             if (data){
-                                var countyData = meta.settings.json.counties.find(x => x.id === data);
-                                var url = Urls['county:detail'](data);
-                                return '<a href="' + url + '">' + countyData.name + '</a>';
+                                var url = Urls['county:detail'](row.county.id);
+                                return '<a href="' + url + '">' + row.county.name + '</a>';
                             } else {
                                 return 'N/A'
                             }
                         }
                     }
                 },
-                {data: "hundred",
+                {data: "hundred.name",
                     defaultContent: '',
                     render: {
                         display: function(data, type, row, meta){
                             if (data){
-                                var hundredData = meta.settings.json.hundreds.find(x => x.id === data);
-                                var url = Urls['hundred:detail'](data);
-                                return '<a href="' + url + '">' + hundredData.name + '</a>';
+                                var url = Urls['hundred:detail'](row.hundred.id);
+                                return '<a href="' + url + '">' + row.hundred.name + '</a>';
                             } else {
                                 return 'N/A'
                             }

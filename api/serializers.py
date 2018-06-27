@@ -188,13 +188,16 @@ class RecordSerializer(FlexFieldsModelSerializer):
 
     record_type = serializers.SerializerMethodField()
     counts = serializers.SerializerMethodField()
+    earliest_session = serializers.ReadOnlyField()
+    latest_session = serializers.ReadOnlyField()
 
     class Meta:
         model = models.Record
-        fields = ('id', 'name', 'record_type', 'reel', 'notes', 'counts', 'archive')
+        fields = ('id', 'name', 'record_type', 'reel', 'notes', 'counts', 'archive', 'earliest_session', 'latest_session')
 
     expandable_fields = {
-        'archive': (ArchiveSerializer, {'source': 'archive'})
+        'archive': (ArchiveSerializer, {'source': 'archive'}),
+        'sessions': ('api.SessionSerializer', {'source': 'session_set', 'many': True}),
     }
 
     @staticmethod
@@ -240,7 +243,7 @@ class HundredSerializer(FlexFieldsModelSerializer):
         fields = ('id', 'name', 'counts', 'county')
 
     expandable_fields = {
-        'county': (CountySerializer, {'source': 'county'})
+        'county': (CountySerializer, {'source': 'county', 'fields': ['id', 'name']})
     }
 
     @staticmethod
@@ -253,7 +256,7 @@ class HundredSerializer(FlexFieldsModelSerializer):
 class VillageSerializer(FlexFieldsModelSerializer):
 
     counts = serializers.SerializerMethodField()
-    chevage_payer_count = serializers.SerializerMethodField()
+    capitagium_payer_count = serializers.SerializerMethodField()
     fine_payer_count = serializers.SerializerMethodField()
     impercamentum_payer_count = serializers.SerializerMethodField()
     heriot_payer_count = serializers.SerializerMethodField()
@@ -262,16 +265,16 @@ class VillageSerializer(FlexFieldsModelSerializer):
     class Meta:
         model = models.Village
         fields = ('id', 'name', 'latitude', 'longitude', 'ancient_demesne', 'great_rumor', 'notes', 'counts', 'county',
-                  'hundred', 'chevage_payer_count', 'fine_payer_count', 'impercamentum_payer_count',
+                  'hundred', 'capitagium_payer_count', 'fine_payer_count', 'impercamentum_payer_count',
                   'heriot_payer_count', 'damaged_party_count')
 
     expandable_fields = {
-        'hundred': (HundredSerializer, {'source': 'hundred'}),
-        'county': (CountySerializer, {'source': 'county'}),
+        'hundred': (HundredSerializer, {'source': 'hundred', 'fields': ['id','name']}),
+        'county': (CountySerializer, {'source': 'county', 'fields': ['id', 'name']}),
     }
 
     @staticmethod
-    def get_chevage_payer_count(record):
+    def get_capitagium_payer_count(record):
         return record.capitagium_payer_count
 
     @staticmethod

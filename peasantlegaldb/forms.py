@@ -50,12 +50,13 @@ class PersonFilterForm(forms.Form):
             ('litigants', 'Litigants'),
             ('pledges_given', 'Pledge Givers'),
             ('pledges_received', 'Pledge Receivers'),
-            ('amercement', 'Amerced'),
-            ('fine', 'Fined'),
-            ('damage', 'Damaged'),
-            ('chevage', 'Capitagium'),
-            ('impercamentum', 'Impercamenta'),
+            ('amerced', 'Amerced'),
+            ('capitagia', 'Capitagia'),
+            ('damaged', 'Damaged'),
+            ('fined', 'Fined'),
             ('heriot', 'Heriot'),
+            ('impercamenta', 'Impercamenta'),
+            ('lands', 'Land'),
         ]
 
         # create a list of tuples for the choices by iterating through Village.objects.all.

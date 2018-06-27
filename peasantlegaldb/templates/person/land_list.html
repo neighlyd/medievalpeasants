@@ -32,7 +32,7 @@
     var format_parcels = function(data){
         var cell = "";
         $.each(data.land.parcel_list, function(index, item){
-            cell = cell + item.amount + " of " + item.type + " held by " + item.tenure
+            cell = cell + item.amount + " of " + item.type + " held by " + item.tenure + "<hr>"
         });
         return cell
     };
@@ -40,10 +40,10 @@
     var format_lands = function(data){
         var cell = "<table class='table'>" + "<tr><th>Land ID</th><th>Parcels</th></tr>";
         $.each(data, function(index, item){
-            var land_url = Urls['land:detail'](item.id);
+            var land_url = Urls['land:detail'](item.land.id);
             var parcels = format_parcels(item);
             cell = cell + "<tr>"+
-                    "<td>" + "<a href='" + land_url + "'>" + item.id + "</a>" + "</td>" +
+                    "<td>" + "<a href='" + land_url + "'>" + item.land.id + "</a>" + "</td>" +
                     "<td>" + parcels + "</td>" +
                     "</tr>"
         });

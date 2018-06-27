@@ -30,24 +30,3 @@
 
     </div>
 {% endblock %}
-
-{% block scripts %}
-
-{{ block.super }}
-
-<script>
-/*
-    $('#selection_list>a').click(function(e){
-        e.preventDefault();
-        var url = $(this).attr('href');
-        $(this).addClass('active').siblings().removeClass('active');
-        if (typeof url !== "undefined") {
-            $("#list_info").load(url);
-        } else {
-        }
-    });
-*/
-
-</script>
-
-{% endblock %}

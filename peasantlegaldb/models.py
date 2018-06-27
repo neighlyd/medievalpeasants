@@ -292,7 +292,7 @@ class Village(models.Model):
         return self.session_set.count()
     
     @property
-    def chevage_payer_count(self):
+    def capitagium_payer_count(self):
         return len(set(Litigant.objects.all().filter(capitagia__isnull=False, case__session__village_id=self.id).values_list('person', flat=True)))
 
     @property

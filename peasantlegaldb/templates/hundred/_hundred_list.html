@@ -9,7 +9,7 @@
     {{ block.super }}
 
 <div class="card-body clearfix" id="main_info">
-    <table class="table table-bordered table-hover" id="table" data-page-length="10">
+    <table class="table table-bordered table-hover" id="table" data-ajax="{% url 'api:hundred-list' %}?format=datatables&keep=id&expand=county" data-page-length="10">
         <thead>
             <th>Hundred</th>
             <th>County</th>
@@ -29,18 +29,10 @@
 <script>
 
     $(document).ready(function () {
-        var url = window.location.pathname;
-        var id = url.split('/').reverse()[1];
-        url = Urls['api:hundred-list']();
-        var api_url = url + "?include[]=county.*&include[]=counts";
         var table = $("#table").DataTable({
             fixedHeader:{ headerOffset: 50 },
             scrollX: true,
-            ajax: {
-                url: api_url,
-                type: "GET",
-                dataSrc: "hundreds.",
-            },
+            serverSide: true,
             "columns": [
                 {data: "name",
                     render: {
@@ -50,21 +42,23 @@
                         }
                     }
                 },
-                {data: "county",
+                {data: "county.name",
                     defaultContent: '',
                     render: {
                         display: function(data, type, row, meta){
                             if (data){
-                                var countyData = meta.settings.json.counties.find(x => x.id === data);
-                                var url = Urls['county:detail'](data);
-                                return '<a href="' + url + '">' + countyData.name + '</a>';
+                                var url = Urls['county:detail'](row.county.id);
+                                return '<a href="' + url + '">' + row.county.name + '</a>';
                             } else {
                                 return 'N/A'
                             }
                         }
                     }
                 },
-                {data: "counts.village"}
+                {data: "counts.village",
+                    searchable: false,
+                    orderable: false,
+                }
             ]
         });
 

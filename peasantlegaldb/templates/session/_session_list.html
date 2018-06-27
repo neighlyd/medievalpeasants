@@ -9,14 +9,15 @@
     {{ block.super }}
 
 <div class="card-body clearfix" id="main_info">
-    <table class="table table-bordered table-hover" id="table" data-page-length="25">
+    <table class="table table-bordered table-hover" id="table" data-ajax="{% url 'api:session-list' %}?format=datatables&keep=human_date&expand=village" data-page-length="10">
         <thead>
             <th>ID</th>
+            <th>Village</th>
             <th>Date</th>
             <th>Law Term</th>
             <th>Cases</th>
             <th>Litigants</th>
-            <th>Chevages</th>
+            <th>Capitagia</th>
             <th>Impercamenta</th>
             <th>Land Cases</th>
         </thead>
@@ -34,40 +35,60 @@
 <script>
 
     $(document).ready(function () {
-        var url = Urls['api:session-list']();
-        api_url = url + "?include[]=counts";
-        console.log(api_url);
         var table = $("#table").DataTable({
-            fixedHeader:{
-                headerOffset: 50
-            },
+            serverSide: true,
             hideEmptyCols: true,
-            scrollX: true,
-            order: [1, "asc"],
-            ajax: {
-                url: api_url,
-                type: "GET",
-                dataSrc: "sessions.",
-            },
+            order: [2, "asc"],
             "columns": [
                 {data: "id",
-                    fnCreatedCell: function(nTd, cellData, rowData, row, col) {
-                        console.log(rowData);
-                        url = Urls['session:detail'](rowData.id);
-                        $(nTd).html("<a href='"+ url +"'>" + rowData.id + "</a>");
+                    searchable: false,
+                    orderable: false,
+                    render: {
+                        display: function(data){
+                            url = Urls['session:detail'](data);
+                            return "<a href='" + url + "'>" + data + "</a>";
+                        }
+                    }
+                },
+                {data: 'village.name',
+                    render: {
+                        display: function(data, type, row){
+                            url = Urls['village:detail'](row.village.id);
+                            return "<a href='" + url + "'>" + data + "</a>";
+                        }
                     }
                 },
                 {data: "date",
-                    fnCreatedCell: function(nTd, cellData, rowData, row, col) {
-                        $(nTd).html(rowData.human_date);
+                    render: {
+                        display: function(data, type, row){
+                            return row.human_date;
+                        }
                     }
                 },
-                {data: "law_term"},
-                {data: "counts.case"},
-                {data: "counts.litigant"},
-                {data: "counts.chevage_payer"},
-                {data: "counts.impercamentum_payer"},
-                {data: "counts.land"},
+                {data: "law_term",
+                    searchable: false,
+                    orderable: false,
+                },
+                {data: "counts.case",
+                    searchable: false,
+                    orderable: false,
+                },
+                {data: "counts.litigant",
+                    searchable: false,
+                    orderable: false,
+                },
+                {data: "counts.chevage_payer",
+                    searchable: false,
+                    orderable: false,
+                },
+                {data: "counts.impercamentum_payer",
+                    searchable: false,
+                    orderable: false,
+                },
+                {data: "counts.land",
+                    searchable: false,
+                    orderable: false,
+                }
             ]
         });
 

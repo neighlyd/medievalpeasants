@@ -1,231 +1,270 @@
 {% load template_tags %}
 {% if case.litigants.all %}
 <h3 class="card-header text-center bg-grey">Litigants</h3>
-    <div class="card-body">
-        <div class="accordion">
-            {% for litigant in case.litigants.all %}
-                    <div class="card">
-                        <div class="card-header">
-                            <div class="row">
 
-                                <div class="col-4"><h6 style="color:blue"><a href="{% url 'person:detail' litigant.person.id %}">{{ litigant.person.full_name }}</a></h6></div>
-                                <div class="col-4 text-center" id="litigant_{{ litigant.person.full_name }}" data-toggle="collapse" data-target="#{{ litigant.id }}_collapse" aria-expanded="true" aria-controls="{{ litigant.id }}_collapse" style="color:darkgray"><u>(click here to see details)</u></div>
-                                <div class="col-4"><h6 class="float-right" style="color:blue">Role: {{ litigant.role.role }}</h6></div>
-                            </div>
-                        </div>
-                        <div class="collapse" id="{{ litigant.id }}_collapse" aria-labelledby="litigant_{{ litigant.person.full_name }}" data-parent="#accordion">
-                            <div class="card-body">
+<div class="card-body clearfix" id="main_info">
+    <table class="table table-bordered table-hover" id="litigant_table" style="width:100%" data-ajax="{% url 'api:litigant-list' %}?case={{ case.id }}&expand=person,amercements,capitagia,damages,fines,heriots,impercamenta,lands,pledges&format=datatables" data-page-length="25">
+        <thead>
+            <th>Name</th>
+            <th>Role</th>
+            <th>Ad Prox.</th>
+            <th>Distrain</th>
+            <th>Attach</th>
+            <th>Bail</th>
+            <th>Amercements</th>
+            <th>Capitagia</th>
+            <th>Damages</th>
+            <th>Fines</th>
+            <th>Heriot</th>
+            <th>Impercamenta</th>
+            <th>Lands</th>
+        </thead>
+    </table>
+</div>
 
-                                {% if litigant.ad_proximum or litigant.attached or litigant.bail or litigant.distrained %}
-                                    <table class="table table-bordered" id="standard_table">
-                                        <thead>
-                                            <th>Ad. Prox</th>
-                                            <th>Attached</th>
-                                            <th>Bailed</th>
-                                            <th>Distrained</th>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                            {% if litigant.ad_proximum %}
-                                                <td class="text-center"><b>√</b></td>
-                                            {% endif %}
-                                            {% if litigant.attached %}
-                                                <td class="text-center"><b>√</b></td>
-                                            {% endif %}
-                                            {% if litigant.bail %}
-                                                <td class="text-center"><b>√</b></td>
-                                            {% endif %}
-                                            {% if litigant.distrained %}
-                                                <td class="text-center"><b>√</b></td>
-                                            {% endif %}
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                {% endif %}
+<script>
 
-                                {% if litigant.amercement.all %}
-                                    <table class="table table-bordered" id="amercements_table">
-                                        <thead>
-                                            <tr>
-                                                <th class="text-center">Amercement</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {% for amercement in litigant.amercements.all %}
-                                                <tr>
-                                                    <td>{{ amercement.amercement }}</td>
-                                                </tr>
-                                            {% endfor %}
-                                        </tbody>
-                                    </table>
-                                {% endif %}
+    var format_amercements = function(data){
+        var cell = "<ul class='list-group list-group-flush'>";
+        $.each(data, function(index, item){
+            cell = cell + "<tr>"+
+            "<li class='list-group-item'>" + item.amercement.amount + ' (' + item.amercement.in_denarius + ' d.)' + "</li>"
+        });
+        cell = cell + "</ul>";
+        return cell
+    };
 
-                                {% if litigant.capitagia.all %}
-                                    <table class="table table-bordered" id="capitagia_table">
-                                        <thead>
-                                            <tr>
-                                                <th class="text-center" colspan="6">Capitagium</th>
-                                            </tr>
-                                            <th>Assessment</th>
-                                            <th>Crossed</th>
-                                            <th>Recessit</th>
-                                            <th>Habet Terram</th>
-                                            <th>Mortuus</th>
-                                            <th>Notes</th>
-                                        </thead>
-                                        <tbody>
-                                            {% for cap in litigant.capitagia.all %}
-                                                <tr>
-                                                    <td>{{ cap.capitagium }}</td>
-                                                    <td class="text-center">{% if cap.crossed %}<b>√</b>{% endif %}</td>
-                                                    <td class="text-center">{% if cap.recessit %}<b>√</b>{% endif %}</td>
-                                                    <td class="text-center">{% if cap.habet_terram %}<b>√</b>{% endif %}</td>
-                                                    <td class="text-center">{% if cap.mortuus %}<b>√</b>{% endif %}</td>
-                                                    <td>{{ cap.notes|linebreaks }}</td>
-                                                </tr>
-                                            {% endfor %}
-                                        </tbody>
-                                    </table>
-                                {% endif %}
+    var format_capitagia = function(data){
+        var cell = "<table class='table'>" + "<tr><th>Assessment</th>"+
+            "<th>Recessit</th>" +
+            "<th>Crossed</th>" +
+            "<th>H. Terram</th>" +
+            "<th>Mortuus</th>" +
+            "<th>Notes</th>" +
+            "</tr>";
+        $.each(data, function(index, item){
+            cell = cell + "<tr>"+
+                    "<td class='text-center'>" + item.capitagium.amount + "(" + item.capitagium.in_denarius + ")" + "</td>" +
+                    "<td class='text-center'>" + checkMakerSubTable(item.recessit) + "</td>" +
+                    "<td class='text-center'>" + checkMakerSubTable(item.crossed) + "</td>" +
+                    "<td class='text-center'>" + checkMakerSubTable(item.habet_terram) + "</td>" +
+                    "<td class='text-center'>" + checkMakerSubTable(item.mortuus) + "</td>" +
+                    "<td>" + item.notes + "</td>" +
+                    "</tr>"
+        });
+        cell = cell + "</table>";
+        return cell
+    };
 
-                                {% if litigant.damages.all %}
-                                    <table class="table table-bordered" id="damages_table">
-                                        <thead>
-                                            <tr>
-                                                <th class="text-center" colspan="2">Damages</th>
-                                            </tr>
-                                            <th>Assessment</th>
-                                            <th>Notes</th>
-                                        </thead>
-                                        <tbody>
-                                            {% for damage in litigant.damages.all %}
-                                                <tr>
-                                                    <td>{{ damage.damage|linebreaks }}</td>
-                                                    <td>{{ damage.notes }}</td>
-                                                </tr>
-                                            {% endfor %}
-                                        </tbody>
-                                    </table>
-                                {% endif %}
+    var format_damages = function(data){
+        var cell = "<ul class='list-group list-group-flush'>";
+        $.each(data, function(index, item){
+            if(item.notes !== ''){
+                if(item.notes.startsWith("for")){
+                    var notes = ' ' + item.notes
+                } else {
+                    var notes = ' for ' + item.notes
+                }
+            } else {
+                var notes = ''
+            };
+            cell = cell + "<tr>"+
+            "<li class='list-group-item'>" + item.damage.amount + ' (' + item.damage.in_denarius + ' d.)' + notes + "</li>"
+        });
+        cell = cell + "</ul>";
+        return cell
+    };
 
-                                {% if litigant.fines.all %}
-                                    <table class="table table-bordered" id="fines_table">
-                                        <thead>
-                                            <th class="text-center">Fine</th>
-                                        </thead>
-                                        <tbody>
-                                            {% for fine in litigant.fines.all %}
-                                                <tr>
-                                                    <td>{{ fine.fine }}</td>
-                                                </tr>
-                                            {% endfor %}
-                                        </tbody>
-                                    </table>
-                                {% endif %}
+    var format_fines = function(data){
+        var cell = "<ul class='list-group list-group-flush'>";
+        $.each(data, function(index, item){
+            cell = cell + "<tr>"+
+            "<li class='list-group-item'>" + item.fine.amount + ' (' + item.fine.in_denarius + ' d.)' + "</li>"
+        });
+        cell = cell + "</ul>";
+        return cell
+    };
 
-                                {% if litigant.heriots.all %}
-                                    <table class="table table-bordered" id="heriot_table">
-                                        <thead>
-                                            <tr>
-                                                <th class="text-center" colspan="2">Heriot</th>
-                                            </tr>
-                                            <th>Chattel</th>
-                                            <th>Assessment</th>
-                                        </thead>
-                                        <tbody>
-                                            {% for heriot in litigant.heriots.all %}
-                                                <tr>
-                                                    <td>{{ heriot.quantity }} {{ heriot.animal }}</td>
-                                                    <td>{{ heriot.heriot }}</td>
-                                                </tr>
-                                            {% endfor %}
-                                        </tbody>
-                                    </table>
-                                {% endif %}
+    var format_heriots = function(data){
+        var cell = "<ul class='list-group list-group-flush'>";
+        $.each(data, function(index, item){
+            cell = cell + "<tr>"+
+            "<li class='list-group-item'>" + item.quantity + ' ' + item.animal.name + ' assessed at ' + item.heriot.amount + ' (' + item.heriot.in_denarius + ' d.)' + "</li>"
+        });
+        cell = cell + "</ul>";
+        return cell
+    };
 
-                                {% if litigant.impercamenta.all %}
-                                    <table class="table table-bordered" id="impercamenta_table">
-                                        <thead>
-                                            <tr>
-                                                <th class="text-center" colspan="3">Impercamentum</th>
-                                            </tr>
-                                            <th>Chattel</th>
-                                            <th>Assessment</th>
-                                            <th>Notes</th>
-                                        </thead>
-                                        <tbody>
-                                            {% for imperc in litigant.impercamenta.all %}
-                                            <tr>
-                                                <td>{{ imperc.quantity }} {{ imperc.animal }}</td>
-                                                <td>{{ imperc.impercamentum }}</td>
-                                                <td>{{ imperc.notes|linebreaks }}</td>
-                                            </tr>
-                                            {% endfor %}
-                                        </tbody>
-                                    </table>
-                                {% endif %}
+    var format_impercamenta = function(data){
+        var cell = "<ul class='list-group list-group-flush'>";
+        $.each(data, function(index, item){
+            if (item.notes){
+                var notes = ' ' + item.notes;
+            } else {
+                var notes = '';
+            }
+            cell = cell + "<tr>"+
+            "<li class='list-group-item'>" + item.impercamentum.amount + ' (' + item.impercamentum.in_denarius + ' d.) for ' + item.quantity + ' ' + item.animal.name + notes + "</li>"
+        });
+        cell = cell + "</ul>";
+        return cell
+    };
 
-                                {% if litigant.lands.all %}
-                                    <table class="table table-bordered" id="lands_table">
-                                        <thead>
-                                            <tr>
-                                                <th class="text-center" colspan="5">Land</th>
-                                            </tr>
-                                            <th>ID</th>
-                                            <th>Land Role</th>
-                                            <th>Parcels</th>
-                                            <th>Villein</th>
-                                            <th>Notes</th>
-                                        </thead>
-                                        <tbody>
-                                            {% for land in litigant.lands.all %}
-                                                <tr>
-                                                    <td><a href="{% url 'land:detail' land.land.id %}">{{ land.land.id }}</a></td>
-                                                    <td>{{ land.role.role }}</td>
-                                                    <td>
-                                                        <ul class="list-group">
-                                                            {% for parcel in land.land.parcels.all %}
-                                                                <li class="list-group-item">{{ parcel.amount }} {{ parcel.parcel_type.parcel_type }} of {{ parcel.parcel_tenure.tenure }}</li>
-                                                            {% endfor %}
-                                                        </ul>
-                                                    </td>
-                                                    <td class="text-center">{% if land.villeinage %}<b>√</b>{% endif %}</td>
-                                                    <td>{{ land.notes|linebreaks }}</td>
-                                                </tr>
-                                            {% endfor %}
-                                        </tbody>
-                                    </table>
-                                {% endif %}
 
-                                {% if litigant.pledges.all %}
-                                    <table class="table table-bordered" id="pledges_table">
-                                        <thead>
-                                            <tr>
-                                                <th colspan="4" class="text-center">Pledges</th>
-                                            </tr>
-                                            <tr>
-                                            <th>Name</th>
-                                            <th>Status</th>
-                                            <th>Gender</th>
 
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {% for pledge in litigant.pledges.all %}
-                                                <tr>
-                                                    <td><a href="{% url 'person:detail' pledge.giver.id %}">{{ pledge.giver.full_name }}</a></td>
-                                                    <td>{{ pledge.giver.get_status_display }}</td>
-                                                    <td>{{ pledge.giver.get_gender_display }}</td>
-                                                </tr>
-                                            {% endfor %}
-                                        </tbody>
-                                    </table>
-                                {% endif %}
+    var format_parcels = function(data){
+        var parcel = "";
+        $.each(data.land.parcel_list, function(index, item){
+            parcel = "<li class='list-group-item'>" + parcel+ item.amount + " of " + item.type + " held by " + item.tenure + "</li>"
+        });
+        return parcel
+    };
 
-                            </div>
-                        </div>
-                    </div>
-            {% endfor %}
-        </div>
-    </div>
+    var format_lands = function(data){
+        var cell = "<ul class='list-group list-group-flush'>";
+        $.each(data, function(index, item){
+            var land_url = Urls['land:detail'](item.land.id);
+            var parcels = format_parcels(item.land.parcel_list);
+            cell = cell + "<a href='" + land_url + "'>" + format_parcels(item.land.parcel_list) + "</a>"
+        });
+        cell = cell + "</table>";
+        return cell
+    };
+
+
+    var litigant_table = $("#litigant_table").DataTable({
+        serverSide: true,
+        hideEmptyCols: {
+            columns: [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+            perPage: true,
+            emptyVals: [/(false)/]
+        },
+        columns:[
+            {data:'person',
+                name: 'person.first_name, person.relation_name, person.last_name',
+                render: {
+                    display: function(data, type, row){
+                        url = Urls['person:detail'](row.person.id);
+                        return "<a href='" + url + "'>" + row.person.full_name + "</a>";
+                    }
+                },
+            },
+            {data: 'role.role',
+                name: 'role.role',
+            },
+            {data: 'ad_proximum',
+                defaultContent: '',
+                searchable: false,
+                orderable: false,
+                render: {
+                    display: checkMaker
+                }
+            },
+            {data: 'distrained',
+                defaultContent: '',
+                searchable: false,
+                orderable: false,
+                render: {
+                    display: checkMaker
+                }
+            },
+            {data: 'attached',
+                defaultContent: '',
+                searchable: false,
+                orderable: false,
+                render: {
+                    display: checkMaker
+                }
+            },
+            {data: 'bail',
+                defaultContent: '',
+                searchable: false,
+                orderable: false,
+                render: {
+                    display: checkMaker
+                }
+            },
+            {data: 'amercements',
+                defaultContent: '',
+                name: 'amercements.amercement.amount, amercements.amercement.in_denarius',
+                render: {
+                    display: function(data, type, row){
+                        if (row.amercements.length > 0){
+                            return format_amercements(row.amercements);
+                        }
+                    }
+                }
+            },
+            {data: 'capitagia',
+                defaultContent: '',
+                name: 'capitagia.capitagium.amount, capitagia.capitagium.in_denarius',
+                render: {
+                    display: function(data, type, row){
+                        if (row.capitagia.length > 0 ){
+                            return format_capitagia(row.capitagia);
+                        }
+                    }
+                }
+            },
+            {data: 'damages',
+                defaultContent: '',
+                name: 'damages.damage.amount, damages.damage.in_denarius',
+                render: {
+                    display: function(data, type, row){
+                        if (row.damages.length > 0 ){
+                            return format_damages(row.damages);
+                        }
+                    }
+                }
+            },
+            {data: 'fines',
+                defaultContent: '',
+                name: 'fines.fine.amount, fines.fine.in_denarius',
+                render: {
+                    display: function(data, type, row){
+                        if (row.fines.length > 0){
+                            return format_fines(row.fines);
+                        }
+                    }
+                }
+            },
+            {data: 'heriots',
+                defaultContent: '',
+                name: 'heriots.heriot.in_denarius, heriots.animal.name, heriots.heriot.amount, heriot.quantity',
+                render: {
+                    display: function(data,type, row){
+                        if (row.heriots.length > 0){
+                            return format_heriots(row.heriots);
+                        }
+                    }
+                }
+            },
+            {data: 'impercamenta',
+                defaultContent: '',
+                name: 'impercamenta.impercamentum.in_denarius, impercamenta.animal.name, impercamenta.impercamentum.amount, impercamenta.quantity',
+                render: {
+                    display: function(data,type, row){
+                        if (row.impercamenta.length > 0){
+                            return format_impercamenta(row.impercamenta);
+                        }
+                    }
+                }
+            },
+            {data: 'lands',
+                defaultContent: '',
+                orderable: false,
+                searchable: false,
+                render: {
+                    display: function(data, type, row){
+                        if (row.lands.length > 0){
+                            return format_lands(row.lands);
+                        }
+                    }
+                }
+            }
+
+        ]
+    })
+
+</script>
 {% endif %}

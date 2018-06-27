@@ -189,20 +189,29 @@ class VerdictViewSet(FlexFieldsModelViewSet):
 
 class HundredViewSet(FlexFieldsModelViewSet):
 
+    permit_list_expands = ['county']
+
     # Must be logged in to edit
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     serializer_class = serializers.HundredSerializer
-    queryset = models.Hundred.objects.all()
+    queryset = models.Hundred.objects.all().prefetch_related('county')
 
 
-class VillageViewSet(FlexFieldsModelViewSet):
+class VillageViewSet(ChainFilterMixin, FlexFieldsModelViewSet):
+
+    permit_list_expands = ['hundred', 'county', ]
 
     # Must be logged in to edit
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
-
     serializer_class = serializers.VillageSerializer
-    queryset = models.Village.objects.all().prefetch_related('person_set').order_by('county__name', 'name')
+
+    def get_queryset(self, queryset=models.Village.objects.all().prefetch_related('person_set').
+                     order_by('county__name', 'name')):
+        chain = {
+            'name': 'village'
+        }
+        return self.filter_chain(queryset, chain, distinct=True)
 
 
 class PersonViewSet(ChainFilterMixin, FlexFieldsModelViewSet):
@@ -224,11 +233,11 @@ class PersonViewSet(ChainFilterMixin, FlexFieldsModelViewSet):
             'cases.case.session.village.hundred': 'hundred_to_litigant',
             'village.hundred': 'hundred',
             'cases.case.session': 'session',
-            'cases.amercements': 'amercements',
+            'cases.amercements': 'amerced',
             'cases.capitagia': 'capitagia',
-            'cases.damages': 'damages',
-            'cases.fines': 'fines',
-            'cases.heriots': 'heriots',
+            'cases.damages': 'damaged',
+            'cases.fines': 'fined',
+            'cases.heriots': 'heriot',
             'cases.impercamenta': 'impercamenta',
             'cases.lands': 'lands',
             'pledge_giver': 'pledges_given',
@@ -238,6 +247,8 @@ class PersonViewSet(ChainFilterMixin, FlexFieldsModelViewSet):
 
 
 class RecordViewSet(ChainFilterMixin, FlexFieldsModelViewSet):
+
+    permit_list_expands = ['sessions', 'archive']
 
     # Must be logged in to edit
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
