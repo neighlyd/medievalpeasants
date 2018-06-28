@@ -1,7 +1,7 @@
 <div class="card">
     <h3 class="card-header text-center bg-grey">Fine List</h3>
     <div class="card-body">
-            <table class="table table-bordered table-hover" id="fine_table" data-ajax="{% url 'api:litigant-list' %}?litigant={{ person.id }}&fines=true&expand=fines,case&format=datatables" data-table-length="10">
+            <table class="table table-bordered table-hover" id="fine_table" data-ajax="{% url 'api:litigant-list' %}?litigant={{ view.kwargs.pk }}&fines=true&expand=fines,case&format=datatables" data-table-length="10">
                 <thead>
                     <th>Details</th>
                     <th>Case</th>

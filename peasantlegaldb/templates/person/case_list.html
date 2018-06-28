@@ -1,7 +1,7 @@
         <div class="card">
             <h3 class="card-header text-center bg-grey">Cases</h3>
                 <div class="card-body">
-                    <table class="table table-bordered table-hover" id="case_list_table" data-ajax="{% url 'api:litigant-list' %}?litigant={{ person.id }}&expand=case&format=datatables" data-page-length="10">
+                    <table class="table table-bordered table-hover" id="case_list_table" data-ajax="{% url 'api:litigant-list' %}?litigant={{ view.kwargs.pk }}&expand=case&format=datatables" data-page-length="10">
                         <thead>
                             <th>Details</th>
                             <th>Case</th>

@@ -1,6 +1,6 @@
 <h3 class="card-header text-center bg-grey">Pledges Given</h3>
 <div class="card-body">
-    <table class="table table-bordered table-hover" id="pledges_given_table" data-ajax="{% url 'api:pledge-list' %}?giver={{ person.id }}&expand=giver,receiver&format=datatables" data-page-length="10">
+    <table class="table table-bordered table-hover" id="pledges_given_table" data-ajax="{% url 'api:pledge-list' %}?giver={{ view.kwargs.pk }}&expand=giver,receiver&format=datatables" data-page-length="10">
         <thead>
             <th>Details</th>
             <th>Receiver</th>

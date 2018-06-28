@@ -2,7 +2,7 @@
 
     <h3 class="card-header text-center bg-grey">Land History</h3>
     <div class="card-body">
-            <table class="table table-bordered table-hover" id="land_table" data-ajax="{% url 'api:litigant-list' %}?litigant={{ person.id }}&lands=true&expand=lands,case&format=datatables" data-table-length="10">
+            <table class="table table-bordered table-hover" id="land_table" data-ajax="{% url 'api:litigant-list' %}?litigant={{ view.kwargs.pk }}&lands=true&expand=lands,case&format=datatables" data-table-length="10">
                 <thead>
                     <th>Details</th>
                     <th>Case</th>
