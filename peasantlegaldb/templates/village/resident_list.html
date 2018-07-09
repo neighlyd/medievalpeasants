@@ -1,9 +1,7 @@
-{% extends '_layout/_l_single_col.html' %}
-
-{% block single_col %}
+<div class="card">
     <h3 class="card-header text-center">Known Resident List</h3>
     <div class="card-body">
-            <table class="table table-bordered table-hover" id="table" data-page-length="25">
+            <table class="table table-bordered table-hover" id="resident_table" data-ajax="{% url 'api:person-list' %}?village_to_resident={{ view.kwargs.pk }}&expand=earliest_case,latest_case&format=datatables" data-page-length="25">
                 <thead>
                     <th></th>
                     <th>Name</th>
@@ -11,23 +9,16 @@
                     <th>Gender</th>
                     <th>1332 Tax</th>
                     <th>1379 Tax</th>
-                    <th>Case Count</th>
                     <th>Earliest Case</th>
                     <th>Latest Case</th>
-                    <th>Pledges Given</th>
-                    <th>Pledges Received</th>
                 </thead>
             </table>
     </div>
-
-{% endblock %}
-
-{% block scripts %}
-    {{ block.super }}
+</div>
 
 <script>
 
- function format( data ){
+    var format_notes = function format( data ){
         return "<table class='table'>" +
             "<tr>" +
             "<td><b>Notes</b></td>" +
@@ -35,84 +26,88 @@
             "</tr>" +
             "</table>"
 
-    }
+    };
 
-    $('#list_residents').on('show.bs.tab', function () {
-        var url = window.location.pathname;
-        var id = url.split('/').reverse()[1];
-        url = Urls["api:person-list"]();
-        var api_url = url + "?filter{village.id}=" + id + "&include[]=counts&include[]=earliest_case.session.village&include[]=latest_case.session.village";
-        var table = $("#table").DataTable({
-            fixedHeader:{ headerOffset: 50 },
-            scrollX: true,
-            order: [1, "asc"],
-            ajax: {
-                url: api_url,
-                type: "GET",
-                dataSrc: "people.",
+    var resident_table = $("#resident_table").DataTable({
+        serverSide: true,
+        order: [1, "asc"],
+        columns: [
+            {
+                class: "details-control",
+                orderable: "false",
+                data: "notes",
+                defaultContent: "",
+                render: checkNotes,
+                width: "15px"
             },
-            "columns": [
-                {
-                    "class": "details-control",
-                    "orderable": "false",
-                    "data": null,
-                    "defaultContent": "",
-                    "render": function(){
-                        return '<i class="fa fa-plus-square" aria-hidden="true"></i>';
-                    },
-                    width:"15px"
-                },
-                {data: "full_name",
-                    fnCreatedCell: function(nTd, cellData, rowData, row, col) {
-                        url = Urls['person:detail'](rowData.id);
-                        $(nTd).html("<a href='"+ url +"'>" + rowData.full_name + "</a>");
+            {
+                data: "full_name",
+                name: "first_name, relation_name, last_name",
+                render: {
+                    display: function (data, type, row) {
+                        var url = Urls['person:detail'](row.id);
+                        return "<a href='" + url + "'>" + data + "</a>";
                     }
-                },
-                {data: "status_display"},
-                {data: "gender_display"},
-                {data: "tax_1332"},
-                {data: "tax_1379"},
-                {data: "counts.all_cases"},
-                {data: "earliest_case",
-                    defaultContent: '',
-                    render: {
-                        display: formatCaseDate,
-                        sort: "session.date"
+                }
+            },
+            {data: "status_display",
+                searchable: false,
+                orderable: false,
+            },
+            {data: "gender_display",
+                searchable: false,
+                orderable: false,
+            },
+            {data: "tax_1332"},
+            {data: "tax_1379"},
+            {data: "earliest_case.id",
+                name: 'earliest_case.session.date',
+                defaultContent: '',
+                render:{
+                    display: function(data, type, row){
+                        if (data){
+                            var url = Urls['case:detail'](data);
+                            return "<a href='" + url + "'>" + row.earliest_case.session.law_term + ", " + row.earliest_case.session.year + "</a>";
+                        } else {
+                            return "N/A"
+                        }
                     }
-                },
-                {data: "latest_case",
-                    defaultContent: '',
-                    render: {
-                        display: formatCaseDate,
-                        sort: "session.date"
+                }
+            },
+            {data: "latest_case.id",
+                name: 'latest_case.session.date',
+                defaultContent: '',
+                render:{
+                    display: function(data, type, row){
+                        if (data){
+                            var url = Urls['case:detail'](data);
+                            return "<a href='" + url + "'>" + row.latest_case.session.law_term + ", " + row.latest_case.session.year + "</a>";
+                        } else {
+                            return "N/A"
+                        }
                     }
-                },
-                {data: "counts.pledge.given"},
-                {data: "counts.pledge.received"},
-            ]
-        });
-
-        $('#table tbody').on('click', 'td.details-control', function(){
-            var tr = $(this).closest('tr');
-            var tdi = tr.find("i.fa");
-            var row = table.row( tr );
-
-            if ( row.child.isShown() ) {
-                row.child.hide();
-                tr.removeClass('shown');
-                tdi.first().removeClass('fa-minus-square');
-                tdi.first().addClass('fa-plus-square');
-            } else{
-                row.child( format( row.data() ) ).show();
-                tr.addClass('shown');
-                tdi.first().removeClass('fa-plus-square');
-                tdi.first().addClass('fa-minus-square');
-            }
-        });
-
+                }
+            },
+        ]
     });
 
+    $('#resident_table').on('click', 'td.details-control', function(){
+        var tr = $(this).closest('tr');
+        var tdi = tr.find("i.fa");
+        var row = resident_table.row( tr );
+
+        if ( row.child.isShown() ) {
+            row.child.hide();
+            tr.removeClass('shown');
+            tdi.first().removeClass('fa-minus-square');
+            tdi.first().addClass('fa-plus-square');
+        } else {
+            row.child( format_notes( row.data() ) ).show();
+            tr.addClass('shown');
+            tdi.first().removeClass('fa-plus-square');
+            tdi.first().addClass('fa-minus-square');
+        }
+    });
+
+
 </script>
-
-
-{% endblock %}

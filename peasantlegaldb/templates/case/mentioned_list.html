@@ -1,6 +1,6 @@
 <h3 class="card-header text-center bg-grey">Places Mentioned List</h3>
     <div class="card-body">
-            <table class="table table-bordered" id="table" data-page-length="25">
+            <table class="table table-bordered" id="mentioned_table" data-ajax="{% url 'api:places-mentioned-list' %}?case={{ view.kwargs.pk }}&expand=village&format=datatables" data-page-length="25">
                 <thead>
                     <th>Village</th>
                     <th>County</th>
@@ -12,20 +12,60 @@
                     <th>Litigants</th>
                     <th>Notes</th>
                 </thead>
-                <tbody>
-                    {% for place in case.placementioned_set.all %}
-                        <tr>
-                            <td><a href="{% url 'village:detail' place.village.id %}">{{ place.village.name }}</a></td>
-                            <td><a href="{% url 'county:detail' place.village.county.id %}">{{ place.village.county.name }}</a></td>
-                            <td class="text-center">{% if place.village.great_rumor %}<b>X</b>{% endif %}</td>
-                            <td class="text-center">{% if place.village.ancient_demesne %}<b>X</b>{% endif %}</td>
-                            <td>{{ place.village.session_count }}</td>
-                            <td>{{ place.village.case_count }}</td>
-                            <td>{{ place.village.resident_count }}</td>
-                            <td>{{ place.village.litigant_count }}</td>
-                            <td>{{ place.notes }}</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
             </table>
     </div>
+
+<script>
+    var mentioned_table = $("#mentioned_table").dataTable({
+        serverSide: true,
+        columns:[
+            {data: 'village.name'},
+            {data: 'village.county.name'},
+            {data: 'village.great_rumor',
+                defaultContent: false,
+                searchable: false,
+                orderable: false,
+                render:{
+                    display: function(data){
+                        if (data){
+                            return "<i class='fas fa-check' style='color:forestgreen'></i>";
+                        } else {
+                            return "";
+                        }
+                    }
+                }
+            },
+            {data: 'village.ancient_demesne',
+                defaultContent: false,
+                searchable: false,
+                orderable: false,
+                render:{
+                    display: function(data){
+                        if (data){
+                            return "<i class='fas fa-check' style='color:forestgreen'></i>";
+                        } else {
+                            return "";
+                        }
+                    }
+                }
+            },
+            {data: 'village.counts.session',
+                searchable: false,
+                orderable: false,
+            },
+            {data: 'village.counts.case',
+                searchable: false,
+                orderable: false,
+            },
+            {data: 'village.counts.resident',
+                searchable: false,
+                orderable: false,
+            },
+            {data: 'village.counts.litigant',
+                searchable: false,
+                orderable: false,
+            },
+            {data: 'notes'},
+        ]
+    })
+</script>

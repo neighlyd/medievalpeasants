@@ -12,3 +12,15 @@ Delete Case:
 
 Fix:
 Places Mentioned table in Case View (see Case 964)
+
+Land_lists - searchable parcels, tenures, and tenant history via datatables if possible.
+
+Datatables conversion:
+    Archive:    done
+    case:       done
+    county:     incomplete
+    hundred:    incomplete
+    land:       incomplete
+    person:     done
+    record:     incomplete (partial)
+    village:    done

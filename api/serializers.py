@@ -325,7 +325,7 @@ class SessionSerializer(FlexFieldsModelSerializer):
         counts['case'] = record.case_count
         counts['litigant'] = record.litigant_count
         counts['land'] = record.land_case_count
-        counts['chevage_payer'] = record.capitagium_payer_count
+        counts['capitagium_payer'] = record.capitagium_payer_count
         counts['impercamentum_payer'] = record.impercamentum_payer_count
         return counts
 
@@ -419,7 +419,15 @@ class PlaceMentionedSerializer(FlexFieldsModelSerializer):
         fields = '__all__'
 
     expandable_fields = {
-        'village': (VillageSerializer, {'source': 'village'}),
+        'village': (VillageSerializer, {
+            'source': 'village',
+            'fields': ['id', 'name', 'county', 'great_rumor', 'ancient_demesne', 'counts'],
+            'expand': ['county']
+            }),
+        'case': ('api.CaseSerializer', {
+            'source': 'case',
+            'expand': ['session']
+        })
     }
 
 
@@ -536,6 +544,7 @@ class PledgeSerializer(FlexFieldsModelSerializer):
     class Meta:
         model = models.Pledge
         fields = '__all__'
+        datatables_always_serializer = ('id',)
 
     expandable_fields = {
         'giver': (PersonSerializer, {'source': 'giver'}),

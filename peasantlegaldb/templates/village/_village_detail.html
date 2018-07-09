@@ -6,13 +6,13 @@
 
 {% block left_sidebar %}
     <div class="list-group" id="selection_list" role="tablist">
-        <a class="list-group-item list-group-item-action" data-toggle="list" role="tab" data-url="{% url 'village:cases' village.id %}" aria-controls="list_cases" aria-selected="false">Cases</a>
-        <a class="list-group-item list-group-item-action" data-toggle="list" role="tab" href="#list_residents" aria-controls="list_residents" aria-selected="false">Residents</a>
-        <a class="list-group-item list-group-item-action" data-toggle="list" role="tab" href="#list_litigants" aria-controls="list_litigants" aria-selected="false">Litigants</a>
-        <a class="list-group-item list-group-item-action" data-toggle="list" role="tab" href="#list_lands" aria-controls="list_lands" aria-selected="false">Lands</a>
-        <a class="list-group-item list-group-item-action" data-toggle="list" role="tab" href="#list_sessions" aria-controls="list_sessions" aria-selected="false">Sessions</a>
-        <a class="list-group-item list-group-item-action" data-toggle="list" role="tab" href="#list_mentioned_here" aria-controls="list_mentioned_here" aria-selected="false">Places Mentioned</a>
-        <a class="list-group-item list-group-item-action" data-toggle="list" role="tab" href="#list_mentioned_elsewhere" aria-controls="list_mentioned_elsewhere" aria-selected="false">Mentioned Elsewhere</a>
+        <a class="list-group-item list-group-item-action active" data-toggle="list" role="tab" href="#list_cases" data-url="{% url 'village:cases' village.id %}" aria-controls="list_cases" aria-selected="true">Cases</a>
+        <a class="list-group-item list-group-item-action" data-toggle="list" role="tab" href="#list_residents" data-url="{% url 'village:residents' village.id %}" aria-controls="list_residents" aria-selected="false">Residents</a>
+        <a class="list-group-item list-group-item-action" data-toggle="list" role="tab" href="#list_litigants" data-url="{% url 'village:litigants' village.id %}" aria-controls="list_litigants" aria-selected="false">Litigants</a>
+        <a class="list-group-item list-group-item-action" data-toggle="list" role="tab" href="#list_lands" data-url="{% url 'village:lands' village.id %}" aria-controls="list_lands" aria-selected="false">Lands</a>
+        <a class="list-group-item list-group-item-action" data-toggle="list" role="tab" href="#list_sessions" data-url="{% url 'village:sessions' village.id %}" aria-controls="list_sessions" aria-selected="false">Sessions</a>
+        <a class="list-group-item list-group-item-action" data-toggle="list" role="tab" href="#list_mentioned_here" data-url="{% url 'village:mentioned_here' village.id %}" aria-controls="list_mentioned_here" aria-selected="false">Places Mentioned</a>
+        <a class="list-group-item list-group-item-action" data-toggle="list" role="tab" href="#list_mentioned_elsewhere" data-url="{% url 'village:mentioned_elsewhere' village.id %}" aria-controls="list_mentioned_elsewhere" aria-selected="false">Mentioned Elsewhere</a>
     </div>
 {% endblock %}
 
@@ -87,13 +87,13 @@
 <br>
 
 <div class="tab-content" id="list_info">
-    <div class="tab-pane fade" id="list_cases" role="tabpanel">{% include 'village/case_list.html' %}</div>
-    <div class="tab-pane fade" id="list_residents" role="tabpanel">{% include 'village/resident_list.html' %}</div>
-    <div class="tab-pane fade" id="list_litigants" role="tabpanel">{% include 'village/litigant_list.html' %}</div>
-    <div class="tab-pane fade" id="list_lands" role="tabpanel">{% include 'village/land_list.html' %}</div>
-    <div class="tab-pane fade" id="list_sessions" role="tabpanel">{% include 'village/session_list.html' %}</div>
-    <div class="tab-pane fade" id="list_mentioned_here" role="tabpanel">{% include 'village/place_mentioned_list.html' %}</div>
-    <div class="tab-pane fade" id="list_mentioned_elsewhere" role="tabpanel">{% include 'village/related_places_list.html' %}</div>
+    <div class="tab-pane show active fade" id="list_cases" role="tabpanel">{% include 'village/case_list.html' %}</div>
+    <div class="tab-pane fade" id="list_residents" role="tabpanel"></div>
+    <div class="tab-pane fade" id="list_litigants" role="tabpanel"></div>
+    <div class="tab-pane fade" id="list_lands" role="tabpanel"></div>
+    <div class="tab-pane fade" id="list_sessions" role="tabpanel"></div>
+    <div class="tab-pane fade" id="list_mentioned_here" role="tabpanel"></div>
+    <div class="tab-pane fade" id="list_mentioned_elsewhere" role="tabpanel"></div>
 </div>
 
 {% endblock %}
@@ -160,9 +160,8 @@
                 async: false,
                 dataType: '',
             }).responseJSON;
-
             // because Dynamic-Rest nests the data one-level deep, strip out the '{ villages:{' layer.
-            locationObject = locationObject.village;
+            locationObject = locationObject;
 
             // assign lat and lng to variables and convert to floats that google maps api can understand.
             var lng = parseFloat(locationObject.longitude);
@@ -210,27 +209,26 @@
 
 <script>
     $(document).ready(function(){
+        $("#selection_list").on('click', 'a', function(e){
+           e.preventDefault();
+           var url = $(this).attr("data-url");
 
-        $('#selection_list a').on('click', function(e){
-            e.preventDefault();
-            var url = $(this).attr('data-url');
+           if (typeof url !== "undefined"){
+               var pane = $(this), href = this.hash;
 
-            $(this).addClass('active').siblings().removeClass('active');
-
-            $.ajax({
-                url: url,
-                type: 'get',
-                dataType: 'json',
-                success: function(data){
-                    $('#list_info').html(data.html_list);
-                }
-            })
-
+               $(href).load(url, function(result){
+                   pane.tab('show');
+               });
+           } else {
+               $(this).tab('show');
+           }
         });
 
+        $('a[data-toggle="tab"').on('shown.bs.tab', function(e){
+            $.fn.dataTable.tables({visible: true, api: true}).columns.adjust().responsive.recalc();
         });
+    })
 
 </script>
-
 
 {% endblock %}

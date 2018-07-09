@@ -32,7 +32,7 @@
         var cell = "<ul class='list-group list-group-flush'>";
         $.each(data, function(index, item){
             cell = cell + "<tr>"+
-            "<li class='list-group-item'>" + item.amercement.amount + ' (' + item.amercement.in_denarius + ')' + "</li>"
+            "<li class='list-group-item'>" + item.amercement.amount + ' (' + item.amercement.in_denarius + 'd.)' + "</li>"
         });
         cell = cell + "</ul>";
         return cell

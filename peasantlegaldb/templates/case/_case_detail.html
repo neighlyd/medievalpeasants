@@ -5,25 +5,27 @@
 {% endblock %}
 
 {% block left_sidebar %}
+    <div class="list-group" id="selection_list" role="tablist">
         <a class="list-group-item list-group-item-action active" data-toggle="list" role="tab" href="#list_litigants" aria-controls="list_litigants" aria-selected="true">Show Litigants</a>
     {% if case.cornbot_exist %}
-        <a class="list-group-item list-group-item-action" data-toggle="list" role="tab" href="#list_cornbot" aria-controls="list_cornbot" aria-selected="false">Show Cornbot</a>
+        <a class="list-group-item list-group-item-action" data-toggle="list" role="tab" href="#list_cornbot" data-url="{% url 'case:cornbot' case.id %}" aria-controls="list_cornbot" aria-selected="false">Show Cornbot</a>
     {% endif %}
     {% if case.extrahura_exist %}
-        <a class="list-group-item list-group-item-action" data-toggle="list" role="tab" href="#list_extrahura" aria-controls="list_extrahura" aria-selected="false">Show Extrahura</a>
+        <a class="list-group-item list-group-item-action" data-toggle="list" role="tab" href="#list_extrahura" data-url="{% url 'case:extrahura' case.id %}" aria-controls="list_extrahura" aria-selected="false">Show Extrahura</a>
     {% endif %}
     {% if case.land_exist %}
-        <a class="list-group-item list-group-item-action" data-toggle="list" role="tab" href="#list_lands" aria-controls="list_lands" aria-selected="false">Show Land</a>
+        <a class="list-group-item list-group-item-action" data-toggle="list" role="tab" href="#list_lands" data-url="{% url 'case:land' case.id %}" aria-controls="list_lands" aria-selected="false">Show Land</a>
     {% endif %}
     {% if case.mentioned_exist %}
-        <a class="list-group-item list-group-item-action" data-toggle="list" role="tab" href="#list_places" aria-controls="list_places" aria-selected="false">Show Places Mentioned</a>
+        <a class="list-group-item list-group-item-action" data-toggle="list" role="tab" href="#list_places" data-url="{% url 'case:mentioned' case.id %}" aria-controls="list_places" aria-selected="false">Show Places Mentioned</a>
     {% endif %}
     {% if case.murrain_exist %}
-        <a class="list-group-item list-group-item-action" data-toggle="list" role="tab" href="#list_murrains" aria-controls="list_murrains" aria-selected="false">Show Murrain</a>
+        <a class="list-group-item list-group-item-action" data-toggle="list" role="tab" href="#list_murrains" data-url="{% url 'case:murrain' case.id %}" aria-controls="list_murrains" aria-selected="false">Show Murrain</a>
     {% endif %}
     {% if case.pledge_exist %}
-        <a class="list-group-item list-group-item-action" data-toggle="list" role="tab" href="#list_pledges" aria-controls="list_pledges" aria-selected="false">Show Pledges</a>
+        <a class="list-group-item list-group-item-action" data-toggle="list" role="tab" href="#list_pledges" data-url="{% url 'case:pledges' case.id %}" aria-controls="list_pledges" aria-selected="false">Show Pledges</a>
     {% endif %}
+    </div>
 {% endblock %}
 
 {% block center_bar %}
@@ -130,12 +132,12 @@
 
 <div class="tab-content" id="lists">
     <div class="tab-pane fade show active" id="list_litigants" role="tabpanel">{% include 'case/litigant_list.html' %}</div>
-    <div class="tab-pane fade" id="list_cornbot" role="tabpanel">{% include 'case/cornbot_list.html' %}</div>
-    <div class="tab-pane fade" id="list_extrahura" role="tabpanel">{% include 'case/extrahura_list.html' %}</div>
-    <div class="tab-pane fade" id="list_lands" role="tabpanel">{% include 'case/land_list.html' %}</div>
-    <div class="tab-pane fade" id="list_places" role="tabpanel">{% include 'case/mentioned_list.html' %}</div>
-    <div class="tab-pane fade" id="list_murrains" role="tabpanel">{% include 'case/murrain_list.html' %}</div>
-    <div class="tab-pane fade" id="list_pledges" role="tabpanel">{% include 'case/pledge_list.html' %}</div>
+    <div class="tab-pane fade" id="list_cornbot" role="tabpanel"></div>
+    <div class="tab-pane fade" id="list_extrahura" role="tabpanel"></div>
+    <div class="tab-pane fade" id="list_lands" role="tabpanel"></div>
+    <div class="tab-pane fade" id="list_places" role="tabpanel"></div>
+    <div class="tab-pane fade" id="list_murrains" role="tabpanel"></div>
+    <div class="tab-pane fade" id="list_pledges" role="tabpanel"></div>
 </div>
 
 {% endblock %}
@@ -162,5 +164,34 @@
             </div>
         {% endif %}
     </div>
+
+{% endblock %}
+
+{% block scripts %}
+
+    {{ block.super }}
+    <script>
+        $(document).ready(function(){
+            $("#selection_list").on('click', 'a', function(e){
+               e.preventDefault();
+               var url = $(this).attr("data-url");
+
+               if (typeof url !== "undefined"){
+                   var pane = $(this), href = this.hash;
+
+                   $(href).load(url, function(result){
+                       pane.tab('show');
+                   });
+               } else {
+                   $(this).tab('show');
+               }
+            });
+
+            $('a[data-toggle="tab"').on('shown.bs.tab', function(e){
+                $.fn.dataTable.tables({visible: true, api: true}).columns.adjust().responsive.recalc();
+            });
+        })
+
+    </script>
 
 {% endblock %}

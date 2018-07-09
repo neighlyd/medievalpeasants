@@ -1,6 +1,6 @@
 <h3 class="card-header text-center bg-grey">Pledges</h3>
 <div class="card-body">
-    <table class="table table-bordered table-hover" id="pledges_list" data-page-length="25">
+    <table class="table table-bordered table-hover" id="pledge_table" data-ajax="{% url 'api:pledge-list' %}?case={{ view.kwargs.pk }}&format=datatables&expand=giver,receiver" data-page-length="25">
         <thead>
             <th>Grantor</th>
             <th>Grantor Status</th>
@@ -9,19 +9,48 @@
             <th>Recipient Status</th>
             <th>Recipient Gender</th>
         </thead>
-        <tbody>
-        {% for litigant in case.litigants.all %}
-            {% for pledge in litigant.pledges.all %}
-                <tr>
-                    <td><a href="{% url 'person:detail' pledge.giver.id %}">{{ pledge.giver.full_name }}</a></td>
-                    <td>{{ pledge.giver.get_status_display }}</td>
-                    <td>{{ pledge.giver.get_gender_display }}</td>
-                    <td><a href="{% url 'person:detail' pledge.receiver.person.id %}">{{ pledge.receiver.person.full_name }}</a></td>
-                    <td>{{ pledge.receiver.person.get_status_display }}</td>
-                    <td>{{ pledge.receiver.person.get_gender_display }}</td>
-                </tr>
-            {% endfor %}
-        {% endfor %}
-        </tbody>
     </table>
 </div>
+
+<script>
+    var pledge_table = $('#pledge_table').dataTable({
+       serverSide: true,
+       columns:[
+           {data: 'giver.full_name',
+               name: 'giver.first_name, giver.relation_name, giver.last_name',
+               render:{
+                    display: function(data, type, row, meta){
+                        var url = Urls['person:detail'](row.giver.id);
+                        return "<a href='" + url + "'>" + row.giver.full_name + "</a>";
+                    }
+                }
+           },
+           {data: 'giver.status_display',
+               searchable: false,
+               orderable: false,
+           },
+           {data: 'giver.gender_display',
+               searchable: false,
+               orderable: false,
+           },
+           {data: 'receiver.person.full_name',
+               name: 'receiver.person.first_name, receiver.person.relation_name, receiver.person.last_name',
+               render:{
+                    display: function(data, type, row, meta) {
+                        var url = Urls['person:detail'](row.receiver.person.id);
+                        return "<a href='" + url + "'>" + data + "</a>";
+                    }
+           }
+           },
+           {data: 'receiver.person.status_display',
+               searchable: false,
+               orderable: false,
+           },
+           {data: 'receiver.person.gender_display',
+               searchable: false,
+               orderable: false,
+           },
+       ]
+    });
+
+</script>

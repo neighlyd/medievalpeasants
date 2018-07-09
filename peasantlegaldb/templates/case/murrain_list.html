@@ -1,15 +1,24 @@
 <h3 class="card-header text-center bg-grey">Murrain</h3>
     <div class="card-body">
-            <table class="table table-bordered" id="table" data-page-length="25">
+            <table class="table table-bordered" id="murrain_table" data-ajax="{% url 'api:murrain-list' %}?case={{ view.kwargs.pk }}&keep=amount&expand=animal&format=datatables" data-page-length="25">
                 <thead>
                     <th>Animal</th>
                     <th>Notes</th>
                 </thead>
-                <tbody>
-                    {% for murrain in case.murrain.all %}
-                        <td>{{ murrain.amount }} {{ murrain.animal }}</td>
-                        <td>{{ murrain.notes }}</td>
-                    {% endfor %}
-                </tbody>
             </table>
     </div>
+<script>
+    var murrain_table = $("#murrain_table").dataTable({
+        serverSide: true,
+        columns: [
+            {data: 'animal.name',
+                render:{
+                    display: function(data, type, row){
+                        return row.amount + ' ' + data
+                    }
+                }
+            },
+            {data: 'notes'}
+        ]
+    })
+</script>

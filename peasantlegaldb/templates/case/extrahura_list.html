@@ -1,6 +1,6 @@
 <h3 class="card-header text-center bg-grey">Extrahura</h3>
     <div class="card-body">
-            <table class="table table-bordered" id="table" data-page-length="25">
+            <table class="table table-bordered" id="extrahura_table" data-ajax="{% url 'api:extrahura-list' %}?case={{ view.kwargs.pk }}&keep=amount&expand=animal,price&format=datatables" data-page-length="25">
                 <thead>
                     <th>Animal</th>
                     <th>Assessed Price</th>
@@ -15,3 +15,25 @@
                 </tbody>
             </table>
     </div>
+
+<script>
+    var extrahura_table = $("#extrahura_table").dataTable({
+        serverSide: true,
+        columns: [
+            {data: 'animal.name',
+                render:{
+                    display: function(data, type, row){
+                        return row.amount + ' ' + data
+                    }
+                }
+            },
+            {data: 'price.in_denarius',
+                render: {
+                    display: function(data, type, row){
+                        return row.price.amount + ' (' + data + 'd.)';
+                    }
+                }
+            }
+        ]
+    })
+</script>

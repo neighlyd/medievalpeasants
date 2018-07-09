@@ -1,13 +1,10 @@
-{% extends '_layout/_l_single_col.html' %}
-
-{% block single_col %}
+<div class="card">
     <h3 class="card-header text-center">Session List</h3>
     <div class="card-body">
-            <table class="table table-bordered table-hover" id="table" data-page-length="25">
+            <table class="table table-bordered table-hover" id="session_table" data-ajax="{% url 'api:session-list' %}?village={{ view.kwargs.pk }}&keep=id,law_term,year&format=datatables" data-page-length="25">
                 <thead>
                     <th>ID</th>
                     <th>Date</th>
-                    <th>Law Term</th>
                     <th>Cases</th>
                     <th>Litigants</th>
                     <th>Chevages</th>
@@ -16,73 +13,51 @@
                 </thead>
             </table>
     </div>
-
-{% endblock %}
-
-{% block scripts %}
-    {{ block.super }}
+</div>
 <script>
 
-    $('#list_sessions').on('show.bs.tab', function () {
-        var url = window.location.pathname;
-        var id = url.split('/').reverse()[1];
-        url = Urls['api:session-list']();
-        api_url = url + "?village=" + id + "&include[]=counts";
-        console.log(api_url);
-        var table = $("#table").DataTable({
-            fixedHeader:{
-                headerOffset: 50
-            },
+        var session_table = $("#session_table").DataTable({
+            serverSide: true,
             hideEmptyCols: true,
-            scrollX: true,
             order: [1, "asc"],
-            ajax: {
-                url: api_url,
-                type: "GET",
-                dataSrc: "sessions.",
-            },
-            "columns": [
+            columns: [
                 {data: "id",
-                    fnCreatedCell: function(nTd, cellData, rowData, row, col) {
-                        url = Urls['session:detail'](rowData.id);
-                        $(nTd).html("<a href='"+ url +"'>" + rowData.id + "</a>");
+                     render:{
+                        display: function(data){
+                            var url = Urls['session:detail'](data);
+                            return "<a href='" + url + "'>" + data + "</a>";
+                        }
                     }
                 },
                 {data: "date",
-                    fnCreatedCell: function(nTd, cellData, rowData, row, col) {
-                        $(nTd).html(rowData.human_date);
+                    render:{
+                        display: function(data, type, row){
+                            var url = Urls['session:detail'](row.id);
+                            return "<a href='" + url + "'>" + row.law_term + ", " + row.year + "</a>";
+                        }
                     }
                 },
-                {data: "law_term"},
-                {data: "counts.case"},
-                {data: "counts.litigant"},
-                {data: "counts.chevage_payer"},
-                {data: "counts.impercamentum_payer"},
-                {data: "counts.land"},
+                {data: "counts.case",
+                    searchable: false,
+                    orderable: false,
+                },
+                {data: "counts.litigant",
+                    searchable: false,
+                    orderable: false,
+                },
+                {data: "counts.capitagium_payer",
+                    searchable: false,
+                    orderable: false,
+                },
+                {data: "counts.impercamentum_payer",
+                    searchable: false,
+                    orderable: false,
+                },
+                {data: "counts.land",
+                    searchable: false,
+                    orderable: false,
+                },
             ]
         });
 
-        $('#table tbody').on('click', 'td.details-control', function(){
-            var tr = $(this).closest('tr');
-            var tdi = tr.find("i.fa");
-            var row = table.row( tr );
-
-            if ( row.child.isShown() ) {
-                row.child.hide();
-                tr.removeClass('shown');
-                tdi.first().removeClass('fa-minus-square');
-                tdi.first().addClass('fa-plus-square');
-            } else{
-                row.child( format( row.data() ) ).show();
-                tr.addClass('shown');
-                tdi.first().removeClass('fa-plus-square');
-                tdi.first().addClass('fa-minus-square');
-            }
-        });
-
-    });
-
 </script>
-
-
-{% endblock %}

@@ -31,7 +31,7 @@
         var cell = "<table class='table'>" + "<tr><th>Damage</th><th>Notes</th></tr>";
         $.each(data, function(index, item){
             cell = cell + "<tr>"+
-            "<td>" + item.damage.amount + ' (' + item.damage.in_denarius + ')' + "</td>" +
+            "<td>" + item.damage.amount + ' (' + item.damage.in_denarius + 'd.)' + "</td>" +
             "<td>" + item.notes + "</td>" +
             "</tr>"
         });

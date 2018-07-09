@@ -49,6 +49,8 @@ function formatSessionDateNoVillage(data, type, row, meta) {
 function checkMaker(data) {
     if (data){
         return "<i class='fas fa-check' style='color:forestgreen'></i>";
+    } else {
+        return "";
     }
 }
 
@@ -56,7 +58,7 @@ function checkMakerSubTable(data) {
     if (data){
         return "<i class='fas fa-check' style='color:forestgreen'></i>";
     } else {
-        return '';
+        return "";
     }
 }
 
