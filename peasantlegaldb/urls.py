@@ -1,11 +1,18 @@
 from django.conf.urls import url, include
 from django.views.generic import TemplateView
-from django.urls import reverse_lazy
 
-from peasantlegaldb import views
+from . import views
+from . import dal_views
 
 index_urls = [
     url(r'^$', TemplateView.as_view(template_name='index.html'), name='index'),
+]
+
+autocomplete_urls = [
+    url(r'^person', dal_views.PersonAutocomplete.as_view(),
+        name='person'),
+    url(r'^village', dal_views.VillageAutocomplete.as_view(),
+        name='village')
 ]
 
 analysis_urls = [
@@ -51,15 +58,15 @@ case_urls = [
 
 county_urls = [
     url(r'^(?P<pk>\d+)/$', views.CountyDetailView.as_view(template_name='county/_county_detail.html'), name='detail'),
-    url(r'^(?P<pk>\d+)/village_list$', views.CountyDetailView.as_view(template_name='county/county_village_list.html'),
+    url(r'^(?P<pk>\d+)/village_list$', TemplateView.as_view(template_name='county/village_list.html'),
         name='villages'),
-    url(r'^(?P<pk>\d+)/case_list$', views.CaseListView.as_view(template_name='county/county_case_list.html'),
+    url(r'^(?P<pk>\d+)/case_list$', TemplateView.as_view(template_name='county/case_list.html'),
         name='cases'),
-    url(r'^(?P<pk>\d+)/resident_list$', views.CaseListView.as_view(template_name='county/county_resident_list.html'),
+    url(r'^(?P<pk>\d+)/resident_list$', TemplateView.as_view(template_name='county/resident_list.html'),
         name='residents'),
-    url(r'^(?P<pk>\d+)/litigant_list$', views.CaseListView.as_view(template_name='county/county_litigant_list.html'),
+    url(r'^(?P<pk>\d+)/litigant_list$', TemplateView.as_view(template_name='county/litigant_list.html'),
         name='litigants'),
-    url(r'^(?P<pk>\d+)/hundred_list$', views.CaseListView.as_view(template_name='county/county_hundred_list.html'),
+    url(r'^(?P<pk>\d+)/hundred_list$', TemplateView.as_view(template_name='county/hundred_list.html'),
         name='hundreds'),
     url(r'^list/$', views.CountyListView.as_view(template_name='county/_county_list.html'),
         name='list'),
@@ -67,13 +74,13 @@ county_urls = [
 
 hundred_urls = [
     url(r'^(?P<pk>\d+)/$', views.HundredDetailView.as_view(template_name='hundred/_hundred_detail.html'), name='detail'),
-    url(r'^(?P<pk>\d+)/case_list$', views.HundredListView.as_view(template_name='hundred/hundred_case_list.html'),
+    url(r'^(?P<pk>\d+)/case_list$', TemplateView.as_view(template_name='hundred/case_list.html'),
         name='cases'),
-    url(r'^(?P<pk>\d+)/resident_list$', views.CaseListView.as_view(template_name='hundred/hundred_resident_list.html'),
+    url(r'^(?P<pk>\d+)/resident_list$', TemplateView.as_view(template_name='hundred/resident_list.html'),
         name='residents'),
-    url(r'^(?P<pk>\d+)/litigant_list$', views.CaseListView.as_view(template_name='hundred/hundred_litigant_list.html'),
+    url(r'^(?P<pk>\d+)/litigant_list$', TemplateView.as_view(template_name='hundred/litigant_list.html'),
         name='litigants'),
-    url(r'^(?P<pk>\d+)/village_list$', views.CaseListView.as_view(template_name='hundred/hundred_village_list.html'),
+    url(r'^(?P<pk>\d+)/village_list$', TemplateView.as_view(template_name='hundred/village_list.html'),
         name='villages'),
     url(r'^list/$', views.HundredListView.as_view(template_name='hundred/_hundred_list.html'),
         name='list'),
@@ -81,10 +88,10 @@ hundred_urls = [
 
 land_urls = [
     url(r'^(?P<pk>\d+)/$', views.LandDetailView.as_view(template_name='land/_land_detail.html'), name='detail'),
-    url(r'^(?P<pk>\d+)/tenants', views.LandDetailView.as_view(template_name='land/tenant_history.html'), name='tenants'),
-    url(r'^(?P<pk>\d+)/split_history', views.LandDetailView.as_view(template_name='land/land_split_history.html'),
+    url(r'^(?P<pk>\d+)/tenants', TemplateView.as_view(template_name='land/tenant_history.html'), name='tenants'),
+    url(r'^(?P<pk>\d+)/split_history', TemplateView.as_view(template_name='land/split_history.html'),
         name='split_history'),
-    url(r'^(?P<pk>\d+)/case_history', views.LandDetailView.as_view(template_name='land/land_case_history.html'),
+    url(r'^(?P<pk>\d+)/case_history', TemplateView.as_view(template_name='land/case_history.html'),
         name='cases'),
 ]
 
@@ -116,8 +123,10 @@ person_detail_urls = [
         name='pledges'),
     url(r'^(?P<pk>\d+)/position_list', TemplateView.as_view(template_name='person/position_list.html'),
         name='positions'),
-    url(r'^(?P<pk>\d+)/relationship_list', TemplateView.as_view(template_name='person/relationship_list.html'),
+    url(r'^(?P<pk>\d+)/relationship_list', views.RelationshipList.as_view(),
         name='relationships'),
+    url(r'^(?P<pk>\d+)/add_relationship/$', views.RelationshipAddView,
+        name='add_relationship'),
     url(r'^list/$', views.PeopleListView.as_view(template_name='person/_person_list.html'),
         name='list'),
     url(r'^add/$', views.PersonAddView.as_view(),
@@ -136,6 +145,11 @@ record_urls = [
     url(r'^(?P<pk>\d+)/edit/$', views.RecordEditView.as_view(), name='edit'),
     url(r'^(?P<pk>\d+)/delete/$', views.RecordDeleteView.as_view(), name='delete'),
     url(r'^list/$', views.RecordListView.as_view(template_name='record/_record_list.html'), name='list'),
+]
+
+relationship_urls = [
+    url(r'^(?P<pk>\d+)/edit/$', views.RelationshipEditView,
+        name='edit'),
 ]
 
 session_urls = [
@@ -169,7 +183,6 @@ village_urls = [
         name='sessions'),
     url(r'^list/$', views.VillageListView.as_view(template_name='village/_village_list.html'),
         name='list'),
-
 ]
 
 # consolidation of detail views.
@@ -185,6 +198,9 @@ urlpatterns = [
     url(r'^record/', include(record_urls, namespace='record')),
     url(r'^session/', include(session_urls, namespace='session')),
     url(r'^village/', include(village_urls, namespace='village')),
+    url(r'^relationship/', include(relationship_urls, namespace='relationship')),
     url(r'^analysis/', include(analysis_urls)),
-    url(r'^case_test/', views.nested_test)
+    url(r'^case_test/', views.nested_test),
+    url(r'^autocomplete/', include(autocomplete_urls, namespace='autocomplete')),
+    url(r'^relationship_fix/', TemplateView.as_view(template_name='analysis/relationships.html'))
 ]

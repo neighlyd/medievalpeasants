@@ -1,0 +1,114 @@
+<div class="card">
+    <div class="card-header">
+        <h3 class="text-center">Case History</h3>
+
+    </div>
+
+    <div class="card-body">
+        <table class="table table-bordered table-hover" id="case_table" data-ajax="{% url 'api:case-list' %}?land_id={{ view.kwargs.pk }}&expand=session,litigants&keep=summary,litigants&format=datatables" data-page-length="10">
+            <thead>
+                <th></th>
+                <th>Case</th>
+                <th>Village</th>
+                <th>Session</th>
+                <th>Court</th>
+                <th>Case Type</th>
+                <th>Verdict</th>
+                <th>Litigants</th>
+            </thead>
+        </table>
+    </div>
+
+</div>
+<script>
+
+    var format_litigants = function(data){
+        var cell = "<ul class='list-group list-group-flush'>";
+        $.each(data, function(index, item){
+            var url = Urls['person:detail'](item.person.id);
+            cell = cell + "<li class='list-group-item'><a href='" + url + "'>" + item.person.full_name + "</a></li>";
+        });
+        cell = cell + "</ul>";
+        return cell;
+    };
+
+    var format_notes = function format( data ) {
+        console.log(data);
+        return "<table class='table'>" +
+            "<tr>" +
+            "<td><b>Litigants:</b></td>" +
+            "<td>" + format_litigants(data.litigants) + "</td>" +
+            "</tr>" +
+            "<tr>" +
+            "<td><b>Summary:</b></td>" +
+            "<td>"+data.summary+"</td>" +
+            "</tr>" +
+        "</table>"
+    };
+
+    var case_table = $('#case_table').DataTable({
+        serverSide: true,
+        order: [3, "asc"],
+        columns: [
+            {
+                class: "details-control",
+                orderable: "false",
+                data: "litigant_list",
+                defaultContent: "",
+                render: checkNotes,
+                width: "15px"
+            },
+            {data: "id",
+                render:{
+                    display: function(data, type, row){
+                        var url = Urls['case:detail'](data);
+                        return "<a href='" + url + "'>" + data + "</a>";
+                    }
+                }
+            },
+            {data: "session.village.name",
+                render:{
+                    display: function(data, type, row){
+                        var url = Urls['village:detail'](row.session.village.id);
+                        return "<a href='" + url + "'>" + data + "</a>";
+                    }
+                }
+            },
+            {data: "session.date",
+                render:{
+                    display: function(data, type, row){
+                        var url = Urls['session:detail'](row.session.id);
+                        return "<a href='" + url + "'>" + row.session.law_term + ", " + row.session.year + "</a>";
+                    }
+                }
+            },
+            {data: "court_type",
+                searchable: false,
+                orderable: false,
+            },
+            {data: "case_type.case_type"},
+            {data: "verdict.verdict"},
+            {data: "litigant_count"},
+        ]
+    });
+
+    $('#case_table').on('click', 'td.details-control', function(){
+        var tr = $(this).closest('tr');
+        var tdi = tr.find('#check');
+        var row = case_table.row( tr );
+        if (tdi.prop('style').color !== 'gray'){
+            if ( row.child.isShown()) {
+                row.child.hide();
+                tr.removeClass('shown');
+                tdi.first().removeClass('fa-minus-square');
+                tdi.first().addClass('fa-plus-square');
+            } else {
+                row.child( format_notes( row.data() ) ).show();
+                tr.addClass('shown');
+                tdi.first().removeClass('fa-plus-square');
+                tdi.first().addClass('fa-minus-square');
+            }
+        }
+    });
+
+</script>

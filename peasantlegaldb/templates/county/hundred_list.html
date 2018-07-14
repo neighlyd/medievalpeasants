@@ -1,0 +1,81 @@
+<div class="card-header">
+    <h3 class="text-center">Hundred List</h3>
+</div>
+<div class="card-body">
+        <table class="table table-bordered table-hover" id="hundred_table" data-ajax="{% url 'api:hundred-list' %}?county={{ view.kwargs.pk }}&expand=villages&format=datatables" data-page-length="10">
+            <thead>
+                <th>Vill List</th>
+                <th>Hundred</th>
+                <th>Vill Count</th>
+            </thead>
+        </table>
+</div>
+
+<script>
+
+    var format_vill_list = function format(data){
+        var cell = "<table class='table'>";
+        var vill = '';
+        console.log(data.villages);
+        $.each(data.villages, function(index, item){
+            var vill_url = Urls['village:detail'](item.id);
+            vill = vill +
+                "<tr>" +
+                "<td><b>Vill</b></td>" +
+                "<td>" + "<a href='" + vill_url + "'>" + item.name + "</a></td>" +
+                "</tr>"
+        });
+        cell = cell + vill + "</table>";
+        return cell
+    };
+
+    var hundred_table = $("#hundred_table").DataTable({
+        serverSide: true,
+        order: [1, 'asc'],
+        columns: [
+            {
+                class: 'details-control',
+                orderable: false,
+                data: 'villages',
+                defaultContent: '',
+                render: checkNotes,
+                width:'15px',
+                orderable: false,
+            },
+            {data: "name",
+                render: {
+                    display: function(data, type, row){
+                        var url = Urls['hundred:detail'](row.id);
+                        return "<a href='"+ url +"'>" + data + "</a>";
+
+                    }
+                }
+            },
+            {data: "counts.village",
+                searchable: false,
+                orderable: false,
+            }
+        ]
+    });
+
+        // Used to activate the + expansion and trigger the format function.
+    $('#hundred_table').on('click', 'td.details-control', function(){
+        var tr = $(this).closest('tr');
+        var tdi = tr.find('#check');
+        var row = hundred_table.row( tr );
+        if (tdi.prop('style').color !== 'gray'){
+            if ( row.child.isShown()) {
+                row.child.hide();
+                tr.removeClass('shown');
+                tdi.first().removeClass('fa-minus-square');
+                tdi.first().addClass('fa-plus-square');
+            } else {
+                row.child( format_vill_list( row.data() ) ).show();
+                tr.addClass('shown');
+                tdi.first().removeClass('fa-plus-square');
+                tdi.first().addClass('fa-minus-square');
+            }
+        }
+    });
+
+</script>

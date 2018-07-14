@@ -1,7 +1,7 @@
 <div class="card">
     <h3 class="card-header text-center">Mentioned Here</h3>
     <div class="card-body">
-            <table class="table table-bordered table-hover" id="mentioned_here_table" data-ajax="{% url 'api:places-mentioned-list' %}?related_to={{ view.kwargs.pk }}&expand=case,village&format=datatables" data-page-length="25">
+            <table class="table table-bordered table-hover" id="mentioned_here_table" data-ajax="{% url 'api:places-mentioned-list' %}?related_to={{ view.kwargs.pk }}&expand=case,village&format=datatables" data-page-length="10">
                 <thead>
                     <th></th>
                     <th>Village</th>

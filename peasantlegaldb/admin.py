@@ -32,6 +32,7 @@ class CaseInline(admin.TabularInline):
 
 class PeopleInline(admin.TabularInline):
     model = Person
+    queryset = Person.objects.all().order_by('last_name').select_related('village')
     extra = 1
     classes = ['collapse']
 

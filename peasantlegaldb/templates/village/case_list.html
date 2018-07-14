@@ -1,7 +1,7 @@
 <div class="card">
     <h3 class="card-header text-center">Case List</h3>
     <div class="card-body">
-            <table class="table table-bordered table-hover" id="case_table" data-ajax="{% url 'api:case-list' %}?village={{ view.kwargs.pk }}&expand=counts,session&format=datatables" data-page-length="25">
+            <table class="table table-bordered table-hover" id="case_table" data-ajax="{% url 'api:case-list' %}?village={{ view.kwargs.pk }}&expand=counts,session&format=datatables" data-page-length="10">
                 <thead>
                     <th></th>
                     <th>Case</th>
@@ -53,11 +53,11 @@
                     }
                 }
             },
-            {data: 'session',
+            {data: 'session.date',
                 searchable: false,
                 render: {
                     display: function(data, type, row){
-                        var url = Urls['session:detail'](data);
+                        var url = Urls['session:detail'](row.session.id);
                         return '<a href="' + url + '">' + row.session.law_term + ", " + row.session.year + "</a>";
                     }
                 }

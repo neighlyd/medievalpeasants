@@ -9,7 +9,11 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit, Layout, Fieldset, Div, HTML, Field, Row, Button
 from crispy_forms.bootstrap import StrictButton
 
+from dal import autocomplete
 
+
+class Row(Div):
+    css_class = 'form-row'
 
 class PersonFilterForm(forms.Form):
     select_village = forms.ChoiceField(
@@ -237,6 +241,13 @@ class PersonForm(forms.ModelForm):
             'tax_1332': _('1332 Poll Tax'),
             'tax_1379': _('1379 Poll Tax'),
         }
+        widgets = {
+            'village': autocomplete.ModelSelect2(url='autocomplete:village',
+                                                 attrs={
+                                                     'data-placeholder': 'Select Village',
+                                                     'data-theme': 'bootstrap4',
+                                                 })
+        }
 
 class LitigantForm(forms.ModelForm):
 
@@ -309,6 +320,77 @@ class AmercementFormsetHelper(FormHelper):
             'amercement',
         )
 
+
+class AddRelationshipForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        super(AddRelationshipForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_tag = False
+        self.helper.form_id = 'add-relationship-form'
+        self.helper.layout = Layout(
+            Row(
+                'person_two',
+            ),
+            Row(
+                Field('relationship', wrapper_class='col-md-6'),
+                Field('confidence', wrapper_class='col-md-5'),
+            )
+        )
+
+    class Meta:
+        model = models.Relationship
+        fields = ['person_two', 'relationship', 'confidence']
+        widgets = {
+            'person_two': autocomplete.ModelSelect2(url='autocomplete:person',
+                                                    attrs={
+                                                        'data-placeholder': 'Type a name',
+                                                        'data-theme': 'bootstrap4'
+                                                        }
+                                                    ),
+        }
+
+
+class EditRelationshipForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        super(EditRelationshipForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_tag = False
+        self.helper.form_id = 'edit-relationship-form'
+        self.helper.layout = Layout(
+            Row(
+                Field('person_one', wrapper_class='col-md-5'),),
+            Row(
+                Field('person_two', wrapper_class='col-md-5'),
+            ),
+            Row(
+                Field('relationship', wrapper_class='col-md-6'),
+                Field('confidence', wrapper_class='col-md-5'),
+            ),
+        )
+
+    class Meta:
+        model = models.Relationship
+        queryset = models.Relationship.objects.all().\
+            prefetch_related('person_one__village', 'person_two__village', 'relationship')
+        fields = ['person_one', 'person_two', 'relationship', 'confidence']
+        widgets = {
+            'person_one': autocomplete.ModelSelect2(url='autocomplete:person',
+                                                    attrs={
+                                                        'data-placeholder': 'Type a name',
+                                                        'data-theme': 'bootstrap4'
+                                                        }
+                                                    ),
+            'person_two': autocomplete.ModelSelect2(url='autocomplete:person',
+                                                    attrs={
+                                                        'data-placeholder': 'Type a name',
+                                                        'data-theme': 'bootstrap4'
+                                                        }
+                                                    ),
+        }
+
+
 # inline formsets
 
 AmercementFormset = inlineformset_factory(models.Litigant, models.Amercement,
@@ -343,3 +425,13 @@ LandFormset = inlineformset_factory(models.Litigant, models.LandtoCase,
 PledgeFormset = inlineformset_factory(models.Litigant, models.Pledge,
                                       fields=('giver',),
                                       extra=1, can_delete=True)
+
+Relationship1Formset = inlineformset_factory(models.Person, models.Relationship,
+                                             fk_name='person_one',
+                                             fields=('person_two', 'confidence', 'relationship'),
+                                             extra=1, can_delete=True)
+
+Relationship2Formset = inlineformset_factory(models.Person, models.Relationship,
+                                             fk_name='person_two',
+                                             fields=('person_one', 'confidence', 'relationship'),
+                                             extra=1, can_delete=True)

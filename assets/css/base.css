@@ -183,6 +183,6 @@ tr.shown td.details-control {
   changing modal size.
  */
 
-.case-modal {
+.editing-modal {
   max-width: 85%;
 }

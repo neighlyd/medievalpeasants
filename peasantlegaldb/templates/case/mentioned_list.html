@@ -19,35 +19,33 @@
     var mentioned_table = $("#mentioned_table").dataTable({
         serverSide: true,
         columns:[
-            {data: 'village.name'},
-            {data: 'village.county.name'},
-            {data: 'village.great_rumor',
-                defaultContent: false,
-                searchable: false,
-                orderable: false,
+            {data: 'village.name',
                 render:{
-                    display: function(data){
-                        if (data){
-                            return "<i class='fas fa-check' style='color:forestgreen'></i>";
-                        } else {
-                            return "";
-                        }
+                    display: function(data, type, row){
+                        var url = Urls['village:detail'](row.village.id);
+                        return "<a href='" + url + "'>" + data + "</a>";
                     }
                 }
             },
-            {data: 'village.ancient_demesne',
-                defaultContent: false,
-                searchable: false,
-                orderable: false,
+            {data: 'village.county.name',
                 render:{
-                    display: function(data){
-                        if (data){
-                            return "<i class='fas fa-check' style='color:forestgreen'></i>";
-                        } else {
-                            return "";
-                        }
+                    display: function(data, type, row){
+                        var url = Urls['county:detail'](row.village.county.id);
+                        return "<a href='" + url + "'>" + data + "</a>";
                     }
                 }
+            },
+            {data: 'village.great_rumor',
+                defaultContent: '',
+                searchable: false,
+                orderable: false,
+                render: checkMaker,
+            },
+            {data: 'village.ancient_demesne',
+                defaultContent: '',
+                render: checkMaker,
+                searchable: false,
+                orderable: false,
             },
             {data: 'village.counts.session',
                 searchable: false,

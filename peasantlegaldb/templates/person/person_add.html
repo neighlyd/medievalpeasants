@@ -30,11 +30,7 @@
                         <div class="card p-0 col-lg-5">
                             <h3 class="card-header">Person Info:</h3>
                                 <div class="card-body">
-                                    {% for field in form %}
-                                        {% if field.name != 'notes' %}
-                                            {{ field | as_crispy_field }}
-                                        {% endif %}
-                                    {% endfor %}
+                                    {% crispy form %}
                                 </div>
                         </div>
                         <div class="card p-0 col-lg-6">

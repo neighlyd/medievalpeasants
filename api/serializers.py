@@ -243,7 +243,8 @@ class HundredSerializer(FlexFieldsModelSerializer):
         fields = ('id', 'name', 'counts', 'county')
 
     expandable_fields = {
-        'county': (CountySerializer, {'source': 'county', 'fields': ['id', 'name']})
+        'county': (CountySerializer, {'source': 'county', 'fields': ['id', 'name']}),
+        'villages': ('api.VillageSerializer', {'source': 'village_set', 'many': True, 'fields': ['id', 'name']})
     }
 
     @staticmethod
@@ -338,7 +339,6 @@ class PersonSerializer(FlexFieldsModelSerializer):
 
     # Use ReadOnlyField to pull in model functions:
     # https://stackoverflow.com/questions/24233988/django-serializer-method-field
-    full_name = serializers.SerializerMethodField()
     gender_display = serializers.ReadOnlyField()
     status_display = serializers.ReadOnlyField()
 
@@ -356,10 +356,6 @@ class PersonSerializer(FlexFieldsModelSerializer):
                                                       'fields': ['case', 'role'],
                                                       'expand': ['case']}),
     }
-
-    @staticmethod
-    def get_full_name(record):
-        return record.full_name
 
     @staticmethod
     def get_counts(record):
@@ -446,12 +442,13 @@ class CaseSerializer(FlexFieldsModelSerializer):
 
     expandable_fields = {
         'session': (SessionSerializer, {'source': 'session', 'expand': ['village'],
-                                        'fields': ['id', 'human_date', 'law_term', 'village', 'year']}),
+                                        'fields': ['id', 'human_date', 'law_term', 'village', 'year', 'date']}),
         'cornbot': (CornbotSerializer, {'source': 'cornbot', 'many': True, 'expand': ['crop_type', 'price']}),
         'extrahura': (ExtrahuraSerializer, {'source': 'extrahura', 'many': True, 'expand': ['animal', 'price']}),
         'murrain': (MurrainSerializer, {'source': 'murrain', 'many': True, 'expand': ['animal']}),
         'placementioned_set': (PlaceMentionedSerializer, {'source': 'placementioned_set', 'many': True,
-                                                        'expand': ['village']})
+                                                        'expand': ['village']}),
+        'litigants': ('api.LitigantSerializer', {'source': 'litigants', 'many': True, 'expand': ['person']})
     }
 
     @staticmethod
@@ -492,6 +489,7 @@ class LandSerializer(FlexFieldsModelSerializer):
 
 
 class LandSplitSerializer(FlexFieldsModelSerializer):
+
     class Meta:
         model = models.LandSplit
         fields = ('id', 'old_land', 'new_land')
@@ -526,7 +524,7 @@ class LitigantSerializer(FlexFieldsModelSerializer):
 
     expandable_fields = {
         'case': (CaseSerializer, {'source': 'case', 'expand': ['session']}),
-        'person': (PersonSerializer, {'source': 'person'}),
+        'person': (PersonSerializer, {'source': 'person', 'expand': ['village']}),
         'amercements': (AmercementSerializer, {'source': 'amercements', 'many': True, 'expand': ['amercement']}),
         'capitagia': (CapitagiumSerializer, {'source': 'capitagia', 'many': True, 'expand': ['capitagium']}),
         'damages': (DamageSerializer, {'source': 'damages', 'many': True, 'expand': ['damage']}),
@@ -569,6 +567,7 @@ class PositionSerializer(FlexFieldsModelSerializer):
 class RelationshipSerializer(FlexFieldsModelSerializer):
 
     relationship = RelationSerializer()
+    confidence = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Relationship
@@ -577,4 +576,22 @@ class RelationshipSerializer(FlexFieldsModelSerializer):
     expandable_fields = {
         'person_one': (PersonSerializer, {'source': 'person_one'}),
         'person_two': (PersonSerializer, {'source': 'person_two'}),
+    }
+
+    @staticmethod
+    def get_confidence(record):
+        return record.get_confidence_display()
+
+
+class LandtoCaseSerializer(FlexFieldsModelSerializer):
+    role = RoleSerializer()
+
+    class Meta:
+        model = models.LandtoCase()
+        fields = '__all__'
+
+    expandable_fields = {
+        'land': (LandSerializer, {'source': 'land'}),
+        'litigant': (LitigantSerializer, {'source': 'litigant', 'expand': ['person', 'case']}),
+        'case': (CaseSerializer, {'source': 'case'}),
     }

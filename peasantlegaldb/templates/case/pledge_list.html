@@ -17,11 +17,10 @@
        serverSide: true,
        columns:[
            {data: 'giver.full_name',
-               name: 'giver.first_name, giver.relation_name, giver.last_name',
                render:{
                     display: function(data, type, row, meta){
                         var url = Urls['person:detail'](row.giver.id);
-                        return "<a href='" + url + "'>" + row.giver.full_name + "</a>";
+                        return "<a href='" + url + "'>" + data + "</a>";
                     }
                 }
            },
@@ -34,7 +33,6 @@
                orderable: false,
            },
            {data: 'receiver.person.full_name',
-               name: 'receiver.person.first_name, receiver.person.relation_name, receiver.person.last_name',
                render:{
                     display: function(data, type, row, meta) {
                         var url = Urls['person:detail'](row.receiver.person.id);

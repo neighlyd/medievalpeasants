@@ -15,7 +15,6 @@ $(function(){
     };
 
     var saveForm = function(){
-        console.log('bing!');
         var form = $(this);
         $.ajax({
             url: form.attr('action'),
@@ -65,7 +64,7 @@ $(function(){
                     $('#modal-delete-litigant .modal-content').html(data.html_form);
                 }
             }
-        })
+        });
     return false
     };
 

@@ -5,12 +5,12 @@
 {% endblock %}
 
 {% block left_sidebar %}
-    <div id="selection_list">
-        <a class="list-group-item list-group-item-action" href="{% url 'county:villages' county.id %}">Villages</a>
-        <a class="list-group-item list-group-item-action" href="{% url 'county:cases' county.id %}">Cases</a>
-        <a class="list-group-item list-group-item-action" href="{% url 'county:residents' county.id %}">Known Residents</a>
-        <a class="list-group-item list-group-item-action" href="{% url 'county:residents' county.id %}">Litigants</a>
-        <a class="list-group-item list-group-item-action" href="{% url 'county:hundreds' county.id %}">Hundreds</a>
+    <div class="list-group" id="selection_list" role="tablist">
+        <a class="list-group-item list-group-item-action active" href="#village_list" data-url="{% url 'county:villages' county.id %}" role="tab" data-toggle="list">Villages</a>
+        <a class="list-group-item list-group-item-action" href="#case_list" data-url="{% url 'county:cases' county.id %}" role="tab" data-toggle="list">Cases</a>
+        <a class="list-group-item list-group-item-action" href="#resident_list" data-url="{% url 'county:residents' county.id %}" role="tab" data-toggle="list">Known Residents</a>
+        <a class="list-group-item list-group-item-action" href="#litigant_list" data-url="{% url 'county:litigants' county.id %}" role="tab" data-toggle="list">Litigants</a>
+        <a class="list-group-item list-group-item-action" href="#hundred_list" data-url="{% url 'county:hundreds' county.id %}" role="tab" data-toggle="list">Hundreds</a>
     </div>
 {% endblock %}
 
@@ -35,8 +35,12 @@
 
 <br>
 
-<div id="list_info">
-
+<div class="tab-content" id="list_info">
+    <div class="tab-pane show active fade" id="village_list" role="tabpanel">{% include 'county/village_list.html' %}</div>
+    <div class="tab-pane fade" id="case_list" role="tabpanel"></div>
+    <div class="tab-pane fade" id="resident_list" role="tabpanel"></div>
+    <div class="tab-pane fade" id="litigant_list" role="tabpanel"></div>
+    <div class="tab-pane fade" id="hundred_list" role="tabpanel"></div>
 </div>
 
 {% endblock %}
@@ -70,7 +74,7 @@
 {% block scripts %}
 
     {{ block.super }}
-    <script type="text/javascript" src="http://nls.tileserver.com/api.js"></script>
+    <script type="text/javascript" src="https://nls.tileserver.com/api.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB51yaYfTmJNUIlZCpIr0HU4m11Hmd7Y9E"></script>
 
     <script>
@@ -95,8 +99,8 @@
             // get lat and lng from API.
             var url = window.location.pathname;
             var id = url.split('/').reverse()[1];
-            url = Urls["api:village-list"]();
-            var villages_url = url + "?&include[]=counts&filter{county.id}=" + id;
+            var api_url = Urls["api:village-list"]();
+            var villages_url = api_url + "?county=" + id;
 
             var locationObject = $.ajax({
                 url: villages_url,
@@ -106,7 +110,7 @@
             }).responseJSON;
 
             // because Dynamic-Rest nests the data one-level deep, strip out the '{ villages:{' layer.
-            locationObject = locationObject.villages;
+            locationObject = locationObject.results;
 
             var countyName = $("#county_name").text();
 
@@ -196,16 +200,32 @@
         }
 
         google.maps.event.addDomListener(window, 'load', initialize);
+
+
     </script>
 
-
-    <!--
     <script>
-        $(document).ready(function(){
-             var url = window.location.pathname;
-            var id = url.split('/').reverse()[1]
-            $("#list_info").load(Urls['session:cases'](id))
+         $(document).ready(function(){
+            $("#selection_list").on('click', 'a', function(e){
+               e.preventDefault();
+               var url = $(this).attr("data-url");
+
+               if (typeof url !== "undefined"){
+                   var pane = $(this), href = this.hash;
+
+                   $(href).load(url, function(result){
+                       pane.tab('show');
+                   });
+               } else {
+                   $(this).tab('show');
+               }
+            });
+
+            $('a[data-toggle="tab"').on('shown.bs.tab', function(e){
+                $.fn.dataTable.tables({visible: true, api: true}).columns.adjust().responsive.recalc();
+            });
         })
+
     </script>
-    -->
+
 {% endblock %}

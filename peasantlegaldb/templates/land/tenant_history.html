@@ -1,135 +1,96 @@
-{% extends '_layout/_l_single_col.html' %}
-
-{% block single_col %}
 <div class="card">
-    <h3 class="card-header text-center">Tenant History</h3>
+    <div class="card-header">
+        <h3 class="text-center">Tenant History</h3>
+    </div>
 
-    <div class="card">
-        <table class="table table-bordered table-hover" id="tenant_history" data-page-length="25">
+    <div class="card-body">
+        <table class="table table-bordered table-hover" id="tenant_table" data-ajax="{% url 'api:landtocase-list' %}?land={{ view.kwargs.pk }}&expand=litigant&format=datatables" data-page-length="10">
             <thead>
                 <th></th>
                 <th>Name</th>
-                <th>Village</th>
-                <th>Case</th>
-                <th>Session</th>
                 <th>Role</th>
                 <th>Villeinage?</th>
-                <th>Fine</th>
-                <th>Heriot</th>
-                <th>Notes</th>
+                <th>Session</th>
+                <th>Case</th>
             </thead>
         </table>
     </div>
 
 </div>
-
-{% endblock %}
-
-{% block scripts %}
-{{ block.super }}
-
 <script>
 
-        function format( data ){
-        return format_person_subdata(data)
+    var format_notes = function format( data ) {
+        return "<table class='table'>" +
+            "<tr>" +
+            "<td>Notes</td>" +
+            "<td>" + data.litigant.case.summary + "</td>" +
+            "</tr>" +
+        "</table>"
     }
 
-    $(document).ready(function() {
-        var url = window.location.pathname;
-        var id = url.split('/').reverse()[1];
-        url = Urls['api:litigant-list']();
-        var url = url + "?include[]=land&filter{land.id}=" + id + "&include[]=person.village&include[]=case.session&include[]=person.counts&include[]=person.earliest_case.session.village&include[]=person.latest_case.session.village";
-        var table = $('#tenant_history').DataTable({
-            scrollX: true,
-            hideEmptyCols: true,
-            ajax: {
-                processing: true,
-                url: url,
-                type: "GET",
-                dataSrc: "litigants.",
+    var tenant_table = $('#tenant_table').DataTable({
+        serverSide: true,
+        order: [[4, "asc"]],
+        "columns": [
+            {
+                class: "details-control",
+                orderable: "false",
+                data: 'litigant.case.summary',
+                defaultContent: "",
+                render: checkNotes,
+                width: "15px"
             },
-            order: [[4, "asc"]],
-            "columns": [
-                {
-                    "class": "details-control",
-                    "orderable": "false",
-                    "data": null,
-                    "defaultContent": "",
-                    "render": function () {
-                        return '<i class="fa fa-plus-square" aria-hidden="true"></i>';
+            {data: "litigant.person.full_name",
+                render: {
+                    display: function (data, type, row) {
+                        url = Urls['person:detail'](row.litigant.person.id);
+                        return "<a href='" + url + "'>" + data + " (" + row.litigant.person.village.name + ")</a>";
                     },
-                    width: "15px"
+                }
+            },
+            {data: 'role.role'},
+            {data: 'litigant.case.villeinage_mention',
+                render: {
+                    display: checkMaker,
                 },
-                {data: "person",
-                    render: {
-                        display: function (data, type, row, col) {
-                            url = Urls['person:detail'](data.id);
-                            return "<a href='" + url + "'>" + data.full_name + "</a>";
-                        },
-                        sort: "full_name",
+                width: '15px',
+            },
+            {data: 'litigant.case.session.date',
+                render: {
+                    display: function(data, type, row){
+                        var url = Urls['session:detail'](row.litigant.case.session.id);
+                        return "<a href='" + url + "'>" + row.litigant.case.session.law_term + ", " + row.litigant.case.session.year + "</a>";
                     }
-                },
-                {data: "person.village.name"},
-                {data: "case",
-                    render: {
-                        display: function(data, type, row, col) {
-                            url = Urls['case:detail'](data.id);
-                            return "<a href='" + url + "'>" + data.id + "</a>";
-                        },
-                        sort: "session.date"
+                }
+            },
+            {data: 'litigant.case.id',
+                render: {
+                    display: function(data, type, row){
+                        var url = Urls['case:detail'](data);
+                        return "<a href='" + url + "'>" + data + "</a>";
                     }
-                },
-                {data: "case.session",
-                    defaultContent: '',
-                    render: {
-                        display: formatSessionDateNoVillage,
-                        sort: "date"
-                    }
-                },
-                {data: "role.role"},
-                {data: "land_villeinage",
-                    defaultContent: '',
-                    render: {
-                        display: checkMaker,
-                    }
-                },
-                {data: "fine",
-                    defaultContent: '',
-                    render: {
-                        display: formatMoney,
-                        sort: 'in_denarius'
-                    },
-                },
-                {data: "heriot",
-		            defaultContent: '',
-                    render: {
-                        display: formatMoney,
-                        sort: 'in_denarius'
-                    },
-                },
-                {data: "land_notes"},
-            ]
-        });
+                }
+            },
+        ]
+    });
 
-        $('#tenant_history tbody').on('click', 'td.details-control', function(){
-            var tr = $(this).closest('tr');
-            var tdi = tr.find("i.fa");
-            var row = table.row( tr );
-
-            if ( row.child.isShown() ) {
+    $('#tenant_table').on('click', 'td.details-control', function(){
+        var tr = $(this).closest('tr');
+        var tdi = tr.find('#check');
+        var row = tenant_table.row( tr );
+        if (tdi.prop('style').color !== 'gray'){
+            if ( row.child.isShown()) {
                 row.child.hide();
                 tr.removeClass('shown');
                 tdi.first().removeClass('fa-minus-square');
                 tdi.first().addClass('fa-plus-square');
-            } else{
-                row.child( format( row.data() ) ).show();
+            } else {
+                row.child( format_notes( row.data() ) ).show();
                 tr.addClass('shown');
                 tdi.first().removeClass('fa-plus-square');
                 tdi.first().addClass('fa-minus-square');
             }
-        });
-
+        }
     });
-</script>
 
-{% endblock %}
+</script>

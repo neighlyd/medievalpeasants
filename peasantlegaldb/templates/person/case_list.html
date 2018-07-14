@@ -85,7 +85,7 @@
     });
 
     // Used to activate the + expansion and trigger the format function.
-     $('#case_list_table').on('click', 'td.details-control', function(){
+    $('#case_list_table').on('click', 'td.details-control', function(){
         var tr = $(this).closest('tr');
         var tdi = tr.find('#check');
         var row = case_list_table.row( tr );

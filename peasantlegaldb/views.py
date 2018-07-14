@@ -1,6 +1,6 @@
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import UpdateView, CreateView, DeleteView, FormView
-from django.views.generic import ListView
+from django.views.generic import ListView, TemplateView
 
 from django.shortcuts import render, get_object_or_404, redirect
 from django.template.loader import render_to_string
@@ -12,7 +12,7 @@ from django.core.urlresolvers import resolve
 from django.http import HttpResponseRedirect
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
-from braces.views import GroupRequiredMixin
+from braces.views import GroupRequiredMixin, AjaxResponseMixin
 
 from . import models
 from . import forms
@@ -832,7 +832,6 @@ class PersonEditView(GroupRequiredMixin, UpdateView):
     model = models.Person
     form_class = forms.PersonForm
     template_name = 'person/person_edit.html'
-
     group_required = Edit
 
 
@@ -965,7 +964,7 @@ class ChevageAnalysisListView(ListView):
 
     model = models.Person
     queryset = models.Person.objects.all().filter(cases__chevage__isnull=False).distinct()\
-        .prefetch_related('cases__case__session','village').order_by('last_name', 'first_name')
+        .select_related('cases__case__session','village').order_by('last_name', 'first_name')
 
     def get_context_data(self, **kwargs):
         context = super(ChevageAnalysisListView, self).get_context_data(**kwargs)
@@ -977,3 +976,77 @@ class ChevageAnalysisListView(ListView):
         context['village'] = village
         context['page_title'] = 'Chevage'
         return context
+
+
+# class RelationshipAddView(GroupRequiredMixin, AjaxResponseMixin, CreateView):
+#     model = models.Person
+#     queryset = models.Relationship.objects.all().select_related('person_two', 'relationship')
+#     template_name = 'person/add_relationship.html'
+#     group_required = Edit
+#     fields = ['person_two', 'relationship', 'confidence']
+#
+#     def get_ajax(self, *args, **kwargs):
+#         context = self.get_context_data(**kwargs)
+#         return render(self.request, self.template_name, context)
+#
+
+class RelationshipList(TemplateView):
+    template_name = 'person/relationship_list.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(RelationshipList, self).get_context_data(**kwargs)
+        context['pk'] = self.kwargs['pk']
+        return context
+
+
+def RelationshipAddView(request, pk):
+
+    data = dict()
+    person_instance = get_object_or_404(models.Person, pk=pk)
+
+    if request.method == 'POST':
+        form = forms.AddRelationshipForm(request.POST)
+        if form.is_valid():
+            new_relationship = form.save(commit=False)
+            new_relationship.person_one = person_instance
+            new_relationship.save()
+            data['form_is_valid'] = True
+        else:
+            data['form_is_valid'] = False
+    else:
+        form = forms.AddRelationshipForm()
+
+    context = {
+        'form': form,
+        'pk': pk,
+    }
+    data['html_form'] = render_to_string('person/add_relationship.html', context, request=request)
+
+    return JsonResponse(data)
+
+
+def RelationshipEditView(request, pk):
+
+    data = dict()
+    relationship_instance = get_object_or_404(models.Relationship, pk=pk)
+
+    if request.method == 'POST':
+        form = forms.EditRelationshipForm(data=request.POST, instance=relationship_instance)
+        if form.is_valid():
+            edit_relationship = form.save(commit=False)
+            edit_relationship.save()
+            data['form_is_valid'] = True
+        else:
+            data['form_is_valid'] = False
+    else:
+        form = forms.EditRelationshipForm(instance=relationship_instance)
+
+    context = {
+        'form': form,
+        'pk': pk,
+    }
+    data['html_form'] = render_to_string('person/edit_relationship.html', context, request=request)
+
+    return JsonResponse(data)
+
+

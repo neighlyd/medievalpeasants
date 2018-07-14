@@ -32,7 +32,7 @@
     var format_parcels = function(data){
         var cell = "";
         $.each(data.land.parcel_list, function(index, item){
-            cell = cell + item.amount + " of " + item.type + " held by " + item.tenure + "<hr>"
+            cell = cell + item.amount + " " + item.type + " held by " + item.tenure + "<hr>"
         });
         return cell
     };

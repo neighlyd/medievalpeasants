@@ -1,10 +1,13 @@
 <div class="card">
-    <h3 class="card-header text-center">Known Litigant List</h3>
+    <div class="card-header">
+        <h3 class="text-center">Known Litigant List</h3>
+    </div>
     <div class="card-body">
-            <table class="table table-bordered table-hover" id="litigant_table" data-ajax="{% url 'api:person-list' %}?village_to_litigant={{ view.kwargs.pk }}&expand=earliest_case,latest_case&format=datatables" data-page-length="10">
+            <table class="table table-bordered table-hover" id="litigant_table" data-ajax="{% url 'api:person-list' %}?hundred_to_litigant={{ view.kwargs.pk }}&expand=session,village,earliest_case,latest_case&format=datatables" data-page-length="10">
                 <thead>
-                    <th></th>
+                    <th>Notes</th>
                     <th>Name</th>
+                    <th>Village</th>
                     <th>Status</th>
                     <th>Gender</th>
                     <th>1332 Tax</th>
@@ -18,7 +21,7 @@
 
 <script>
 
-    var format_notes = function format( data ){
+ var format_notes = function ( data ){
         return "<table class='table'>" +
             "<tr>" +
             "<td><b>Notes</b></td>" +
@@ -27,7 +30,6 @@
             "</table>"
 
     };
-
     var litigant_table = $("#litigant_table").DataTable({
         serverSide: true,
         order: [1, "asc"],
@@ -38,13 +40,20 @@
                 data: "notes",
                 defaultContent: "",
                 render: checkNotes,
-                width: "15px"
+                width:"15px"
             },
-            {
-                data: "full_name",
+            {data: "full_name",
                 render: {
                     display: function (data, type, row) {
                         var url = Urls['person:detail'](row.id);
+                        return "<a href='" + url + "'>" + data + "</a>";
+                    }
+                }
+            },
+            {data: "village.name",
+                render: {
+                    display: function (data, type, row) {
+                        var url = Urls['village:detail'](row.village.id);
                         return "<a href='" + url + "'>" + data + "</a>";
                     }
                 }
@@ -59,30 +68,28 @@
             },
             {data: "tax_1332"},
             {data: "tax_1379"},
-            {data: "earliest_case.id",
-                name: 'earliest_case.session.date',
+            {data: "earliest_case.session.date",
                 defaultContent: '',
-                render:{
-                    display: function(data, type, row){
+                render: {
+                    display: function (data, type, row) {
                         if (data){
-                            var url = Urls['case:detail'](data);
+                            var url = Urls['case:detail'](row.earliest_case.id);
                             return "<a href='" + url + "'>" + row.earliest_case.session.law_term + ", " + row.earliest_case.session.year + "</a>";
                         } else {
-                            return "N/A"
+                            return "N/A";
                         }
                     }
                 }
             },
-            {data: "latest_case.id",
-                name: 'latest_case.session.date',
+            {data: "latest_case.session.date",
                 defaultContent: '',
-                render:{
-                    display: function(data, type, row){
-                        if (data){
-                            var url = Urls['case:detail'](data);
+                render: {
+                    display: function (data, type, row) {
+                        if (data) {
+                            var url = Urls['case:detail'](row.latest_case.id);
                             return "<a href='" + url + "'>" + row.latest_case.session.law_term + ", " + row.latest_case.session.year + "</a>";
                         } else {
-                            return "N/A"
+                            return "N/A";
                         }
                     }
                 }
@@ -90,7 +97,8 @@
         ]
     });
 
-    $('#litigant_table').on('click', 'td.details-control', function(){
+    // Used to activate the + expansion and trigger the format function.
+     $('#litigant_table').on('click', 'td.details-control', function(){
         var tr = $(this).closest('tr');
         var tdi = tr.find('#check');
         var row = litigant_table.row( tr );
@@ -108,7 +116,6 @@
             }
         }
     });
-
 
 
 </script>

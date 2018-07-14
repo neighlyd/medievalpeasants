@@ -1,10 +1,10 @@
 {% extends '_layout/_l_three_col.html' %}
 
-{% block left_sidebar%}
-    <div id="selection_list">
-        <a class="list-group-item active" href="{% url 'land:tenants' land.id %}">Tenant History</a>
-        <a class="list-group-item" href="{% url 'land:cases' land.id %}" >Case History</a>
-        <a class="list-group-item" href="{% url 'land:split_history' land.id %}" >Land Split History</a>
+{% block left_sidebar %}
+    <div class="list-group" id="selection_list" role="tablist">
+        <a class="list-group-item list-group-item-action active" href="#tenant_list" data-url="{% url 'land:tenants' land.id %}" role="tab" data-toggle="list">Tenant History</a>
+        <a class="list-group-item list-group-item-action" href="#case_list" data-url="{% url 'land:cases' land.id %}" role="tab" data-toggle="list">Case History</a>
+        <a class="list-group-item list-group-item-action" href="#split_list" data-url="{% url 'land:split_history' land.id %}" >Land Split History</a>
     </div>
 {% endblock %}
 
@@ -19,14 +19,11 @@
         <div class="card p-0 col-5">
             <h4 class="card-header">Parcels:</h4>
                 <div class="card-body">
-                    <table class="table table-sm">
+                    <ul class="list-group list-group-flush">
                         {% for x in land.parcels.all %}
-                            <tr class="row m-0">
-                                <td class="d-inline-block col-4"><b>Parcel:</b></td>
-                                <td class="d-inline-block col-8">{{ x.amount }} {{ x.parcel_type.parcel_type }} held by {{ x.parcel_tenure.tenure }}</td>
-                            </tr>
+                            <li class="list-group-item">{{ x.amount }} {{ x.parcel_type.parcel_type }} held by {{ x.parcel_tenure.tenure }}</li>
                         {% endfor %}
-                    </table>
+                    </ul>
                 </div>
         </div>
 
@@ -45,8 +42,10 @@
 
 <br>
 
-<div id="list_info">
-
+<div class="tab-content" id="list_info">
+    <div class="tab-pane show active fade" id="tenant_list" role="tabpanel">{% include 'land/tenant_history.html' %}</div>
+    <div class="tab-pane fade" id="case_list" role="tabpanel"></div>
+    <div class="tab-pane fade" id="split_list" role="tabpanel"></div>
 </div>
 
 
@@ -79,14 +78,32 @@
 {% endblock %}
 
 {% block scripts %}
-{{ block.super }}
+
+    {{ block.super }}
 
 <script>
+
     $(document).ready(function(){
-        var url = window.location.pathname;
-        var id = url.split('/').reverse()[1];
-        $("#list_info").load(Urls['land:tenants'](id))
-    })
+        $("#selection_list").on('click', 'a', function(e){
+           e.preventDefault();
+           var url = $(this).attr("data-url");
+
+           if (typeof url !== "undefined"){
+               var pane = $(this), href = this.hash;
+
+               $(href).load(url, function(result){
+                   pane.tab('show');
+               });
+           } else {
+               $(this).tab('show');
+           }
+        });
+
+        $('a[data-toggle="tab"').on('shown.bs.tab', function(e){
+            $.fn.dataTable.tables({visible: true, api: true}).columns.adjust().responsive.recalc();
+        });
+    });
+
 </script>
 
 {% endblock %}

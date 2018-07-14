@@ -214,6 +214,7 @@ class Relation(models.Model):
     class Meta:
         verbose_name = "Relation Type"
         verbose_name_plural = "Relation Types"
+        ordering = ['relation']
 
     relation = models.CharField(max_length=25)
 
@@ -370,6 +371,7 @@ class Person(models.Model):
 
     class Meta:
         verbose_name_plural = "People"
+        ordering = ['last_name', 'relation_name', 'first_name']
 
     STATUS_CHOICES = {
         (1, 'Villein'),
@@ -397,6 +399,7 @@ class Person(models.Model):
     notes = models.TextField(blank=True)
     earliest_case = models.ForeignKey('Case', null=True, blank=True, related_name='person_to_earliest_case+')
     latest_case = models.ForeignKey('Case', null=True, blank=True, related_name='person_to_latest_case+')
+    full_name = models.CharField(max_length=250, null=True, blank=True)
 
     def get_absolute_url(self):
         return reverse('person:detail', args=[str(self.id)])
@@ -544,14 +547,6 @@ class Person(models.Model):
         return data
 
     @property
-    def full_name(self):
-        if self.relation_name:
-            concated_name = self.first_name + ' ' + self.relation_name + ' ' + self.last_name
-        else:
-            concated_name = self.first_name + ' ' + self.last_name
-        return concated_name
-
-    @property
     def status_display(self):
         return self.get_status_display()
 
@@ -559,19 +554,15 @@ class Person(models.Model):
     def gender_display(self):
         return self.get_gender_display()
 
-    @property
-    def name_and_village(self):
+    def save(self, *args, **kwargs):
         if self.relation_name:
-            concated_name = self.first_name + ' ' + self.relation_name + ' ' + self.last_name + ' | ' + self.village.name
+            self.full_name = self.first_name + ' ' + self.relation_name + ' ' + self.last_name
         else:
-            concated_name = self.first_name + ' ' + self.last_name + ' | ' + self.village.name
-        return concated_name
+            self.full_name = self.first_name + ' ' + self.last_name
+        super(Person, self).save(*args, **kwargs)
 
     def __str__(self):
-        if self.relation_name:
-            return self.first_name + ' ' + self.relation_name + ' ' + self.last_name + ' | ' + self.village.name
-        else:
-            return self.first_name + ' ' + self.last_name + ' | ' + self.village.name
+        return self.full_name + ' (' + self.village.name + ')'
 
 
 class Record(models.Model):
@@ -739,7 +730,8 @@ class Case(models.Model):
     def litigant_list(self):
         # iterate through a case's litigant set (litigants) and create a list of dictionaries containing the  name
         # and role for each person.
-        litigant_list = [{"id": person.person.id, "name": person.person.full_name, "role": person.role.role} for person in self.litigants.all()]
+        litigant_list = [{"id": person.person.id, "name": person.person.full_name, "role": person.role.role}
+                         for person in self.litigants.all()]
         return litigant_list
 
     @property
@@ -789,7 +781,10 @@ class Case(models.Model):
         return pledge_exists
 
     def __str__(self):
-        return 'Case %s | %s (%s / %s)' % (self.id, self.session.village.name, self.session.get_law_term_display(), self.session.date.year)
+        return 'Case %s | %s (%s / %s)' % (self.id,
+                                           self.session.village.name,
+                                           self.session.get_law_term_display(),
+                                           self.session.date.year)
 
 
 class Cornbot(models.Model):
@@ -926,6 +921,7 @@ class Damage(models.Model):
     damage = models.ForeignKey(Money)
     notes = models.TextField(blank=True)
 
+
 class Heriot(models.Model):
     litigant = models.ForeignKey(Litigant, on_delete=models.CASCADE, related_name='heriots')
     quantity = models.CharField(max_length=25, blank=True,)
@@ -972,7 +968,7 @@ class LandSplit(models.Model):
     # add Case so I can track timing... I'm an idiot!
 
     def __str__(self):
-        return "Old Land ID %s, New Land ID %s" % (self.old_land, self.new_land)
+        return "Old Land ID {0}, New Land ID {1}".format(self.old_land, self.new_land)
 
 
 class Position(models.Model):
@@ -987,8 +983,25 @@ class Position(models.Model):
 
 
 class Relationship(models.Model):
+
+    CONFIDENCE_LEVEL = [
+        (1, '1 - Low'),
+        (2, '2'),
+        (3, '3 - Medium'),
+        (4, '4'),
+        (5, '5 - High')
+    ]
+
     person_one = models.ForeignKey(Person, on_delete=models.CASCADE, related_name='relationship_person_one')
     person_two = models.ForeignKey(Person, on_delete=models.CASCADE, related_name='relationship_person_two')
     # need to rework so relationships are more descriptive, including when (which case) it was revealed..
     relationship = models.ForeignKey(Relation)
     definitive = models.BooleanField(default=False)
+    confidence = models.IntegerField(null=True, choices=CONFIDENCE_LEVEL)
+
+    @property
+    def confidence_display(self):
+        return self.get_confidence_display()
+
+    def __str__(self):
+        return '{0} - {1} and {2}'.format(self.id, self.person_one.full_name, self.person_two.full_name)

@@ -1,6 +1,6 @@
 <h3 class="card-header text-center">Land</h3>
     <div class="card-body">
-            <table class="table table-bordered table-hover" id="land_table" data-ajax="{% url 'api:land-list' %}?village={{ view.kwargs.pk }}&expand=tenants.litigant.person,tenants.litigant.case&format=datatables&distinct=true">
+            <table class="table table-bordered table-hover" id="land_table" data-ajax="{% url 'api:land-list' %}?village={{ view.kwargs.pk }}&expand=tenants.litigant.person,tenants.litigant.case&format=datatables&distinct=true" data-page-length="5">
                 <thead>
                     <th>History</th>
                     <th>Land ID</th>

@@ -1,0 +1,51 @@
+{% extends '_layout/_l_two_col.html' %}
+
+{% block center_bar %}
+
+    <table class="table table-bordered" id="relationship_table" data-ajax="{% url 'api:relationship-list' %}?confidence=false&expand=person_one,person_two&format=datatables" data-page-length="25">
+        <thead>
+            <th>Person One</th>
+            <th>Person Two</th>
+            <th>Relationship</th>
+            <th>Definitive</th>
+            <th>Confidence</th>
+        </thead>
+    </table>
+
+{% endblock %}
+
+{% block scripts %}
+
+    {{ block.super }}
+    <script>
+
+    $(document).ready(function(){
+        var relationship_table = $('#relationship_table').DataTable({
+          serverSide: true,
+          columns: [
+              {data: 'person_one.full_name',
+                  render:{
+                    display: function(data, type, row){
+                        var url = Urls['person:detail'](row.person_one.id);
+                        return "<a href='" + url + "'>" + data + "</a>";
+                    }
+                  }
+              },
+              {data: 'person_two.full_name',
+                  render:{
+                    display: function(data, type, row){
+                        var url = Urls['person:detail'](row.person_two.id);
+                        return "<a href='" + url + "'>" + data + "</a>";
+                    }
+                  }
+              },
+              {data: 'relationship.relation'},
+              {data: 'definitive'},
+              {data: 'confidence'},
+          ]
+        })
+    });
+
+    </script>
+
+{% endblock %}

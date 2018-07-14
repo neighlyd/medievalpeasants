@@ -1,0 +1,83 @@
+
+<div class="card">
+    <div class="card-header">
+        <h3 class="text-center">Parcel Split History</h3>
+    </div>
+
+    <div class="card-body">
+        <table class="table table-bordered table-hover" id="split_table" data-ajax="{% url 'api:land-split-list' %}?land={{ view.kwargs.pk }}&expand=old_land,new_land&format=datatables" data-page-length="10">
+            <thead>
+                <th>Old Land ID</th>
+                <th>Old Land Parcels</th>
+                <th>Old Land Notes</th>
+                <th>New Land ID</th>
+                <th>New Land Parcels</th>
+                <th>New Land Notes</th>
+            </thead>
+        </table>
+    </div>
+
+</div>
+
+<script>
+    var split_table = $('#split_table').DataTable({
+        serverSide: true,
+        columns: [
+            {data: "old_land",
+                defaultContent: '',
+                render: {
+                    display: function(data, type, row, col){
+                        url = Urls['land:detail'](data.id);
+                        return "<a href='"+ url +"'>" + data.id+ "</a>";
+                    },
+                    sort: "id"
+                }
+            },
+            {data: "old_land.parcel_list",
+                defaultContent: '',
+                render: {
+                    display: list_parcels,
+                }
+            },
+            {data: "old_land.notes"},
+            {data: "new_land",
+                defaultContent: '',
+                render: {
+                    display: function(data, type, row, col){
+                        url = Urls['land:detail'](data.id);
+                        return "<a href='"+ url +"'>" + data.id+ "</a>";
+                    },
+                    sort: "id"
+                }
+            },
+            {data: "new_land.parcel_list",
+                defaultContent: '',
+                render: {
+                    display: list_parcels,
+                }
+            },
+            {data: "new_land.notes"},
+
+        ]
+    });
+
+    $('#split_table').on('click', 'td.details-control', function(){
+        var tr = $(this).closest('tr');
+        var tdi = tr.find('#check');
+        var row = split_table.row( tr );
+        if (tdi.prop('style').color !== 'gray'){
+            if ( row.child.isShown()) {
+                row.child.hide();
+                tr.removeClass('shown');
+                tdi.first().removeClass('fa-minus-square');
+                tdi.first().addClass('fa-plus-square');
+            } else {
+                row.child( format_notes( row.data() ) ).show();
+                tr.addClass('shown');
+                tdi.first().removeClass('fa-plus-square');
+                tdi.first().addClass('fa-minus-square');
+            }
+        }
+    });
+
+</script>

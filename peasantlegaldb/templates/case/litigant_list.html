@@ -112,8 +112,8 @@
 
     var format_parcels = function(data){
         var parcel = "";
-        $.each(data.land.parcel_list, function(index, item){
-            parcel = "<li class='list-group-item'>" + parcel+ item.amount + " of " + item.type + " held by " + item.tenure + "</li>"
+        $.each(data, function(index, item){
+            parcel = parcel + "<li class='list-group-item'>" + item.amount + " " + item.type + " held by " + item.tenure + "</li>"
         });
         return parcel
     };
@@ -122,10 +122,9 @@
         var cell = "<ul class='list-group list-group-flush'>";
         $.each(data, function(index, item){
             var land_url = Urls['land:detail'](item.land.id);
-            var parcels = format_parcels(item.land.parcel_list);
-            cell = cell + "<a href='" + land_url + "'>" + format_parcels(item.land.parcel_list) + "</a>"
+            cell = cell + "<a href='" + land_url + "'>" + format_parcels(item.land.parcel_list)
         });
-        cell = cell + "</table>";
+        cell = cell + "</ul>";
         return cell
     };
 
@@ -138,12 +137,11 @@
             emptyVals: [/(false)/]
         },
         columns:[
-            {data:'person',
-                name: 'person.first_name, person.relation_name, person.last_name',
+            {data:'person.full_name',
                 render: {
                     display: function(data, type, row){
                         url = Urls['person:detail'](row.person.id);
-                        return "<a href='" + url + "'>" + row.person.full_name + "</a>";
+                        return "<a href='" + url + "'>" + data + "</a>";
                     }
                 },
             },

@@ -5,11 +5,11 @@
 {% endblock %}
 
 {% block left_sidebar %}
-    <div id="selection_list">
-        <a class="list-group-item list-group-item-action" href="{% url 'hundred:villages' hundred.id %}">Villages</a>
-        <a class="list-group-item list-group-item-action" href="{% url 'hundred:cases' hundred.id %}">Cases</a>
-        <a class="list-group-item list-group-item-action" href="{% url 'hundred:residents' hundred.id %}">Known Residents</a>
-        <a class="list-group-item list-group-item-action" href="{% url 'hundred:litigants' hundred.id %}">Litigants</a>
+    <div class="list-group" id="selection_list" role="tablist">
+        <a class="list-group-item list-group-item-action active" href="#village_list" data-url="{% url 'hundred:villages' hundred.id %}" role="tab" data-toggle="list">Villages</a>
+        <a class="list-group-item list-group-item-action" href="#case_list" data-url="{% url 'hundred:cases' hundred.id %}" role="tab" data-toggle="list">Cases</a>
+        <a class="list-group-item list-group-item-action" href="#resident_list" data-url="{% url 'hundred:residents' hundred.id %}" role="tab" data-toggle="list">Known Residents</a>
+        <a class="list-group-item list-group-item-action" href="#litigant_list" data-url="{% url 'hundred:litigants' hundred.id %}" role="tab" data-toggle="list">Litigants</a>
     </div>
 {% endblock %}
 
@@ -21,8 +21,11 @@
 
 <br>
 
-<div id="list_info">
-
+<div class="tab-content" id="list_info">
+    <div class="tab-pane show active fade" id="village_list" role="tabpanel">{% include 'hundred/village_list.html' %}</div>
+    <div class="tab-pane fade" id="case_list" role="tabpanel"></div>
+    <div class="tab-pane fade" id="resident_list" role="tabpanel"></div>
+    <div class="tab-pane fade" id="litigant_list" role="tabpanel"></div>
 </div>
 
 {% endblock %}
@@ -56,5 +59,27 @@
 {% block scripts %}
 
     {{ block.super }}
+    <script>
+        $(document).ready(function(){
+            $("#selection_list").on('click', 'a', function(e){
+               e.preventDefault();
+               var url = $(this).attr("data-url");
+
+               if (typeof url !== "undefined"){
+                   var pane = $(this), href = this.hash;
+
+                   $(href).load(url, function(result){
+                       pane.tab('show');
+                   });
+               } else {
+                   $(this).tab('show');
+               }
+            });
+
+            $('a[data-toggle="tab"').on('shown.bs.tab', function(e){
+                $.fn.dataTable.tables({visible: true, api: true}).columns.adjust().responsive.recalc();
+            });
+        });
+    </script>
 
 {% endblock %}

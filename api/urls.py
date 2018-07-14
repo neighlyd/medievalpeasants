@@ -34,6 +34,7 @@ router.register(r'records', api_views.RecordViewSet, base_name='record')
 router.register(r'sessions', api_views.SessionViewSet, base_name='session')
 router.register(r'verdicts', api_views.VerdictViewSet, base_name='verdict')
 router.register(r'villages', api_views.VillageViewSet, base_name='village')
+router.register(r'landtocase', api_views.LandtoCaseViewSet, base_name='landtocase')
 
 urlpatterns = [
     url(r'^', include(router.urls))

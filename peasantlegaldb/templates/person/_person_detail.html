@@ -1,9 +1,5 @@
 {% extends '_layout/_l_three_col.html' %}
 
-{% block navbar %}
-{% include '_layout/__navbar.html' %}
-{% endblock %}
-
 {% block left_sidebar %}
     <div class="list-group" id="selection_list" role="tablist">
         <a class="list-group-item list-group-item-action active" href="#stats_list" role="tab" data-toggle="list">Stats</a>
@@ -179,11 +175,7 @@
 
 {% block scripts %}
 
-{{ block.super }}
-
-{% if  person.id == 91 %}
-    javascript for editing goes here. Change person.id to user verification.
-{% endif %}
+    {{ block.super }}
 
 <script>
     $(document).ready(function(){

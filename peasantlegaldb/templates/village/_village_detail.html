@@ -56,7 +56,7 @@
                                     <td class="d-inline-block col-8">{{ village.case_count }}</td>
                                 </tr>
                                 <tr class="row m-0">
-                                    <td class="d-inline-block col-4"><b>Known Residents:</b></td>
+                                    <td class="d-inline-block col-4" data-toggle="tooltip" data-placement="top" title="Please be aware of problems using court rolls for demography. See Poos and Smith's critique - 'Legal Windows'"><b>Known Residents*:</b></td>
                                     <td class="d-inline-block col-8">{{ village.resident_count }}</td>
                                 </tr>
                                 <tr class="row m-0">
@@ -227,7 +227,11 @@
         $('a[data-toggle="tab"').on('shown.bs.tab', function(e){
             $.fn.dataTable.tables({visible: true, api: true}).columns.adjust().responsive.recalc();
         });
-    })
+    });
+
+$(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+})
 
 </script>
 
