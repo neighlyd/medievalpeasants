@@ -15,21 +15,16 @@ autocomplete_urls = [
         name='village')
 ]
 
-analysis_urls = [
-    url(r'^chevage/(?P<village_pk>[0-9]+)/$', views.ChevageAnalysisListView.as_view(
-        template_name='analysis/chevage.html'), name='chevage_analysis'),
-]
-
 archive_urls = [
     url(r'^list/$', views.ArchiveListView.as_view(template_name='archive/_archive_list.html'),
         name='list'),
     url(r'^(?P<pk>\d+)/$', views.ArchiveDetailView.as_view(template_name='archive/_archive_detail.html'),
         name='detail'),
-    url(r'^(?P<pk>\d+)/case_list', views.ArchiveDetailView.as_view(template_name='archive/case_list.html'),
+    url(r'^(?P<pk>\d+)/case_list', TemplateView.as_view(template_name='archive/case_list.html'),
         name='cases'),
-    url(r'^(?P<pk>\d+)/record_list', views.ArchiveDetailView.as_view(template_name='archive/record_list.html'),
+    url(r'^(?P<pk>\d+)/record_list', TemplateView.as_view(template_name='archive/record_list.html'),
         name='records'),
-    url(r'^(?P<pk>\d+)/session_list', views.ArchiveDetailView.as_view(template_name='archive/session_list.html'),
+    url(r'^(?P<pk>\d+)/session_list', TemplateView.as_view(template_name='archive/session_list.html'),
         name='sessions'),
     url(r'^add/$', views.ArchiveAddView.as_view(), name='add'),
     url(r'^(?P<pk>\d+)/edit/$', views.ArchiveEditView.as_view(), name='edit'),
@@ -139,7 +134,7 @@ person_detail_urls = [
 
 record_urls = [
     url(r'^(?P<pk>\d+)/$', views.RecordDetailView.as_view(template_name='record/_record_detail.html'), name='detail'),
-    url(r'^(?P<pk>\d+)/session_list.html$', views.RecordDetailView.as_view(template_name='record/session_list.html'),
+    url(r'^(?P<pk>\d+)/session_list.html$', TemplateView.as_view(template_name='record/session_list.html'),
         name='sessions'),
     url(r'^add/$', views.RecordAddView.as_view(), name='add'),
     url(r'^(?P<pk>\d+)/edit/$', views.RecordEditView.as_view(), name='edit'),
@@ -156,9 +151,9 @@ session_urls = [
     url(r'^list/$', views.SessionListView.as_view(template_name='session/_session_list.html'),
         name='list'),
     url(r'^(?P<pk>\d+)/$', views.SessionDetailView.as_view(template_name='session/_session_detail.html'), name='detail'),
-    url(r'^(?P<pk>\d+)/case_list$', views.SessionDetailView.as_view(template_name='session/case_list.html'),
+    url(r'^(?P<pk>\d+)/case_list$', TemplateView.as_view(template_name='session/case_list.html'),
         name='cases'),
-    url(r'^(?P<pk>\d+)/litigant_list$', views.SessionDetailView.as_view(template_name='session/litigant_list.html'),
+    url(r'^(?P<pk>\d+)/litigant_list$', TemplateView.as_view(template_name='session/litigant_list.html'),
         name='litigants'),
     url(r'^add/$', views.SessionAddView.as_view(), name='add'),
     url(r'^(?P<pk>\d+)/edit/$', views.SessionEditView.as_view(), name='edit'),
@@ -199,7 +194,6 @@ urlpatterns = [
     url(r'^session/', include(session_urls, namespace='session')),
     url(r'^village/', include(village_urls, namespace='village')),
     url(r'^relationship/', include(relationship_urls, namespace='relationship')),
-    url(r'^analysis/', include(analysis_urls)),
     url(r'^case_test/', views.nested_test),
     url(r'^autocomplete/', include(autocomplete_urls, namespace='autocomplete')),
     url(r'^relationship_fix/', TemplateView.as_view(template_name='analysis/relationships.html'))

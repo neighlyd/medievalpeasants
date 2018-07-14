@@ -754,7 +754,7 @@ class Case(models.Model):
 
     @property
     def land_exist(self):
-        return self.litigants.filter(land__isnull=False).exists()
+        return self.litigants.filter(lands__isnull=False).exists()
 
     @property
     def cornbot_exist(self):
@@ -824,31 +824,12 @@ class Litigant(models.Model):
     person = models.ForeignKey(Person, on_delete=models.CASCADE, related_name='cases')
     case = models.ForeignKey(Case, on_delete=models.CASCADE, related_name='litigants')
     role = models.ForeignKey(Role, related_name='litigant_role')
-    fine = models.ForeignKey(Money, null=True, blank=True, related_name='litigant_fine')
-    amercement = models.ForeignKey(Money, null=True, blank=True, related_name='litigant_amercement')
-    damage = models.ForeignKey(Money, null=True, blank=True, related_name='litigant_damages')
-    damage_notes = models.TextField(blank=True,)
     ad_proximum = models.BooleanField()
     distrained = models.BooleanField()
     # Added at Case 1189.
     attached = models.BooleanField()
     # Added at Case 1424
     bail = models.BooleanField()
-    chevage = models.ForeignKey(Money, null=True, blank=True, related_name='litigant_chevage')
-    crossed = models.NullBooleanField()
-    recessit = models.NullBooleanField()
-    habet_terram = models.NullBooleanField()
-    chevage_notes = models.TextField(blank=True)
-    heriot_quantity = models.CharField(max_length=25, blank=True,)
-    heriot_animal = models.ForeignKey(Chattel, null=True, related_name='heriot_animal')
-    heriot = models.ForeignKey(Money, null=True, blank=True, related_name='heriot_assessment')
-    impercamentum_quantity = models.IntegerField(null=True, blank=True,)
-    impercamentum_animal = models.ForeignKey(Chattel, null=True, blank=True, related_name='impercamentum_animal')
-    impercamentum = models.ForeignKey(Money, null=True, blank=True, related_name='impercamentum_amercement')
-    impercamentum_notes = models.TextField(blank=True,)
-    land = models.ForeignKey(Land, null=True, blank=True, on_delete=models.CASCADE, related_name='case_to_land')
-    land_villeinage = models.NullBooleanField()
-    land_notes = models.TextField(blank=True,)
 
     @property
     def impercamentum_denarius_total(self):

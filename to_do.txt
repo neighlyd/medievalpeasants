@@ -15,4 +15,6 @@ Places Mentioned table in Case View (see Case 964)
 
 Land_lists - searchable parcels, tenures, and tenant history via datatables if possible.
 
+Relationship Fix: http://localhost:8000/relationship_fix/
+
 Deal w/ the atte Buttoke family & atte Steorte family

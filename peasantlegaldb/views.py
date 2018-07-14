@@ -194,7 +194,7 @@ class CaseDetailView(DetailView):
     queryset = models.Case.objects.all().prefetch_related('litigants__person', 'litigants__amercements',
                                                           'litigants__capitagia', 'litigants__damages',
                                                           'litigants__fines', 'litigants__heriots',
-                                                          'litigants__impercamenta', 'litigants__land')\
+                                                          'litigants__impercamenta', 'litigants__lands')\
         .order_by('litigants__person__last_name', 'litigants__person__first_name')\
         .annotate(amercement_count=Count('litigants__amercements'), cap_count=Count('litigants__capitagia'),
                   damage_count=Count('litigants__damages'), fine_count=Count('litigants__fines'),
@@ -749,7 +749,7 @@ def case_lists(request, pk):
         query_list = models.Case.objects.filter(id=pk).prefetch_related('litigants__person', 'litigants__amercements',
                                                                         'litigants__capitagia', 'litigants__damages',
                                                                         'litigants__fines', 'litigants__heriots',
-                                                                        'litigants__impercamenta', 'litigants__land')\
+                                                                        'litigants__impercamenta', 'litigants__lands')\
             .order_by('litigants__person__last_name', 'litigants__person__first_name')\
             .annotate(amercement_count=Count('litigants__amercements'), cap_count=Count('litigants__capitagia'),
                       damage_count=Count('litigants__damages'), fine_count=Count('litigants__fines'),
@@ -957,24 +957,6 @@ class VillageListView(ListView):
     def get_context_data(self, **kwargs):
         context = super(VillageListView, self).get_context_data(**kwargs)
         context['page_title'] = 'Village'
-        return context
-
-
-class ChevageAnalysisListView(ListView):
-
-    model = models.Person
-    queryset = models.Person.objects.all().filter(cases__chevage__isnull=False).distinct()\
-        .select_related('cases__case__session','village').order_by('last_name', 'first_name')
-
-    def get_context_data(self, **kwargs):
-        context = super(ChevageAnalysisListView, self).get_context_data(**kwargs)
-        qs = context['object_list']
-        village_id = self.kwargs.get('village_pk')
-        chevage_list = qs.filter(cases__case__session__village=village_id).filter(cases__chevage__isnull=True)
-        village =  models.Village.objects.get(id=village_id)
-        context['chevage_list'] = chevage_list
-        context['village'] = village
-        context['page_title'] = 'Chevage'
         return context
 
 
