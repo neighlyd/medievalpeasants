@@ -9,7 +9,7 @@
     {{ block.super }}
 
 <div class="card-body clearfix" id="main_info">
-    <table class="table table-bordered table-hover" id="table" data-ajax="{% url 'api:village-list' %}?format=datatables&keep=id&expand=hundred,county" data-page-length="25">
+    <table class="table table-bordered table-hover" id="table" data-ajax="{% url 'api:village-list' %}?format=datatables&expand=hundred,county" data-page-length="25">
         <thead>
             <th>Notes</th>
             <th>Village</th>

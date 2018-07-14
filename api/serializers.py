@@ -15,6 +15,7 @@ class ParcelTenureSerializer(FlexFieldsModelSerializer):
         model = models.ParcelTenure
         name = 'parcel_tenure'
         fields = ('id', 'tenure',)
+        datatables_always_serialize = ('id',)
 
 
 class ParcelTypeSerializer(FlexFieldsModelSerializer):
@@ -23,6 +24,7 @@ class ParcelTypeSerializer(FlexFieldsModelSerializer):
         model = models.ParcelType
         name = 'parcel_type'
         fields = ('id', 'parcel_type',)
+        datatables_always_serialize = ('id',)
 
 
 class PositionTypeSerializer(FlexFieldsModelSerializer):
@@ -31,6 +33,7 @@ class PositionTypeSerializer(FlexFieldsModelSerializer):
         model = models.PositionType
         name = 'position_title'
         fields = ('id', 'title',)
+        datatables_always_serialize = ('id',)
 
 
 class RelationSerializer(FlexFieldsModelSerializer):
@@ -39,6 +42,7 @@ class RelationSerializer(FlexFieldsModelSerializer):
         model = models.Relation
         name = 'relation_title'
         fields = ('id', 'relation',)
+        datatables_always_serialize = ('id',)
 
 
 class RoleSerializer(FlexFieldsModelSerializer):
@@ -47,6 +51,7 @@ class RoleSerializer(FlexFieldsModelSerializer):
         model = models.Role
         name = 'role'
         fields = ('id', 'role',)
+        datatables_always_serialize = ('id',)
 
 
 class VerdictSerializer(FlexFieldsModelSerializer):
@@ -55,6 +60,7 @@ class VerdictSerializer(FlexFieldsModelSerializer):
         model = models.Verdict
         name = 'verdict'
         fields = ('id', 'verdict',)
+        datatables_always_serialize = ('id',)
 
 
 class MoneySerializer(FlexFieldsModelSerializer):
@@ -63,6 +69,7 @@ class MoneySerializer(FlexFieldsModelSerializer):
         model = models.Money
         name = 'money'
         fields = ('id', 'amount', 'in_denarius')
+        datatables_always_serialize = ('id',)
 
 
 class ChattelSerializer(FlexFieldsModelSerializer):
@@ -71,6 +78,7 @@ class ChattelSerializer(FlexFieldsModelSerializer):
         model = models.Chattel
         name = 'chattel'
         fields = ('id', 'name',)
+        datatables_always_serialize = ('id',)
 
 
 class CaseTypeSerializer(FlexFieldsModelSerializer):
@@ -79,6 +87,7 @@ class CaseTypeSerializer(FlexFieldsModelSerializer):
         model = models.CaseType
         name = 'case_type'
         fields = ('id', 'case_type',)
+        datatables_always_serialize = ('id',)
 
 
 class LandParcelSerializer(FlexFieldsModelSerializer):
@@ -88,12 +97,14 @@ class LandParcelSerializer(FlexFieldsModelSerializer):
     class Meta:
         model = models.LandParcel
         fields = '__all__'
+        datatables_always_serialize = ('id',)
 
 
 class AmercementSerializer(FlexFieldsModelSerializer):
     class Meta:
         model = models.Amercement
         fields = '__all__'
+        datatables_always_serialize = ('id',)
 
     expandable_fields = {
         'amercement': (MoneySerializer, {'source': 'amercement'}),
@@ -104,6 +115,7 @@ class CapitagiumSerializer(FlexFieldsModelSerializer):
     class Meta:
         model = models.Capitagium
         fields = '__all__'
+        datatables_always_serialize = ('id',)
 
     expandable_fields = {
         'capitagium': (MoneySerializer, {'source': 'capitagium'}),
@@ -114,6 +126,7 @@ class DamageSerializer(FlexFieldsModelSerializer):
     class Meta:
         model = models.Damage
         fields = '__all__'
+        datatables_always_serialize = ('id',)
 
     expandable_fields = {
         'damage': (MoneySerializer, {'source': 'damage'}),
@@ -124,6 +137,7 @@ class FineSerializer(FlexFieldsModelSerializer):
     class Meta:
         model = models.Fine
         fields = '__all__'
+        datatables_always_serialize = ('id',)
 
     expandable_fields = {
         'fine': (MoneySerializer, {'source': 'fine'}),
@@ -134,6 +148,7 @@ class HeriotSerializer(FlexFieldsModelSerializer):
     class Meta:
         model = models.Heriot
         fields = '__all__'
+        datatables_always_serialize = ('id',)
 
     expandable_fields = {
         'heriot': (MoneySerializer, {'source': 'heriot'}),
@@ -145,6 +160,7 @@ class ImpercamentumSerializer(FlexFieldsModelSerializer):
     class Meta:
         model = models.Impercamentum
         fields = '__all__'
+        datatables_always_serialize = ('id',)
 
     expandable_fields = {
         'impercamentum': (MoneySerializer, {'source': 'impercamentum'}),
@@ -162,6 +178,7 @@ class ArchiveSerializer(FlexFieldsModelSerializer):
         model = models.Archive
         name = 'archive'
         fields = ('id', 'name', 'website', 'notes', 'counts')
+        datatables_always_serialize = ('id',)
 
     @staticmethod
     def get_counts(record):
@@ -194,6 +211,7 @@ class RecordSerializer(FlexFieldsModelSerializer):
     class Meta:
         model = models.Record
         fields = ('id', 'name', 'record_type', 'reel', 'notes', 'counts', 'archive', 'earliest_session', 'latest_session')
+        datatables_always_serialize = ('id',)
 
     expandable_fields = {
         'archive': (ArchiveSerializer, {'source': 'archive'}),
@@ -219,6 +237,7 @@ class CountySerializer(FlexFieldsModelSerializer):
     class Meta:
         model = models.County
         fields = ('id', 'name', 'abbreviation', 'counts',)
+        datatables_always_serialize = ('id',)
 
     @staticmethod
     def get_counts(record):
@@ -241,6 +260,7 @@ class HundredSerializer(FlexFieldsModelSerializer):
     class Meta:
         model = models.Hundred
         fields = ('id', 'name', 'counts', 'county')
+        datatables_always_serialize = ('id',)
 
     expandable_fields = {
         'county': (CountySerializer, {'source': 'county', 'fields': ['id', 'name']}),
@@ -268,6 +288,7 @@ class VillageSerializer(FlexFieldsModelSerializer):
         fields = ('id', 'name', 'latitude', 'longitude', 'ancient_demesne', 'great_rumor', 'notes', 'counts', 'county',
                   'hundred', 'capitagium_payer_count', 'fine_payer_count', 'impercamentum_payer_count',
                   'heriot_payer_count', 'damaged_party_count')
+        datatables_always_serialize = ('id',)
 
     expandable_fields = {
         'hundred': (HundredSerializer, {'source': 'hundred', 'fields': ['id','name']}),
@@ -314,6 +335,7 @@ class SessionSerializer(FlexFieldsModelSerializer):
     class Meta:
         model = models.Session
         fields = ('id', 'date', 'folio', 'notes', 'law_term', 'year', 'human_date', 'village', 'record', 'counts',)
+        datatables_always_serialize = ('id',)
 
     expandable_fields = {
         'village': (VillageSerializer, {'source': 'village', 'fields': ['id', 'name']}),
@@ -347,6 +369,7 @@ class PersonSerializer(FlexFieldsModelSerializer):
         fields = ('id', 'first_name', 'relation_name', 'last_name', 'status', 'gender', 'tax_1332', 'tax_1379', 'notes',
                   'full_name', 'village', 'gender_display', 'status_display', 'earliest_case',
                   'latest_case')
+        datatables_always_serialize = ('id',)
 
     expandable_fields = {
         'earliest_case': ('api.CaseSerializer', {'source': 'earliest_case', 'expand': ['session'], 'fields': ['id', 'session']}),
@@ -378,6 +401,7 @@ class CornbotSerializer(FlexFieldsModelSerializer):
     class Meta:
         model = models.Cornbot
         fields = '__all__'
+        datatables_always_serialize = ('id',)
 
     expandable_fields = {
         'crop_type': (ChattelSerializer, {'source': 'crop_type'}),
@@ -390,6 +414,7 @@ class ExtrahuraSerializer(FlexFieldsModelSerializer):
     class Meta:
         model = models.Extrahura
         fields = '__all__'
+        datatables_always_serialize = ('id',)
 
     expandable_fields = {
         'animal': (ChattelSerializer, {'source': 'animal'}),
@@ -402,6 +427,7 @@ class MurrainSerializer(FlexFieldsModelSerializer):
     class Meta:
         model = models.Murrain
         fields = '__all__'
+        datatables_always_serialize = ('id',)
 
     expandable_fields = {
         'animal': (ChattelSerializer, {'source': 'animal'}),
@@ -413,6 +439,7 @@ class PlaceMentionedSerializer(FlexFieldsModelSerializer):
     class Meta:
         model = models.PlaceMentioned
         fields = '__all__'
+        datatables_always_serialize = ('id',)
 
     expandable_fields = {
         'village': (VillageSerializer, {
@@ -439,6 +466,7 @@ class CaseSerializer(FlexFieldsModelSerializer):
         model = models.Case
         fields = ('id', 'active_sale', 'ad_legem', 'case_type', 'court_type', 'incidental_land', 'of_interest',
                   'session', 'summary', 'verdict', 'villeinage_mention', 'litigant_count', 'pledge_count')
+        datatables_always_serialize = ('id',)
 
     expandable_fields = {
         'session': (SessionSerializer, {'source': 'session', 'expand': ['village'],
@@ -476,6 +504,7 @@ class LandSerializer(FlexFieldsModelSerializer):
         model = models.Land
         name = 'land'
         fields = ('id', 'notes', 'parcel_list', 'earliest_case', 'latest_case')
+        datatables_always_serialize = ('id',)
 
     expandable_fields = {
         'earliest_case': ('api.CaseSerializer', {'source': 'earliest_case'}),
@@ -493,6 +522,7 @@ class LandSplitSerializer(FlexFieldsModelSerializer):
     class Meta:
         model = models.LandSplit
         fields = ('id', 'old_land', 'new_land')
+        datatables_always_serialize = ('id',)
 
     expandable_fields = {
         'old_land': (LandSerializer, {'source': 'old_land'}),
@@ -507,6 +537,7 @@ class LandtoCaseSerializer(FlexFieldsModelSerializer):
     class Meta:
         model = models.LandtoCase
         fields = '__all__'
+        datatables_always_serialize = ('id',)
 
     expandable_fields = {
         'land': (LandSerializer, {'source': 'land'}),
@@ -521,6 +552,7 @@ class LitigantSerializer(FlexFieldsModelSerializer):
     class Meta:
         model = models.Litigant
         fields = ('id', 'case', 'person', 'role', 'ad_proximum', 'distrained', 'attached', 'bail',)
+        datatables_always_serialize = ('id',)
 
     expandable_fields = {
         'case': (CaseSerializer, {'source': 'case', 'expand': ['session']}),
@@ -543,6 +575,7 @@ class PledgeSerializer(FlexFieldsModelSerializer):
         model = models.Pledge
         fields = '__all__'
         datatables_always_serializer = ('id',)
+        datatables_always_serialize = ('id',)
 
     expandable_fields = {
         'giver': (PersonSerializer, {'source': 'giver'}),
@@ -557,6 +590,7 @@ class PositionSerializer(FlexFieldsModelSerializer):
     class Meta:
         model = models.Position
         fields = '__all__'
+        datatables_always_serialize = ('id',)
 
     expandable_fields = {
         'person': (PersonSerializer, {'source': 'person'}),
@@ -572,6 +606,7 @@ class RelationshipSerializer(FlexFieldsModelSerializer):
     class Meta:
         model = models.Relationship
         fields = '__all__'
+        datatables_always_serialize = ('id',)
 
     expandable_fields = {
         'person_one': (PersonSerializer, {'source': 'person_one'}),
@@ -589,6 +624,7 @@ class LandtoCaseSerializer(FlexFieldsModelSerializer):
     class Meta:
         model = models.LandtoCase()
         fields = '__all__'
+        datatables_always_serialize = ('id',)
 
     expandable_fields = {
         'land': (LandSerializer, {'source': 'land'}),

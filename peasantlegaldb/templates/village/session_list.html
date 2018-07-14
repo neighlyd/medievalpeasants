@@ -1,7 +1,7 @@
 <div class="card">
     <h3 class="card-header text-center">Session List</h3>
     <div class="card-body">
-            <table class="table table-bordered table-hover" id="session_table" data-ajax="{% url 'api:session-list' %}?village={{ view.kwargs.pk }}&keep=id,law_term,year&format=datatables" data-page-length="10">
+            <table class="table table-bordered table-hover" id="session_table" data-ajax="{% url 'api:session-list' %}?village={{ view.kwargs.pk }}&keep=law_term,year&format=datatables" data-page-length="10">
                 <thead>
                     <th>ID</th>
                     <th>Date</th>
