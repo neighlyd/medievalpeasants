@@ -1,0 +1,18 @@
+<form method="post" action="{% url 'litigant:edit' litigant.id %}" class="edit_litigant_form">
+    {% csrf_token %}
+
+    <div class="modal-header">
+        <h4 class="modal-title text-center">Edit Litigant</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        {% include 'case/case_litigant_modal_body.html' %}
+    </div>
+
+    <div class="modal-footer col-9 offset-3 d-flex justify-content-between p-2">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-success">Edit Litigant</button>
+    </div>
+</form>

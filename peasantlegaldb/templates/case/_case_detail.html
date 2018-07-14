@@ -5,49 +5,47 @@
 {% endblock %}
 
 {% block left_sidebar %}
-    <div id="selection_list">
-    {% if case.litigant_exist %}
-        <a class="list-group-item list-group-item-action" href="{% url 'case_litigant_list' case.id %}">Show Litigants</a>
-    {% endif %}
-    {% if case.pledge_exist %}
-        <a class="list-group-item list-group-item-action" href="{% url 'case_pledge_list' case.id %}">Show Pledges</a>
-    {% endif %}
-    {% if case.land_exist %}
-        <a class="list-group-item list-group-item-action" href="{% url 'case_land_list' case.id %}">Show Land</a>
+    <div class="list-group" id="selection_list" role="tablist">
+        <a class="list-group-item list-group-item-action active" data-toggle="list" role="tab" href="#list_litigants" aria-controls="list_litigants" aria-selected="true">Show Litigants</a>
+    {% if case.cornbot_exist %}
+        <a class="list-group-item list-group-item-action" data-toggle="list" role="tab" href="#list_cornbot" data-url="{% url 'case:cornbot' case.id %}" aria-controls="list_cornbot" aria-selected="false">Show Cornbot</a>
     {% endif %}
     {% if case.extrahura_exist %}
-        <a class="list-group-item list-group-item-action" href="{% url 'case_extrahura_list' case.id %}">Show Extrahura</a>
+        <a class="list-group-item list-group-item-action" data-toggle="list" role="tab" href="#list_extrahura" data-url="{% url 'case:extrahura' case.id %}" aria-controls="list_extrahura" aria-selected="false">Show Extrahura</a>
     {% endif %}
-    {% if case.cornbot_exist %}
-        <a class="list-group-item list-group-item-action" href="{% url 'case_cornbot_list' case.id %}">Show Cornbot</a>
-    {% endif %}
-    {% if case.murrain_exist %}
-        <a class="list-group-item list-group-item-action" href="{% url 'case_murrain_list' case.id %}">Show Murrain</a>
+    {% if case.land_exist %}
+        <a class="list-group-item list-group-item-action" data-toggle="list" role="tab" href="#list_lands" data-url="{% url 'case:land' case.id %}" aria-controls="list_lands" aria-selected="false">Show Land</a>
     {% endif %}
     {% if case.mentioned_exist %}
-        <a class="list-group-item list-group-item-action" href="{% url 'case_place_mentioned_list' case.id %}">Show Places Mentioned</a>
+        <a class="list-group-item list-group-item-action" data-toggle="list" role="tab" href="#list_places" data-url="{% url 'case:mentioned' case.id %}" aria-controls="list_places" aria-selected="false">Show Places Mentioned</a>
+    {% endif %}
+    {% if case.murrain_exist %}
+        <a class="list-group-item list-group-item-action" data-toggle="list" role="tab" href="#list_murrains" data-url="{% url 'case:murrain' case.id %}" aria-controls="list_murrains" aria-selected="false">Show Murrain</a>
+    {% endif %}
+    {% if case.pledge_exist %}
+        <a class="list-group-item list-group-item-action" data-toggle="list" role="tab" href="#list_pledges" data-url="{% url 'case:pledges' case.id %}" aria-controls="list_pledges" aria-selected="false">Show Pledges</a>
     {% endif %}
     </div>
 {% endblock %}
 
 {% block center_bar %}
 
-<div class="card-header text-center">
-    <h2 class="card-title">Case {{ case.id }}</h2>
-    <h3 class="card-subtitle text-muted"><a href="{% url 'village' case.session.village.id %}" style="color: inherit; text-decoration: none">{{ case.session.village.name}}</a> - {{case.session.get_law_term_display }}, {{ case.session.date.year}}</h3>
-    <h6 class="card-subtitle text-muted float-right"><a href="{% url 'record' case.session.record.id %}" style="color: inherit; text-decoration: none">{{ case.session.record.name }}, F.{{ case.session.folio }}</a></h6>
+<div class="card-header text-center bg-grey">
+    <h2 class="card-title bg-grey">Case {{ case.id }}</h2>
+    <h3 class="card-subtitle text-muted"><a href="{% url 'village:detail' case.session.village.id %}" style="color: inherit; text-decoration: none">{{ case.session.village.name}}</a> - {{case.session.get_law_term_display }}, {{ case.session.date.year}}</h3>
+    <h6 class="card-subtitle text-muted float-right"><a href="{% url 'record:detail' case.session.record.id %}" style="color: inherit; text-decoration: none">{{ case.session.record.name }}, F.{{ case.session.folio }}</a></h6>
 </div>
 
 <div class="card-body clearfix" id="main_info">
     <div class="d-flex justify-content-between flex-wrap">
 
                     <div class="card p-0 col-lg-5">
-                        <h3 class="card-header">Case Info:</h3>
+                        <h3 class="card-header bg-grey">Case Info:</h3>
                         <div class="card-body">
                             <table class="table table-sm">
                                 <tr class="row m-0">
                                     <td class="d-inline-block col-4"><b>Date:</b></td>
-                                    <td class="d-inline-block col-8"><a href="{% url 'session' case.session.id %}">{{ case.session.date }}</a></td>
+                                    <td class="d-inline-block col-8"><a href="{% url 'session:detail' case.session.id %}">{{ case.session.date }}</a></td>
                                 </tr>
                                 <tr class="row m-0">
                                     <td class="d-inline-block col-4"><b>Court Type:</b></td>
@@ -61,71 +59,65 @@
                                     <td class="d-inline-block col-4"><b>Verdict:</b></td>
                                     <td class="d-inline-block col-8">{{ case.verdict.verdict}}</td>
                                 </tr>
+                                {% if case.litigant_count > 0 %}
                                 <tr class="row m-0">
                                     <td class="d-inline-block col-4"><b>Litigant Count:</b></td>
                                     <td class="d-inline-block col-8">{{ case.litigant_count }}</td>
                                 </tr>
+                                {% endif %}
+                                {% if case.pledges_count > 0 %}
                                 <tr class="row m-0">
                                     <td class="d-inline-block col-4"><b>Pledge Count:</b></td>
-                                    <td class="d-inline-block col-8">{{ case.pledge_count }}</td>
+                                    <td class="d-inline-block col-8">{{ case.pledges_count }}</td>
                                 </tr>
+                                {% endif %}
+                                {% if case.of_interest %}
                                 <tr class="row m-0">
                                     <td class="d-inline-block col-4"><b>Case of Interest?</b></td>
                                     <td  class="d-inline-block col-8">
-                                        {% if case.of_interest %}
                                             Yes
-                                        {% else %}
-                                            No
-                                        {% endif %}
                                     </td>
+                                {% endif %}
                                 </tr>
+                                {% if case.ad_legem %}
                                 <tr class="row m-0">
                                     <td class="d-inline-block col-4"><b>At Law?</b></td>
                                     <td class="d-inline-block col-8">
-                                        {% if case.ad_legem %}
                                             Yes
-                                        {% else %}
-                                            No
-                                        {% endif %}
                                     </td>
                                 </tr>
+                                {% endif %}
+                                {% if case.villeinage_mention %}
                                 <tr class="row m-0">
                                     <td class="d-inline-block col-4"><b>Villeinage?</b></td>
                                     <td class="d-inline-block col-8">
-                                        {% if case.villeinage_mention %}
                                             Yes
-                                        {% else %}
-                                            No
-                                        {% endif %}
                                     </td>
                                 </tr>
+                                {% endif %}
+                                {% if case.active_sale%}
                                 <tr class="row m-0">
                                     <td class="d-inline-block col-4"><b>Active Sale?</b></td>
                                     <td class="d-inline-block col-8">
-                                        {% if case.active_sale%}
                                             Yes
-                                        {% else %}
-                                            No
-                                        {% endif %}
                                     </td>
                                 </tr>
+                                {% endif %}
+                                {% if case.incidental_land%}
                                 <tr class="row m-0">
                                     <td class="d-inline-block col-4"><b>Incidental Land?</b></td>
                                     <td class="d-inline-block col-8">
-                                        {% if case.incidental_land%}
                                             Yes
-                                        {% else %}
-                                            No
-                                        {% endif %}
                                     </td>
                                 </tr>
+                                {% endif %}
 
                             </table>
                         </div>
                     </div>
 
                     <div class="card p-0 col-lg-6">
-                        <h3 class="card-header">Notes:</h3>
+                        <h3 class="card-header bg-grey">Notes:</h3>
                             <div class="card-body">
 
                             <h6 class="card-text">
@@ -138,8 +130,14 @@
 
 <br>
 
-<div id="list_info">
-
+<div class="tab-content" id="lists">
+    <div class="tab-pane fade show active" id="list_litigants" role="tabpanel">{% include 'case/litigant_list.html' %}</div>
+    <div class="tab-pane fade" id="list_cornbot" role="tabpanel"></div>
+    <div class="tab-pane fade" id="list_extrahura" role="tabpanel"></div>
+    <div class="tab-pane fade" id="list_lands" role="tabpanel"></div>
+    <div class="tab-pane fade" id="list_places" role="tabpanel"></div>
+    <div class="tab-pane fade" id="list_murrains" role="tabpanel"></div>
+    <div class="tab-pane fade" id="list_pledges" role="tabpanel"></div>
 </div>
 
 {% endblock %}
@@ -148,14 +146,14 @@
     <div class="container" style="position: sticky; top: 65px">
         {% if perms.peasantlegaldb.add_case %}
             <div class="btn-group" role="group">
-                <a class="btn btn-success" href="#">Add Case</a>
+                <a class="btn btn-success" href="{% url 'case:add' %}">Add Case</a>
             </div>
             <br>
             <br>
         {% endif %}
         {% if perms.peasantlegaldb.change_case %}
             <div class="btn-group" role="group">
-                <a class="btn btn-warning" href="#">Edit Case</a>
+                <a class="btn btn-warning" href="{% url 'case:edit' case.pk %}">Edit Case</a>
             </div>
             <br>
             <br>
@@ -170,5 +168,30 @@
 {% endblock %}
 
 {% block scripts %}
+
     {{ block.super }}
+    <script>
+        $(document).ready(function(){
+            $("#selection_list").on('click', 'a', function(e){
+               e.preventDefault();
+               var url = $(this).attr("data-url");
+
+               if (typeof url !== "undefined"){
+                   var pane = $(this), href = this.hash;
+
+                   $(href).load(url, function(result){
+                       pane.tab('show');
+                   });
+               } else {
+                   $(this).tab('show');
+               }
+            });
+
+            $('a[data-toggle="tab"').on('shown.bs.tab', function(e){
+                $.fn.dataTable.tables({visible: true, api: true}).columns.adjust().responsive.recalc();
+            });
+        })
+
+    </script>
+
 {% endblock %}

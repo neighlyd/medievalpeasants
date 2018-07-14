@@ -8,6 +8,7 @@ register = template.Library()
 def obj_classname(obj):
     return obj.__class__.__name__
 
+
 @register.filter
 def qs_classname(obj):
     return obj.model.__name__
@@ -28,6 +29,7 @@ def input_class(bound_field):
             css_class = 'is-valid'
     return 'form-control {}'.format(css_class)
 
+
 @register.filter
 def has_group(user, group_name):
 
@@ -44,3 +46,24 @@ def has_group(user, group_name):
     # Check to see if the group exists within the user's group_set and return a boolean to the template.
     # Within the template use {% if user | has_group:"<group_name>" %} to check for permissions.
     return user.groups.filter(name=group_name).exists()
+
+@register.simple_tag
+def max_length(*args):
+    '''
+    Inspects a series of values and returns the maximum of them.
+    Usage: {% max_length <value 1> <value 2> <value 3> as max_length %}
+    the "as max_length" can be changed to any variable name.
+    See 'case/litigant_list.html for usage.
+    '''
+    maximum = max(args)
+    if maximum < 1:
+        maximum = 1
+    return maximum
+
+@register.filter
+def get_range(value):
+    '''
+    Returns a range for a given value in a template
+    Usage: {% for i in <number>|get_range %}
+    '''
+    return range(value)

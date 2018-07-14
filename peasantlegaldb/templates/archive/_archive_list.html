@@ -9,7 +9,7 @@
     {{ block.super }}
 
 <div class="card-body clearfix" id="main_info">
-    <table class="table table-bordered table-hover" id="table" data-page-length="25">
+    <table class="table table-bordered table-hover" id="archive_table" data-ajax="{% url 'api:archive-list' %}?format=datatables" data-page-length="25">
         <thead>
             <th>Name</th>
             <th>Website</th>
@@ -24,41 +24,54 @@
 {% endblock %}
 
 {% block right_sidebar %}
-    {{ block.super }}
+                {% if perms.peasantlegaldb.add_archive %}
+                    <div class="container" style="position: sticky; top: 65px">
+                        <div class="btn-group" role="group">
+                        <a class="btn btn-success float-right" href="{% url 'archive:add' %}">Add {{ page_title }}</a>
+                        </div>
+                    </div>
+                {% endif %}
 {% endblock %}
 
 {% block scripts %}
 {{ block.super }}
 <script>
     $(document).ready(function(){
-        var url = Urls['api:archive-list']();
-        url = url + '?include[]=counts';
-        var table = $('#table').DataTable({
+        var archive_table = $('#archive_table').DataTable({
             fixedHeader: {
                 headerOffset: 50
             },
+            serverSide: true,
             scrollX: true,
-            ajax: {
-                processing: true,
-                url: url,
-                type: "GET",
-                dataSrc: "archives.",
-            },
-            "columns": [
+            columns: [
                 {data: "name",
                     fnCreatedCell: function(nTd, cellData, rowData, row, col) {
                         $(nTd).html("<a href='" + '/archive/' + rowData.id + "'>" + rowData.name + "</a>");
                     }
                 },
                 {data: "website",
-                    fnCreatedCell: function(nTd, cellData, rowData, row, col) {
-                        $(nTd).html("<a href='" + (rowData.website) + "'> Website </a>");
+                    defaultContent: '',
+                    render:{
+                        display: function(data, type, row, col){
+                            if (data){
+                                return "<a href='" + (data) + "'> Website </a>"
+                            }
+                        }
                     }
                 },
                 {data: "notes"},
-                {data: "counts.record"},
-                {data: "counts.session"},
-                {data: "counts.case"},
+                {data: "counts.record",
+                    searchable: false,
+                    orderable: false,
+                },
+                {data: "counts.session",
+                    searchable: false,
+                    orderable: false,
+                },
+                {data: "counts.case",
+                    searchable: false,
+                    orderable: false,
+                },
             ],
 
         });

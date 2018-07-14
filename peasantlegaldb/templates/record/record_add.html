@@ -1,0 +1,14 @@
+{% extends '_layout/_add_edit.html' %}
+
+{% block card_body %}
+    <form action="" method="post">
+        {% csrf_token %}
+        {% include '_layout/_form.html' %}
+        <div class="container">
+            <div class="row">
+                <a href="{{ request.META.HTTP_REFERER }}" class="btn btn-danger mr-auto">Cancel</a>
+                <input type="submit" class="btn btn-success ml-auto" value="Add" />
+            </div>
+        </div>
+    </form>
+{% endblock %}

@@ -1,0 +1,18 @@
+<form method="post" action="{% url 'case:add_litigant' case.id %}" class="add-litigant-form">
+    {% csrf_token %}
+    <div class="modal-header">
+        <h4 class="modal-title">Add a New Litigant</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times</span>
+        </button>
+    </div>
+
+    <div class="modal-body">
+        {% include 'case/case_litigant_modal_body.html' %}
+    </div>
+
+    <div class="modal-footer d-flex justify-content-between p-2">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-success">Add Litigant</button>
+    </div>
+</form>

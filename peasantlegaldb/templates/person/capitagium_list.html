@@ -1,0 +1,124 @@
+<div class="card">
+    <h3 class="card-header text-center bg-grey">Capitagium List</h3>
+    <div class="card-body">
+            <table class="table table-bordered table-hover" id="capitagium_table" data-ajax="{% url 'api:litigant-list' %}?litigant={{ view.kwargs.pk }}&capitagia=true&expand=capitagia,case&format=datatables" data-table-length="10">
+                <thead>
+                    <th>Details</th>
+                    <th>Case</th>
+                    <th>Session</th>
+                    <th>Capitagia</th>
+                    <th>Litigants</th>
+                </thead>
+
+    </div>
+</div>
+
+<script>
+
+    var format_capitagium_summary = function format( d ) {
+        return "<table class='table'>" +
+            "<tr>" +
+            "<td><b>Summary:</b></td>" +
+            "<td>" + d.case.summary + "</td>" +
+            "</tr>"
+            };
+
+    var format_capitagia = function(data){
+        var cell = "<table class='table'>" + "<tr><th>Assessment</th>"+
+            "<th>Recessit</th>" +
+            "<th>Crossed</th>" +
+            "<th>H. Terram</th>" +
+            "<th>Mortuus</th>" +
+            "<th>Notes</th>" +
+            "</tr>";
+        $.each(data, function(index, item){
+            cell = cell + "<tr>"+
+                    "<td class='text-center'>" + item.capitagium.amount + "(" + item.capitagium.in_denarius + "d.)" + "</td>" +
+                    "<td class='text-center'>" + checkMakerSubTable(item.recessit) + "</td>" +
+                    "<td class='text-center'>" + checkMakerSubTable(item.crossed) + "</td>" +
+                    "<td class='text-center'>" + checkMakerSubTable(item.habet_terram) + "</td>" +
+                    "<td class='text-center'>" + checkMakerSubTable(item.mortuus) + "</td>" +
+                    "<td>" + item.notes + "</td>" +
+                    "</tr>"
+        });
+        cell = cell + "</table>";
+        return cell
+    };
+
+    var capitagium_table = $('#capitagium_table').DataTable({
+        serverSide: true,
+        order: [[2, 'asc']],
+        ajax: {
+            source: 'cases.'
+        },
+        columns: [
+            {
+                class: 'details-control',
+                orderable: false,
+                data: 'case.summary',
+                name: 'case.summary',
+                defaultContent: '',
+                render: checkNotes,
+                width:'15px'
+            },
+            {data: 'case.id',
+                searchable: false,
+                orderable: false,
+                render: {
+                    display: function(data){
+                        var url = Urls['case:detail'](data);
+                        return "<a href='" + url + "'>" + data + "</a>";
+                    }
+                }
+            },
+            {data: 'case.session',
+                name: 'case.session.date',
+                render:{
+                    display: function(data, type, row){
+                        if (data){
+                            var url = Urls['session:detail'](data.id);
+                            return "<a href='" + url + "'>" + data.law_term + ', ' + data.human_date + "</a>";
+                        } else {
+                            return "N/A";
+                        }
+                    }
+                }
+            },
+            {data: 'capitagia',
+                searchable: false,
+                orderable: false,
+                render: {
+                    display: function(data){
+                        if (data){
+                            return format_capitagia(data);
+                        }
+                    }
+                }
+            },
+            {data: 'case.litigant_count',
+                searchable: false,
+                orderable: false
+            },
+        ]
+    });
+
+    // Used to activate the + expansion and trigger the format function.
+     $('#capitagium_table').on('click', 'td.details-control', function(){
+        var tr = $(this).closest('tr');
+        var tdi = tr.find('#check');
+        var row = capitagium_table.row( tr );
+        if (tdi.prop('style').color !== 'gray'){
+            if ( row.child.isShown()) {
+                row.child.hide();
+                tr.removeClass('shown');
+                tdi.first().removeClass('fa-minus-square');
+                tdi.first().addClass('fa-plus-square');
+            } else {
+                row.child( format_capitagium_summary( row.data() ) ).show();
+                tr.addClass('shown');
+                tdi.first().removeClass('fa-plus-square');
+                tdi.first().addClass('fa-minus-square');
+            }
+        }
+    });
+</script>

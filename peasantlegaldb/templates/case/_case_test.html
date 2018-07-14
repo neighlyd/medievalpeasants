@@ -1,180 +1,50 @@
-{% extends '_layout/_l_two_col.html' %}
-{% load widget_tweaks %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Cases</title>
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0/css/bootstrap.css">
+  <link rel="stylesheet" href="//cdn.datatables.net/1.10.16/css/dataTables.bootstrap4.min.css">
+</head>
 
-{% block navbar %}
-    {% include '_layout/__navbar.html' %}
-{% endblock %}
-
-{% block center_bar %}
-    <form>
-
-        {% csrf_token %}
-
-        <div class="form-group d-flex justify-content-center">
-        {% for field in form.visible_fields %}
-                <div class="col-sm-1">
-                    <h4>{{ field.label_tag }}</h4>
-                </div>
-                <div class="col-md-3.5">
-                    {% render_field field class="form-control" id="select_case_type" %}
-                </div>
-        {% endfor %}
-        </div>
-        <div class="form-group d-flex justify-content-center">
-                    <button type="button" class="btn btn-primary" id="get_cases">Get Cases</button>
-        </div>
-
-    </form>
-</div>
-
-<br>
-<div id="list_cases" style="display: none">
-    <div class="card">
-        <div class="card-body clearfix" id="main_info">
-            <table class="table table-bordered table-hover" id="table" data-page-length="25">
-                <thead>
-                    <th>Notes</th>
-                    <th>Case ID</th>
-                    <th>Village</th>
-                    <th>Session</th>
-                    <th>Court Type</th>
-                    <th>Case Type</th>
-                    <th>Verdict</th>
-                    <th>Litigant Count</th>
-                    <th>Of Note?</th>
-                </thead>
-            </table>
-        </div>
+<body>
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-12">
+        <table id="cases" class="table table-striped table-bordered" style="width:100%">
+          <thead>
+            <tr>
+              <th>Case</th>
+              <th>Date</th>
+              <th>Village</th>
+            </tr>
+          </thead>
+        </table>
+      </div>
     </div>
-</div>
-{% endblock %}
-
-{% block right_sidebar %}
-{% endblock %}
-
-{% block scripts %}
-
-    {{ block.super }}
-
-    <script>
-     function format( d ) {
-        return "<table class='table'>" +
-            "<tr>" +
-            "<td><b>Summary:</b></td>" +
-            "<td>" + d.summary + "</td>" +
-            "</tr>"
-    }
-
-
-    $(document).ready(function(){
-        $(":button").click(function(e){
-            $('.btn').removeClass('active');
-            $(this).addClass('active');
-            var caseType = $("#select_case_type").val();
-            var url = Urls["api:case-list"]();
-            if (caseType == null || caseType == '') {
-                if ($("#list_cases").is(":visible")) {
-                    $("#list_cases").hide();
-                    return
-                } else {
-                    return
-                }
-            }
-            if (caseType === "All"){
-                url = url + "?exclude[]=session.*&include[]=litigant_count&include[]=session.village.name&include[]=session.law_term&include[]=session.date&include[]=session.human_date";
-            }
-            else {
-                url = url + "?case_type=" + caseType + "&exclude[]=session.*&include[]=litigant_count&include[]=session.village.name&include[]=session.law_term&include[]=session.date&include[]=session.human_date";
-            }
-            $("#table").DataTable().destroy();
-            var table = $('#table').DataTable({
-                scrollX: true,
-                scrollY: 500,
-                scrollCollapse: true,
-                paging: false,
-                ajax: {
-                    processing: true,
-                    url: url,
-                    type: "GET",
-                    dataSrc: "cases.",
-                },
-                order: [[3, "asc"], [4, "asc"]],
-                "columns": [
-                    {
-                        "class": "details-control",
-                        "orderable": "false",
-                        "data": "summary",
-                        "defaultContent": "",
-                        "render": checkNotes,
-                        width:"15px"
-                    },
-                    {data: "id",
-                        fnCreatedCell: function(nTd, cellData, rowData, row, col) {
-                            var url = Urls.case(rowData.id)
-                            $(nTd).html("<a href='"+ url +"'>" + rowData.id + "</a>");
+  </div>
+  <script src="//code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+  <script src="//cdn.datatables.net/1.10.16/js/dataTables.bootstrap4.min.js"></script>
+  <script>
+      $(document).ready(function() {
+          var table = $('#cases').DataTable({
+              "serverSide": true,
+              "ajax": "/api/cases/?format=datatables&expand=session.village",
+              "columns": [
+                  {"data": "id",},
+                  {"data": "session.date"},
+                  {"data": "session.village.name",
+                      defaultContent: '',
+                      render:{
+                        display: function(data, type, row, meta){
+                            return data
                         }
-                    },
-                    {data: "session.village.name",
-                        defaultContent: '',
-                        render:{
-                            display: function(data, type, row, col){
-                                var url = Urls.village(row.session.village.id);
-                                return "<a href='" + url + "'>" + data + "</a>";
-                            }
-                        }
-                    },
-                    {data: "session",
-                        defaultContent: '',
-                        render:{
-                            display: function(data, type, row, col){
-                                var url = Urls.session(data.id);
-                                return "<a href'" + url + "'>" + data.human_date + "</a>";
-
-                            },
-                        sort: "date"
-                        }
-                    },
-                    {data: "court_type"},
-                    {data: "case_type.case_type"},
-                    {data: "verdict.verdict"},
-                    {data: "litigant_count"},
-                    {data: "of_interest",
-                        fnCreatedCell: function(nTd, cellData, rowData, row, col) {
-                            if (rowData.of_interest === true){
-                                $(nTd).html("<i class='fa fa-check' style='color:forestgreen'></i>")
-                            } else {
-                                $(nTd).html("")
-                            }
-                        }
-                    }
-                ],
-
-            });
-
-            // Used to activate the + expansion and trigger the format function.
-             $('#table tbody').on('click', 'td.details-control', function(){
-                var tr = $(this).closest('tr');
-                var tdi = tr.find("i.fa");
-                var row = table.row( tr );
-
-                if ( row.child.isShown()) {
-                    row.child.hide();
-                    tr.removeClass('shown');
-                    tdi.first().removeClass('fa-minus-square');
-                    tdi.first().addClass('fa-plus-square');
-                } else {
-                    row.child( format( row.data() ) ).show();
-                    tr.addClass('shown');
-                    tdi.first().removeClass('fa-plus-square');
-                    tdi.first().addClass('fa-minus-square');
-                }
-            });
-            if ($("#list_cases").not(":visible")){
-                $("#list_cases").show();
-            }
-        });
-    });
-
-    </script>
-
-{% endblock %}
+                      }
+                  },
+              ]
+          });
+      });
+  </script>
+</body>
+</html>

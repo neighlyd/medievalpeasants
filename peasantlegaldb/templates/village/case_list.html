@@ -1,0 +1,124 @@
+<div class="card">
+    <h3 class="card-header text-center">Case List</h3>
+    <div class="card-body">
+            <table class="table table-bordered table-hover" id="case_table" data-ajax="{% url 'api:case-list' %}?village={{ view.kwargs.pk }}&expand=counts,session&format=datatables" data-page-length="10">
+                <thead>
+                    <th></th>
+                    <th>Case</th>
+                    <th>Session</th>
+                    <th>Court Type</th>
+                    <th>Case Type</th>
+                    <th>Verdict</th>
+                    <th>Litigant Count</th>
+                    <th>Of Note</th>
+                    <th>Villein</th>
+                    <th>Active Sale</th>
+                    <th>Incidental Land</th>
+                </thead>
+
+            </table>
+    </div>
+
+</div>
+
+<script>
+
+    var format_case_list_summary = function format( d ) {
+        return "<table class='table'>" +
+            "<tr>" +
+            "<td><b>Summary:</b></td>" +
+            "<td>" + d.summary + "</td>" +
+            "</tr>"
+            };
+
+    var case_table = $("#case_table").DataTable({
+        serverSide: true,
+        hideEmptyCols: {
+            emptyVals: [/(false)/]
+        },
+        columns: [
+            {
+                class: 'details-control',
+                orderable: false,
+                data: 'summary',
+                defaultContent: '',
+                render: checkNotes,
+                width:'15px'
+            },
+            {data: 'id',
+                render:{
+                    display: function(data){
+                        var url = Urls['case:detail'](data);
+                        return '<a href="' + url + '">' + data + "</a>";
+                    }
+                }
+            },
+            {data: 'session.date',
+                searchable: false,
+                render: {
+                    display: function(data, type, row){
+                        var url = Urls['session:detail'](row.session.id);
+                        return '<a href="' + url + '">' + row.session.law_term + ", " + row.session.year + "</a>";
+                    }
+                }
+            },
+            {data: 'court_type',
+                searchable: false,
+                orderable: false,
+            },
+            {data: 'case_type.case_type',},
+            {data: 'verdict.verdict',},
+            {data: 'litigant_count',
+                searchable: false,
+                orderable: false,
+            },
+            {data: 'of_interest',
+                searchable: false,
+                render: {
+                    display: checkMaker
+                }
+            },
+            {data: 'villeinage_mention',
+                searchable: false,
+                render: {
+                    display: checkMaker
+                }
+            },
+            {data: 'active_sale',
+                searchable: false,
+                render: {
+                    display: checkMaker
+                }
+            },
+            {data: 'incidental_land',
+                searchable: false,
+                render: {
+                    display: checkMaker
+                }
+            }
+        ]
+    });
+
+
+    // Used to activate the + expansion and trigger the format function.
+     $('#case_table').on('click', 'td.details-control', function(){
+        var tr = $(this).closest('tr');
+        var tdi = tr.find('#check');
+        var row = case_table.row( tr );
+        if (tdi.prop('style').color !== 'gray'){
+            if ( row.child.isShown()) {
+                row.child.hide();
+                tr.removeClass('shown');
+                tdi.first().removeClass('fa-minus-square');
+                tdi.first().addClass('fa-plus-square');
+            } else {
+                row.child( format_case_list_summary( row.data() ) ).show();
+                tr.addClass('shown');
+                tdi.first().removeClass('fa-plus-square');
+                tdi.first().addClass('fa-minus-square');
+            }
+        }
+    });
+
+</script>
+

@@ -1,0 +1,133 @@
+<div class="card">
+    <h3 class="card-header text-center">Mentioned Elsewhere</h3>
+    <div class="card-body">
+            <table class="table table-bordered table-hover" id="mentioned_elsewhere_table" data-ajax="{% url 'api:places-mentioned-list' %}?village={{ view.kwargs.pk }}&expand=case&format=datatables" data-page-length="10">
+                <thead>
+                    <th></th>
+                    <th>Village</th>
+                    <th>Case</th>
+                    <th>Session</th>
+                    <th>Court Type</th>
+                    <th>Case Type</th>
+                    <th>Verdict</th>
+                    <th>Litigant Count</th>
+                    <th>Of Note</th>
+                    <th>Villein</th>
+                    <th>Active Sale</th>
+                    <th>Incidental Land</th>
+                </thead>
+            </table>
+    </div>
+</div>
+<script>
+
+    var format_summary = function format( data ){
+        return "<table class='table'>" +
+            "<tr>" +
+            "<td><b>Summary</b></td>" +
+            "<td>" + data.case.summary + "</td>" +
+            "</tr>" +
+            "</table>"
+
+    };
+
+    var mentioned_elsewhere_table = $("#mentioned_elsewhere_table").DataTable({
+        serverSide: true,
+        hideEmptyCols: {
+            emptyVals: [/(false)/]
+        },
+        order: [1, "asc"],
+        "columns": [
+            {
+                class: "details-control",
+                orderable: "false",
+                data: 'case.summary',
+                defaultContent: "",
+                render: checkNotes,
+                width: "15px"
+            },
+            {data: "case.session.village.name",
+                defaultContent: '',
+                render: {
+                    display: function(data, type, row, col){
+                        url = Urls['village:detail'](row.case.session.village.id);
+                        return "<a href='" + url + "'>" + data  + "</a>";
+                    },
+                    sort: "name"
+                }
+            },
+            {data: "case.id",
+                defaultContent: '',
+                render: {
+                    display: function(data, type, row, col) {
+                        url = Urls['case:detail'](data);
+                        return "<a href='"+ url +"'>" + data + "</a>";
+                    },
+                    sort: "id"
+                }
+             },
+            {data: "case.session",
+                name: "case.session.date",
+                defaultContent: '',
+                render: {
+                    display: function(data, type, row){
+                      var url = Urls['session:detail'](row.case.session.id);
+                      return "<a href='" + url + "'>" + row.case.session.law_term + ", " + row.case.session.year + "</a>";
+                    },
+                }
+            },
+            {data: "case.court_type",
+                searchable: false,
+                orderable: false,
+            },
+            {data: "case.case_type.case_type"},
+            {data: "case.verdict.verdict"},
+            {data: "case.litigant_count",
+                searchable: false,
+                orderable: false,
+            },
+            {data: "case.of_interest",
+                defaultContent: '',
+                render: {
+                    display: checkMaker,
+                }
+            },
+            {data: "case.villeinage_mention",
+                defaultContent: '',
+                render: {
+                    display: checkMaker,
+                }
+            },
+            {data: "case.active_sale",
+                defaultContent: '',
+                render: {
+                    display: checkMaker,
+                }
+            },
+            {data: "case.incidental_land",
+                defaultContent: '',
+                render: {
+                    display: checkMaker,
+                }
+            },
+        ]
+    });
+
+    $('#mentioned_elsewhere_table').on('click', 'td.details-control', function(){
+        var tr = $(this).closest('tr');
+        var tdi = tr.find("i.fa");
+        var row = mentioned_elsewhere_table.row( tr );
+
+        if ( row.child.isShown() ) {
+            row.child.hide();
+            tr.removeClass('shown');
+            tdi.first().removeClass('fa-minus-square');
+            tdi.first().addClass('fa-plus-square');
+        } else{
+            row.child( format_summary( row.data() ) ).show();
+            tr.addClass('shown');
+            tdi.first().removeClass('fa-plus-square');
+            tdi.first().addClass('fa-minus-square');
+        }
+    });
+</script>

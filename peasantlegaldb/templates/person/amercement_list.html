@@ -1,0 +1,128 @@
+<div class="card">
+    <h3 class="card-header text-center bg-grey">Amercement List</h3>
+    <div class="card-body">
+            <table class="table table-bordered table-hover" id="amercement_list_table" data-ajax="{% url 'api:litigant-list' %}?amercements=true&litigant={{ view.kwargs.pk }}&expand=amercements,case&format=datatables" data-table-length="10">
+                <thead>
+                    <th>Details</th>
+                    <th>Case</th>
+                    <th>Session</th>
+                    <th class="text-center">Amercement</th>
+                    <th>Court</th>
+                    <th>Case Type</th>
+                    <th>Role</th>
+                    <th>Verdict</th>
+                    <th>Litigants</th>
+                </thead>
+            </table>
+    </div>
+
+</div>
+
+<!-- used to navigate pagination -->
+<script>
+    var format_amercement_summary = function( d ) {
+        return "<table class='table'>" +
+            "<tr>" +
+            "<td><b>Summary:</b></td>" +
+            "<td>" + d.case.summary + "</td>" +
+            "</tr>"
+    };
+
+    var format_amercements = function(data){
+        var cell = "<ul class='list-group list-group-flush'>";
+        $.each(data, function(index, item){
+            cell = cell + "<tr>"+
+            "<li class='list-group-item'>" + item.amercement.amount + ' (' + item.amercement.in_denarius + 'd.)' + "</li>"
+        });
+        cell = cell + "</ul>";
+        return cell
+    };
+
+    var amercement_list_table = $('#amercement_list_table').DataTable({
+        serverSide: true,
+        ajax: {
+            source: 'cases.'
+        },
+        columns: [
+            {
+                class: 'details-control',
+                orderable: false,
+                data: 'case.summary',
+                name: 'case.summary',
+                defaultContent: '',
+                render: checkNotes,
+                width:'15px'
+            },
+            {data: 'case.id',
+                searchable: false,
+                orderable: false,
+                render: {
+                    display: function(data){
+                        var url = Urls['case:detail'](data);
+                        return "<a href='" + url + "'>" + data + "</a>";
+                    }
+                }
+            },
+            {data: 'case.session',
+                name: 'case.session.date',
+                render:{
+                    display: function(data, type, row){
+                        if (data){
+                            var url = Urls['session:detail'](data.id);
+                            return "<a href='" + url + "'>" + data.law_term + ', ' + data.human_date + "</a>";
+                        } else {
+                            return "N/A";
+                        }
+                    }
+                }
+            },
+            {data: 'amercements',
+                searchable: false,
+                orderable: false,
+                render: {
+                    display: function(data){
+                        if (data){
+                            return format_amercements(data);
+                        }
+                    }
+                }
+            },
+            {data: 'case.court_type',
+                searchable: false,
+            },
+            {data: 'case.case_type.case_type',
+                name: 'case.case_type.case_type',
+            },
+            {data: 'case.verdict.verdict',
+                name: 'case.verdict.verdict',
+            },
+            {data: 'role.role',
+                name: 'role.role',
+            },
+            {data: 'case.litigant_count',
+                searchable: false,
+                orderable: false
+            },
+        ]
+    });
+
+    // Used to activate the + expansion and trigger the format function.
+     $('#amercement_list_table').on('click', 'td.details-control', function(){
+        var tr = $(this).closest('tr');
+        var tdi = tr.find('#check');
+        var row = amercement_list_table.row( tr );
+        if (tdi.prop('style').color !== 'gray'){
+            if ( row.child.isShown()) {
+                row.child.hide();
+                tr.removeClass('shown');
+                tdi.first().removeClass('fa-minus-square');
+                tdi.first().addClass('fa-plus-square');
+            } else {
+                row.child( format_amercement_summary( row.data() ) ).show();
+                tr.addClass('shown');
+                tdi.first().removeClass('fa-plus-square');
+                tdi.first().addClass('fa-minus-square');
+            }
+        }
+    });
+</script>

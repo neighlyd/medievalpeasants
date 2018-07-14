@@ -9,17 +9,14 @@
     {{ block.super }}
 
 <div class="card-body clearfix" id="main_info">
-    <table class="table table-bordered table-hover" id="table" data-page-length="25">
+    <table class="table table-bordered table-hover" id="table" data-ajax="{% url 'api:village-list' %}?format=datatables&keep=id&expand=hundred,county" data-page-length="25">
         <thead>
             <th>Notes</th>
             <th>Village</th>
+            <th>County</th>
             <th>Hundred</th>
             <th>Great Rumor</th>
             <th>Ancient Demesne</th>
-            <th>Sessions</th>
-            <th>Cases</th>
-            <th>Residents</th>
-            <th>Litigants</th>
         </thead>
     </table>
 </div>
@@ -47,41 +44,50 @@
 
 
     $(document).ready(function () {
-        var url = window.location.pathname;
-        var id = url.split('/').reverse()[1];
-        url = Urls["api:village-list"]();
-        var api_url = url + "?include[]=hundred&include[]=counts";
         var table = $("#table").DataTable({
-            fixedHeader:{ headerOffset: 50 },
             scrollX: true,
+            serverSide: true,
             order: [1, "asc"],
-            ajax: {
-                url: api_url,
-                type: "GET",
-                dataSrc: "villages.",
-            },
             "columns": [
                 {
                     "class": "details-control",
-                    "orderable": "false",
+                    "orderable": false,
                     "data": "notes",
                     "defaultContent": "",
                     "render": checkNotes,
                     width:"15px"
                 },
                 {data: "name",
-                    fnCreatedCell: function(nTd, cellData, rowData, row, col) {
-                        url = Urls.village(rowData.id);
-                        $(nTd).html("<a href='"+ url +"'>" + rowData.name + "</a>");
+                    render: {
+                        display: function(data, type, row, meta){
+                            var url = Urls['village:detail'](row.id);
+                            return '<a href="' + url + '">' + row.name + '</a>';
+                        }
                     }
                 },
-                {data: "hundred",
-                    fnCreatedCell: function(nTd, cellData, rowData, row, col){
-                        if (cellData){
-                            url = Urls.hundred(cellData.id);
-                            $(nTd).html("<a href='"+ url + "'>" + cellData.name + "</a>");
-                        } else {
-                            $(nTd).html("N/A")
+                {data: "county.name",
+                    defaultContent: '',
+                    render: {
+                        display: function(data, type, row, meta){
+                            if (data){
+                                var url = Urls['county:detail'](row.county.id);
+                                return '<a href="' + url + '">' + row.county.name + '</a>';
+                            } else {
+                                return 'N/A'
+                            }
+                        }
+                    }
+                },
+                {data: "hundred.name",
+                    defaultContent: '',
+                    render: {
+                        display: function(data, type, row, meta){
+                            if (data){
+                                var url = Urls['hundred:detail'](row.hundred.id);
+                                return '<a href="' + url + '">' + row.hundred.name + '</a>';
+                            } else {
+                                return 'N/A'
+                            }
                         }
                     }
                 },
@@ -97,28 +103,25 @@
                         display: checkMaker,
                     }
                 },
-                {data: "counts.session"},
-                {data: "counts.case"},
-                {data: "counts.resident"},
-                {data: "counts.litigant"},
             ]
         });
 
         $('#table tbody').on('click', 'td.details-control', function(){
             var tr = $(this).closest('tr');
-            var tdi = tr.find("#");
+            var tdi = tr.find("#check");
             var row = table.row( tr );
-
-            if ( row.child.isShown() ) {
-                row.child.hide();
-                tr.removeClass('shown');
-                tdi.first().removeClass('fa-minus-square');
-                tdi.first().addClass('fa-plus-square');
-            } else{
-                row.child( format( row.data() ) ).show();
-                tr.addClass('shown');
-                tdi.first().removeClass('fa-plus-square');
-                tdi.first().addClass('fa-minus-square');
+            if (tdi.prop('style').color !== 'gray'){
+                if ( row.child.isShown() ) {
+                    row.child.hide();
+                    tr.removeClass('shown');
+                    tdi.first().removeClass('fa-minus-square');
+                    tdi.first().addClass('fa-plus-square');
+                } else{
+                    row.child( format( row.data() ) ).show();
+                    tr.addClass('shown');
+                    tdi.first().removeClass('fa-plus-square');
+                    tdi.first().addClass('fa-minus-square');
+                }
             }
         });
 

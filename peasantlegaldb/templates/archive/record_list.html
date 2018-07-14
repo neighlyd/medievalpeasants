@@ -1,26 +1,25 @@
-{% extends '_layout/_l_single_col.html' %}
-
-{% block single_col %}
-    <h3 class="card-header text-center">Record List</h3>
-    <div class="card-body">
-            <table class="table table-bordered table-hover" id="table" data-page-length="25">
-                <thead>
-                    <th>Notes</th>
-                    <th>Name</th>
-                    <th>Record Type</th>
-                    <th>Reel</th>
-                    <th>Earliest Session</th>
-                    <th>Latest Session</th>
-                    <th>Sessions</th>
-                    <th>Cases</th>
-                </thead>
-            </table>
+<div class="card">
+    <div class="card-header text-center bg-grey">
+        <h3>Record List</h3>
+        {% if perms.peasantlegaldb.add_record %}
+            <a href="{% url 'record:add' %}?archive={{ archive.id }}" class="btn btn-sm btn-success">Add Record</a>
+        {% endif %}
     </div>
 
-{% endblock %}
+    <div class="card-body">
+        <table class="table table-bordered table-hover" id="record_table" data-ajax="{% url 'api:record-list' %}?archive={{ archive.id }}&format=datatables" data-page-length="10">
+            <thead>
+                <th>Notes</th>
+                <th>Name</th>
+                <th>Record Type</th>
+                <th>Reel</th>
+                <th>Sessions</th>
+                <th>Cases</th>
+            </thead>
+        </table>
+    </div>
 
-{% block scripts %}
-    {{ block.super }}
+</div>
 
 <script>
 
@@ -33,75 +32,59 @@
         "</table>"
     }
 
-    $(document).ready(function () {
-        var url = window.location.pathname;
-        var id = url.split('/').reverse()[1];
-        url = Urls['api:archive-detail'](id);
-        var api_url = url + "?include[]=records.session_dates&include[]=records.counts";
-        var table = $("#table").DataTable({
-            fixedHeader:{                headerOffset: 50            },
-            scrollX: true,
-            order: [4, "asc"],
-            ajax: {
-                url: api_url,
-                type: "GET",
-                dataSrc: "archive.records.",
+    var record_table = $("#record_table").DataTable({
+        serverSide: true,
+        columns: [
+            {
+                class: "details-control",
+                orderable: false,
+                data: "notes",
+                defaultContent: "",
+                render: checkNotes,
+                width:"15px"
             },
-            "columns": [
-                {
-                    "class": "details-control",
-                    "orderable": false,
-                    "data": "notes",
-                    "defaultContent": "",
-                    "render": checkNotes,
-                    width:"15px"
-                },
-                {data: "name",
-                    fnCreatedCell: function(nTd, cellData, rowData, row, col) {
-                        url = Urls.record(rowData.id);
-                        $(nTd).html("<a href='"+ url +"'>" + rowData.name + "</a>");
+            {data: "name",
+                render:{
+                    display: function(data, type, row){
+                        var url = Urls['record:detail'](row.id);
+                        return "<a href='"+ url +"'>" + data + "</a>";
                     }
-                },
-                {data: "record_type"},
-                {data: "reel"},
-                {data: "session_dates.earliest_session",
-                    render: {
-                        display: formatSessionDate,
-                        sort: "date",
-                    }
-                },
-                {data: "session_dates.latest_session",
-                    render: {
-                        display: formatSessionDate,
-                        sort: "date",
-                    }
-                },
-                {data: "counts.session"},
-                {data: "counts.case"},
-            ]
-        });
+                }
+            },
+            {data: "record_type",
+                searchable: false,
+                orderable: false,
+            },
+            {data: "reel"},
+            {data: "counts.session",
+                searchable: false,
+                orderable: false,
+            },
+            {data: "counts.case",
+                searchable: false,
+                orderable: false,
+            },
+        ]
+    });
 
-        $('#table tbody').on('click', 'td.details-control', function(){
-            var tr = $(this).closest('tr');
-            var tdi = tr.find("i.fa");
-            var row = table.row( tr );
-
-            if ( row.child.isShown() ) {
+    $('#record_table tbody').on('click', 'td.details-control', function(){
+        var tr = $(this).closest('tr');
+        var tdi = tr.find("#check");
+        var row = record_table.row( tr );
+        if (tdi.prop('style').color !== 'gray') {
+            if (row.child.isShown()) {
                 row.child.hide();
                 tr.removeClass('shown');
                 tdi.first().removeClass('fa-minus-square');
                 tdi.first().addClass('fa-plus-square');
-            } else{
-                row.child( format( row.data() ) ).show();
+            } else {
+                row.child(format(row.data())).show();
                 tr.addClass('shown');
                 tdi.first().removeClass('fa-plus-square');
                 tdi.first().addClass('fa-minus-square');
             }
-        });
+        }
     });
 
 
 </script>
-
-
-{% endblock %}

@@ -1,0 +1,63 @@
+<div class="card">
+    <h3 class="card-header text-center">Session List</h3>
+    <div class="card-body">
+            <table class="table table-bordered table-hover" id="session_table" data-ajax="{% url 'api:session-list' %}?village={{ view.kwargs.pk }}&keep=id,law_term,year&format=datatables" data-page-length="10">
+                <thead>
+                    <th>ID</th>
+                    <th>Date</th>
+                    <th>Cases</th>
+                    <th>Litigants</th>
+                    <th>Chevages</th>
+                    <th>Impercamenta</th>
+                    <th>Land Cases</th>
+                </thead>
+            </table>
+    </div>
+</div>
+<script>
+
+        var session_table = $("#session_table").DataTable({
+            serverSide: true,
+            hideEmptyCols: true,
+            order: [1, "asc"],
+            columns: [
+                {data: "id",
+                     render:{
+                        display: function(data){
+                            var url = Urls['session:detail'](data);
+                            return "<a href='" + url + "'>" + data + "</a>";
+                        }
+                    }
+                },
+                {data: "date",
+                    render:{
+                        display: function(data, type, row){
+                            var url = Urls['session:detail'](row.id);
+                            return "<a href='" + url + "'>" + row.law_term + ", " + row.year + "</a>";
+                        }
+                    }
+                },
+                {data: "counts.case",
+                    searchable: false,
+                    orderable: false,
+                },
+                {data: "counts.litigant",
+                    searchable: false,
+                    orderable: false,
+                },
+                {data: "counts.capitagium_payer",
+                    searchable: false,
+                    orderable: false,
+                },
+                {data: "counts.impercamentum_payer",
+                    searchable: false,
+                    orderable: false,
+                },
+                {data: "counts.land",
+                    searchable: false,
+                    orderable: false,
+                },
+            ]
+        });
+
+</script>

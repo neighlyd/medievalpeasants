@@ -1,0 +1,31 @@
+{% extends '_layout/__base.html' %}
+
+{% block navbar %}
+    {% include '_layout/__navbar.html' %}
+{% endblock %}
+
+{% block content %}
+    <br>
+    <div class="d-flex justify-content-end">
+
+            <div class="mx-auto">
+                <form action="" method="post">
+                    {% csrf_token %}
+                    <div class="card">
+                        {% block card_body %}
+                        {% endblock %}
+                </div>
+            </div>
+
+            <div class="p-10">
+                <div class="container" style="position: sticky; top: 65px;">
+                    {% block buttons %}
+                    {% endblock %}
+                </div>
+            </div>
+
+        </form>
+    </div>
+
+    </div>
+{% endblock %}

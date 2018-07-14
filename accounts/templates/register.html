@@ -4,7 +4,7 @@
     Register
 {% endblock %}
 
-{% block card-body %}
+{% block card_body %}
     <form method="post" novalidate>
         {% csrf_token %}
         {% include '_layout/_form.html' %}

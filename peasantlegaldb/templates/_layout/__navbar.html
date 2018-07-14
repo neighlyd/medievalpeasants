@@ -10,11 +10,11 @@
         <ul class="navbar-nav mr-auto">
 
             <li class="nav-item">
-                <a class="nav-link" href="{% url 'person_list' %}">People</a>
+                <a class="nav-link" href="{% url 'person:list' %}">People</a>
             </li>
 
             <li class="nav-item">
-                <a class="nav-link" href="{% url 'case_list' %}">Cases</a>
+                <a class="nav-link" href="{% url 'case:list' %}">Cases</a>
             </li>
 
             <li class="nav-item dropdown">
@@ -22,10 +22,9 @@
                     Places
                 </a>
                 <div class="dropdown-menu" aria-labelledby="navbarPeopleDropdown" style="background-color: #245602">
-                    <a class="dropdown-item" href="{% url 'village_list' %}">Villages</a>
-                    <a class="dropdown-item" href="{% url 'hundred_list' %}">Hundreds</a>
-                    <a class="dropdown-item" href="{% url 'county_list' %}">Counties</a>
-                    <a class="dropdown-item" href="{% url 'land_list' %}">Lands</a>
+                    <a class="dropdown-item" href="{% url 'village:list' %}">Villages</a>
+                    <a class="dropdown-item" href="{% url 'hundred:list' %}">Hundreds</a>
+                    <a class="dropdown-item" href="{% url 'county:list' %}">Counties</a>
                 </div>
             </li>
 
@@ -34,9 +33,9 @@
                     Sources
                 </a>
                 <div class="dropdown-menu" aria-labelledby="navbarPeopleDropdown" style="background-color: #245602">
-                    <a class="dropdown-item" href="{% url 'archive_list' %}">Archives</a>
-                    <a class="dropdown-item" href="{% url 'session_list' %}">Sessions</a>
-                    <a class="dropdown-item" href="{% url 'record_list' %}">Records</a>
+                    <a class="dropdown-item" href="{% url 'archive:list' %}">Archives</a>
+                    <a class="dropdown-item" href="{% url 'session:list' %}">Sessions</a>
+                    <a class="dropdown-item" href="{% url 'record:list' %}">Records</a>
                 </div>
             </li>
 

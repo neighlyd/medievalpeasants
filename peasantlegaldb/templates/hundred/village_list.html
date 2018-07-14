@@ -1,0 +1,107 @@
+<div class="card">
+    <div class="card-header">
+        <h3 class="text-center">Village List</h3>
+    </div>
+
+    <div class="card-body">
+            <table class="table table-bordered table-hover" id="village_table" data-ajax="{% url 'api:village-list' %}?hundred={{ view.kwargs.pk }}&format=datatables" data-page-length="10">
+                <thead>
+                    <th>Notes</th>
+                    <th>Village</th>
+                    <th>Great Rumor</th>
+                    <th>Ancient Demesne</th>
+                    <th>Sessions</th>
+                    <th>Cases</th>
+                    <th>Residents</th>
+                    <th>Litigants</th>
+                </thead>
+            </table>
+    </div>
+
+</div>
+
+
+<script>
+    var format_notes = function format( data ){
+        return "<table class='table'>" +
+            "<tr>" +
+            "<td><b>Notes</b></td>" +
+            "<td>" + data.notes + "</td>" +
+            "</tr>" +
+            "</table>"
+    };
+
+    var village_table = $("#village_table").DataTable({
+        serverSide: true,
+        order: [1, "asc"],
+        columns: [
+            {
+                "class": "details-control",
+                "orderable": "false",
+                "data": "notes",
+                "defaultContent": "",
+                "render": checkNotes,
+                width:"15px"
+            },
+            {data: "name",
+                defaultContent: '',
+                render: {
+                    display: function(data, type, row, col){
+                        url = Urls['village:detail'](row.id);
+                        return "<a href='"+ url +"'>" + data + "</a>";
+                    },
+                    sort: "name"
+                }
+            },
+            {data: "great_rumor",
+                defaultContent: '',
+                render: {
+                    display: checkMaker,
+                }
+            },
+            {data: "ancient_demesne",
+                defaultContent: '',
+                render: {
+                    display: checkMaker,
+                }
+            },
+            {data: "counts.session",
+                searchable: false,
+                orderable: false,
+            },
+            {data: "counts.case",
+                searchable: false,
+                orderable: false,
+            },
+            {data: "counts.resident",
+                searchable: false,
+                orderable: false,
+            },
+            {data: "counts.litigant",
+                searchable: false,
+                orderable: false,
+            },
+        ]
+    });
+
+    // Used to activate the + expansion and trigger the format function.
+     $('#village_table').on('click', 'td.details-control', function(){
+        var tr = $(this).closest('tr');
+        var tdi = tr.find('#check');
+        var row = village_table.row( tr );
+        if (tdi.prop('style').color !== 'gray'){
+            if ( row.child.isShown()) {
+                row.child.hide();
+                tr.removeClass('shown');
+                tdi.first().removeClass('fa-minus-square');
+                tdi.first().addClass('fa-plus-square');
+            } else {
+                row.child( format_notes( row.data() ) ).show();
+                tr.addClass('shown');
+                tdi.first().removeClass('fa-plus-square');
+                tdi.first().addClass('fa-minus-square');
+            }
+        }
+    });
+        
+</script>

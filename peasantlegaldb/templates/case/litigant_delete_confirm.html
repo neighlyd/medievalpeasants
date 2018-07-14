@@ -1,0 +1,20 @@
+<form method="post" action="{% url 'litigant:delete' litigant.id %}" class="delete_litigant_form">
+    {% csrf_token %}
+    <div class="modal-header">
+        <h4 class="modal-title text-center">Confirm Litigant Removal</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+
+    <div class="modal-body">
+        <p class="lead">Are you sure you want to remove <strong>{{ litigant.person.full_name }}</strong> from this case?</p>
+        <p class="center-text">All of their associated data tied to this case will be lost.</p>
+    </div>
+
+    <div class="modal-footer d-flex justify-content-between p-2">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-danger">Remove Litigant</button>
+    </div>
+
+</form>

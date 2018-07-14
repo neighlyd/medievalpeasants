@@ -5,8 +5,11 @@
 {% endblock %}
 
 {% block left_sidebar %}
-    <div id="selection_list">
-        <a class="list-group-item list-group-item-action active" href="{% url 'record_list' archive.id %}">Records</a>
+    <div class="list-group" id="selection_list" role="tablist">
+        <a class="list-group-item list-group-item-action" href="#record_list" data-url="{% url 'archive:records' archive.id %}" role="tab" data-toggle="list">Records</a>
+        <a class="list-group-item list-group-item-action" href="#session_list" data-url="{% url 'archive:sessions' archive.id %}" role="tab" data-toggle="list">Sessions</a>
+        <a class="list-group-item list-group-item-action" href="#case_list" data-url="{% url 'archive:cases' archive.id %}" role="tab" data-toggle="list">Cases</a>
+
     </div>
 {% endblock %}
 
@@ -57,8 +60,10 @@
 
 <br>
 
-<div id="list_info">
-
+<div class="tab-content" id="list_info">
+    <div class="tab-pane fade" id="record_list" role="tabpanel"></div>
+    <div class="tab-pane fade" id="session_list" role="tabpanel"></div>
+    <div class="tab-pane fade" id="case_list" role="tabpanel"></div>
 </div>
 
 {% endblock %}
@@ -67,21 +72,21 @@
     <div class="container" style="position: sticky; top: 65px">
         {% if perms.peasantlegaldb.add_archive %}
             <div class="btn-group" role="group">
-                <a class="btn btn-success" href="#">Add Archive</a>
+                <a class="btn btn-success" href="{% url 'archive:add' %}">Add Archive</a>
             </div>
             <br>
             <br>
         {% endif %}
         {% if perms.peasantlegaldb.change_archive %}
             <div class="btn-group" role="group">
-                <a class="btn btn-warning" href="#">Edit Archive</a>
+                <a class="btn btn-warning" href="{% url 'archive:edit' archive.id %}">Edit Archive</a>
             </div>
             <br>
             <br>
         {% endif %}
         {% if perms.peasantlegaldb.delete_archive %}
             <div class="btn-group" role="group">
-                <a class="btn btn-danger" href="#">Delete Archive</a>
+                <a class="btn btn-danger" href="{% url 'archive:delete' archive.id %}">Delete Archive</a>
             </div>
         {% endif %}
     </div>
@@ -92,9 +97,24 @@
 
     <script>
         $(document).ready(function(){
-             var url = window.location.pathname;
-            var id = url.split('/').reverse()[1]
-            $("#list_info").load(Urls.record_list(id))
+            $("#selection_list").on('click', 'a', function(e){
+               e.preventDefault();
+               var url = $(this).attr("data-url");
+
+               if (typeof url !== "undefined"){
+                   var pane = $(this), href = this.hash;
+
+                   $(href).load(url, function(result){
+                       pane.tab('show');
+                   });
+               } else {
+                   $(this).tab('show');
+               }
+            });
+
+            $('a[data-toggle="tab"').on('shown.bs.tab', function(e){
+                $.fn.dataTable.tables({visible: true, api: true}).columns.adjust().responsive.recalc();
+            });
         })
     </script>
 

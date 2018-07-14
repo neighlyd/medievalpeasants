@@ -1,0 +1,109 @@
+<h3 class="card-header text-center">Land</h3>
+    <div class="card-body">
+            <table class="table table-bordered table-hover" id="land_table" data-ajax="{% url 'api:land-list' %}?village={{ view.kwargs.pk }}&expand=tenants.litigant.person,tenants.litigant.case&format=datatables&distinct=true" data-page-length="5">
+                <thead>
+                    <th>History</th>
+                    <th>Land ID</th>
+                    <th>Parcels</th>
+                    <th>Notes</th>
+                </thead>
+            </table>
+    </div>
+
+<script>
+
+    var format_tenant_history = function format( data ) {
+        var cell = "<table class='table'>" +
+            "<tr>" +
+            "<th>Case</th>" +
+            "<th>Date</th>" +
+            "<th>Person</th>" +
+            "<th>Role</th>" +
+            "</tr>";
+        $.each(data.tenants, function(index, item){
+            cell = cell +
+                "<tr>" +
+                "<td>" + "<a href='" + Urls['case:detail'](item.litigant.case.id) + "'>" + item.litigant.case.id + "</a></td>" +
+                "<td>" + "<a href='" + Urls['session:detail'](item.litigant.case.session.id) + "'>" + item.litigant.case.session.law_term + ", " + item.litigant.case.session.year +  "</a></td>" +
+                "<td>" + "<a href='" + Urls['person:detail'](item.litigant.person.id) + "'>" + item.litigant.person.full_name + "</a></td>" +
+                "<td>" + item.role.role + "</td>"
+        });
+        cell = cell + "</table>";
+        return cell;
+    };
+
+
+    var format_parcels = function(data){
+        var cell = "<ul class='list-group list-group-flush'>";
+        $.each(data, function(index, item){
+            cell = cell + "<tr>"+
+            "<li class='list-group-item'>" + item.amount + ' ' + item.type + ' of ' + item.tenure + "</li>"
+        });
+        cell = cell + "</ul>";
+        return cell
+    };
+
+    var land_table = $('#land_table').DataTable({
+        serverSide: true,
+        columns: [
+            {
+                class: 'details-control',
+                orderable: false,
+                searchable: false,
+                data: 'tenants',
+                name: 'tenants',
+                defaultContent: '',
+                render: checkNotes,
+                width:'15px'
+            },
+            {data: 'id',
+                searchable: false,
+                orderable: false,
+                render: {
+                    display: function(data){
+                        var url = Urls['land:detail'](data);
+                        return "<a href='" + url + "'>" + data + "</a>";
+                    }
+                }
+            },
+            {data: 'parcel_list',
+                defaultContent: '',
+                orderable: false,
+                searchable: false,
+                name: 'parcel_list.type, parcel_list.tenure',
+                render:{
+                    display: function(data, type, row){
+                        if(data){
+                            return format_parcels(data)
+                        } else {
+                            return " "
+                        }
+                    }
+                }
+            },
+            {data: 'notes',
+                orderable: false,
+            },
+        ]
+    });
+
+    // Used to activate the + expansion and trigger the format function.
+     $('#land_table').on('click', 'td.details-control', function(){
+        var tr = $(this).closest('tr');
+        var tdi = tr.find('#check');
+        var row = land_table.row( tr );
+        if (tdi.prop('style').color !== 'gray'){
+            if ( row.child.isShown()) {
+                row.child.hide();
+                tr.removeClass('shown');
+                tdi.first().removeClass('fa-minus-square');
+                tdi.first().addClass('fa-plus-square');
+            } else {
+                row.child( format_tenant_history( row.data() ) ).show();
+                tr.addClass('shown');
+                tdi.first().removeClass('fa-plus-square');
+                tdi.first().addClass('fa-minus-square');
+            }
+        }
+    });
+</script>

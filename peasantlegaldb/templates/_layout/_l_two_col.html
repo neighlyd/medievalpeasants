@@ -25,13 +25,7 @@
         <div class="p-0 col-lg-1">
 
             {% block right_sidebar %}
-                {% if user.is_authenticated %}
-                    <div class="container" style="position: sticky; top: 65px">
-                        <div class="btn-group" role="group">
-                        <button type="button" class="btn btn-secondary float-right"">Add {{ page_title }}</button>
-                        </div>
-                    </div>
-                {% endif %}
+
             {% endblock %}
 
         </div>

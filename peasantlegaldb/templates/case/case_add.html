@@ -1,0 +1,86 @@
+{% extends '_layout/_l_form_input.html' %}
+{% load template_tags %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block navbar %}
+    {% include '_layout/__navbar.html' %}
+{% endblock %}
+
+
+{% block center_block %}
+<div class="p-0 col-lg-8">
+    <div class="card">
+    <form id="case" action="" method="post">
+        {% csrf_token %}
+
+    <div class="card-header text-center">
+        <h2 class="card-title">Add Case</h2>
+    </div>
+
+    <div class="card-body clearfix" id="main_form">
+        <div class="d-flex justify-content-between flex-wrap">
+
+                        <div class="card p-0 col-lg-5">
+                            <h3 class="card-header">Case Info:</h3>
+                                <div class="card-body">
+                                    {% for field in form %}
+                                        {% if field.name != 'summary' %}
+                                            {{ field | as_crispy_field }}
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                        </div>
+                        <div class="card p-0 col-lg-6">
+                            <h3 class="card-header">Notes:</h3>
+                            <div class="card-body">
+                                {{ form.summary | as_crispy_field }}
+                            </div>
+                        </div>
+        </div>
+    </div>
+
+    </div>
+</div>
+
+<div class="p-0 col-lg-2">
+    <div class="container" style="position: sticky; top: 65px">
+        <button type="submit" class="btn btn-success" name="add_litigants">Add Litigants</button>
+        <br>
+        <br>
+        <button type="submit" class="btn btn-success" name="add_another">Add New Case</button>
+        <br>
+        <br>
+</form>
+        <a class="btn btn-danger" href="{{ request.META.HTTP_REFERER }}">Cancel</a>
+    </div>
+</div>
+
+
+{% endblock %}
+
+
+{% block scripts %}
+
+    {{ block.super }}
+
+    <script src="{% static '/js/serialize-object.min.js' %}"></script>
+    <script src="{% static '/js/formset.js' %}"></script>
+    <script>
+        $(function(){
+            $('#litigants').formset({
+                prefix: '{{ litigant_formset.prefix }}'
+            });
+        })
+    </script>
+    <script>
+        $(document).ready(function(){
+            $("#add").click(function(){
+                $("#case").submit();
+            })
+        })
+    </script>
+
+
+
+{% endblock %}

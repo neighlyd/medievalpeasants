@@ -1,58 +1,51 @@
-{% extends '_layout/_l_single_col.html' %}
-{% block single_col %}
-
-    <h3 class="card-header text-center">Positions</h3>
+<div class="card">
+    <h3 class="card-header text-center bg-grey">Positions</h3>
     <div class="card-body">
-            <table class="table table-bordered table-hover" id="person_position_list" data-page-length="25">
+            <table class="table table-bordered table-hover" id="position_table" data-ajax="{% url 'api:position-list' %}?person={{ view.kwargs.pk }}&expand=session&format=datatables" data-table-length="10">
                 <thead>
                     <th>Title</th>
                     <th>Session</th>
                     <th>Definitive</th>
                 </thead>
-            </table>
+
     </div>
 
-{% endblock %}
-
-{% block scripts %}
-    {{ block.super }}
+</div>
 
 <script>
-    // provides format for nested table that displays when + sign is clicked.
-
-    $(document).ready(function () {
-        var url = window.location.pathname;
-        var id = url.split('/').reverse()[1];
-        url = Urls["api:person-detail"](id);
-        var api_url = url + "?include[]=positions.session";
-        var position_table = $("#person_position_list").DataTable({
-            fixedHeader:{ headerOffset: 50 },
-            order: [2, "asc"],
-            ajax: {
-                url: api_url,
-                type: "GET",
-                dataSrc: "person.positions.",
+    var position_table = $('#position_table').DataTable({
+        serverSide: true,
+        order: [[1, 'asc']],
+        columns: [
+            {data: 'title.title',
+                name: 'title.title'
             },
-            "columns": [
-                {data: "title.title"},
-                {data: "session",
-                    defaultContent: '',
-                    render: {
-                        display: formatSessionDateNoVillage,
-                        sort: "date"
-                    }
-                },
-                {data: "definitive",
-                    defaultContent: '',
-                    render: {
-                        display: checkMaker,
+            {data: 'session',
+                name: 'session.date',
+                render: {
+                   display: function(data, type, row){
+                        if (data){
+                            var url = Urls['session:detail'](data.id);
+                            return "<a href='" + url + "'>" + data.law_term + ', ' + data.human_date + "</a>";
+                        } else {
+                            return "N/A";
+                        }
                     }
                 }
-            ]
-        })
+            },
+            {data: 'definitive',
+                searchable: false,
+                orderable: false,
+                render: {
+                    display: function(data){
+                        if (data){
+                            return "Yes"
+                        } else {
+                            return "No"
+                        }
+                    }
+                }
+            },
+        ]
     });
-
 </script>
-
-
-{% endblock %}

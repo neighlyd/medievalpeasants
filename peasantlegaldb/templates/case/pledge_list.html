@@ -1,0 +1,54 @@
+<h3 class="card-header text-center bg-grey">Pledges</h3>
+<div class="card-body">
+    <table class="table table-bordered table-hover" id="pledge_table" data-ajax="{% url 'api:pledge-list' %}?case={{ view.kwargs.pk }}&format=datatables&expand=giver,receiver" data-page-length="25">
+        <thead>
+            <th>Grantor</th>
+            <th>Grantor Status</th>
+            <th>Grantor Gender</th>
+            <th>Recipient</th>
+            <th>Recipient Status</th>
+            <th>Recipient Gender</th>
+        </thead>
+    </table>
+</div>
+
+<script>
+    var pledge_table = $('#pledge_table').dataTable({
+       serverSide: true,
+       columns:[
+           {data: 'giver.full_name',
+               render:{
+                    display: function(data, type, row, meta){
+                        var url = Urls['person:detail'](row.giver.id);
+                        return "<a href='" + url + "'>" + data + "</a>";
+                    }
+                }
+           },
+           {data: 'giver.status_display',
+               searchable: false,
+               orderable: false,
+           },
+           {data: 'giver.gender_display',
+               searchable: false,
+               orderable: false,
+           },
+           {data: 'receiver.person.full_name',
+               render:{
+                    display: function(data, type, row, meta) {
+                        var url = Urls['person:detail'](row.receiver.person.id);
+                        return "<a href='" + url + "'>" + data + "</a>";
+                    }
+           }
+           },
+           {data: 'receiver.person.status_display',
+               searchable: false,
+               orderable: false,
+           },
+           {data: 'receiver.person.gender_display',
+               searchable: false,
+               orderable: false,
+           },
+       ]
+    });
+
+</script>

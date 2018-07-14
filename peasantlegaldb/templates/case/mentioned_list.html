@@ -1,0 +1,69 @@
+<h3 class="card-header text-center bg-grey">Places Mentioned List</h3>
+    <div class="card-body">
+            <table class="table table-bordered" id="mentioned_table" data-ajax="{% url 'api:places-mentioned-list' %}?case={{ view.kwargs.pk }}&expand=village&format=datatables" data-page-length="25">
+                <thead>
+                    <th>Village</th>
+                    <th>County</th>
+                    <th>Great Rumor</th>
+                    <th>Ancient Demesne</th>
+                    <th>Sessions</th>
+                    <th>Cases</th>
+                    <th>Residents</th>
+                    <th>Litigants</th>
+                    <th>Notes</th>
+                </thead>
+            </table>
+    </div>
+
+<script>
+    var mentioned_table = $("#mentioned_table").dataTable({
+        serverSide: true,
+        columns:[
+            {data: 'village.name',
+                render:{
+                    display: function(data, type, row){
+                        var url = Urls['village:detail'](row.village.id);
+                        return "<a href='" + url + "'>" + data + "</a>";
+                    }
+                }
+            },
+            {data: 'village.county.name',
+                render:{
+                    display: function(data, type, row){
+                        var url = Urls['county:detail'](row.village.county.id);
+                        return "<a href='" + url + "'>" + data + "</a>";
+                    }
+                }
+            },
+            {data: 'village.great_rumor',
+                defaultContent: '',
+                searchable: false,
+                orderable: false,
+                render: checkMaker,
+            },
+            {data: 'village.ancient_demesne',
+                defaultContent: '',
+                render: checkMaker,
+                searchable: false,
+                orderable: false,
+            },
+            {data: 'village.counts.session',
+                searchable: false,
+                orderable: false,
+            },
+            {data: 'village.counts.case',
+                searchable: false,
+                orderable: false,
+            },
+            {data: 'village.counts.resident',
+                searchable: false,
+                orderable: false,
+            },
+            {data: 'village.counts.litigant',
+                searchable: false,
+                orderable: false,
+            },
+            {data: 'notes'},
+        ]
+    })
+</script>

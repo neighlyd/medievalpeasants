@@ -1,0 +1,162 @@
+{% extends '_layout/_l_form_input.html' %}
+{% load template_tags %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block navbar %}
+    {% include '_layout/__navbar.html' %}
+{% endblock %}
+
+    {% block left_sidebar %}
+        <div class="container" style="position: sticky; top: 65px">
+            <button type="button" class="btn btn-success pull-right" id="add_litigant" data-url="{% url 'case:add_litigant' case.id %}"><i class="fas fa-plus"></i>  Add Litigant</button>
+        </div>
+    {% endblock %}
+
+{% block center_block %}
+<div class="p-0 col-lg-8">
+    <div class="card">
+    <form id="case" method="post">
+        {% csrf_token %}
+
+    <div class="card-header text-center">
+        <h2 class="card-title">Case {{ case.id }}</h2>
+    </div>
+
+    <div class="card-body clearfix" id="main_form">
+        <div class="d-flex justify-content-between flex-wrap">
+
+                        <div class="card p-0 col-lg-5">
+                            <h3 class="card-header">Case Info:</h3>
+                                <div class="card-body">
+                                    {% for field in form %}
+                                        {% if field.name != 'summary' %}
+                                            {{ field | as_crispy_field }}
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                        </div>
+                        <div class="card p-0 col-lg-6">
+                            <h3 class="card-header">Notes:</h3>
+                            <div class="card-body">
+                                {{ form.summary }}
+                            </div>
+                        </div>
+        </div>
+    </div>
+    <br>
+    <div class="card">
+        <div class="card-header text-center">
+
+            <h4 class="card-title">Litigants</h4>
+        </div>
+        <div class="card-body" id="litigants">
+            {% include 'case/litigant_table_for_case.html' %}
+        </div>
+    </div>
+    </div>
+</div>
+<div class="p-0 col-lg-2">
+    <div class="container" style="position: sticky; top: 65px">
+        <button type="submit" class="btn btn-success" name="finish_editing">Finish Editing</button>
+        <br>
+        <br>
+        <button type="submit" class="btn btn-success" name="add_another">Add New Case</button>
+        <br>
+        <br>
+    </form>
+        <a class="btn btn-danger" href="{{ request.META.HTTP_REFERER }}">Cancel</a>
+    </div>
+</div>
+
+<!-- Modal for editing litigants. The content is loaded dynamically through ajax. -->
+<div class="modal fade" id="modal-litigant">
+    <div class="modal-dialog modal-lg editing-modal">
+        <div class="modal-content">
+
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modal-delete-litigant">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+    {{ block.super }}
+    <script src="{% static '/js/formset.js' %}"></script>
+    <script src="{% static '/js/case_edit.js' %}"></script>
+    <script>
+        $(document).ready(function() {
+
+            // Need to run formset functions when the modal is created, otherwise, the formset function can't pick up the
+            // creation of the formset.
+            $('#modal-litigant').on('shown.bs.modal', function () {
+                $('#add_amercement_collapse tbody tr').formset({
+                    prefix: 'amercement',
+                    addText: 'Add Another',
+                    deleteText: 'Delete Amercement',
+                });
+            });
+            $('#modal-litigant').on('shown.bs.modal', function () {
+                $('#add_capitagium_collapse tbody tr').formset({
+                    prefix: 'capitagium',
+                    addText: 'Add Another',
+                    deleteText: 'Delete Capitagium',
+                });
+            });
+            $('#modal-litigant').on('shown.bs.modal', function () {
+                $('#add_damage_collapse tbody tr').formset({
+                    prefix: 'damage',
+                    addText: 'Add Another',
+                    deleteText: 'Delete Damage',
+                });
+            });
+            $('#modal-litigant').on('shown.bs.modal', function () {
+                $('#add_fine_collapse tbody tr').formset({
+                    prefix: 'fine',
+                    addText: 'Add Another',
+                    deleteText: 'Delete Fine',
+                });
+            });
+            $('#modal-litigant').on('shown.bs.modal', function () {
+                $('#add_heriot_collapse tbody tr').formset({
+                    prefix: 'heriot',
+                    addText: 'Add Another',
+                    deleteText: 'Delete Heriot',
+                });
+            });
+            $('#modal-litigant').on('shown.bs.modal', function () {
+                $('#add_impercamentum_collapse tbody tr').formset({
+                    prefix: 'impercamentum',
+                    addText: 'Add Another',
+                    deleteText: 'Delete Impercamentum',
+                });
+            });
+            $('#modal-litigant').on('shown.bs.modal', function () {
+                $('#add_land_collapse tbody tr').formset({
+                    prefix: 'land',
+                    addText: 'Add Another',
+                    deleteText: 'Delete Land',
+                });
+            });
+            $('#modal-litigant').on('shown.bs.modal', function () {
+                $('#add_pledge_collapse tbody tr').formset({
+                    prefix: 'pledge',
+                    addText: 'Add Another',
+                    deleteText: 'Delete Pledge',
+                });
+            });
+
+        });
+
+    </script>
+
+{% endblock %}

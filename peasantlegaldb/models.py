@@ -1,6 +1,10 @@
 from django.db import models
 from django.db.models import Count, Max, Min, Avg, Sum
+from django.urls import reverse
+
 from decimal import *
+
+from datetime import date
 
 
 '''
@@ -30,23 +34,32 @@ class Archive(models.Model):
     website = models.URLField(blank=True)
     notes = models.TextField(blank=True)
 
+    def get_absolute_url(self):
+        return reverse('archive:detail', args=[str(self.id)])
+
     @property
     def record_count(self):
         return self.record_set.count()
 
     @property
     def session_count(self):
+        # .aggregate(Count('<FIELD>')) returns a dict of {'<FIELD>__count': amount}. Then use .get('<FIELD>__count') to
+        # get the value for the API.
         return self.record_set.aggregate(Count('session')).get('session__count')
 
     @property
     def case_count(self):
-        return self.record_set.aggregate(Count('session__cases')).get('session__cases__count')
+        return self.record_set.aggregate(Count('session__case')).get('session__case__count')
 
     def __str__(self):
         return self.name
 
 
 class Money(models.Model):
+
+    class Meta:
+        ordering = ['in_denarius']
+
     amount = models.CharField(max_length=150)
     in_denarius = models.IntegerField(null=True, blank=True)
 
@@ -60,6 +73,9 @@ class Money(models.Model):
 class Chattel(models.Model):
     name = models.CharField(max_length=250)
 
+    class Meta:
+        ordering = ['name']
+
     def __str__(self):
         return self.name
 
@@ -69,6 +85,7 @@ class CaseType(models.Model):
     class Meta:
         verbose_name = "Case Type"
         verbose_name_plural = "Case Types"
+        ordering = ['case_type']
 
     case_type = models.CharField(max_length=150)
 
@@ -80,6 +97,7 @@ class County(models.Model):
 
     class Meta:
         verbose_name_plural = "Counties"
+        ordering = ['name']
 
     name = models.CharField(max_length=20)
     abbreviation = models.CharField(max_length=15)
@@ -106,7 +124,7 @@ class County(models.Model):
 
     @property
     def case_count(self):
-        return self.village_set.aggregate(Count('session__cases')).get('session__cases__count')
+        return self.village_set.aggregate(Count('session__case')).get('session__case__count')
 
     @property
     def resident_count(self):
@@ -131,7 +149,7 @@ class Land(models.Model):
     def parcel_list(self):
         parcel_list = []
         queryset = self.parcels.all().prefetch_related('parcel_type', 'parcel_tenure')
-        try:
+        if queryset:
             for x in queryset:
                 new_entry = {
                     "amount": x.amount,
@@ -139,13 +157,10 @@ class Land(models.Model):
                     "tenure": x.parcel_tenure.tenure,
                 }
                 parcel_list.append(new_entry)
-        except:
-            pass
-
         return parcel_list
 
     def __str__(self):
-        return "Land ID: %s" % (self.id)
+        return "%s" % (self.id)
 
 
 class ParcelTenure(models.Model):
@@ -199,6 +214,7 @@ class Relation(models.Model):
     class Meta:
         verbose_name = "Relation Type"
         verbose_name_plural = "Relation Types"
+        ordering = ['relation']
 
     relation = models.CharField(max_length=25)
 
@@ -209,12 +225,18 @@ class Relation(models.Model):
 class Role(models.Model):
     role = models.CharField(max_length=50)
 
+    class Meta:
+        ordering = ['role']
+
     def __str__(self):
         return self.role
 
 
 class Verdict(models.Model):
     verdict = models.CharField(max_length=150)
+
+    class Meta:
+        ordering = ['verdict']
 
     def __str__(self):
         return self.verdict
@@ -234,6 +256,9 @@ class Hundred(models.Model):
 
 class Village(models.Model):
 
+    class Meta:
+        ordering = ['name',]
+
     name = models.CharField(max_length=50)
     latitude = models.DecimalField(max_digits=10, decimal_places=7)
     longitude = models.DecimalField(max_digits=10, decimal_places=7)
@@ -246,9 +271,12 @@ class Village(models.Model):
     great_rumor = models.BooleanField(default=False)
     notes = models.TextField(blank=True)
 
+    def get_absolute_url(self):
+        return reverse('case:detail', args=[str(self.id)])
+
     @property
     def case_count(self):
-        return self.session_set.aggregate(Count('cases')).get('cases__count')
+        return self.session_set.aggregate(Count('case')).get('case__count')
 
     @property
     def litigant_count(self):
@@ -265,55 +293,55 @@ class Village(models.Model):
         return self.session_set.count()
     
     @property
-    def chevage_payer_count(self):
-        return len(set(Litigant.objects.all().filter(chevage__isnull=False, case__session__village_id=self.id).values_list('person', flat=True)))
+    def capitagium_payer_count(self):
+        return len(set(Litigant.objects.all().filter(capitagia__isnull=False, case__session__village_id=self.id).values_list('person', flat=True)))
 
     @property
     def fine_payer_count(self):
-        return len(set(Litigant.objects.all().filter(fine__isnull=False, case__session__village_id=self.id).values_list('person', flat=True)))
+        return len(set(Litigant.objects.all().filter(fines__isnull=False, case__session__village_id=self.id).values_list('person', flat=True)))
 
     @property
     def impercamentum_payer_count(self):
-        return len(set(Litigant.objects.all().filter(impercamentum__isnull=False, case__session__village_id=self.id).values_list('person', flat=True)))
+        return len(set(Litigant.objects.all().filter(impercamenta__isnull=False, case__session__village_id=self.id).values_list('person', flat=True)))
 
     @property
     def heriot_payer_count(self):
-        return len(set(Litigant.objects.all().filter(heriot__isnull=False, case__session__village_id=self.id).values_list('person', flat=True)))
+        return len(set(Litigant.objects.all().filter(heriots__isnull=False, case__session__village_id=self.id).values_list('person', flat=True)))
 
     @property
     def damaged_party_count(self):
-        return len(set(Litigant.objects.all().filter(damage__isnull=False, case__session__village_id=self.id).values_list('person', flat=True)))
+        return len(set(Litigant.objects.all().filter(damages__isnull=False, case__session__village_id=self.id).values_list('person', flat=True)))
 
     @property
     def monetary_counts(self):
-        return self.session_set.aggregate(amercement_count=Count('cases__case_to_person__amercement'),
-                                          amercement_max=Max('cases__case_to_person__amercement__in_denarius'),
-                                          amercement_min=Min('cases__case_to_person__amercement__in_denarius'),
-                                          amercement_avg=Avg('cases__case_to_person__amercement__in_denarius'),
-                                          amercement_sum=Sum('cases__case_to_person__amercement__in_denarius'),
-                                          fine_count=Count('cases__case_to_person__fine'),
-                                          fine_max=Max('cases__case_to_person__fine__in_denarius'),
-                                          fine_min=Min('cases__case_to_person__fine__in_denarius'),
-                                          fine_avg=Avg('cases__case_to_person__fine__in_denarius'),
-                                          fine_sum=Sum('cases__case_to_person__fine__in_denarius'),
-                                          damage_count=Count('cases__case_to_person__damage'),
-                                          damage_avg=Avg('cases__case_to_person__damage__in_denarius'),
-                                          damage_sum=Sum('cases__case_to_person__damage__in_denarius'),
-                                          chevage_count=Count('cases__case_to_person__chevage'),
-                                          chevage_max=Max('cases__case_to_person__chevage__in_denarius'),
-                                          chevage_min=Min('cases__case_to_person__chevage__in_denarius'),
-                                          chevage_avg=Avg('cases__case_to_person__chevage__in_denarius'),
-                                          chevage_sum=Sum('cases__case_to_person__chevage__in_denarius'),
-                                          heriot_count=Count('cases__case_to_person__heriot'),
-                                          heriot_max=Max('cases__case_to_person__heriot__in_denarius'),
-                                          heriot_min=Min('cases__case_to_person__heriot__in_denarius'),
-                                          heriot_avg=Avg('cases__case_to_person__heriot__in_denarius'),
-                                          heriot_sum=Sum('cases__case_to_person__heriot__in_denarius'),
-                                          impercamentum_count=Count('cases__case_to_person__impercamentum'),
-                                          impercamentum_max=Max('cases__case_to_person__impercamentum__in_denarius'),
-                                          impercamentum_min=Min('cases__case_to_person__impercamentum__in_denarius'),
-                                          impercamentum_avg=Avg('cases__case_to_person__impercamentum__in_denarius'),
-                                          impercamentum_sum=Sum('cases__case_to_person__impercamentum__in_denarius') )
+        return self.session_set.aggregate(amercement_count=Count('case__litigants__amercement'),
+                                          amercement_max=Max('case__litigants__amercement__in_denarius'),
+                                          amercement_min=Min('case__litigants__amercement__in_denarius'),
+                                          amercement_avg=Avg('case__litigants__amercement__in_denarius'),
+                                          amercement_sum=Sum('case__litigants__amercement__in_denarius'),
+                                          fine_count=Count('case__litigants__fine'),
+                                          fine_max=Max('case__litigants__fine__in_denarius'),
+                                          fine_min=Min('case__litigants__fine__in_denarius'),
+                                          fine_avg=Avg('case__litigants__fine__in_denarius'),
+                                          fine_sum=Sum('case__litigants__fine__in_denarius'),
+                                          damage_count=Count('case__litigants__damage'),
+                                          damage_avg=Avg('case__litigants__damage__in_denarius'),
+                                          damage_sum=Sum('case__litigants__damage__in_denarius'),
+                                          chevage_count=Count('case__litigants__chevage'),
+                                          chevage_max=Max('case__litigants__chevage__in_denarius'),
+                                          chevage_min=Min('case__litigants__chevage__in_denarius'),
+                                          chevage_avg=Avg('case__litigants__chevage__in_denarius'),
+                                          chevage_sum=Sum('case__litigants__chevage__in_denarius'),
+                                          heriot_count=Count('case__litigants__heriot'),
+                                          heriot_max=Max('case__litigants__heriot__in_denarius'),
+                                          heriot_min=Min('case__litigants__heriot__in_denarius'),
+                                          heriot_avg=Avg('case__litigants__heriot__in_denarius'),
+                                          heriot_sum=Sum('case__litigants__heriot__in_denarius'),
+                                          impercamentum_count=Count('case__litigants__impercamentum'),
+                                          impercamentum_max=Max('case__litigants__impercamentum__in_denarius'),
+                                          impercamentum_min=Min('case__litigants__impercamentum__in_denarius'),
+                                          impercamentum_avg=Avg('case__litigants__impercamentum__in_denarius'),
+                                          impercamentum_sum=Sum('case__litigants__impercamentum__in_denarius') )
 
     @property
     def median_chevage(self):
@@ -343,6 +371,7 @@ class Person(models.Model):
 
     class Meta:
         verbose_name_plural = "People"
+        ordering = ['last_name', 'relation_name', 'first_name']
 
     STATUS_CHOICES = {
         (1, 'Villein'),
@@ -370,14 +399,22 @@ class Person(models.Model):
     notes = models.TextField(blank=True)
     earliest_case = models.ForeignKey('Case', null=True, blank=True, related_name='person_to_earliest_case+')
     latest_case = models.ForeignKey('Case', null=True, blank=True, related_name='person_to_latest_case+')
+    full_name = models.CharField(max_length=250, null=True, blank=True)
 
+    def get_absolute_url(self):
+        return reverse('person:detail', args=[str(self.id)])
+
+    # Used to check if a person has amercements, fines, etc. in templates.
+    # TODO: Update to reflect change in amercement, fines, etc. model structure.
     @property
     def pledges_given_count(self):
         return self.pledge_giver.all().count()
 
     @property
     def pledges_received_count(self):
-        return self.pledge_receiver.all().count()
+        pledge_count = self.cases.aggregate(pledge_count=Count('pledges', distinct=True))
+        pledge_count = pledge_count['pledge_count']
+        return pledge_count
 
     @property
     def relationship_count(self):
@@ -387,15 +424,15 @@ class Person(models.Model):
 
     @property
     def position_count(self):
-        return self.position.all().count()
+        return self.positions.all().count()
 
     @property
     def case_exists(self):
-        return self.person_to_case.exists()
+        return self.cases.exists()
 
     @property
     def land_exists(self):
-        return self.person_to_case.filter(land__isnull=False).exists()
+        return self.cases.filter(lands__isnull=False).exists()
 
     @property
     def relationship_exists(self):
@@ -408,12 +445,16 @@ class Person(models.Model):
 
     @property
     def position_exists(self):
-        return self.position.exists()
+        return self.positions.exists()
 
     @property
     def pledge_exists(self):
+        pledge_exists = False
         pledge_given = self.pledge_giver.exists()
-        pledge_received = self.pledge_receiver.exists()
+        pledge_received = False
+        for case in self.cases.all():
+            if case.pledges.exists():
+                pledge_received = True
         if pledge_given or pledge_received:
             return True
         else:
@@ -421,63 +462,68 @@ class Person(models.Model):
 
     @property
     def monetary_counts(self):
-        return self.person_to_case.aggregate(amercement_count=Count('amercement'),
-                                             amercement_max=Max('amercement__in_denarius'),
-                                             amercement_min=Min('amercement__in_denarius'),
-                                             amercement_avg=Avg('amercement__in_denarius'),
-                                             amercement_sum=Sum('amercement__in_denarius'), fine_count=Count('fine'),
-                                             fine_max=Max('fine__in_denarius'), fine_min=Min('fine__in_denarius'),
-                                             fine_avg=Avg('fine__in_denarius'), fine_sum=Sum('fine__in_denarius'),
-                                             damage_count=Count('damage'), damage_max=Max('damage__in_denarius'),
-                                             damage_min=Min('damage__in_denarius'),
-                                             damage_avg=Avg('damage__in_denarius'),
-                                             damage_sum=Sum('damage__in_denarius'), chevage_count=Count('chevage'),
-                                             chevage_max=Max('chevage__in_denarius'),
-                                             chevage_min=Min('chevage__in_denarius'),
-                                             chevage_avg=Avg('chevage__in_denarius'),
-                                             chevage_sum=Sum('chevage__in_denarius'), heriot_count=Count('heriot'),
-                                             heriot_max=Max('heriot__in_denarius'),
-                                             heriot_min=Min('heriot__in_denarius'),
-                                             heriot_avg=Avg('heriot__in_denarius'),
-                                             heriot_sum=Sum('heriot__in_denarius'),
-                                             impercamentum_count=Count('impercamentum'),
-                                             impercamentum_max=Max('impercamentum__in_denarius'),
-                                             impercamentum_min=Min('impercamentum__in_denarius'),
-                                             impercamentum_avg=Avg('impercamentum__in_denarius'),
-                                             impercamentum_sum=Sum('impercamentum__in_denarius') )
+        return self.cases.aggregate(amercement_count=Count('amercements'),
+                                             amercement_max=Max('amercements__amercement__in_denarius'),
+                                             amercement_min=Min('amercements__amercement__in_denarius'),
+                                             amercement_avg=Avg('amercements__amercement__in_denarius'),
+                                             amercement_sum=Sum('amercements__amercement__in_denarius'), fine_count=Count('fines'),
+                                             fine_max=Max('fines__fine__in_denarius'), fine_min=Min('fines__fine__in_denarius'),
+                                             fine_avg=Avg('fines__fine__in_denarius'), fine_sum=Sum('fines__fine__in_denarius'),
+                                             damage_count=Count('damages'), damage_max=Max('damages__damage__in_denarius'),
+                                             damage_min=Min('damages__damage__in_denarius'),
+                                             damage_avg=Avg('damages__damage__in_denarius'),
+                                             damage_sum=Sum('damages__damage__in_denarius'), capitagium_count=Count('capitagia'),
+                                             capitagium_max=Max('capitagia__capitagium__in_denarius'),
+                                             capitagium_min=Min('capitagia__capitagium__in_denarius'),
+                                             capitagium_avg=Avg('capitagia__capitagium__in_denarius'),
+                                             capitagium_sum=Sum('capitagia__capitagium__in_denarius'), heriot_count=Count('heriots'),
+                                             heriot_max=Max('heriots__heriot__in_denarius'),
+                                             heriot_min=Min('heriots__heriot__in_denarius'),
+                                             heriot_avg=Avg('heriots__heriot__in_denarius'),
+                                             heriot_sum=Sum('heriots__heriot__in_denarius'),
+                                             impercamentum_count=Count('impercamenta'),
+                                             impercamentum_max=Max('impercamenta__impercamentum__in_denarius'),
+                                             impercamentum_min=Min('impercamenta__impercamentum__in_denarius'),
+                                             impercamentum_avg=Avg('impercamenta__impercamentum__in_denarius'),
+                                             impercamentum_sum=Sum('impercamenta__impercamentum__in_denarius') )
 
     @property
     def amercement_exists(self):
-        return self.person_to_case.filter(amercement__isnull=False).exists()
+        return self.cases.filter(amercements__isnull=False).exists()
 
     @property
     def fine_exists(self):
-        return self.person_to_case.filter(fine__isnull=False).exists()
+        return self.cases.filter(fines__isnull=False).exists()
 
     @property
     def damage_exists(self):
-        return self.person_to_case.filter(damage__isnull=False).exists()
+        return self.cases.filter(damages__isnull=False).exists()
 
     @property
-    def chevage_exists(self):
-        return self.person_to_case.filter(chevage__isnull=False).exists()
+    def capitagia_exists(self):
+        return self.cases.filter(capitagia__isnull=False).exists()
 
     @property
     def impercamentum_exists(self):
-        return self.person_to_case.filter(impercamentum__isnull=False).exists()
+        return self.cases.filter(impercamenta__isnull=False).exists()
 
     @property
     def heriot_exists(self):
-        return self.person_to_case.filter(heriot__isnull=False).exists()
+        return self.cases.filter(heriots__isnull=False).exists()
 
     @property
     def case_count_litigation(self):
-        case_count = self.person_to_case.exclude(chevage__isnull=False).values_list('case').distinct().count()
+        case_count = self.cases.exclude(capitagia__isnull=False).values_list('case').distinct().count()
         return case_count
 
     @property
+    def capitagium_count(self):
+        capitagium_count = self.cases.exclude(capitagia__isnull=True).values_list('case').distinct().count()
+        return capitagium_count
+
+    @property
     def case_count_all(self):
-        case_count = len(set(self.person_to_case.values_list('case')))
+        case_count = len(set(self.cases.values_list('case')))
         return case_count
 
     @property
@@ -501,14 +547,6 @@ class Person(models.Model):
         return data
 
     @property
-    def full_name(self):
-        if self.relation_name:
-            concated_name = self.first_name + ' ' + self.relation_name + ' ' + self.last_name
-        else:
-            concated_name = self.first_name + ' ' + self.last_name
-        return concated_name
-
-    @property
     def status_display(self):
         return self.get_status_display()
 
@@ -516,19 +554,15 @@ class Person(models.Model):
     def gender_display(self):
         return self.get_gender_display()
 
-    @property
-    def name_and_village(self):
+    def save(self, *args, **kwargs):
         if self.relation_name:
-            concated_name = self.first_name + ' ' + self.relation_name + ' ' + self.last_name + ' | ' + self.village.name
+            self.full_name = self.first_name + ' ' + self.relation_name + ' ' + self.last_name
         else:
-            concated_name = self.first_name + ' ' + self.last_name + ' | ' + self.village.name
-        return concated_name
+            self.full_name = self.first_name + ' ' + self.last_name
+        super(Person, self).save(*args, **kwargs)
 
     def __str__(self):
-        if self.relation_name:
-            return self.first_name + ' ' + self.relation_name + ' ' + self.last_name + ' | ' + self.village.name
-        else:
-            return self.first_name + ' ' + self.last_name + ' | ' + self.village.name
+        return self.full_name + ' (' + self.village.name + ')'
 
 
 class Record(models.Model):
@@ -601,7 +635,7 @@ class Record(models.Model):
 
     @property
     def case_count(self):
-        return self.session_set.aggregate(Count('cases')).get('cases__count')
+        return self.session_set.aggregate(Count('case')).get('case__count')
 
 
     def __str__(self):
@@ -630,9 +664,12 @@ class Session(models.Model):
     village = models.ForeignKey(Village)
     notes = models.TextField(blank=True)
 
+    def get_absolute_url(self):
+        return reverse('session:detail', args=[str(self.id)])
+
     @property
     def case_count(self):
-        return self.cases.count()
+        return self.case_set.count()
 
     @property
     def litigant_count(self):
@@ -640,15 +677,15 @@ class Session(models.Model):
 
     @property
     def land_case_count(self):
-        return len(set(Litigant.objects.filter(case__session=self.id, land__isnull=False).values_list('case', flat=True)))
+        return len(set(Litigant.objects.filter(case__session=self.id, lands__isnull=False).values_list('case', flat=True)))
 
     @property
-    def chevage_payer_count(self):
-        return len(set(Litigant.objects.filter(case__session=self.id, chevage__isnull=False).values_list('person', flat=True)))
+    def capitagium_payer_count(self):
+        return len(set(Litigant.objects.filter(case__session=self.id, capitagia__isnull=False).values_list('person', flat=True)))
 
     @property
     def impercamentum_payer_count(self):
-        return len(set(Litigant.objects.filter(case__session=self.id, impercamentum__isnull=False).values_list('person', flat=True)))
+        return len(set(Litigant.objects.filter(case__session=self.id, impercamenta__isnull=False).values_list('person', flat=True)))
 
 
     @property
@@ -663,7 +700,7 @@ class Session(models.Model):
         return year
 
     def __str__(self):
-        return '%s %s %s Session.' % (self.village.name, self.get_law_term_display(), self.date.year)
+        return '%s - %s, %s %s' % (self.id, self.village.name, self.get_law_term_display(), self.date.year)
 
 
 class Case(models.Model):
@@ -672,49 +709,52 @@ class Case(models.Model):
         (1, 'Hallmoot'),
         (2, 'Tourn'),
         (3, 'Impercamentum'),
-        (4, 'Chevage'),
+        (4, 'Capitagium'),
         (5, 'Unknown'),
         (6, 'Account Roll'),
     }
 
     summary = models.TextField(blank=True)
-    session = models.ForeignKey(Session, on_delete=models.CASCADE, related_name='cases')
+    session = models.ForeignKey(Session, on_delete=models.CASCADE)
     case_type = models.ForeignKey(CaseType)
     court_type = models.IntegerField(choices=COURT_TYPES)
     verdict = models.ForeignKey(Verdict)
-    of_interest = models.NullBooleanField()
+    of_interest = models.BooleanField()
 #   started ad legem at Case 578.
-    ad_legem = models.NullBooleanField()
-    villeinage_mention = models.NullBooleanField()
-    active_sale = models.NullBooleanField()
-    incidental_land = models.NullBooleanField()
-    litigants = models.ManyToManyField(Person, through='Litigant')
+    ad_legem = models.BooleanField()
+    villeinage_mention = models.BooleanField()
+    active_sale = models.BooleanField()
+    incidental_land = models.BooleanField()
 
     @property
     def litigant_list(self):
-        # iterate through a case's litigant set (case_to_person) and create a list of dictionaries containing the  name
+        # iterate through a case's litigant set (litigants) and create a list of dictionaries containing the  name
         # and role for each person.
-        litigant_list = [{"id": person.person.id, "name": person.person.full_name, "role": person.role.role} for person in self.case_to_person.all()]
+        litigant_list = [{"id": person.person.id, "name": person.person.full_name, "role": person.role.role}
+                         for person in self.litigants.all()]
         return litigant_list
 
     @property
     def litigant_count(self):
-        litigants = [(x) for x in self.case_to_person.values_list('person_id', flat=True)]
-        number_of_litigants = len(set(litigants))
-        return number_of_litigants
+        return self.litigants.count()
 
     @property
     def pledge_count(self):
-        pledge_count = len(set(self.case_to_pledge.all()))
+        pledge_count = []
+        for litigant in self.litigants.all():
+            for pledge in litigant.pledges.all():
+                pledge_count.append(pledge.giver_id)
+                pledge_count.append(pledge.receiver_id)
+        pledge_count = len(set(pledge_count))
         return pledge_count
 
     @property
     def litigant_exist(self):
-        return self.case_to_person.filter(person__isnull=False).exists()
+        return self.litigants.filter(person__isnull=False).exists()
 
     @property
     def land_exist(self):
-        return self.case_to_person.filter(land__isnull=False).exists()
+        return self.litigants.filter(lands__isnull=False).exists()
 
     @property
     def cornbot_exist(self):
@@ -734,10 +774,17 @@ class Case(models.Model):
 
     @property
     def pledge_exist(self):
-        return self.case_to_pledge.filter(case=self).exists()
+        pledge_exists = False
+        for case in self.litigants.all():
+            if case.pledges.exists():
+                pledge_exists = True
+        return pledge_exists
 
     def __str__(self):
-        return 'Case %s | %s (%s / %s)' % (self.id, self.session.village.name, self.session.get_law_term_display(), self.session.date.year)
+        return 'Case %s | %s (%s / %s)' % (self.id,
+                                           self.session.village.name,
+                                           self.session.get_law_term_display(),
+                                           self.session.date.year)
 
 
 class Cornbot(models.Model):
@@ -774,43 +821,121 @@ class PlaceMentioned(models.Model):
 
 class Litigant(models.Model):
 
-    person = models.ForeignKey(Person, on_delete=models.CASCADE, related_name='person_to_case')
-    case = models.ForeignKey(Case, on_delete=models.CASCADE, related_name='case_to_person')
+    person = models.ForeignKey(Person, on_delete=models.CASCADE, related_name='cases')
+    case = models.ForeignKey(Case, on_delete=models.CASCADE, related_name='litigants')
     role = models.ForeignKey(Role, related_name='litigant_role')
-    fine = models.ForeignKey(Money, null=True, blank=True, related_name='litigant_fine')
-    amercement = models.ForeignKey(Money, null=True, blank=True, related_name='litigant_amercement')
-    damage = models.ForeignKey(Money, null=True, blank=True, related_name='litigant_damages')
-    damage_notes = models.TextField(blank=True,)
-    ad_proximum = models.NullBooleanField()
-    distrained = models.NullBooleanField()
+    ad_proximum = models.BooleanField()
+    distrained = models.BooleanField()
     # Added at Case 1189.
-    attached = models.NullBooleanField()
+    attached = models.BooleanField()
     # Added at Case 1424
-    bail = models.NullBooleanField()
-    chevage = models.ForeignKey(Money, null=True, blank=True, related_name='litigant_chevage')
+    bail = models.BooleanField()
+
+    @property
+    def impercamentum_denarius_total(self):
+        total = self.impercamenta.aggregate(total=Sum('impercamentum__in_denarius'))
+        total = total['total']
+        return total
+
+    @property
+    def impercamentum_animal_total(self):
+        total = self.impercamenta.aggregate(total=Sum('quantity'))
+        total = total['total']
+        return total
+
+    # Used to check if a litigant has amercements, fines, etc. in templates.
+    @property
+    def amercement_exists(self):
+        return self.amercements.exists()
+    
+    @property
+    def damage_exists(self):
+        return self.damages.exists()
+    
+    @property
+    def capitagium_exists(self):
+        return self.capitagia.exists()
+
+    @property
+    def fine_exists(self):
+        return self.fines.exists()
+    
+    @property
+    def heriot_exists(self):
+        return self.heriots.exists()
+    
+    @property
+    def impercamentum_exists(self):
+        return self.impercamenta.exists()
+    
+    @property
+    def land_exists(self):
+        return self.lands.exists()
+
+    @property
+    def pledge_exists(self):
+        return self.pledges.exists()
+
+
+class Fine(models.Model):
+    litigant = models.ForeignKey(Litigant, on_delete=models.CASCADE, related_name='fines')
+    fine = models.ForeignKey(Money)
+
+
+class Amercement(models.Model):
+    litigant = models.ForeignKey(Litigant, on_delete=models.CASCADE, related_name='amercements')
+    amercement = models.ForeignKey(Money)
+
+
+class Capitagium(models.Model):
+    litigant = models.ForeignKey(Litigant, on_delete=models.CASCADE, related_name='capitagia')
+    capitagium = models.ForeignKey(Money)
+    notes = models.TextField(blank=True,)
     crossed = models.NullBooleanField()
     recessit = models.NullBooleanField()
     habet_terram = models.NullBooleanField()
-    chevage_notes = models.TextField(blank=True,)
-    heriot_quantity = models.CharField(max_length=25, blank=True,)
-    heriot_animal = models.ForeignKey(Chattel, null=True, related_name='heriot_animal')
-    heriot = models.ForeignKey(Money, null=True, blank=True, related_name='heriot_assessment')
-    impercamentum_quantity = models.IntegerField(null=True, blank=True,)
-    impercamentum_animal = models.ForeignKey(Chattel, null=True, blank=True, related_name='impercamentum_animal')
-    impercamentum = models.ForeignKey(Money, null=True, blank=True, related_name='impercamentum_amercement')
-    impercamentum_notes = models.TextField(blank=True,)
-    land = models.ForeignKey(Land, null=True, blank=True, on_delete=models.CASCADE, related_name='case_to_land')
-    land_villeinage = models.NullBooleanField()
-    land_notes = models.TextField(blank=True,)
+    mortuus = models.NullBooleanField()
+
+
+class Damage(models.Model):
+    litigant = models.ForeignKey(Litigant, on_delete=models.CASCADE, related_name='damages')
+    damage = models.ForeignKey(Money)
+    notes = models.TextField(blank=True)
+
+
+class Heriot(models.Model):
+    litigant = models.ForeignKey(Litigant, on_delete=models.CASCADE, related_name='heriots')
+    quantity = models.CharField(max_length=25, blank=True,)
+    animal = models.ForeignKey(Chattel, null=True)
+    heriot = models.ForeignKey(Money)
+
+
+class Impercamentum(models.Model):
+    litigant = models.ForeignKey(Litigant, on_delete=models.CASCADE, related_name='impercamenta')
+    quantity = models.IntegerField(null=True, blank=True)
+    animal = models.ForeignKey(Chattel, null=True, blank=True)
+    impercamentum = models.ForeignKey(Money)
+    notes = models.TextField(blank=True)
+
+
+class LandtoCase(models.Model):
+
+    class Meta:
+        ordering = ['litigant__case__session__date']
+
+    litigant = models.ForeignKey(Litigant, on_delete=models.CASCADE, related_name='lands')
+    land = models.ForeignKey(Land, null=True, blank=True, on_delete=models.CASCADE, related_name='tenants')
+    villeinage = models.NullBooleanField()
+    role = models.ForeignKey(Role, on_delete=models.CASCADE)
+    notes = models.TextField(blank=True,)
 
 
 class Pledge(models.Model):
-    case = models.ForeignKey(Case, on_delete=models.CASCADE, related_name='case_to_pledge')
-    pledge_giver = models.ForeignKey(Person, on_delete=models.CASCADE, related_name='pledge_giver')
-    pledge_receiver = models.ForeignKey(Person, on_delete=models.CASCADE, related_name='pledge_receiver')
+    giver = models.ForeignKey(Person, on_delete=models.CASCADE, related_name='pledge_giver')
+    receiver = models.ForeignKey(Litigant, on_delete=models.CASCADE, related_name='pledges')
 
     def __str__(self):
-        return "%s pledged %s, Case %s" % (self.pledge_giver, self.pledge_receiver, self.case)
+        return "%s pledged %s" % (self.giver.full_name, self.receiver.person.full_name)
 
 
 class LandSplit(models.Model):
@@ -824,23 +949,40 @@ class LandSplit(models.Model):
     # add Case so I can track timing... I'm an idiot!
 
     def __str__(self):
-        return "Old Land ID %s, New Land ID %s" % (self.old_land, self.new_land)
+        return "Old Land ID {0}, New Land ID {1}".format(self.old_land, self.new_land)
 
 
 class Position(models.Model):
-    person = models.ForeignKey(Person, on_delete=models.CASCADE, related_name='position')
+    person = models.ForeignKey(Person, on_delete=models.CASCADE, related_name='positions')
     title = models.ForeignKey(PositionType)
     # rework so this is per case not per session.
     session = models.ForeignKey(Session, on_delete=models.CASCADE)
     definitive = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.PositionType.title
+        return self.title.title
 
 
 class Relationship(models.Model):
+
+    CONFIDENCE_LEVEL = [
+        (1, '1 - Low'),
+        (2, '2'),
+        (3, '3 - Medium'),
+        (4, '4'),
+        (5, '5 - High')
+    ]
+
     person_one = models.ForeignKey(Person, on_delete=models.CASCADE, related_name='relationship_person_one')
     person_two = models.ForeignKey(Person, on_delete=models.CASCADE, related_name='relationship_person_two')
     # need to rework so relationships are more descriptive, including when (which case) it was revealed..
     relationship = models.ForeignKey(Relation)
     definitive = models.BooleanField(default=False)
+    confidence = models.IntegerField(null=True, choices=CONFIDENCE_LEVEL)
+
+    @property
+    def confidence_display(self):
+        return self.get_confidence_display()
+
+    def __str__(self):
+        return '{0} - {1} and {2}'.format(self.id, self.person_one.full_name, self.person_two.full_name)

@@ -273,10 +273,9 @@
                 // This gets ALL data in current column.. Need just the visible rows
                 var data     = this.data().toArray(),
                     isVis    = false,
-                    intStart = ( perPage === true ? info.start : 0 ),
-                    intStop  = ( perPage === true ? info.end   : data.length ),
+                    intStart = ( perPage === true && info.serverSide === false ? info.start : 0 ),
+                    intStop  = ( perPage === true && info.serverSide === false ? info.end   : data.length ),
                     dtState  = api.state.loaded()
-
 
                 //for( var i = 0; i < data.length; i ++ ) {
                 for( var i = intStart; i < intStop; i++ ){
@@ -304,6 +303,7 @@
                 .on( 'search.dt', _checkColumns )
                 .on( 'order.dt',  _checkColumns )
                 .on( 'length.dt', _checkColumns )
+                .on( 'draw.dt',   _checkColumns ) // triggers after data loaded with AJAX
 
         // Run check for the initial page load
         _checkColumns()

@@ -6,67 +6,34 @@
 {% endblock %}
 
 {% block additional_title %}
-    <form>
-        {% csrf_token %}
+    <div class="form-inline d-flex justify-content-center" id="filter_people">
+            <div class="form-group" style="padding-top: 5px">
 
-        <div class="form-group d-flex justify-content-center" style="padding-top: 5px">
         {% for field in filter_village_form.visible_fields %}
-                <div class="col-sm-2">
+                <div class="col-2">
                     <h4>{{ field.label_tag }}</h4>
                 </div>
-                <div class="col-md-3.5">
-                    {% render_field field class="form-control" id="select_village" %}
+                <div class="col-4">
+                    {% render_field field class="form-control" id=field.name %}
                 </div>
         {% endfor %}
         </div>
+    </div>
+    <br>
+    <div class="text-center">
+        <button type="button" class="btn btn-primary" id="get_people">Get People</button>
+
+    </div>
 {% endblock %}
 
 
 {% block center_bar %}
     {{ block.super }}
-    <br>
-        <div class="mx-auto">
-            <div class="row">
-                <div class="btn-group">
-                    <!-- remember to add 'gets' class so JQuery can properly ID the buttons -->
-                    <button type="button" class="btn btn-success gets" id="residents">Residents</button>
-                    <button type="button" class="btn btn-success gets" id="litigants">Litigants</button>
-                    <button type="button" class="btn btn-success gets" id="pledges_given">Pledge Givers</button>
-                    <button type="button" class="btn btn-success gets" id="pledges_received">Pledge Receivers</button>
-                    <button type="button" class="btn btn-success gets" id="amercement">Amercements</button>
-                    <button type="button" class="btn btn-success gets" id="fine">Fines</button>
-                    <button type="button" class="btn btn-success gets" id="damage">Damages</button>
-                    <button type="button" class="btn btn-success gets" id="chevage">Chevages</button>
-                    <button type="button" class="btn btn-success gets" id="impercamentum">Impercamenta</button>
-                    <button type="button" class="btn btn-success gets" id="heriot">Heriots</button>
-                </div>
-            </div>
-            <br>
-            <div class="row">
-                <div class="btn-group">
-                    <div class="btn-group">
-                        <!-- Remember to add 'analysis' class so JQuery can properly ID the buttons -->
-                        <button type="button" class="btn btn-success analysis" id="chevage">Chevage Analysis</button>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="btn-group">
-                </div>
-
-            </div>
-
-            </div>
-
-    </form>
-
-    <br>
 <div id="list_people" style="display: none">
     <div class="card">
         <div class="card-body clearfix" id="main_info">
             <table class="table table-bordered table-hover" id="table" data-page-length="25">
                 <thead>
-                    <th>Details</th>
                     <th>Name</th>
                     <th>Village</th>
                     <th>Status</th>
@@ -81,7 +48,15 @@
 {% endblock %}
 
 {% block right_sidebar %}
-    {{ block.super }}
+    <div class="container" style="position: sticky; top: 65px">
+        {% if perms.peasantlegaldb.add_person %}
+            <div class="btn-group" role="group">
+                <a class="btn btn-success" href="{% url 'person:add' %}">Add Person</a>
+            </div>
+            <br>
+            <br>
+        {% endif %}
+    </div>
 {% endblock %}
 
 {% block scripts %}
@@ -89,28 +64,6 @@
     {{ block.super }}
 
     <script>
-        function format( data ) {
-        return "<table class='table'>" +
-            "<tr>" +
-            "<td><b>Litigation</b></td>" +
-            "<td><b>Cases</b></td>" +
-            "<td><b>Chevage</b></td>" +
-            "<td><b>Pledges Given</b></td>" +
-            "<td><b>Pledges Received</b></td>" +
-            "<td><b>Relationships</b></td>" +
-            "<td><b>Positions</b></td>" +
-            "</tr>" +
-            "<tr>" +
-            "<td>"+ data.counts.litigation +"</td>" +
-            "<td>" + data.counts.all_cases + "</td>" +
-            "<td>" + data.counts.monetary.chevage_count + "</td>" +
-            "<td>" + data.counts.pledge.given + "</td>" +
-            "<td>" + data.counts.pledge.received + "</td>" +
-            "<td>" + data.counts.relationship + "</td>" +
-            "<td>" + data.counts.position + "</td>" +
-            "</tr>" +
-        "</table>"
-    }
 
     $(document).ready(function(){
 
@@ -122,7 +75,7 @@
                 alert("Please select a village");
                 return;
             } else if (village === 'All'){
-                alert("Chevage Analysis view is too slow when run with all villages. Please select only one village.")
+                alert("Chevage Analysis view is too slow when run with all villages. Please select only one village.");
                 return;
             } else {
                 var url = Urls.chevage_analysis({village_pk: village});
@@ -130,111 +83,108 @@
             }
         });
 
-        $(".gets").click(function(e){
+        $("#get_people").click(function(e){
             $(".btn").removeClass('active');
             $(this).addClass('active');
 
             var village = $("#select_village").val();
+            var filter = $('#select_filter').val();
+            var apiCall = 'format=datatables&expand=village,earliest_case,latest_case';
             var btnClicked = e.target.id;
             var url = Urls["api:person-list"]();
 
-            if (village === ''){
-                alert("Please select a village");
-                return
-            }
-
-            if (village === 'None') {
+            if (village === 'None' || filter === 'None') {
                 if ($("#list_people").is(":visible")) {
                     $("#list_people").hide();
                     return
                 } else {
                     return
                 }
-            }
-            if (village === "All"){
-                    if (btnClicked === "residents") {
-                        url = url + "?exclude[]=village.*&include[]=village.name&include[]=counts&include[]=earliest_case.session.village&include[]=latest_case.session.village";
-                    } else if (btnClicked === "litigants") {
-                        url = url + "?exclude[]=village.*&include[]=village.name&include[]=counts&include[]=earliest_case.session.village&include[]=latest_case.session.village";
+            } else if (village === "All"){
+                    if (filter === "residents") {
+                        url = url + '?' + apiCall;
+                    } else if (filter === "litigants") {
+                        url = url + '?' + apiCall;
                     } else {
-                        url = url + "?" + btnClicked + "=true&exclude[]=village.*&include[]=village.name&include[]=counts&include[]=earliest_case.session.village&include[]=latest_case.session.village";
+                        url = url + "?" + filter + "=true&" + apiCall;
                     }
             }
             else {
-                if (btnClicked === "residents") {
-                        url = url + "?filter{village.id}=" + village + "&exclude[]=village.*&include[]=village.name&include[]=counts&include[]=earliest_case.session.village&include[]=latest_case.session.village";
-                    } else if (btnClicked === "litigants") {
-                        url = url + "?village_to_litigant=" + village + "&exclude[]=village.*&include[]=village.name&include[]=counts&include[]=earliest_case.session.village&include[]=latest_case.session.village";
+                if (filter === "residents") {
+                        url = url + "?village_to_resident=" + village + "&" + apiCall;
+                    } else if (filter === "litigants") {
+                        url = url + "?village_to_litigant=" + village + "&" + apiCall;
                     } else {
-                        url = url + "?" + btnClicked + "=true&village_to_litigant=" + village + "&exclude[]=village.*&include[]=village.name&include[]=counts&include[]=earliest_case.session.village&include[]=latest_case.session.village";
+                        url = url + "?" + filter + "=true&village_to_litigant=" + village + "&" + apiCall;
                     }
             }
             $("#table").DataTable().destroy();
             var table = $('#table').DataTable({
-                order: [1, "asc"],
+                order: [0, "asc"],
                 scrollX: true,
                 scrollY: 500,
                 scrollCollapse: true,
-                paging: false,
-                ajax: {
-                    processing: true,
-                    url: url,
-                    type: "GET",
-                    dataSrc: "people.",
-                },
+                paging: true,
+                serverSide: true,
+                ajax: url,
                 "columns": [
-                    {
-                        "class": "details-control",
-                        "orderable": false,
-                        "data": "counts",
-                        "defaultContent": "",
-                        "render": checkNotes,
-                        width:"15px"
-                    },
                     {data: "full_name",
                         defaultContent: '',
                         render: {
-                            display: function(data, type, row, meta){
-                                return "<a href='" + Urls.person(row.id) + "'>" + row.full_name + "</a>";
+                            display: function(data, type, row){
+                                var url = Urls['person:detail'](row.id);
+                                return "<a href='" + url + "'>" + data + "</a>";
                             },
                         }
                     },
-                    {data: "village.name"},
-                    {data: "status_display"},
-                    {data: "gender_display"},
-                    {data: "earliest_case",
+                    {data: "village",
+                        name: 'village.name',
                         defaultContent: '',
                         render: {
-                            display: formatCaseDate,
-                            sort: "session.date"
+                            display: function(data, type, row){
+                                var url = Urls['village:detail'](data.id);
+                                return "<a href='" + url + "'>" + data.name + "</a>";
+                            },
                         }
                     },
-                    {data: "latest_case",
+                    {data: "status_display",
+                        searchable: false,
+                        name: 'status'
+                    },
+                    {data: "gender_display",
+                        searchable: false,
+                        name: 'gender'
+                    },
+                    {data: 'earliest_case',
+                        name: 'earliest_case.session.date, earliest_case.session.village.name',
                         defaultContent: '',
                         render: {
-                            display: formatCaseDate,
-                           sort: "session.date"
+                            display: function(data, type, row){
+                                if (data){
+                                    var url = Urls['case:detail'](data.id);
+                                    return "<a href='" + url + "'>" + data.session.village.name + ' | ' + data.session.law_term + ', ' + data.session.year + "</a>";
+                                } else {
+                                    return 'N/A';
+                                }
+                            }
+                        }
+                    },
+                    {data: 'latest_case',
+                        name: 'latest_case.session.date, latest_case.session.village.name',
+                        defaultContent: '',
+                        render: {
+                            display: function (data, type, row) {
+                                if (data) {
+                                    var url = Urls['case:detail'](data.id);
+                                    return "<a href='" + url + "'>" + data.session.village.name + ' | ' + data.session.law_term + ', ' + data.session.year + "</a>";
+                                } else {
+                                    return 'N/A';
+                                }
+                            }
                         }
                     },
                 ],
 
-            });
-            $('#table tbody').on('click', 'td.details-control', function(){
-                var tr = $(this).closest('tr');
-                var tdi = tr.find("i.fa");
-                var row = table.row( tr );
-
-                if ( row.child.isShown()) {
-                    row.child.hide();
-                    tr.removeClass('shown');
-                    tdi.first().removeClass('fa-minus-square');
-                    tdi.first().addClass('fa-plus-square');
-                } else {
-                    row.child( format( row.data() ) ).show();
-                    tr.addClass('shown');
-                    tdi.first().removeClass('fa-plus-square');
-                    tdi.first().addClass('fa-minus-square');
-                }
             });
             if ($("#list_people").not(":visible")){
 

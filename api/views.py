@@ -2,7 +2,10 @@ from django.db.models import Q
 
 from dynamic_rest.viewsets import DynamicModelViewSet
 
+from rest_flex_fields import FlexFieldsModelViewSet
+
 from rest_framework import permissions
+from rest_framework.viewsets import ModelViewSet
 
 from api import serializers
 from peasantlegaldb import models
@@ -15,26 +18,74 @@ from peasantlegaldb import models
 # iterate through the dictionary, checking to see if there is a value or not. If there is, it checks to see if it should
 # treat it as a boolean check or not ("true" or "false"), or whether it is a filter check. It then filters the queryset
 # based on that, and returns the queryset to the ViewSet class. Again, see the LitigantViewSet for example.
-def check_chain(check, queryset, distinct=False):
-    for key, value in check.items():
-        if value is not None:
-            if value == "true":
-                new_filter = key + "__isnull"
-                queryset = queryset.filter(**{new_filter: False})
-            elif value == "false":
-                new_filter = key + "__isnull"
-                queryset = queryset.filter(**{new_filter:True})
-            else:
-                queryset = queryset.filter(**{key:value})
+class ChainFilterQueryMixin(object):
 
-    if distinct == True:
-        queryset = queryset.distinct()
+    def _get_chain_params(self, chain):
+        for key, value in chain.items():
+            chain[key]['field'] = value['field'].replace('.', '__')
+            chain[key]['search'] = self.request.query_params.get(key)
+        return chain
 
-    return queryset
+    def _get_distinct_params(self):
+        distinct_param = self.request.query_params.get('distinct', None)
+        if distinct_param is not None:
+            if distinct_param == 'false' or distinct_param == 'False':
+                distinct = False
+            elif distinct_param == 'true' or distinct_param == 'True':
+                distinct = True
+        else:
+            try:
+                distinct = self.chain_filter_distinct
+            except:
+                distinct = True
+        return distinct
+
+    def _filter_chain(self, queryset, chain):
+        filtered_chain = self._get_chain_params(chain)
+        distinct = self._get_distinct_params()
+        for key, value in filtered_chain.items():
+            if value['search'] is not None:
+                # query_params are strings. Convert to python boolean objects.
+                if value['search'] == 'true' or value['search'] == 'True':
+                    search_val = True
+                elif value['search'] == 'false' or value['search'] == 'False':
+                    search_val = False
+                else:
+                    search_val = value['search']
+                if 'type' in value:
+                    # I prefer to search for isnull using opposite true/false tests (e.g. are there fines?). Sue me.
+                    if value['type'] == 'isnull':
+                        if value['search'] == 'true' or value['search'] == 'True':
+                            new_filter = value['field'] + '__isnull'
+                            queryset = queryset.filter(**{new_filter: False})
+                        elif value['search'] == 'false' or value['search'] == 'False':
+                            new_filter = value['field'] + '__isnull'
+                            queryset = queryset.filter(**{new_filter: True})
+                    else:
+                        continue
+                else:
+                    queryset = queryset.filter(**{value['field']: search_val})
+        # import ipdb
+        # ipdb.set_trace()
+        if distinct == True:
+            return queryset.distinct()
+        else:
+            return queryset
+
+    def get_queryset(self):
+        queryset = super(ChainFilterQueryMixin, self).get_queryset()
+        try:
+            chain = self.chain
+            return self._filter_chain(queryset, chain)
+        except:
+            return queryset
 
 
 # API views
-class ArchiveViewSet(DynamicModelViewSet):
+class ArchiveViewSet(FlexFieldsModelViewSet):
+
+    # Must be logged in to edit
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     # API endpoint that allows the model to be viewed or edited.
     queryset = models.Archive.objects.all()
@@ -45,20 +96,20 @@ class ArchiveViewSet(DynamicModelViewSet):
         return super(ArchiveViewSet, self).list(request, *args, **kwargs)
 
 
-class ArchiveListEndpoint(DynamicModelViewSet):
-    queryset = models.Archive.objects.all()
-    serializer_class = serializers.ArchiveSerializer
+class MoneyViewSet(FlexFieldsModelViewSet):
+
+    # Must be logged in to edit
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
-
-
-class MoneyViewSet(DynamicModelViewSet):
 
     queryset = models.Money.objects.all().order_by('in_denarius', 'amount')
     serializer_class = serializers.MoneySerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
 
-class ChattelViewSet(DynamicModelViewSet):
+class ChattelViewSet(FlexFieldsModelViewSet):
+
+    # Must be logged in to edit
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     queryset = models.Chattel.objects.all().order_by('name')
     serializer_class = serializers.ChattelSerializer
@@ -66,250 +117,353 @@ class ChattelViewSet(DynamicModelViewSet):
 
 class CaseTypeViewSet(DynamicModelViewSet):
 
+class CaseTypeViewSet(FlexFieldsModelViewSet):
+
+    # Must be logged in to edit
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
     queryset = models.CaseType.objects.all().order_by('case_type')
     serializer_class = serializers.CaseTypeSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
 
-class CountyViewSet(DynamicModelViewSet):
+class CountyViewSet(ChainFilterQueryMixin, FlexFieldsModelViewSet):
+
+    # Must be logged in to edit
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     serializer_class = serializers.CountySerializer
     queryset = models.County.objects.all().order_by('name')
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
 
-class LandViewSet(DynamicModelViewSet):
+class LandViewSet(ChainFilterQueryMixin, FlexFieldsModelViewSet):
 
-    queryset = models.Land.objects.all()
-    serializer_class = serializers.LandSerializer
+    permit_list_expands = ['tenants', 'tenants.role', 'tenants.litigant', 'tenants.litigant.person',
+                           'tenants.litigant.case']
+
+    # Must be logged in to edit
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+    queryset = models.Land.objects.all().prefetch_related('tenants__litigant__case', 'parcels')
+    serializer_class = serializers.LandSerializer
+    chain = {
+        'case': {'field': 'tenants.litigant.case'},
+        'village': {'field': 'tenants.litigant.case.session.village'},
+    }
 
-    def get_queryset(self, *args, **kwargs):
+class ParcelTenureViewSet(FlexFieldsModelViewSet):
 
-        # get case param from url, then if it is not empty get instance of case object and extract value list of each
-        # distinct land associated with it. Afterwards, iterate through this queryset, ignoring blanks, and append each
-        # element to a list. Set the Land queryset filter to include all items in list. __in= is the syntax used to
-        # include all items in a filter - see:
-        #   https://stackoverflow.com/questions/36851257/general-way-of-filtering-by-ids-with-drf
-        # An alternative approach using dictionaries instead of lists is included here (perhaps could be used with
-        # .value instead of .values_list if necessary):
-        #   https://stackoverflow.com/questions/14258338/django-rest-framework-filtering
-
-        case = self.request.query_params.get('case')
-        if not case:
-            return models.Land.objects.all()
-        else:
-            case_instance = models.Case.objects.get(id=case)
-            sub_queryset = case_instance.case_to_person.all().values_list('land_id', flat=True).distinct()
-            land_list=[]
-            for x in sub_queryset:
-                if x is not None:
-                    land_list.append(x)
-            return models.Land.objects.filter(id__in=land_list)
-
-class ParcelTenureViewSet(DynamicModelViewSet):
+    # Must be logged in to edit
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     queryset = models.ParcelTenure.objects.all().order_by('tenure')
     serializer_class = serializers.ParcelTenureSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
 
-class ParcelTypeViewSet(DynamicModelViewSet):
+class ParcelTypeViewSet(FlexFieldsModelViewSet):
+
+    # Must be logged in to edit
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     queryset = models.ParcelType.objects.all().order_by('parcel_type')
     serializer_class = serializers.ParcelTypeSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
 
-class PositionTypeViewSet(DynamicModelViewSet):
+class PositionTypeViewSet(FlexFieldsModelViewSet):
+
+    # Must be logged in to edit
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     queryset = models.PositionType.objects.all().order_by('title')
     serializer_class = serializers.PositionTypeSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
 
-class RelationViewSet(DynamicModelViewSet):
+class RelationViewSet(FlexFieldsModelViewSet):
+
+    # Must be logged in to edit
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     queryset = models.Relation.objects.all().order_by('relation')
     serializer_class = serializers.RelationSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
 
-class RoleViewSet(DynamicModelViewSet):
+class RoleViewSet(FlexFieldsModelViewSet):
+
+    # Must be logged in to edit
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     queryset = models.Role.objects.all().order_by('role')
     serializer_class = serializers.RoleSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
 
-class VerdictViewSet(DynamicModelViewSet):
+class VerdictViewSet(FlexFieldsModelViewSet):
+
+    # Must be logged in to edit
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     queryset = models.Verdict.objects.all().order_by('verdict')
     serializer_class = serializers.VerdictSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
 
-class HundredViewSet(DynamicModelViewSet):
+class HundredViewSet(ChainFilterQueryMixin, FlexFieldsModelViewSet):
+
+    permit_list_expands = ['county', 'villages']
+
+    # Must be logged in to edit
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     serializer_class = serializers.HundredSerializer
-    queryset = models.Hundred.objects.all()
+    queryset = models.Hundred.objects.all().select_related('county').order_by('name')
+    chain = {
+        'county': {'field': 'county'},
+    }
+
+
+class VillageViewSet(ChainFilterQueryMixin, FlexFieldsModelViewSet):
+
+    permit_list_expands = ['hundred', 'county', ]
+
+    # Must be logged in to edit
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
-
-
-class VillageViewSet(DynamicModelViewSet):
-
     serializer_class = serializers.VillageSerializer
-    queryset = models.Village.objects.all().order_by('county__name', 'name')
+    queryset = models.Village.objects.all()\
+        .select_related('county', 'hundred')\
+        .prefetch_related('person_set')\
+        .order_by('county__name', 'name')
+    chain = {
+        'village': {'field': 'name'},
+        'county': {'field': 'county'},
+        'hundred': {'field': 'hundred'},
+    }
+
+
+class PersonViewSet(ChainFilterQueryMixin, FlexFieldsModelViewSet):
+
+    permit_list_expands = ['village', 'earliest_case', 'latest_case']
+
+    # Must be logged in to edit
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
-
-
-class PersonViewSet(DynamicModelViewSet):
-
     serializer_class = serializers.PersonSerializer
+    queryset = models.Person.objects.all().select_related(
+        'village',
+        'earliest_case__session__village',
+        'latest_case__session__village').order_by('first_name', 'last_name')
+    chain = {
+        'county_to_litigant': {'field': 'cases.case.session.village.county'},
+        'county_to_resident': {'field': 'village.county'},
+        'village_to_resident': {'field': 'village'},
+        'village_to_litigant': {'field': 'cases.case.session.village'},
+        'hundred_to_litigant': {'field': 'cases.case.session.village.hundred'},
+        'hundred_to_resident': {'field': 'village.hundred'},
+        'hundred': {'field': 'village.hundred'},
+        'session': {'field': 'cases.case.session'},
+        'amerced': {'field': 'cases.amercements', 'type': 'isnull'},
+        'capitagia': {'field': 'cases.capitagia', 'type': 'isnull'},
+        'damaged': {'field': 'cases.damages', 'type': 'isnull'},
+        'fined': {'field': 'cases.fines', 'type': 'isnull'},
+        'heriot': {'field': 'cases.heriots', 'type': 'isnull'},
+        'impercamenta':{'field': 'cases.impercamenta', 'type': 'isnull'},
+        'lands': {'field': 'cases.lands', 'type': 'isnull'},
+        'pledges_given': {'field': 'pledge_giver', 'type': 'isnull'},
+        'pledges_received': {'field': 'cases.pledges', 'type': 'isnull'},
+        'case': {'field': 'cases.case'},
+    }
+
+
+class RecordViewSet(ChainFilterQueryMixin, FlexFieldsModelViewSet):
+
+    permit_list_expands = ['sessions', 'archive']
+
+    # Must be logged in to edit
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
-
-    def get_queryset(self, queryset=models.Person.objects.all()):
-        chain_filter = {}
-        chain_filter['person_to_case__case__session__village__county_id'] = self.request.query_params.get('county_to_litigant')
-        chain_filter['village__county_id'] = self.request.query_params.get('county_to_resident')
-        chain_filter['person_to_case__case__session__village_id'] = self.request.query_params.get('village_to_litigant')
-        chain_filter['person_to_case__case__session__village__hundred_id'] = self.request.query_params.get('hundred_to_litigant')
-        chain_filter['village__hundred_id'] = self.request.query_params.get('hundred')
-        chain_filter['person_to_case__chevage'] = self.request.query_params.get('chevage')
-        chain_filter['person_to_case__impercamentum'] = self.request.query_params.get('impercamentum')
-        chain_filter['person_to_case__amercement'] = self.request.query_params.get('amercement')
-        chain_filter['person_to_case__fine'] = self.request.query_params.get('fine')
-        chain_filter['person_to_case__heriot'] = self.request.query_params.get('heriot')
-        chain_filter['person_to_case__damage'] = self.request.query_params.get('damage')
-        chain_filter['pledge_giver'] = self.request.query_params.get('pledges_given')
-        chain_filter['pledge_receiver'] = self.request.query_params.get('pledges_received')
-        
-        if not chain_filter:
-            return queryset
-        else:
-            queryset = check_chain(chain_filter, queryset)
-            return queryset
-
-
-class RecordViewSet(DynamicModelViewSet):
 
     serializer_class = serializers.RecordSerializer
-    queryset = models.Record.objects.all().order_by('archive__name', 'name')
+    queryset = models.Record.objects.all().select_related('archive').order_by('archive__name', 'name')
+    chain = {
+        'archive': {'field': 'archive'}
+    }
+
+
+class SessionViewSet(ChainFilterQueryMixin, FlexFieldsModelViewSet):
+
+    permit_list_expands = ['village', 'record']
+
+    # Must be logged in to edit
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
-
-
-class SessionViewSet(DynamicModelViewSet):
 
     serializer_class = serializers.SessionSerializer
-    queryset = models.Session.objects.all().order_by('village__name', 'record__record_type', 'date')
+    queryset = models.Session.objects.all()\
+        .select_related('village', 'record')\
+        .order_by('village__name', 'record__record_type', 'date')
+    chain = {
+        'village': {'field': 'village'},
+        'record': {'field': 'record'},
+        'archive': {'field': 'record.archive'},
+    }
+
+
+class CaseViewSet(ChainFilterQueryMixin, FlexFieldsModelViewSet):
+
+    permit_list_expands = ['session', 'session.village', 'litigants']
+    # Must be logged in to edit
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
-
-    def get_queryset(self, queryset=models.Session.objects.all()):
-        chain_filter = {}
-        chain_filter['village'] = self.request.query_params.get('village')
-
-        distinct = self.request.query_params.get('distinct')
-
-        if not chain_filter:
-            return queryset
-        else:
-            if distinct == "true":
-                queryset = check_chain(chain_filter, queryset, True)
-            else:
-                queryset = check_chain(chain_filter, queryset, False)
-            return queryset
-
-
-class CaseViewSet(DynamicModelViewSet):
-
     serializer_class = serializers.CaseSerializer
+    queryset = models.Case.objects.all()\
+        .select_related('session__village', 'case_type', 'verdict')\
+        .prefetch_related('litigants', 'litigants__pledges')\
+        .order_by('session__date')
+    chain = {
+        'session': {'field': 'session'},
+        'record': {'field': 'session.record'},
+        'archive': {'field': 'session.record.archive'},
+        'village': {'field': 'session.village'},
+        'hundred': {'field': 'session.village.hundred'},
+        'county': {'field': 'session.village.county'},
+        'land': {'field': 'litigants.lands'},
+        'land_id': {'field': 'litigants.lands.land'},
+        'case_type': {'field': 'case_type'},
+        'verdict': {'field': 'verdict'},
+        'litigant': {'field': 'litigants.in'},
+        'pledge_receiver': {'field': 'cases.pledges'} ,
+    }
+
+
+class CornbotViewSet(ChainFilterQueryMixin, FlexFieldsModelViewSet):
+
+    permit_list_expands = ['crop_type', 'price']
+
+    # Must be logged in to edit
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
-
-    def get_queryset(self, queryset=models.Case.objects.all()):
-        chain_filter={}
-        chain_filter['session__village_id'] = self.request.query_params.get('village')
-        chain_filter['session__village__hundred_id'] = self.request.query_params.get('hundred')
-        chain_filter['session__village__county_id'] = self.request.query_params.get('county')
-        chain_filter['case_to_person__land_id'] = self.request.query_params.get('land')
-        chain_filter['case_type'] = self.request.query_params.get('case_type')
-        distinct = self.request.query_params.get('distinct')
-
-        if not chain_filter:
-            return queryset
-        else:
-            if distinct == "true":
-                queryset = check_chain(chain_filter, queryset, True)
-            else:
-                queryset = check_chain(chain_filter, queryset)
-            return queryset
-
-
-class CornbotViewSet(DynamicModelViewSet):
-
     serializer_class = serializers.CornbotSerializer
-    queryset = models.Cornbot.objects.all().order_by('case__session__village__name', 'case__session__date')
+    queryset = models.Cornbot.objects.all()\
+        .select_related('case__session__village')\
+        .order_by('case__session__village__name', 'case__session__date')
+    chain = {
+        'case': {'field': 'case'},
+    }
+
+
+class ExtrahuraViewSet(ChainFilterQueryMixin, FlexFieldsModelViewSet):
+    permit_list_expands = ['animal', 'price']
+
+    # Must be logged in to edit
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
-
-
-class ExtrahuraViewSet(DynamicModelViewSet):
-
     serializer_class = serializers.ExtrahuraSerializer
-    queryset = models.Extrahura.objects.all().order_by('case__session__village__name', 'case__session__date')
+    queryset = models.Extrahura.objects.all()\
+        .select_related('case__session__village')\
+        .order_by('case__session__village__name', 'case__session__date')
+    chain = {
+        'case': {'field': 'case'},
+    }
+
+
+class MurrainViewSet(ChainFilterQueryMixin, FlexFieldsModelViewSet):
+
+    permit_list_expands = ['animal']
+    # Must be logged in to edit
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
-
-
-class MurrainViewSet(DynamicModelViewSet):
-
     serializer_class = serializers.MurrainSerializer
-    queryset = models.Murrain.objects.all().order_by('case__session__village__name', 'case__session__date')
+    queryset = models.Murrain.objects.all()\
+        .select_related('case__session__village')\
+        .order_by('case__session__village__name', 'case__session__date')
+    chain = {
+        'case': {'field': 'case'},
+    }
+
+
+class PlaceMentionedViewSet(ChainFilterQueryMixin, FlexFieldsModelViewSet):
+
+    permit_list_expands = ['village', 'case']
+    # Must be logged in to edit
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
-
-
-class PlaceMentionedViewSet(DynamicModelViewSet):
-
     serializer_class = serializers.PlaceMentionedSerializer
-    queryset = models.PlaceMentioned.objects.all()
+    queryset = models.PlaceMentioned.objects.all()\
+        .select_related('village', 'case__session__village')\
+        .order_by('village')
+    chain = {
+        'village': {'field': 'village'},
+        'related_to': {'field': 'case.session.village'},
+        'case': {'field': 'case', 'select_related': 'case'},
+        'ancient_demesne': {'field': 'village.ancient_demesne'},
+        'great_rumor': {'field': 'village.great_rumor'},
+    }
+
+
+class LandParcelViewSet(FlexFieldsModelViewSet):
+
+    # Must be logged in to edit
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
-    def get_queryset(self, queryset=models.PlaceMentioned.objects.all()):
-        chain_filter={}
-        chain_filter['village_id'] = self.request.query_params.get('village')
-        chain_filter['case__session__village_id'] = self.request.query_params.get('related_to')
-        if not chain_filter:
-            return queryset
-        else:
-            queryset = check_chain(chain_filter, queryset)
-            return queryset
-
-
-class LandParcelViewSet(DynamicModelViewSet):
-
-    queryset = models.LandParcel.objects.all().order_by('land', 'parcel_type__parcel_type')
+    queryset = models.LandParcel.objects.all().select_related('parcel_type').order_by('land', 'parcel_type__parcel_type')
     serializer_class = serializers.LandParcelSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
 
-class LitigantViewSet(DynamicModelViewSet):
+class LitigantViewSet(ChainFilterQueryMixin, FlexFieldsModelViewSet):
+    permit_list_expands = ['amercements', 'amercements.amercement',
+                           'capitagia', 'capitagia.capitagium',
+                           'damages', 'damages.damage',
+                           'fines', 'fines.fine',
+                           'heriots', 'heriots.animal',
+                           'impercamenta', 'impercamenta.impercamentum', 'impercamenta.animal',
+                           'lands',
+                           'case', 'role',
+                           'pledges', 'pledges.giver',
+                           'person', 'person.village']
 
+    # Must be logged in to edit
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
     serializer_class = serializers.LitigantSerializer
-    queryset = models.Litigant.objects.all()
+    queryset = models.Litigant.objects.all()\
+        .select_related('person', 'case', 'case__session')\
+        .order_by('person__first_name', 'person__last_name')
+    chain = {
+        'litigant': {'field': 'person'},
+        'case': {'field': 'case'},
+        'amercements': {'field': 'amercements', 'type': 'isnull'},
+        'damages': {'field': 'damages', 'type': 'isnull'},
+        'capitagia': {'field': 'capitagia', 'type': 'isnull'},
+        'fines': {'field': 'fines', 'type': 'isnull'},
+        'heriots': {'field': 'heriots', 'type': 'isnull'},
+        'impercamenta': {'field': 'impercamenta', 'type': 'isnull'},
+        'lands': {'field': 'lands', 'type': 'isnull'},
+        'land': {'field': 'lands.land'},
+        'pledges': {'field': 'pledges', 'type': 'isnull'},
+        'county': {'field': 'case.session.village.county'}
+    }
+
+
+class PledgeViewSet(ChainFilterQueryMixin, FlexFieldsModelViewSet):
+
+    permit_list_expands = ['giver', 'receiver', 'receiver.case', 'receiver.person']
+    # Must be logged in to edit
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
-
-
-class PledgeViewSet(DynamicModelViewSet):
-
     serializer_class = serializers.PledgeSerializer
-    queryset = models.Pledge.objects.all().order_by('case__session__village__name', 'case__session__date',
-                                                    'pledge_giver__last_name', 'pledge_giver__first_name')
+    queryset = models.Pledge.objects.all()\
+        .select_related('giver','receiver__case', 'receiver__person')\
+        .order_by('giver__last_name', 'giver__first_name')
+    chain = {
+        'giver': {'field': 'giver'},
+        'receiver': {'field': 'receiver.person'},
+        'case': {'field': 'receiver.case'},
+    }
+
+
+class LandSplitViewSet(FlexFieldsModelViewSet):
+    permit_list_expands = ['new_land', 'old_land']
+
+    # Must be logged in to edit
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
-
-
-class LandSplitViewSet(DynamicModelViewSet):
-
     serializer_class = serializers.LandSplitSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
-    def get_queryset(self, queryset=models.LandSplit.objects.all()):
+    def get_queryset(self, queryset=models.LandSplit.objects.all().order_by('old_land__case_to_land__case__session__date')):
         land = self.request.query_params.get('land')
         if not land:
             return queryset
@@ -318,21 +472,51 @@ class LandSplitViewSet(DynamicModelViewSet):
             return queryset
 
 
-class PositionViewSet(DynamicModelViewSet):
+class PositionViewSet(ChainFilterQueryMixin, FlexFieldsModelViewSet):
+    permit_list_expands = ['session']
+
+    # Must be logged in to edit
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     serializer_class = serializers.PositionSerializer
-    queryset = models.Position.objects.all()
+    queryset = models.Position.objects.all().prefetch_related('session')
+    chain = {
+        'person': {'field': 'person'}
+    }
+
+
+class RelationshipViewSet(FlexFieldsModelViewSet):
+    permit_list_expands = ['person_one', 'person_two']
+
+    # Must be logged in to edit
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
-
-
-class RelationshipViewSet(DynamicModelViewSet):
-
     serializer_class = serializers.RelationshipSerializer
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+    # queryset = models.Relationship.objects.all()
+    # chain = {
+    #     'confidence': {'field': 'confidence', 'type': 'isnull'},
+    # }
 
     def get_queryset(self, *args, **kwargs):
         relations = self.request.query_params.get('relations')
-        if not relations:
-             return models.Relationship.objects.all()
-        else:
+        confidence = self.request.query_params.get('confidence')
+        if relations:
             return models.Relationship.objects.filter(Q(person_one=relations) | Q(person_two=relations))
+        elif confidence:
+            if confidence == 'true' or confidence == 'True':
+                confidence = False
+            else:
+                confidence = True
+            return models.Relationship.objects.filter(confidence__isnull=confidence)
+        else:
+            return models.Relationship.objects.all()
+
+
+class LandtoCaseViewSet(ChainFilterQueryMixin, FlexFieldsModelViewSet):
+    permit_list_expands = ['litigant', 'land', 'role', 'case']
+
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+    serializer_class = serializers.LandtoCaseSerializer
+    queryset = models.LandtoCase.objects.all()
+    chain = {
+        'land': {'field': 'land'}
+    }

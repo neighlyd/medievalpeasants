@@ -6,34 +6,26 @@
 {% endblock %}
 
 {% block additional_title %}
-    <form>
-        {% csrf_token %}
-
-        <div class="form-group d-flex justify-content-center" style="padding-top: 5px">
-        {% for field in filter_case_form.visible_fields %}
-                <div class="col-sm-2">
+    <div class="form-inline d-flex justify-content-center" id="select_cases">
+            <div class="form-group" style="padding-top: 5px">
+            {% for field in filter_case_form.visible_fields %}
+                <div class="col-1">
                     <h4>{{ field.label_tag }}</h4>
                 </div>
-                <div class="col-md-3.5">
-                    {% render_field field class="form-control" id="select_case_type" %}
+                <div class="col-3">
+                    {% render_field field class="form-control" id=field.name %}
                 </div>
         {% endfor %}
+        </div>
+    </div>
+    <br>
+        <div class="text-center">
+            <button type="button" class="btn btn-primary" id="get_cases">Get Cases</button>
         </div>
 {% endblock %}
 
 {% block center_bar %}
     {{ block.super }}
-    <br>
-        <div class="mx-auto">
-            <div class="justify-content-center">
-                        <button type="button" class="btn btn-primary" id="get_cases">Get Cases</button>
-            </div>
-        </div>
-
-    </form>
-
-    <br>
-
 <div id="list_cases" style="display: none">
     <div class="card">
         <div class="card-body clearfix" id="main_info">
@@ -57,7 +49,15 @@
 {% endblock %}
 
 {% block right_sidebar %}
-    {{ block.super }}
+    <div class="container" style="position: sticky; top: 65px">
+        {% if perms.peasantlegaldb.add_case %}
+            <div class="btn-group" role="group">
+                <a class="btn btn-success" href="{% url 'case:add' %}">Add Case</a>
+            </div>
+            <br>
+            <br>
+        {% endif %}
+    </div>
 {% endblock %}
 
 {% block scripts %}
@@ -75,83 +75,153 @@
 
 
     $(document).ready(function(){
-        $(":button").click(function(e){
+
+        $('#select_village').change(function(){
+           var url = $('#select_village').attr('data_case_types_url');
+           var villageID = $(this).val();
+           $.ajax({
+                   url: url,
+                   data: {
+                       'village': villageID
+                   },
+                   success: function(data){
+                       $("#select_case_type").html(data);
+                   }
+               })
+        });
+
+        $('#select_case_type').change(function(){
+            var url = $('#select_case_type').attr('data_verdict_types_url');
+            var caseTypeID = $(this).val();
+            $.ajax({
+                url: url,
+                data: {
+                    'case_type': caseTypeID
+                },
+                success: function(data){
+                    $('#select_verdict_type').html(data);
+                }
+            })
+
+        });
+
+        $("#get_cases").click(function(e){
             $('.btn').removeClass('active');
             $(this).addClass('active');
             var caseType = $("#select_case_type").val();
+            var village = $("#select_village").val();
+            var verdictType = $("#select_verdict_type").val();
+            var apiCall = 'format=datatables&expand=session';
             var url = Urls['api:case-list']();
-            if (caseType == null || caseType == '') {
+            if (caseType === 'None' || village === 'None' || verdictType === 'None') {
                 if ($("#list_cases").is(":visible")) {
                     $("#list_cases").hide();
+
                     return
                 } else {
                     return
                 }
             }
-            if (caseType === "All"){
-                url = url + "?exclude[]=session.*&include[]=litigant_count&include[]=session.village.name&include[]=session.law_term&include[]=session.date&include[]=session.human_date&include[]=pledge_count";
+            if ( village === "All" ){
+                if ( caseType === "All" ){
+                    if ( verdictType === "All" ){
+                        url = url + '?' + apiCall;
+                    } else {
+                        url = url + "?verdict=" + verdictType + '&' + apiCall;
+                    }
+                } else {
+                    if ( verdictType === "All" ){
+                        url = url + "?case_type=" + caseType + '&' + apiCall;
+                    } else {
+                        url = url + "?case_type=" + caseType + "&verdict=" + verdictType + '&' + apiCall;
+
+                    }
+                }
+            } else {
+                if ( caseType === "All" ){
+                    if ( verdictType === "All" ){
+                        url = url + "?village=" + village + '&' + apiCall;
+                    } else {
+                        url = url + "?village=" + village + "&verdict=" + verdictType + '&' + apiCall;
+                    }
+                } else {
+                    if ( verdictType === "All" ){
+                        url = url + "?village=" + village + "&case_type=" + caseType + '&' + apiCall;
+                    } else {
+                        url = url + "?village=" + village + "&case_type=" + caseType + "&verdict=" + verdictType + '&' + apiCall;
+                    }
+                }
             }
-            else {
-                url = url + "?case_type=" + caseType + "&exclude[]=session.*&include[]=litigant_count&include[]=session.village.name&include[]=session.law_term&include[]=session.date&include[]=session.human_date&include[]=pledge_count";
-            }
+
             $("#table").DataTable().destroy();
             var table = $('#table').DataTable({
                 scrollX: true,
                 scrollY: 500,
                 scrollCollapse: true,
-                paging: false,
-                ajax: {
-                    processing: true,
-                    url: url,
-                    type: "GET",
-                    dataSrc: "cases.",
-                },
+                paging: true,
+                serverSide: true,
+                ajax: url,
                 order: [[3, "asc"], [4, "asc"]],
                 "columns": [
                     {
-                        "class": "details-control",
-                        "orderable": "false",
-                        "data": "summary",
-                        "defaultContent": "",
-                        "render": checkNotes,
-                        width:"15px"
+                        class: 'details-control',
+                        orderable: false,
+                        data: 'summary',
+                        defaultContent: '',
+                        render: checkNotes,
+                        width:'15px'
                     },
                     {data: "id",
                         defaultContent: '',
                         render: {
-                            display: function(data, type, row, col){
-                            var url = Urls.case(data);
+                            display: function(data, type, row){
+                            var url = Urls['case:detail'](data);
                             return "<a href='"+ url +"'>" + data + "</a>"
                             }
                         }
                     },
-                    {data: "session.village.name",
+                    {data: "session.village",
                         defaultContent: '',
+                        name: 'session.village.name',
                         render:{
-                            display: function(data, type, row, col){
-                                var url = Urls.village(row.session.village.id);
-                                return "<a href='" + url + "'>" + data + "</a>";
+                            display: function(data, type, row, meta){
+                                var url = Urls['village:detail'](data.id);
+                                return "<a href='" + url + "'>" + data.name + "</a>";
                             }
                         }
                     },
                     {data: "session",
                         defaultContent: '',
+                        name: 'session.date, session.village.name',
                         render:{
-                            display: function(data, type, row, col){
-                                var url = Urls.session(data.id);
-                                return "<a href'" + url + "'>" + data.human_date + "</a>";
+                            display: function(data, type, row, meta){
+                                var url = Urls['session:detail'](data.id);
+                                return "<a href='" + url + "'>" + data.law_term + ', ' + data.human_date + "</a>";
 
                             },
-                        sort: "date"
                         }
                     },
-                    {data: "court_type"},
-                    {data: "case_type.case_type"},
-                    {data: "verdict.verdict"},
-                    {data: "litigant_count"},
-                    {data: "pledge_count"},
+                    {data: "court_type",
+                        searchable: false,
+                    },
+                    {data: "case_type.case_type",
+                        name: 'case_type.case_type',
+                    },
+                    {data: "verdict.verdict",
+                        name: 'verdict.verdict',
+                    },
+                    {data: "litigant_count",
+                        searchable: false,
+                        orderable: false,
+                    },
+                    {data: "pledge_count",
+                        searchable: false,
+                        orderable: false,
+                    },
                     {data: "of_interest",
                         defaultContent: '',
+                        searchable: false,
+                        orderable: false,
                         render:{
                             display: checkMaker,
                         }
@@ -163,21 +233,23 @@
             // Used to activate the + expansion and trigger the format function.
              $('#table tbody').on('click', 'td.details-control', function(){
                 var tr = $(this).closest('tr');
-                var tdi = tr.find("i.fa");
+                var tdi = tr.find('#check');
                 var row = table.row( tr );
-
-                if ( row.child.isShown()) {
-                    row.child.hide();
-                    tr.removeClass('shown');
-                    tdi.first().removeClass('fa-minus-square');
-                    tdi.first().addClass('fa-plus-square');
-                } else {
-                    row.child( format( row.data() ) ).show();
-                    tr.addClass('shown');
-                    tdi.first().removeClass('fa-plus-square');
-                    tdi.first().addClass('fa-minus-square');
+                if (tdi.prop('style').color !== 'gray'){
+                    if ( row.child.isShown()) {
+                        row.child.hide();
+                        tr.removeClass('shown');
+                        tdi.first().removeClass('fa-minus-square');
+                        tdi.first().addClass('fa-plus-square');
+                    } else {
+                        row.child( format( row.data() ) ).show();
+                        tr.addClass('shown');
+                        tdi.first().removeClass('fa-plus-square');
+                        tdi.first().addClass('fa-minus-square');
+                    }
                 }
             });
+
             if ($("#list_cases").not(":visible")){
                 $("#list_cases").show();
             }

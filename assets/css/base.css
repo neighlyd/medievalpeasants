@@ -141,3 +141,48 @@ body {
   color: #9ebb97;
   background-color: #4a8323;
 }
+
+#map {
+    height: 400px;
+    width: 100%;
+}
+
+.details-control {
+    text-align:center;
+    color:forestgreen;
+    cursor: pointer;
+}
+
+tr.shown td.details-control {
+    text-align:center;
+    color:red;
+}
+
+/*
+  css for hiding the table-row when adding in collapsing rows. See: https://stackoverflow.com/questions/16389775/twitter-bootstrap-use-collapse-js-on-table-cells-almost-done
+ */
+
+.hiddenRow {
+  padding: 0 !important;
+  border: 0 !important;
+}
+
+.tab {
+   text-indent: 40px;
+}
+
+/*
+  css for custom card backgrounds
+ */
+
+.bg-grey {
+  background-color: #bababa;
+}
+
+/*
+  changing modal size.
+ */
+
+.editing-modal {
+  max-width: 85%;
+}

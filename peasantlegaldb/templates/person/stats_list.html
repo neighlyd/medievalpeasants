@@ -1,0 +1,384 @@
+<div class="card">
+    <h4 class="card-header text-center bg-grey">Stats Summary</h4>
+    <div class="card-body">
+        <br>
+        <div class="d-flex flex-wrap justify-content-around">
+
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Case Info</h4>
+                    <table class="table table-sm">
+                        <tr>
+                            <td>Litigation Count</td>
+                            <td>{{ person.case_count_litigation }}</td>
+                        </tr>
+                        <tr>
+                            <td>Capitagium Count</td>
+                            <td>{{ person.capitagium_count }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            {% if person.pledge_exists %}
+                <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Pledge Info</h4>
+                    <table class="table table-sm">
+                        <tr>
+                            <td>Pledges Given</td>
+                            <td>{{ person.pledges_given_count }}</td>
+                        </tr>
+                        <tr>
+                            <td>Pledges Received</td>
+                            <td>{{ person.pledges_received_count }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            {% endif %}
+
+            {% if person.relationship_exists %}
+                <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Relationship Info</h4>
+                    <table class="table table-sm">
+                        <tr>
+                            <td>Known Relationships</td>
+                            <td>{{ person.relationship_count }}</td>
+                        </tr>
+                        <tr>
+                            <td>Known Positions</td>
+                            <td>{{ person.position_count }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            {% endif %}
+
+            {% if person.amercement_exists %}
+                <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Amercement Info</h4>
+                    <table class="table table-sm">
+                        <tr>
+                            <td>Count</td>
+                            <td>{{ person.amercement_count }}</td>
+                        </tr>
+                        <tr>
+                            <td>Minimum (in d.)</td>
+                            {% if person.amercement_min == 0 %}
+                                    <td>0</td>
+                            {% elif person.amercement_min > 0 %}
+                                    <td>{{ person.amercement_min|floatformat }}</td>
+                            {% else %}
+                                    <td>--</td>
+                            {% endif %}
+                        </tr>
+                        <tr>
+                            <td>Maximum (in d.)</td>
+                            {% if person.amercement_max == 0 %}
+                                    <td>0</td>
+                            {% elif person.amercement_max > 0 %}
+                                    <td>{{ person.amercement_max|floatformat }}</td>
+                            {% else %}
+                                    <td>--</td>
+                            {% endif %}
+                        </tr>
+                        <tr>
+                            <td>Average (in d.)</td>
+                            {% if person.amercement_avg == 0 %}
+                                    <td>0</td>
+                            {% elif person.amercement_avg > 0 %}
+                                    <td>{{ person.amercement_avg|floatformat }}</td>
+                            {% else %}
+                                    <td>--</td>
+                            {% endif %}
+                        </tr>
+                        <tr>
+                            <td>Total (in d.)</td>
+                            {% if person.amercement_sum == 0 %}
+                                    <td>0</td>
+                            {% elif person.amercement_sum > 0 %}
+                                    <td>{{ person.amercement_sum|floatformat }}</td>
+                            {% else %}
+                                    <td>--</td>
+                            {% endif %}
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            {% endif %}
+            {% if person.fine_exists %}
+                <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Fine Info</h4>
+                    <table class="table table-sm">
+                        <tr>
+                            <td>Count</td>
+                            <td>{{ person.fine_count }}</td>
+                        </tr>
+                        <tr>
+                            <td>Minimum (in d.)</td>
+                            {% if person.fine_min == 0 %}
+                                    <td>0</td>
+                            {% elif person.fine_min > 0 %}
+                                    <td>{{ person.fine_min|floatformat }}</td>
+                            {% else %}
+                                    <td>--</td>
+                            {% endif %}
+                        </tr>
+                        <tr>
+                            <td>Maximum (in d.)</td>
+                            {% if person.fine_max == 0 %}
+                                    <td>0</td>
+                            {% elif person.fine_max > 0 %}
+                                    <td>{{ person.fine_max|floatformat }}</td>
+                            {% else %}
+                                    <td>--</td>
+                            {% endif %}
+                        </tr>
+                        <tr>
+                            <td>Average (in d.)</td>
+                            {% if person.fine_avg == 0 %}
+                                    <td>0</td>
+                            {% elif person.fine_avg > 0 %}
+                                    <td>{{ person.fine_avg|floatformat }}</td>
+                            {% else %}
+                                    <td>--</td>
+                            {% endif %}
+                        </tr>
+                        <tr>
+                            <td>Total (in d.)</td>
+                            {% if person.fine_sum == 0 %}
+                                    <td>0</td>
+                            {% elif person.fine_sum > 0 %}
+                                    <td>{{ person.fine_sum|floatformat }}</td>
+                            {% else %}
+                                    <td>--</td>
+                            {% endif %}
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            {% endif %}
+
+            {% if person.damage_exists %}
+                <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Damages Info</h4>
+                    <table class="table table-sm">
+                        <tr>
+                            <td>Count</td>
+                            <td>{{ person.damage_count }}</td>
+                        </tr>
+                        <tr>
+                            <td>Minimum (in d.)</td>
+                            {% if person.damage_min == 0 %}
+                                    <td>0</td>
+                            {% elif person.damage_min > 0 %}
+                                    <td>{{ person.damage_min|floatformat }}</td>
+                            {% else %}
+                                    <td>--</td>
+                            {% endif %}
+                        </tr>
+                        <tr>
+                            <td>Maximum (in d.)</td>
+                            {% if person.damage_max == 0 %}
+                                    <td>0</td>
+                            {% elif person.damage_max > 0 %}
+                                    <td>{{ person.damage_max|floatformat }}</td>
+                            {% else %}
+                                    <td>--</td>
+                            {% endif %}
+                        </tr>
+                        <tr>
+                            <td>Average (in d.)</td>
+                            {% if person.damage_avg == 0 %}
+                                    <td>0</td>
+                            {% elif person.damage_avg > 0 %}
+                                    <td>{{ person.damage_avg|floatformat }}</td>
+                            {% else %}
+                                    <td>--</td>
+                            {% endif %}
+                        </tr>
+                        <tr>
+                            <td>Total (in d.)</td>
+                            {% if person.damage_sum == 0 %}
+                                    <td>0</td>
+                            {% elif person.damage_sum > 0 %}
+                                    <td>{{ person.damage_sum|floatformat }}</td>
+                            {% else %}
+                                    <td>--</td>
+                            {% endif %}
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            {% endif %}
+
+            {% if person.capitagia_exists %}
+                <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Chevage Info</h4>
+                    <table class="table table-sm">
+                        <tr>
+                            <td>Count</td>
+                            <td>{{ person.chevage_count }}</td>
+                        </tr>
+                        <tr>
+                            <td>Minimum (in d.)</td>
+                            {% if person.chevage_min == 0 %}
+                                    <td>0</td>
+                            {% elif person.chevage_min > 0 %}
+                                    <td>{{ person.chevage_min|floatformat }}</td>
+                            {% else %}
+                                    <td>--</td>
+                            {% endif %}
+                        </tr>
+                        <tr>
+                            <td>Maximum (in d.)</td>
+                            {% if person.chevage_max == 0 %}
+                                    <td>0</td>
+                            {% elif person.chevage_max > 0 %}
+                                    <td>{{ person.chevage_max|floatformat }}</td>
+                            {% else %}
+                                    <td>--</td>
+                            {% endif %}
+                        </tr>
+                        <tr>
+                            <td>Average (in d.)</td>
+                            {% if person.chevage_avg == 0 %}
+                                    <td>0</td>
+                            {% elif person.chevage_avg > 0 %}
+                                    <td>{{ person.chevage_avg|floatformat }}</td>
+                            {% else %}
+                                    <td>--</td>
+                            {% endif %}
+                        </tr>
+                        <tr>
+                            <td>Total (in d.)</td>
+                            {% if person.chevage_sum == 0 %}
+                                    <td>0</td>
+                            {% elif person.chevage_sum > 0 %}
+                                    <td>{{ person.chevage_sum|floatformat }}</td>
+                            {% else %}
+                                    <td>--</td>
+                            {% endif %}
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            {% endif %}
+
+            {% if person.impercamentum_exists %}
+                <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Impercamenta Info</h4>
+                    <table class="table table-sm">
+                        <tr>
+                            <td>Count</td>
+                            <td>{{ person.impercamentum_count }}</td>
+                        </tr>
+                        <tr>
+                            <td>Minimum (in d.)</td>
+                            {% if person.impercamentum_min == 0 %}
+                                    <td>0</td>
+                            {% elif person.impercamentum_min > 0 %}
+                                    <td>{{ person.impercamentum_min|floatformat }}</td>
+                            {% else %}
+                                    <td>--</td>
+                            {% endif %}
+                        </tr>
+                        <tr>
+                            <td>Maximum (in d.)</td>
+                            {% if person.impercamentum_max == 0 %}
+                                    <td>0</td>
+                            {% elif person.impercamentum_max > 0 %}
+                                    <td>{{ person.impercamentum_max|floatformat }}</td>
+                            {% else %}
+                                    <td>--</td>
+                            {% endif %}
+                        </tr>
+                        <tr>
+                            <td>Average (in d.)</td>
+                            {% if person.impercamentum_avg == 0 %}
+                                    <td>0</td>
+                            {% elif person.impercamentum_avg > 0 %}
+                                    <td>{{ person.impercamentum_avg|floatformat }}</td>
+                            {% else %}
+                                    <td>--</td>
+                            {% endif %}
+                        </tr>
+                        <tr>
+                            <td>Total (in d.)</td>
+                            {% if person.impercamentum_sum == 0 %}
+                                    <td>0</td>
+                            {% elif person.impercamentum_sum > 0 %}
+                                    <td>{{ person.impercamentum_sum|floatformat }}</td>
+                            {% else %}
+                                    <td>--</td>
+                            {% endif %}
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            {% endif %}
+
+            {% if person.heriot_exists %}
+                <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Heriot Info</h4>
+                    <table class="table table-sm">
+                        <tr>
+                            <td>Count</td>
+                            <td>{{ person.heriot_count }}</td>
+                        </tr>
+                        <tr>
+                            <td>Minimum (in d.)</td>
+                            {% if person.heriot_min == 0 %}
+                                    <td>0</td>
+                            {% elif person.heriot_min > 0 %}
+                                    <td>{{ person.heriot_min|floatformat }}</td>
+                            {% else %}
+                                    <td>--</td>
+                            {% endif %}
+                        </tr>
+                        <tr>
+                            <td>Maximum (in d.)</td>
+                            {% if person.heriot_max == 0 %}
+                                    <td>0</td>
+                            {% elif person.heriot_max > 0 %}
+                                    <td>{{ person.heriot_max|floatformat }}</td>
+                            {% else %}
+                                    <td>--</td>
+                            {% endif %}
+                        </tr>
+                        <tr>
+                            <td>Average (in d.)</td>
+                            {% if person.heriot_avg == 0 %}
+                                    <td>0</td>
+                            {% elif person.heriot_avg > 0 %}
+                                    <td>{{ person.heriot_avg|floatformat }}</td>
+                            {% else %}
+                                    <td>--</td>
+                            {% endif %}
+                        </tr>
+                        <tr>
+                            <td>Total (in d.)</td>
+                            {% if person.heriot_sum == 0 %}
+                                    <td>0</td>
+                            {% elif person.heriot_sum > 0 %}
+                                    <td>{{ person.heriot_sum|floatformat }}</td>
+                            {% else %}
+                                    <td>--</td>
+                            {% endif %}
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+    </div>
+</div>

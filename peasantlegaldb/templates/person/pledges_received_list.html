@@ -1,0 +1,112 @@
+<h3 class="card-header text-center bg-grey">Pledges Received</h3>
+<div class="card-body">
+    <table class="table table-bordered table-hover" id="pledges_received_table" data-ajax="{% url 'api:pledge-list' %}?receiver={{ view.kwargs.pk }}&expand=giver,receiver&format=datatables" data-page-length="10">
+        <thead>
+            <th>Details</th>
+            <th>Grantor</th>
+            <th>Status</th>
+            <th>Gender</th>
+            <th>Case</th>
+            <th>Session</th>
+            <th>Court</th>
+            <th>Case Type</th>
+            <th>Verdict</th>
+            <th>Litigants</th>
+        </thead>
+    </table>
+</div>
+
+<script>
+
+    var format_pledges_received_summary = function format( data ) {
+        return "<table class='table'>" +
+            "<tr>" +
+            "<td><b>Summary:</b></td>" +
+            "<td>" + data.receiver.case.summary + "</td>" +
+            "</tr>"
+            };
+
+    var pledges_received_table = $('#pledges_received_table').DataTable({
+        serverSide: true,
+        order: [[5, 'asc']],
+        columns: [
+            {
+                class: 'details-control',
+                orderable: false,
+                data: 'receiver.case.summary',
+                name: 'receiver.case.summary',
+                defaultContent: '',
+                render: checkNotes,
+                width:'15px'
+            },
+            {data: 'giver.full_name',
+                name: 'giver.full_name',
+                render: {
+                    display: function(data, type, row){
+                        var url = Urls['person:detail'](row.giver.id);
+                        return "<a href='" + url + "'>" + data + "</a>";
+                    }
+                }
+            },
+            {data: 'giver.status_display',
+                searchable: false,
+                orderable: false,
+            },
+            {data: 'giver.gender_display',
+                searchable: false,
+                orderable: false,
+            },
+            {data: 'receiver.case.id',
+                render: {
+                    display: function(data){
+                        var url = Urls['case:detail'](data);
+                        return "<a href='" + url + "'>" + data + "</a>";
+                    }
+                }
+            },
+            {data: 'receiver.case.session',
+                name: 'receiver.case.session.date, receiver.case.session.village.name',
+                render: {
+                    display: function(data, type, row){
+                        var url = Urls['session:detail'](data.id);
+                        return "<a href='" + url + "'>" + data.law_term + ', ' + data.year + "</a>";
+                    }
+                }
+            },
+            {data: 'receiver.case.court_type',
+                searchable: false,
+            },
+            {data: 'receiver.case.case_type.case_type',
+                name: 'receiver.case.case_type.case_type',
+            },
+            {data: 'receiver.case.verdict.verdict',
+                name: 'receiver.case.verdict.verdict',
+            },
+            {data: 'receiver.case.litigant_count',
+                searchable: false,
+                orderable: false
+            },
+        ]
+    });
+
+    // Used to activate the + expansion and trigger the format function.
+     $('#pledges_received_table').on('click', 'td.details-control', function(){
+        var tr = $(this).closest('tr');
+        var tdi = tr.find('#check');
+        var row = pledges_received_table.row( tr );
+        if (tdi.prop('style').color !== 'gray'){
+            if ( row.child.isShown()) {
+                row.child.hide();
+                tr.removeClass('shown');
+                tdi.first().removeClass('fa-minus-square');
+                tdi.first().addClass('fa-plus-square');
+            } else {
+                row.child( format_pledges_received_summary( row.data() ) ).show();
+                tr.addClass('shown');
+                tdi.first().removeClass('fa-plus-square');
+                tdi.first().addClass('fa-minus-square');
+            }
+        }
+    });
+
+</script>

@@ -1,0 +1,94 @@
+<div class="card">
+    <div class="card-header text-center bg-grey">
+        <h3>Session List</h3>
+        {% if perms.peasantlegaldb.add_session %}
+            <a href="{% url 'session:add' %}?record={{ record.id }}" class="btn btn-sm btn-success">Add Session</a>
+        {% endif %}
+    </div>
+
+<div class="card-body">
+    <table class="table table-bordered table-hover" id="session_table" data-ajax="{% url 'api:session-list' %}?record={{ record.id }}&expand=village&keep=law_term,year&format=datatables" data-page-length="25">
+        <thead>
+            <th>Notes</th>
+            <th>Village</th>
+            <th>Session</th>
+            <th>Cases</th>
+            <th>Litigants</th>
+        </thead>
+    </table>
+</div>
+
+</div>
+
+<script>
+
+    var format_notes = function format( data ) {
+        return "<table class='table'>" +
+            "<tr>" +
+            "<td>Notes</td>" +
+            "<td>" + data.notes + "</td>" +
+            "</tr>" +
+        "</table>"
+    }
+
+    var session_table = $("#session_table").DataTable({
+        serverSide: true,
+        fixedHeader:{ headerOffset: 50 },
+        scrollX: true,
+        order: [2, "asc"],
+        columns: [
+            {
+                class: "details-control",
+                orderable: false,
+                data: "notes",
+                defaultContent: "",
+                render: checkNotes,
+                width:"15px"
+            },
+            {data: "village.name",
+                render:{
+                    display: function(data, type, row){
+                        var url = Urls['village:detail'](row.village.id);
+                        return "<a href='"+ url +"'>" + data + "</a>"
+                    }
+                }
+            },
+            {data: "date",
+                render: {
+                    display: function(data, type, row){
+                        var url = Urls['session:detail'](row.id);
+                        return "<a href='"+ url +"'>" + row.law_term + ", " + row.year + "</a>"
+                    }
+                }
+            },
+            {data: "counts.case",
+                searchable: false,
+                orderable: false,
+            },
+            {data: "counts.litigant",
+                searchable: false,
+                orderable: false,
+            },
+        ]
+    });
+
+    $('#session_table').on('click', 'td.details-control', function(){
+        var tr = $(this).closest('tr');
+        var tdi = tr.find('#check');
+        var row = session_table.row( tr );
+        if (tdi.prop('style').color !== 'gray'){
+            if ( row.child.isShown()) {
+                row.child.hide();
+                tr.removeClass('shown');
+                tdi.first().removeClass('fa-minus-square');
+                tdi.first().addClass('fa-plus-square');
+            } else {
+                row.child( format_notes( row.data() ) ).show();
+                tr.addClass('shown');
+                tdi.first().removeClass('fa-plus-square');
+                tdi.first().addClass('fa-minus-square');
+            }
+        }
+    });
+
+</script>

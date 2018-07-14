@@ -5,9 +5,9 @@
 {% endblock %}
 
 {% block left_sidebar %}
-    <div id="selection_list">
-        <a class="list-group-item list-group-item-action active" href="{% url 'session_case_list' session.id %}">Cases</a>
-
+    <div class="list-group" id="selection_list" role="tablist">
+        <a class="list-group-item list-group-item-action" data-toggle="list" role="tab" href="#case_list" data-url="{% url 'session:cases' session.id %}" aria-controls="case_list" aria-selected="true">Cases</a>
+        <a class="list-group-item list-group-item-action" data-toggle="list" role="tab" href="#litigant_list" data-url="{% url 'session:litigants' session.id %}" aria-controls="litigant_list" aria-selected="true">Litigants</a>
     </div>
 {% endblock %}
 
@@ -15,7 +15,7 @@
 
 <div class="card-header text-center">
     <h2 class="card-title">Session - {{ session.id }}</h2>
-    <h6 class="card-subtitle text-muted float-right"><a href="{% url 'record' session.record.id %}" style="color: inherit; text-decoration: none">{{ session.record.name }}, F.{{ session.folio }}</a></h6>
+    <h6 class="card-subtitle text-muted float-right"><a href="{% url 'record:detail' session.record.id %}" style="color: inherit; text-decoration: none">{{ session.record.name }}, F.{{ session.folio }}</a></h6>
 </div>
 
 <div class="card-body clearfix" id="main_info">
@@ -27,7 +27,7 @@
                             <table class="table table-sm">
                                 <tr class="row m-0">
                                     <td class="d-inline-block col-4"><b>Village:</b></td>
-                                    <td class="d-inline-block col-8"><a href="{% url 'village' session.village.id %}">{{ session.village.name }}</a></td>
+                                    <td class="d-inline-block col-8"><a href="{% url 'village:detail' session.village.id %}">{{ session.village.name }}</a></td>
                                 </tr>
                                 <tr class="row m-0">
                                     <td class="d-inline-block col-4"><b>Term:</b></td>
@@ -50,11 +50,11 @@
                                     <td class="d-inline-block col-8">{{ session.litigant_count }}</td>
                                 </tr>
                                 <tr class="row m-0">
-                                    <td class="d-inline-block col-4"><b>Chevage Payers:</b></td>
-                                    <td class="d-inline-block col-8">{{ session.chevage_payer_count }}</td>
+                                    <td class="d-inline-block col-4"><b>Capitagium Payers:</b></td>
+                                    <td class="d-inline-block col-8">{{ session.capitagium_payer_count }}</td>
                                 </tr>
                                 <tr class="row m-0">
-                                    <td class="d-inline-block col-4"><b>Impercamenta Payers:</b></td>
+                                    <td class="d-inline-block col-4"><b>Impercamentum Payers:</b></td>
                                     <td class="d-inline-block col-8">{{ session.impercamentum_payer_count }}</td>
                                 </tr>
                                 <tr class="row m-0">
@@ -80,8 +80,9 @@
 
 <br>
 
-<div id="list_info">
-
+<div class="tab-content" id="list_info">
+    <div class="tab-pane fade" id="case_list" role="tabpanel"></div>
+    <div class="tab-pane fade" id="litigant_list" role="tabpanel"></div>
 </div>
 
 {% endblock %}
@@ -91,21 +92,21 @@
     <div class="container" style="position: sticky; top: 65px">
         {% if perms.peasantlegaldb.add_session %}
             <div class="btn-group" role="group">
-                <a class="btn btn-success" href="#">Add Session</a>
+                <a class="btn btn-success" href="{% url 'session:add' %}">Add Session</a>
             </div>
             <br>
             <br>
         {% endif %}
         {% if perms.peasantlegaldb.change_session %}
             <div class="btn-group" role="group">
-                <a class="btn btn-warning" href="#">Edit Session</a>
+                <a class="btn btn-warning" href="{% url 'session:edit' session.id %}">Edit Session</a>
             </div>
             <br>
             <br>
         {% endif %}
         {% if perms.peasantlegaldb.delete_session %}
             <div class="btn-group" role="group">
-                <a class="btn btn-danger" href="#">Delete Session</a>
+                <a class="btn btn-danger" href="{% url 'session:delete' session.id %}">Delete Session</a>
             </div>
         {% endif %}
     </div>
@@ -117,9 +118,25 @@
 
     <script>
         $(document).ready(function(){
-             var url = window.location.pathname;
-            var id = url.split('/').reverse()[1]
-            $("#list_info").load(Urls.session_case_list(id))
+            $("#selection_list").on('click', 'a', function(e){
+               e.preventDefault();
+               var url = $(this).attr("data-url");
+
+               if (typeof url !== "undefined"){
+                   var pane = $(this), href = this.hash;
+
+                   $(href).load(url, function(result){
+                       pane.tab('show');
+                   });
+               } else {
+                   $(this).tab('show');
+               }
+            });
+
+            $('a[data-toggle="tab"').on('shown.bs.tab', function(e){
+                $.fn.dataTable.tables({visible: true, api: true}).columns.adjust().responsive.recalc();
+            });
         })
     </script>
+
 {% endblock %}

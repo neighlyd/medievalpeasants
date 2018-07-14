@@ -30,13 +30,15 @@ LOGIN_URL = 'login'
 # Application definition
 
 INSTALLED_APPS = [
+    'dal',
+    'dal_select2',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'peasantlegaldb',
+    'peasantlegaldb.apps.PeasantlegaldbConfig',
     'accounts',
     'coverage',
     'rest_framework',
@@ -45,6 +47,7 @@ INSTALLED_APPS = [
     'django_filters',
     'peasantlegaldb.templatetags',
     'widget_tweaks',
+    'crispy_forms',
 ]
 
 MIDDLEWARE = [
@@ -132,11 +135,19 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_RENDERER_CLASSES': [
         'rest_framework.renderers.JSONRenderer',
-        'dynamic_rest.renderers.DynamicBrowsableAPIRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',
+        'rest_framework_datatables.renderers.DatatablesRenderer',
     ],
-    'DEFAULT_FILTER_BACKENDS':
-        ('django_filters.rest_framework.DjangoFilterBackend',)
+    'DEFAULT_FILTER_BACKENDS': (
+        'rest_framework_datatables.filters.DatatablesFilterBackend',
+    ),
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework_datatables.pagination.DatatablesPageNumberPagination',
+    'PAGE_SIZE': 50,
 }
+
+#declare template pack for Crispy Forms
+
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 # SECRET_KEY and Database information stored in secret_settings.py which is excluded from git through .gitignore.
 # Import SECRET_KEY and Database information. Ensure that the secret_settings.py file is the correct one before using.

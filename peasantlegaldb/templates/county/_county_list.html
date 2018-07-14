@@ -9,7 +9,7 @@
     {{ block.super }}
 
 <div class="card-body clearfix" id="main_info">
-    <table class="table table-bordered table-hover" id="table" data-page-length="25">
+    <table class="table table-bordered table-hover" id="table" data-ajax="{% url 'api:county-list' %}?format=datatables&keep=id" data-page-length="50">
         <thead>
             <th>Name</th>
             <th>Hundreds</th>
@@ -35,34 +35,51 @@
 <script>
 
     $(document).ready(function () {
-        var url = window.location.pathname;
-        var id = url.split('/').reverse()[1];
-        url = Urls['api:county-list']();
-        var api_url = url + "?include[]=counts";
         var table = $("#table").DataTable({
             fixedHeader:{ headerOffset: 50 },
             scrollX: true,
             order: [0, "asc"],
-            ajax: {
-                url: api_url,
-                type: "GET",
-                dataSrc: "counties.",
-            },
             "columns": [
                 {data: "name",
-                    fnCreatedCell: function(nTd, cellData, rowData, row, col) {
-                        url = Urls.county(rowData.id);
-                        $(nTd).html("<a href='"+ url +"'>" + rowData.name + "</a>");
+                    render: {
+                        display: function(data, type, row, meta){
+                            var url = Urls['county:detail'](row.id);
+                            return "<a href='"+ url +"'>" + data + "</a>"
+                        }
                     }
                 },
-                {data: "counts.hundred"},
-                {data: "counts.village"},
-                {data: "counts.great_rumor"},
-                {data: "counts.ancient_demesne"},
-                {data: "counts.session"},
-                {data: "counts.case"},
-                {data: "counts.resident"},
-                {data: "counts.litigant"},
+                {data: "counts.hundred",
+                    searchable: false,
+                    orderable: false,
+                },
+                {data: "counts.village",
+                    searchable: false,
+                    orderable: false,
+                },
+                {data: "counts.great_rumor",
+                    searchable: false,
+                    orderable: false,
+                },
+                {data: "counts.ancient_demesne",
+                    searchable: false,
+                    orderable: false,
+                },
+                {data: "counts.session",
+                    searchable: false,
+                    orderable: false,
+                },
+                {data: "counts.case",
+                    searchable: false,
+                    orderable: false,
+                },
+                {data: "counts.resident",
+                    searchable: false,
+                    orderable: false,
+                },
+                {data: "counts.litigant",
+                    searchable: false,
+                    orderable: false,
+                },
             ]
         });
 

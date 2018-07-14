@@ -9,7 +9,7 @@
     <div class="container-fluid d-flex justify-content-between pt-2">
 
         <div class="p-0 col-lg-2">
-            <div class="list-group" style="position: fixed">
+            <div class="list-group" role="tablist" style="position: fixed">
                 {% block left_sidebar %}
                 {% endblock %}
             </div>
@@ -29,23 +29,4 @@
         </div>
 
     </div>
-{% endblock %}
-
-{% block scripts %}
-
-{{ block.super }}
-
-<script>
-    $('#selection_list>a').click(function(e){
-        e.preventDefault();
-        var url = $(this).attr('href');
-        $(this).addClass('active').siblings().removeClass('active');
-        if (typeof url !== "undefined") {
-            $("#list_info").load(url);
-        } else {
-        }
-    });
-
-</script>
-
 {% endblock %}

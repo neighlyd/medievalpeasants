@@ -9,7 +9,7 @@
     {{ block.super }}
 
 <div class="card-body clearfix" id="main_info">
-    <table class="table table-bordered table-hover" id="table" data-page-length="25">
+    <table class="table table-bordered table-hover" id="table" data-ajax="{% url 'api:record-list' %}?expand=sessions,archive&format=datatables" data-page-length="25">
         <thead>
             <th></th>
             <th>Name</th>
@@ -48,57 +48,57 @@
     }
 
     $(document).ready(function () {
-        var url = Urls['api:record-list']();
-        var api_url = url + "?include[]=counts&include[]=session_dates&include[]=archive&include[]=sessions.village";
         var table = $("#table").DataTable({
-            fixedHeader:{ headerOffset: 50 },
-            scrollX: true,
-            order: [5, "asc"],
-            ajax: {
-                url: api_url,
-                type: "GET",
-                dataSrc: "records.",
-            },
-            "columns": [
+            serverSide: true,
+            order: [1, "asc"],
+            columns: [
                 {
-                    "class": "details-control",
-                    "orderable": "false",
-                    "data": "sessions",
-                    "defaultContent": "",
-                    "render": function(cellData){
-                        if (cellData != '') {
-                            return '<i class="fa fa-plus-square" aria-hidden="true"></i>';
-                        } else {
-                            return '<i class="fa fa-plus-square" aria-hidden="true" style="color: gray"></i>';
-                        }
-                    },
+                    class: "details-control",
+                    orderable: false,
+                    data: "sessions",
+                    defaultContent: "",
+                    render: checkNotes,
                     width:"15px"
                 },
                 {data: "name",
-                    fnCreatedCell: function(nTd, cellData, rowData, row, col) {
-                        url = Urls.record(rowData.id);
-                        $(nTd).html("<a href='"+ url +"'>" + rowData.name + "</a>");
+                    render: {
+                        display: function(data, type, row){
+                            url = Urls['record:detail'](row.id);
+                            return "<a href='"+ url +"'>" + data + "</a>"
+                        }
                     }
                 },
                 {data: "record_type"},
-                {data: "archive.name"},
-                {data: "reel"},
-                {data: "session_dates.earliest_session",
-                    defaultContent: '',
+                {data: "archive.name",
                     render: {
-                        display: formatSessionDate,
-                        sort: "date",
+                        display: function(data, type, row){
+                            url = Urls['archive:detail'](row.archive.id)
+                            return "<a href='"+ url +"'>" + data + "</a>"
+                        }
                     }
                 },
-                {data: "session_dates.latest_session",
+                {data: "reel"},
+                {data: "earliest_session",
+                    searchable: false,
+                    orderable: false,
                     defaultContent: '',
                     render: {
                         display: formatSessionDate,
-                        sort: "date",
+                    }
+                },
+                {data: "latest_session",
+                    searchable: false,
+                    orderable: false,
+                    defaultContent: '',
+                    render: {
+                        display: formatSessionDate,
                     }
                 },
                 {data: "counts",
                     defaultContent: '',
+                    searchable: false,
+                    orderable: false,
+
                     render: {
                         display: function (data, type, row, meta) {
                                 if (data.session) {
@@ -112,6 +112,9 @@
                 },
                 {data: "counts",
                     defaultContent: '',
+                    searchable: false,
+                    orderable: false,
+
                     render: {
                         display: function (data, type, row, meta) {
                                 if (data.case) {
@@ -150,8 +153,8 @@
        var concat = '';
        data.sessions.forEach(function(session){
            concat = concat + "<tr>" +
-                "<td><a href='" + Urls.session(session.id) + "'>" + session.id + "</a></td>" +
-                "<td><a href='" + Urls.village(session.village.id) + "'>" + session.village.name + "</a></td>" +
+                "<td><a href='" + Urls['session:detail'](session.id) + "'>" + session.id + "</a></td>" +
+                "<td><a href='" + Urls['village:detail'](session.village.id) + "'>" + session.village.name + "</a></td>" +
                 "<td>" + session.human_date + "</td>" +
                 "<td>" + session.notes + "</td>" +
                 "<td>" + session.counts.case + "</td>" +

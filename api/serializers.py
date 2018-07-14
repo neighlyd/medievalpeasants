@@ -3,43 +3,45 @@ from rest_framework import serializers
 from dynamic_rest.serializers import DynamicModelSerializer
 from dynamic_rest.fields import DynamicMethodField, DynamicRelationField
 
+from rest_flex_fields import FlexFieldsModelSerializer
+
 from peasantlegaldb import models
 
 
 # Normalized tables section
-class ParcelTenureSerializer(DynamicModelSerializer):
+class ParcelTenureSerializer(FlexFieldsModelSerializer):
 
     class Meta:
         model = models.ParcelTenure
-        name = 'parcel tenure'
+        name = 'parcel_tenure'
         fields = ('id', 'tenure',)
 
 
-class ParcelTypeSerializer(DynamicModelSerializer):
+class ParcelTypeSerializer(FlexFieldsModelSerializer):
 
     class Meta:
         model = models.ParcelType
-        name = 'parcel type'
+        name = 'parcel_type'
         fields = ('id', 'parcel_type',)
 
 
-class PositionTypeSerializer(DynamicModelSerializer):
+class PositionTypeSerializer(FlexFieldsModelSerializer):
 
     class Meta:
         model = models.PositionType
-        name = 'position title'
+        name = 'position_title'
         fields = ('id', 'title',)
 
 
-class RelationSerializer(DynamicModelSerializer):
+class RelationSerializer(FlexFieldsModelSerializer):
 
     class Meta:
         model = models.Relation
-        name = 'relation title'
+        name = 'relation_title'
         fields = ('id', 'relation',)
 
 
-class RoleSerializer(DynamicModelSerializer):
+class RoleSerializer(FlexFieldsModelSerializer):
 
     class Meta:
         model = models.Role
@@ -47,7 +49,7 @@ class RoleSerializer(DynamicModelSerializer):
         fields = ('id', 'role',)
 
 
-class VerdictSerializer(DynamicModelSerializer):
+class VerdictSerializer(FlexFieldsModelSerializer):
 
     class Meta:
         model = models.Verdict
@@ -55,7 +57,7 @@ class VerdictSerializer(DynamicModelSerializer):
         fields = ('id', 'verdict',)
 
 
-class MoneySerializer(DynamicModelSerializer):
+class MoneySerializer(FlexFieldsModelSerializer):
 
     class Meta:
         model = models.Money
@@ -63,7 +65,7 @@ class MoneySerializer(DynamicModelSerializer):
         fields = ('id', 'amount', 'in_denarius')
 
 
-class ChattelSerializer(DynamicModelSerializer):
+class ChattelSerializer(FlexFieldsModelSerializer):
 
     class Meta:
         model = models.Chattel
@@ -71,257 +73,296 @@ class ChattelSerializer(DynamicModelSerializer):
         fields = ('id', 'name',)
 
 
-class CaseTypeSerializer(DynamicModelSerializer):
+class CaseTypeSerializer(FlexFieldsModelSerializer):
 
     class Meta:
         model = models.CaseType
-        name = 'case type'
+        name = 'case_type'
         fields = ('id', 'case_type',)
+
+
+class LandParcelSerializer(FlexFieldsModelSerializer):
+    parcel_type = ParcelTypeSerializer()
+    parcel_tenure = ParcelTenureSerializer()
+
+    class Meta:
+        model = models.LandParcel
+        fields = '__all__'
+
+
+class AmercementSerializer(FlexFieldsModelSerializer):
+    class Meta:
+        model = models.Amercement
+        fields = '__all__'
+
+    expandable_fields = {
+        'amercement': (MoneySerializer, {'source': 'amercement'}),
+    }
+
+
+class CapitagiumSerializer(FlexFieldsModelSerializer):
+    class Meta:
+        model = models.Capitagium
+        fields = '__all__'
+
+    expandable_fields = {
+        'capitagium': (MoneySerializer, {'source': 'capitagium'}),
+    }
+
+
+class DamageSerializer(FlexFieldsModelSerializer):
+    class Meta:
+        model = models.Damage
+        fields = '__all__'
+
+    expandable_fields = {
+        'damage': (MoneySerializer, {'source': 'damage'}),
+    }
+
+
+class FineSerializer(FlexFieldsModelSerializer):
+    class Meta:
+        model = models.Fine
+        fields = '__all__'
+
+    expandable_fields = {
+        'fine': (MoneySerializer, {'source': 'fine'}),
+    }
+
+
+class HeriotSerializer(FlexFieldsModelSerializer):
+    class Meta:
+        model = models.Heriot
+        fields = '__all__'
+
+    expandable_fields = {
+        'heriot': (MoneySerializer, {'source': 'heriot'}),
+        'animal': (ChattelSerializer, {'source': 'animal'}),
+    }
+
+
+class ImpercamentumSerializer(FlexFieldsModelSerializer):
+    class Meta:
+        model = models.Impercamentum
+        fields = '__all__'
+
+    expandable_fields = {
+        'impercamentum': (MoneySerializer, {'source': 'impercamentum'}),
+        'animal': (ChattelSerializer, {'source': 'animal'}),
+    }
 
 
 # Begin Data-Entry tables
 
-class ArchiveSerializer(DynamicModelSerializer):
+class ArchiveSerializer(FlexFieldsModelSerializer):
 
-    counts = DynamicMethodField(
-        requires = [
-            'record_set__session_set__case'
-        ],
-        deferred=True
-    )
-    records = DynamicRelationField('RecordSerializer', source='record_set', many=True, deferred=True, embed=True)
+    counts = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Archive
         name = 'archive'
-        fields = ('id', 'name', 'website', 'notes', 'counts', 'records')
+        fields = ('id', 'name', 'website', 'notes', 'counts')
 
-    def get_counts(self, record):
-        counts = {}
+    @staticmethod
+    def get_counts(record):
+        counts = dict()
         counts['record'] = record.record_count
         counts['session'] = record.session_count
         counts['case'] = record.case_count
         return counts
 
-    def get_record_count(self, record):
+    @staticmethod
+    def get_record_count(record):
         return record.record_count
 
-    def get_session_count(self, record):
+    @staticmethod
+    def get_session_count(record):
         return record.session_count
 
-    def get_case_count(self, record):
+    @staticmethod
+    def get_case_count(record):
         return record.case_count
 
 
-class RecordSerializer(DynamicModelSerializer):
+class RecordSerializer(FlexFieldsModelSerializer):
 
     record_type = serializers.SerializerMethodField()
-    archive = DynamicRelationField('ArchiveSerializer', deferred=True, embed=True)
-    sessions = DynamicRelationField('SessionSerializer', source='session_set', many=True, deferred=True, embed=True)
-    counts = DynamicMethodField(
-        requires = [
-            'session_set__case'
-        ],
-        deferred=True
-    )
-    session_dates = DynamicMethodField(
-        requires = [
-            'session_set'
-        ],
-        deferred=True
-    )
+    counts = serializers.SerializerMethodField()
+    earliest_session = serializers.ReadOnlyField()
+    latest_session = serializers.ReadOnlyField()
 
     class Meta:
         model = models.Record
-        fields = ('id', 'name', 'record_type', 'reel', 'notes', 'counts', 'archive', 'sessions', 'session_dates')
+        fields = ('id', 'name', 'record_type', 'reel', 'notes', 'counts', 'archive', 'earliest_session', 'latest_session')
 
-    def get_session_dates(self, record):
-        counts = {}
+    expandable_fields = {
+        'archive': (ArchiveSerializer, {'source': 'archive'}),
+        'sessions': ('api.SessionSerializer', {'source': 'session_set', 'many': True}),
+    }
 
-        counts['earliest_session'] = record.earliest_session
-        counts['latest_session'] = record.latest_session
-
-        return counts
-
-    def get_counts(self, record):
-        counts = {}
+    @staticmethod
+    def get_counts(record):
+        counts = dict()
         counts['case'] = record.case_count
         counts['session'] = record.session_count
         return counts
 
-    def get_record_type(self, record):
+    @staticmethod
+    def get_record_type(record):
         return record.get_record_type_display()
 
 
-class CountySerializer(DynamicModelSerializer):
+class CountySerializer(FlexFieldsModelSerializer):
 
-    counts = DynamicMethodField(
-        requires = [
-            'village_set__session_set__case', 'village_set__person'
-        ],
-        deferred=True
-    )
-    villages = DynamicRelationField('VillageSerializer', source='village_set', deferred=True, many=True, embed=True)
-    hundreds = DynamicRelationField('HundredSerializer', source='hundred_set', deferred=True, many=True, embed=True)
+    counts = serializers.SerializerMethodField()
 
     class Meta:
         model = models.County
-        fields = ('id', 'name', 'abbreviation', 'counts', 'villages', 'hundreds',)
+        fields = ('id', 'name', 'abbreviation', 'counts',)
 
-    def get_counts(self, record):
-        counts = {}
+    @staticmethod
+    def get_counts(record):
+        counts = dict()
         counts['hundred'] = record.hundred_count
-        counts['village']= record.village_count
+        counts['village'] = record.village_count
         counts['great_rumor'] = record.great_rumor_count
         counts['ancient_demesne'] = record.ancient_demesne_count
-        counts['session']= record.session_count
+        counts['session'] = record.session_count
         counts['case'] = record.case_count
         counts['resident'] = record.resident_count
         counts['litigant'] = record.litigant_count
         return counts
 
 
-class HundredSerializer(DynamicModelSerializer):
+class HundredSerializer(FlexFieldsModelSerializer):
 
-    county = DynamicRelationField('CountySerializer', deferred=True, embed=True)
-    counts = DynamicMethodField(
-        requires = [
-            'village'
-        ],
-        deferred=True
-    )
-    villages = DynamicRelationField('VillageSerializer', source='village_set', many=True, deferred=True, embed=True)
+    counts = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Hundred
-        fields = ('id', 'name', 'counts', 'county', 'villages')
+        fields = ('id', 'name', 'counts', 'county')
 
-    def get_counts(self, record):
-        counts={}
+    expandable_fields = {
+        'county': (CountySerializer, {'source': 'county', 'fields': ['id', 'name']}),
+        'villages': ('api.VillageSerializer', {'source': 'village_set', 'many': True, 'fields': ['id', 'name']})
+    }
+
+    @staticmethod
+    def get_counts(record):
+        counts = dict()
         counts['village'] = record.village_count
         return counts
 
 
-class VillageSerializer(DynamicModelSerializer):
+class VillageSerializer(FlexFieldsModelSerializer):
 
-    hundred = DynamicRelationField('HundredSerializer', deferred=True, embed=True)
-    county = DynamicRelationField('CountySerializer', deferred=True, embed=True)
-    sessions = DynamicRelationField('SessionSerializer', source='session_set', deferred=True, many=True, embed=True)
-    counts = DynamicMethodField(
-        requires = [
-            'person'
-        ],
-        deferred=True,
-    )
-    chevage_payer_count = DynamicMethodField(deferred=True)
-    fine_payer_count = DynamicMethodField(deferred=True)
-    impercamentum_payer_count = DynamicMethodField(deferred=True)
-    heriot_payer_count = DynamicMethodField(deferred=True)
-    damaged_party_count = DynamicMethodField(deferred=True)
+    counts = serializers.SerializerMethodField()
+    capitagium_payer_count = serializers.SerializerMethodField()
+    fine_payer_count = serializers.SerializerMethodField()
+    impercamentum_payer_count = serializers.SerializerMethodField()
+    heriot_payer_count = serializers.SerializerMethodField()
+    damaged_party_count = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Village
         fields = ('id', 'name', 'latitude', 'longitude', 'ancient_demesne', 'great_rumor', 'notes', 'counts', 'county',
-                  'hundred', 'sessions', 'chevage_payer_count', 'fine_payer_count', 'impercamentum_payer_count', 
+                  'hundred', 'capitagium_payer_count', 'fine_payer_count', 'impercamentum_payer_count',
                   'heriot_payer_count', 'damaged_party_count')
 
-    def get_chevage_payer_count(self, record):
-        return record.chevage_payer_count
+    expandable_fields = {
+        'hundred': (HundredSerializer, {'source': 'hundred', 'fields': ['id','name']}),
+        'county': (CountySerializer, {'source': 'county', 'fields': ['id', 'name']}),
+    }
 
-    def get_fine_payer_count(self, record):
+    @staticmethod
+    def get_capitagium_payer_count(record):
+        return record.capitagium_payer_count
+
+    @staticmethod
+    def get_fine_payer_count(record):
         return record.fine_payer_count
 
-    def get_impercamentum_payer_count(self, record):
+    @staticmethod
+    def get_impercamentum_payer_count(record):
         return record.impercamentum_payer_count
 
-    def get_heriot_payer_count(self, record):
+    @staticmethod
+    def get_heriot_payer_count(record):
         return record.heriot_payer_count
 
-    def get_damaged_party_count(self, record):
+    @staticmethod
+    def get_damaged_party_count(record):
         return record.damaged_party_count
 
-    def get_counts(self, record):
-        counts = {}
+    @staticmethod
+    def get_counts(record):
+        counts = dict()
         counts['case'] = record.case_count
         counts['resident'] = record.resident_count
-        counts['litigant']= record.litigant_count
-        counts['session']= record.session_count
+        counts['litigant'] = record.litigant_count
+        counts['session'] = record.session_count
         return counts
 
 
-
-class SessionSerializer(DynamicModelSerializer):
+class SessionSerializer(FlexFieldsModelSerializer):
 
     law_term = serializers.SerializerMethodField()
     year = serializers.ReadOnlyField()
     human_date = serializers.ReadOnlyField()
-    village = DynamicRelationField('VillageSerializer', deferred=True, embed=True)
-    record = DynamicRelationField('RecordSerializer', deferred=True)
-    counts = DynamicMethodField(
-        requires = [
-            'cases',
-        ],
-        deferred=True,
-    )
-    cases = DynamicRelationField('CaseSerializer', deferred=True, embed=True, many=True)
+    counts = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Session
-        fields = ('id', 'date', 'folio', 'notes', 'law_term', 'year', 'human_date', 'village', 'record', 'counts',
-                  'cases')
+        fields = ('id', 'date', 'folio', 'notes', 'law_term', 'year', 'human_date', 'village', 'record', 'counts',)
 
-    def get_counts(self, record):
-        counts = {}
+    expandable_fields = {
+        'village': (VillageSerializer, {'source': 'village', 'fields': ['id', 'name']}),
+        'record': (RecordSerializer, {'source': 'record'}),
+    }
+
+    @staticmethod
+    def get_counts(record):
+        counts = dict()
         counts['case'] = record.case_count
         counts['litigant'] = record.litigant_count
         counts['land'] = record.land_case_count
-        counts['chevage_payer'] = record.chevage_payer_count
+        counts['capitagium_payer'] = record.capitagium_payer_count
         counts['impercamentum_payer'] = record.impercamentum_payer_count
         return counts
 
-    def get_law_term(self, record):
+    @staticmethod
+    def get_law_term(record):
         return record.get_law_term_display()
 
 
-class PersonSerializer(DynamicModelSerializer):
-
+class PersonSerializer(FlexFieldsModelSerializer):
 
     # Use ReadOnlyField to pull in model functions:
     # https://stackoverflow.com/questions/24233988/django-serializer-method-field
-    full_name = serializers.ReadOnlyField()
     gender_display = serializers.ReadOnlyField()
     status_display = serializers.ReadOnlyField()
-
-    counts = DynamicMethodField(
-        requires = [
-            'person_to_case__case__session', 'pledge_giver', 'pledge_receiver', 'position', 'relationship_person_one',
-            'relationship_person_two', 'case_set'
-        ],
-        deferred=True
-    )
-    earliest_case = DynamicRelationField('CaseSerializer', deferred=True, embed=True)
-    latest_case = DynamicRelationField('CaseSerializer', deferred=True, embed=True)
-    village = DynamicRelationField('VillageSerializer', embed=True, deferred=True)
-    cases = DynamicRelationField('LitigantSerializer', deferred=True, source='person_to_case', many=True, embed=True)
-    pledges_given = DynamicRelationField('PledgeSerializer', deferred=True, source='pledge_giver', many=True,
-                                         embed=True)
-    pledges_received = DynamicRelationField('PledgeSerializer', deferred=True, source='pledge_receiver', many=True,
-                                            embed=True)
-    positions = DynamicRelationField('PositionSerializer', deferred=True, source='position', many=True, embed=True)
 
     class Meta:
         model = models.Person
         fields = ('id', 'first_name', 'relation_name', 'last_name', 'status', 'gender', 'tax_1332', 'tax_1379', 'notes',
-                  'full_name', 'counts', 'village', 'cases', 'pledges_given', 'pledges_received', 'positions',
-                  'gender_display', 'status_display', 'earliest_case', 'latest_case')
+                  'full_name', 'village', 'gender_display', 'status_display', 'earliest_case',
+                  'latest_case')
 
-    def get_counts(self, record):
-        counts = {}
+    expandable_fields = {
+        'earliest_case': ('api.CaseSerializer', {'source': 'earliest_case', 'expand': ['session'], 'fields': ['id', 'session']}),
+        'latest_case': ('api.CaseSerializer', {'source': 'latest_case', 'expand': ['session'], 'fields': ['id', 'session']}),
+        'village': (VillageSerializer, {'source': 'village', 'fields': ['id', 'name']}),
+        'cases': ('api.LitigantSerializer', {'source': 'cases', 'many': True, 'read_only': True,
+                                                      'fields': ['case', 'role'],
+                                                      'expand': ['case']}),
+    }
 
-        pledge_counts = {}
+    @staticmethod
+    def get_counts(record):
+        counts = dict()
+        pledge_counts = dict()
         pledge_counts['given'] = record.pledges_given_count
         pledge_counts['received'] = record.pledges_received_count
-
         counts['pledge'] = pledge_counts
         counts['monetary'] = record.monetary_counts
         counts['relationship'] = record.relationship_count
@@ -332,202 +373,225 @@ class PersonSerializer(DynamicModelSerializer):
         return counts
 
 
-class LandSerializer(DynamicModelSerializer):
+class CornbotSerializer(FlexFieldsModelSerializer):
 
-    parcel_list = DynamicMethodField(
-        requires = [
-            'parcels__parcel_type', 'parcels__parcel_tenure'
-        ]
-    )
-    earliest_date = DynamicRelationField('CaseSerializer', deferred=True, embed=True)
-    latest_date = DynamicRelationField('CaseSerializer', deferred=True, embed=True)
+    class Meta:
+        model = models.Cornbot
+        fields = '__all__'
 
-    tenant_history = DynamicRelationField(
-        'LitigantSerializer',
-        source='case_to_land',
-        many=True,
-        deferred=True,
-        embed=True,
-        queryset=models.Litigant.objects.order_by('case__session__date')
-    )
+    expandable_fields = {
+        'crop_type': (ChattelSerializer, {'source': 'crop_type'}),
+        'price': (MoneySerializer, {'source': 'price'})
+    }
+
+
+class ExtrahuraSerializer(FlexFieldsModelSerializer):
+
+    class Meta:
+        model = models.Extrahura
+        fields = '__all__'
+
+    expandable_fields = {
+        'animal': (ChattelSerializer, {'source': 'animal'}),
+        'price': (MoneySerializer, {'source': 'price'}),
+    }
+
+
+class MurrainSerializer(FlexFieldsModelSerializer):
+
+    class Meta:
+        model = models.Murrain
+        fields = '__all__'
+
+    expandable_fields = {
+        'animal': (ChattelSerializer, {'source': 'animal'}),
+    }
+
+
+class PlaceMentionedSerializer(FlexFieldsModelSerializer):
+
+    class Meta:
+        model = models.PlaceMentioned
+        fields = '__all__'
+
+    expandable_fields = {
+        'village': (VillageSerializer, {
+            'source': 'village',
+            'fields': ['id', 'name', 'county', 'great_rumor', 'ancient_demesne', 'counts'],
+            'expand': ['county']
+            }),
+        'case': ('api.CaseSerializer', {
+            'source': 'case',
+            'expand': ['session']
+        })
+    }
+
+
+class CaseSerializer(FlexFieldsModelSerializer):
+
+    court_type = serializers.SerializerMethodField()
+    litigant_count = serializers.SerializerMethodField()
+    pledge_count = serializers.SerializerMethodField()
+    case_type = CaseTypeSerializer()
+    verdict = VerdictSerializer()
+
+    class Meta:
+        model = models.Case
+        fields = ('id', 'active_sale', 'ad_legem', 'case_type', 'court_type', 'incidental_land', 'of_interest',
+                  'session', 'summary', 'verdict', 'villeinage_mention', 'litigant_count', 'pledge_count')
+
+    expandable_fields = {
+        'session': (SessionSerializer, {'source': 'session', 'expand': ['village'],
+                                        'fields': ['id', 'human_date', 'law_term', 'village', 'year', 'date']}),
+        'cornbot': (CornbotSerializer, {'source': 'cornbot', 'many': True, 'expand': ['crop_type', 'price']}),
+        'extrahura': (ExtrahuraSerializer, {'source': 'extrahura', 'many': True, 'expand': ['animal', 'price']}),
+        'murrain': (MurrainSerializer, {'source': 'murrain', 'many': True, 'expand': ['animal']}),
+        'placementioned_set': (PlaceMentionedSerializer, {'source': 'placementioned_set', 'many': True,
+                                                        'expand': ['village']}),
+        'litigants': ('api.LitigantSerializer', {'source': 'litigants', 'many': True, 'expand': ['person']})
+    }
+
+    @staticmethod
+    def get_court_type(record):
+        return record.get_court_type_display()
+
+    @staticmethod
+    def get_litigant_list(record):
+        return record.litigant_list
+
+    @staticmethod
+    def get_litigant_count(record):
+        return record.litigant_count
+
+    @staticmethod
+    def get_pledge_count(record):
+        return record.pledge_count
+
+
+class LandSerializer(FlexFieldsModelSerializer):
+
+    parcel_list = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Land
         name = 'land'
-        fields = ('id', 'notes', 'parcel_list', 'tenant_history', 'earliest_date', 'latest_date')
+        fields = ('id', 'notes', 'parcel_list', 'earliest_case', 'latest_case')
 
-    def get_parcel_list(self, record):
+    expandable_fields = {
+        'earliest_case': ('api.CaseSerializer', {'source': 'earliest_case'}),
+        'latest_case': ('api.CaseSerializer', {'source': 'latest_case'}),
+        'tenants': ('api.LandtoCaseSerializer', {'source': 'tenants', 'many': True, 'expand': ['litigant',]})
+    }
+
+    @staticmethod
+    def get_parcel_list(record):
         return record.parcel_list
 
 
-class CaseSerializer(DynamicModelSerializer):
-
-    court_type = serializers.SerializerMethodField()
-    litigant_count = DynamicMethodField(
-        requires=[
-            'case_to_person'
-        ],
-        deferred=True
-    )
-    litigant_list = DynamicMethodField(
-        requires=[
-            'case_to_person'
-        ],
-        deferred=True
-    )
-    pledge_count = DynamicMethodField(
-        requires=[
-            'case_to_pledge'
-        ],
-        deferred=True
-    )
-
-    session = DynamicRelationField('SessionSerializer', deferred=True, embed=True)
-    case_type = DynamicRelationField('CaseTypeSerializer', embed=True)
-    verdict = DynamicRelationField('VerdictSerializer', embed=True)
-    litigants = DynamicRelationField('PersonSerializer', deferred=True, many=True, embed=True)
-    cornbot = DynamicRelationField('CornbotSerializer', deferred=True, many=True, embed=True)
-    extrahura = DynamicRelationField('ExtrahuraSerializer', deferred=True, many=True, embed=True)
-    murrain = DynamicRelationField('MurrainSerializer', deferred=True, many=True, embed=True)
-    places_mentioned = DynamicRelationField('PlaceMentionedSerializer', source='placementioned_set', deferred=True,
-                                            many=True, embed=True)
-    people = DynamicRelationField('LitigantSerializer', source='case_to_person', deferred=True, many=True, embed=True)
-    pledges = DynamicRelationField('PledgeSerializer', source='case_to_pledge', deferred=True, many=True, embed=True)
-
-
-    class Meta:
-        model = models.Case
-        fields = ('id', 'summary', 'court_type', 'of_interest', 'ad_legem', 'villeinage_mention', 'active_sale',
-                  'incidental_land', 'session', 'case_type', 'verdict', 'litigants', 'litigant_count', 'litigant_list',
-                  'cornbot', 'extrahura', 'murrain', 'places_mentioned', 'people', 'pledges', 'pledge_count')
-
-    def get_court_type(self, record):
-        return record.get_court_type_display()
-
-    def get_litigant_list(self, record):
-        return record.litigant_list
-
-    def get_litigant_count(self, record):
-        return record.litigant_count
-
-    def get_pledge_count(self, record):
-        return record.pledge_count
-
-
-class LitigantSerializer(DynamicModelSerializer):
-
-    case = DynamicRelationField('CaseSerializer', deferred=True, embed=True)
-    person = DynamicRelationField('PersonSerializer', deferred=True, embed=True)
-    land = DynamicRelationField('LandSerializer', embed=True)
-    role = DynamicRelationField('RoleSerializer', embed=True)
-    fine = DynamicRelationField('MoneySerializer', embed=True)
-    amercement = DynamicRelationField('MoneySerializer', embed=True)
-    damage = DynamicRelationField('MoneySerializer', embed=True)
-    chevage = DynamicRelationField('MoneySerializer', embed=True)
-    heriot = DynamicRelationField('MoneySerializer', embed=True)
-    heriot_animal = DynamicRelationField('ChattelSerializer', embed=True)
-    impercamentum = DynamicRelationField('MoneySerializer', embed=True)
-    impercamentum_animal = DynamicRelationField('ChattelSerializer', embed=True)
-
-    class Meta:
-        model = models.Litigant
-        fields = ('id', 'damage_notes', 'ad_proximum', 'distrained', 'attached', 'bail', 'chevage', 'crossed',
-                  'recessit', 'habet_terram', 'chevage_notes', 'heriot_quantity', 'impercamentum_quantity',
-                  'impercamentum_notes', 'amercement', 'fine', 'damage', 'chevage', 'heriot_animal', 'heriot',
-                  'impercamentum_animal', 'impercamentum', 'land_notes', 'land_villeinage', 'land', 'person', 'case',
-                  'role',)
-
-
-class PledgeSerializer(DynamicModelSerializer):
-
-    pledge_giver = DynamicRelationField('PersonSerializer', embed=True)
-    pledge_receiver = DynamicRelationField('PersonSerializer', embed=True)
-    case = DynamicRelationField('CaseSerializer', deferred=True, embed=True)
-
-    class Meta:
-        model = models.Pledge
-        fields = ('id', 'pledge_giver', 'pledge_receiver', 'case')
-
-
-class CornbotSerializer(DynamicModelSerializer):
-
-    case = DynamicRelationField('CaseSerializer', deferred=True, embed=True)
-    crop_type = DynamicRelationField('ChattelSerializer', embed=True)
-    price = DynamicRelationField('MoneySerializer', embed=True)
-
-    class Meta:
-        model = models.Cornbot
-        fields = ('id', 'amount', 'notes', 'case', 'crop_type', 'price')
-
-
-class ExtrahuraSerializer(DynamicModelSerializer):
-
-    case = DynamicRelationField('CaseSerializer', deferred=True, embed=True)
-    animal = DynamicRelationField('ChattelSerializer', embed=True)
-    price = DynamicRelationField('MoneySerializer', embed=True)
-
-    class Meta:
-        model = models.Extrahura
-        fields = ('id', 'amount', 'animal', 'price', 'case')
-
-
-class MurrainSerializer(DynamicModelSerializer):
-
-    case = DynamicRelationField('CaseSerializer', deferred=True, embed=True)
-    animal = DynamicRelationField('ChattelSerializer', embed=True)
-
-    class Meta:
-        model = models.Murrain
-        fields = ('id', 'amount', 'notes', 'animal', 'case')
-
-
-class PlaceMentionedSerializer(DynamicModelSerializer):
-
-    case = DynamicRelationField('CaseSerializer', deferred=True, embed=True)
-    village = DynamicRelationField('VillageSerializer', deferred=True, embed=True)
-
-    class Meta:
-        model = models.PlaceMentioned
-        fields = ('id', 'notes', 'case', 'village')
-
-
-class LandParcelSerializer(DynamicModelSerializer):
-
-    parcel_type = DynamicRelationField('ParcelTypeSerializer', embed=True)
-    parcel_tenure = DynamicRelationField('ParcelTenureSerializer', embed=True)
-
-    class Meta:
-        model = models.LandParcel
-        fields = ('id', 'amount', 'parcel_type', 'parcel_tenure')
-
-
-class LandSplitSerializer(DynamicModelSerializer):
-
-    old_land = DynamicRelationField('LandSerializer', deferred=True, embed=True)
-    new_land = DynamicRelationField('LandSerializer', deferred=True, embed=True)
+class LandSplitSerializer(FlexFieldsModelSerializer):
 
     class Meta:
         model = models.LandSplit
         fields = ('id', 'old_land', 'new_land')
 
+    expandable_fields = {
+        'old_land': (LandSerializer, {'source': 'old_land'}),
+        'new_land': (LandSerializer, {'source': 'new_land'}),
+    }
 
-class PositionSerializer(DynamicModelSerializer):
 
-    person = DynamicRelationField('PersonSerializer', deferred=True, embed=True)
-    title = DynamicRelationField('PositionTypeSerializer', embed=True)
-    session = DynamicRelationField('SessionSerializer', deferred=True, embed=True)
+class LandtoCaseSerializer(FlexFieldsModelSerializer):
+
+    role = RoleSerializer()
+
+    class Meta:
+        model = models.LandtoCase
+        fields = '__all__'
+
+    expandable_fields = {
+        'land': (LandSerializer, {'source': 'land'}),
+        'litigant': ('api.LitigantSerializer', {'source': 'litigant'}),
+    }
+
+
+class LitigantSerializer(FlexFieldsModelSerializer):
+
+    role = RoleSerializer()
+
+    class Meta:
+        model = models.Litigant
+        fields = ('id', 'case', 'person', 'role', 'ad_proximum', 'distrained', 'attached', 'bail',)
+
+    expandable_fields = {
+        'case': (CaseSerializer, {'source': 'case', 'expand': ['session']}),
+        'person': (PersonSerializer, {'source': 'person', 'expand': ['village']}),
+        'amercements': (AmercementSerializer, {'source': 'amercements', 'many': True, 'expand': ['amercement']}),
+        'capitagia': (CapitagiumSerializer, {'source': 'capitagia', 'many': True, 'expand': ['capitagium']}),
+        'damages': (DamageSerializer, {'source': 'damages', 'many': True, 'expand': ['damage']}),
+        'fines': (FineSerializer, {'source': 'fines', 'many': True, 'expand': ['fine']}),
+        'heriots': (HeriotSerializer, {'source': 'heriots', 'many': True, 'expand': ['heriot', 'animal']}),
+        'impercamenta': (ImpercamentumSerializer, {'source': 'impercamenta', 'many': True,
+                                                   'expand': ['impercamentum', 'animal']}),
+        'lands': (LandtoCaseSerializer, {'source': 'lands', 'many': True, 'expand': ['land']}),
+        'pledges': ('api.PledgeSerializer', {'source': 'pledges', 'many': True, 'expand': ['giver']})
+    }
+
+
+class PledgeSerializer(FlexFieldsModelSerializer):
+
+    class Meta:
+        model = models.Pledge
+        fields = '__all__'
+        datatables_always_serializer = ('id',)
+
+    expandable_fields = {
+        'giver': (PersonSerializer, {'source': 'giver'}),
+        'receiver': (LitigantSerializer, {'source': 'receiver', 'expand': ['person', 'case']}),
+    }
+
+
+class PositionSerializer(FlexFieldsModelSerializer):
+
+    title = PositionTypeSerializer()
 
     class Meta:
         model = models.Position
-        fields = ('id', 'definitive', 'person', 'title', 'session')
+        fields = '__all__'
+
+    expandable_fields = {
+        'person': (PersonSerializer, {'source': 'person'}),
+        'session': (SessionSerializer, {'source': 'session'})
+    }
 
 
-class RelationshipSerializer(DynamicModelSerializer):
+class RelationshipSerializer(FlexFieldsModelSerializer):
 
-    person_one = DynamicRelationField('PersonSerializer', deferred=True, embed=True)
-    person_two = DynamicRelationField('PersonSerializer', deferred=True, embed=True)
-    relationship = DynamicRelationField('RelationSerializer', embed=True)
+    relationship = RelationSerializer()
+    confidence = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Relationship
-        fields = ('id', 'definitive', 'person_one', 'person_two', 'relationship')
+        fields = '__all__'
+
+    expandable_fields = {
+        'person_one': (PersonSerializer, {'source': 'person_one'}),
+        'person_two': (PersonSerializer, {'source': 'person_two'}),
+    }
+
+    @staticmethod
+    def get_confidence(record):
+        return record.get_confidence_display()
+
+
+class LandtoCaseSerializer(FlexFieldsModelSerializer):
+    role = RoleSerializer()
+
+    class Meta:
+        model = models.LandtoCase()
+        fields = '__all__'
+
+    expandable_fields = {
+        'land': (LandSerializer, {'source': 'land'}),
+        'litigant': (LitigantSerializer, {'source': 'litigant', 'expand': ['person', 'case']}),
+        'case': (CaseSerializer, {'source': 'case'}),
+    }

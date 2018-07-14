@@ -5,8 +5,8 @@
 {% endblock %}
 
 {% block left_sidebar %}
-    <div id="selection_list">
-        <a class="list-group-item list-group-item-action active" href="{% url 'record_session_list' record.id %}">Sessions</a>
+    <div class="list-group" id="selection_list">
+        <a class="list-group-item list-group-item-action active" href="#session_list" data-url="{% url 'record:sessions' record.id %}" role="tab" data-toggle="list">Sessions</a>
     </div>
 {% endblock %}
 
@@ -33,12 +33,12 @@
                                 </tr>
                                 <tr class="row m-0">
                                     <td class="d-inline-block col-4"><b>Archive:</b></td>
-                                    <td class="d-inline-block col-8">{{ record.archive.name }}</td>
+                                    <td class="d-inline-block col-8"><a href="{% url 'archive:detail' record.archive.id %}">{{ record.archive.name }}</a></td>
                                 </tr>
                                 <tr class="row m-0">
                                     <td class="d-inline-block col-4"><b>Earliest Session:</b></td>
                                     {% if record.earliest_session.id %}
-                                        <td class="d-inline-block col-8"><a href="{% url 'session' record.earliest_session.id %}">{{ record.earliest_session.village.name }} - {{ record.earliest_session.get_law_term_display }}, {{ record.earliest_session.date.year }}</a></td>
+                                        <td class="d-inline-block col-8"><a href="{% url 'session:detail' record.earliest_session.id %}">{{ record.earliest_session.village.name }} - {{ record.earliest_session.get_law_term_display }}, {{ record.earliest_session.date.year }}</a></td>
                                     {% else %}
                                         <td class="d-inline-block col-8">None</td>
                                     {% endif %}
@@ -46,7 +46,7 @@
                                 <tr class="row m-0">
                                     <td class="d-inline-block col-4"><b>Latest Session:</b></td>
                                     {% if record.latest_session.id %}
-                                        <td class="d-inline-block col-8"><a href="{% url 'session' record.latest_session.id %}">{{ record.latest_session.village.name }} - {{ record.latest_session.get_law_term_display }}, {{ record.latest_session.date.year }}</a></td>
+                                        <td class="d-inline-block col-8"><a href="{% url 'session:detail' record.latest_session.id %}">{{ record.latest_session.village.name }} - {{ record.latest_session.get_law_term_display }}, {{ record.latest_session.date.year }}</a></td>
                                     {% else %}
                                         <td class="d-inline-block col-8">None</td>
                                     {% endif %}
@@ -78,8 +78,8 @@
 
 <br>
 
-<div id="list_info">
-
+<div class="tab-content" id="list_info">
+    <div class="tab-pane fade" id="session_list" role="tabpanel"></div>
 </div>
 
 {% endblock %}
@@ -89,14 +89,14 @@
     <div class="container" style="position: sticky; top: 65px">
         {% if perms.peasantlegaldb.add_record %}
             <div class="btn-group" role="group">
-                <a class="btn btn-success" href="#">Add Record</a>
+                <a class="btn btn-success" href="{% url 'record:add' %}">Add Record</a>
             </div>
             <br>
             <br>
         {% endif %}
         {% if perms.peasantlegaldb.change_record %}
             <div class="btn-group" role="group">
-                <a class="btn btn-warning" href="#">Edit Record</a>
+                <a class="btn btn-warning" href="{% url 'record:edit' record.id %}">Edit Record</a>
             </div>
             <br>
             <br>
@@ -115,9 +115,25 @@
 
     <script>
         $(document).ready(function(){
-             var url = window.location.pathname;
-            var id = url.split('/').reverse()[1]
-            $("#list_info").load(Urls.record_session_list(id))
+
+         $("#selection_list").on('click', 'a', function(e){
+               e.preventDefault();
+               var url = $(this).attr("data-url");
+
+               if (typeof url !== "undefined"){
+                   var pane = $(this), href = this.hash;
+
+                   $(href).load(url, function(result){
+                       pane.tab('show');
+                   });
+               } else {
+                   $(this).tab('show');
+               }
+            });
+
+            $('a[data-toggle="tab"').on('shown.bs.tab', function(e){
+                $.fn.dataTable.tables({visible: true, api: true}).columns.adjust().responsive.recalc();
+            });
         })
     </script>
 

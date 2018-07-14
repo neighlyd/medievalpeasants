@@ -1,4 +1,4 @@
-{%  load widget_tweaks %}
+{% load widget_tweaks %}
 {% load template_tags %}
 
 {% if form.non_field_errors %}
@@ -35,4 +35,11 @@
             </small>
         {% endif %}
     </div>
+{% endfor %}
+
+{% for field in formset %}
+    <div class="form-group">
+        {{ field }}
+    </div>
+    <hr>
 {% endfor %}
