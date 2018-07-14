@@ -1,0 +1,15 @@
+{% extends '__layout/_l_two_col.html' %}
+{% load crispy_forms_tags %}
+
+{% block center_bar %}
+<div class="card">
+    <div class="card-header">
+        <h4>Create a Profile</h4>
+    </div>
+
+    <div class="card-body">
+        {% crispy form %}
+    </div>
+
+</div>
+{% endblock %}

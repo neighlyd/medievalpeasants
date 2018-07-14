@@ -3,8 +3,8 @@ from django.core.urlresolvers import reverse
 from django.urls import resolve
 from django.contrib.auth.models import User
 
-from accounts.forms import RegistrationForm
-from accounts.views import register
+from profiles.forms import RegistrationForm
+from profiles.views import register
 
 
 # Create your tests here.

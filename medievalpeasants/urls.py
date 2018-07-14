@@ -20,7 +20,7 @@ from django.views.generic import TemplateView
 
 from django_js_reverse.views import urls_js
 
-from accounts import urls as account_urls
+from profiles import urls as profile_urls
 from api import urls as api_urls
 from peasantlegaldb import urls as peasantlegal_urls
 
@@ -33,11 +33,11 @@ urlpatterns = [
 
 ]
 
-# Account urls (e.g. registration, pw reset, login, etc.) are in accounts/urls.py. They are then imported to the main
+# Account urls (e.g. registration, pw reset, login, etc.) are in profiles/urls.py. They are then imported to the main
 # urls.py and routed with this statement.
 
 urlpatterns += [
-    url(r'^accounts/', include(account_urls)),
+    url(r'^profile/', include(profile_urls)),
 ]
 
 # Peasant Legal urls are defined within peasantlegaldb/urls.py. They are then imported to the main urls.py and routed

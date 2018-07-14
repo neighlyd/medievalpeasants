@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'peasantlegaldb.apps.PeasantlegaldbConfig',
-    'accounts',
+    'profiles',
     'coverage',
     'rest_framework',
     'dynamic_rest',

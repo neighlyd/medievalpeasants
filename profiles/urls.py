@@ -2,10 +2,10 @@ from django.conf.urls import url, include
 from django.contrib.auth import views as auth_views
 
 
-from accounts import views
+from profiles import views
 
 
-accounts_url = [
+profile_url = [
     url(r'^register/', views.TemporaryRegistration.as_view(), name='register'),
     url(r'^login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
     url(r'^logout/', auth_views.LogoutView.as_view(), name='logout'),
@@ -37,5 +37,5 @@ accounts_url = [
 ]
 
 urlpatterns = [
-    url(r'^', include(accounts_url)),
+    url(r'^', include(profile_url)),
 ]
