@@ -115,7 +115,6 @@ class ChattelViewSet(FlexFieldsModelViewSet):
     serializer_class = serializers.ChattelSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
-class CaseTypeViewSet(DynamicModelViewSet):
 
 class CaseTypeViewSet(FlexFieldsModelViewSet):
 
