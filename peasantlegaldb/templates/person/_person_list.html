@@ -1,29 +1,14 @@
 {% extends '_layout/_l_two_col.html' %}
-{% load widget_tweaks %}
+{% load crispy_forms_tags %}
 
 {% block navbar %}
     {% include '_layout/__navbar.html' %}
 {% endblock %}
 
 {% block additional_title %}
-    <div class="form-inline d-flex justify-content-center" id="filter_people">
-            <div class="form-group" style="padding-top: 5px">
-
-        {% for field in filter_village_form.visible_fields %}
-                <div class="col-2">
-                    <h4>{{ field.label_tag }}</h4>
-                </div>
-                <div class="col-4">
-                    {% render_field field class="form-control" id=field.name %}
-                </div>
-        {% endfor %}
-        </div>
-    </div>
-    <br>
-    <div class="text-center">
-        <button type="button" class="btn btn-primary" id="get_people">Get People</button>
-
-    </div>
+    <form id="select_village">
+            {% crispy filter_village_form %}
+    </form>
 {% endblock %}
 
 
@@ -87,8 +72,8 @@
             $(".btn").removeClass('active');
             $(this).addClass('active');
 
-            var village = $("#select_village").val();
-            var filter = $('#select_filter').val();
+            var village = $("#id_select_village").val();
+            var filter = $('#id_select_filter').val();
             var apiCall = 'format=datatables&expand=village,earliest_case,latest_case';
             var btnClicked = e.target.id;
             var url = Urls["api:person-list"]();

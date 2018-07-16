@@ -1,27 +1,15 @@
 {% extends '_layout/_l_two_col.html' %}
 {% load widget_tweaks %}
+{% load crispy_forms_tags %}
 
 {% block navbar %}
     {% include '_layout/__navbar.html' %}
 {% endblock %}
 
 {% block additional_title %}
-    <div class="form-inline d-flex justify-content-center" id="select_cases">
-            <div class="form-group" style="padding-top: 5px">
-            {% for field in filter_case_form.visible_fields %}
-                <div class="col-1">
-                    <h4>{{ field.label_tag }}</h4>
-                </div>
-                <div class="col-3">
-                    {% render_field field class="form-control" id=field.name %}
-                </div>
-        {% endfor %}
-        </div>
-    </div>
-    <br>
-        <div class="text-center">
-            <button type="button" class="btn btn-primary" id="get_cases">Get Cases</button>
-        </div>
+        <form id="select_cases">
+                    {% crispy filter_case_form %}
+        </form>
 {% endblock %}
 
 {% block center_bar %}
@@ -76,8 +64,8 @@
 
     $(document).ready(function(){
 
-        $('#select_village').change(function(){
-           var url = $('#select_village').attr('data_case_types_url');
+        $('#id_select_village').change(function(){
+           var url = $('#id_select_village').attr('data_case_types_url');
            var villageID = $(this).val();
            $.ajax({
                    url: url,
@@ -85,13 +73,13 @@
                        'village': villageID
                    },
                    success: function(data){
-                       $("#select_case_type").html(data);
+                       $("#id_select_case_type").html(data);
                    }
                })
         });
 
-        $('#select_case_type').change(function(){
-            var url = $('#select_case_type').attr('data_verdict_types_url');
+        $('#id_select_case_type').change(function(){
+            var url = $('#id_select_case_type').attr('data_verdict_types_url');
             var caseTypeID = $(this).val();
             $.ajax({
                 url: url,
@@ -99,7 +87,7 @@
                     'case_type': caseTypeID
                 },
                 success: function(data){
-                    $('#select_verdict_type').html(data);
+                    $('#id_select_verdict_type').html(data);
                 }
             })
 
@@ -108,9 +96,9 @@
         $("#get_cases").click(function(e){
             $('.btn').removeClass('active');
             $(this).addClass('active');
-            var caseType = $("#select_case_type").val();
-            var village = $("#select_village").val();
-            var verdictType = $("#select_verdict_type").val();
+            var caseType = $("#id_select_case_type").val();
+            var village = $("#id_select_village").val();
+            var verdictType = $("#id_select_verdict_type").val();
             var apiCall = 'format=datatables&expand=session';
             var url = Urls['api:case-list']();
             if (caseType === 'None' || village === 'None' || verdictType === 'None') {

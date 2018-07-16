@@ -6,23 +6,23 @@
 {% endblock %}
 
 {% block content %}
-    <div class="container-fluid d-flex justify-content-between pt-2">
+    <div class="container-fluid clearfix d-flex flex-wrap justify-content-between pt-2">
 
-        <div class="p-0 col-lg-2">
-            <div class="list-group" role="tablist" style="position: fixed">
+        <div class="p-1 col-md-2">
+            <div class="list-group" role="tablist" style="position: sticky; top: 65px">
                 {% block left_sidebar %}
                 {% endblock %}
             </div>
         </div>
 
-        <div class="p-0 col-lg-8">
+        <div class="p-1 col-md-8">
             <div class="card">
                 {% block center_bar %}
                 {% endblock %}
             </div>
         </div>
 
-        <div class="p-0 col-lg-2">
+        <div class="p-1 col-md-2">
             {% block right_sidebar %}
 
             {% endblock %}

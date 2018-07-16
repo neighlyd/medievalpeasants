@@ -23,7 +23,8 @@ class PersonFilterForm(forms.Form):
             attrs={
                 'class':'selector',
             }
-        )
+        ),
+        required=False,
     )
     select_filter = forms.ChoiceField(
         label='Filter',
@@ -32,7 +33,8 @@ class PersonFilterForm(forms.Form):
             attrs={
                 'class':'selector',
             }
-        )
+        ),
+        required=False,
     )
 
     def __init__(self, *args, **kwargs):
@@ -70,6 +72,27 @@ class PersonFilterForm(forms.Form):
         choices = EXTRA_VILLAGE_CHOICES + choices
         self.fields['select_village'].choices = choices
         self.fields['select_filter'].choices = FILTER_CHOICES
+        self.helper = FormHelper()
+        self.helper.form_tag = False
+        self.helper.disable_csrf = True
+        self.helper.label_class = 'col-form-label-lg'
+        self.helper.layout = Layout(
+            Row(
+                Div(
+                    Field('select_village', css_class='form-control mr-sm-2'),
+                    css_class='col-md-4',
+                ),
+                Div(
+                    Field('select_filter', css_class='form-control mr-sm-2'),
+                    css_class='col-md-4',
+                ),
+                css_class='justify-content-center'
+            ),
+            Row(
+                StrictButton('Get People', id='get_people', css_class='btn-success'),
+                css_class='justify-content-center'
+            )
+        )
 
 
 class CaseFilterForm(forms.Form):
@@ -85,7 +108,8 @@ class CaseFilterForm(forms.Form):
                 'class':'selector',
                 'data_case_types_url': case_types_url,
             }
-        )
+        ),
+        required = False
     )
     select_case_type = forms.ChoiceField(
         label='Case Filter',
@@ -95,7 +119,8 @@ class CaseFilterForm(forms.Form):
                 'class':'selector',
                 'data_verdict_types_url': verdict_types_url,
             }
-        )
+        ),
+        required = False,
     )
     select_verdict_type = forms.ChoiceField(
             label='Verdict Filter',
@@ -104,7 +129,8 @@ class CaseFilterForm(forms.Form):
                 attrs={
                     'class':'selector',
                 }
-            )
+            ),
+            required = False,
         )
 
     def __init__(self, *args, **kwargs):
@@ -115,14 +141,14 @@ class CaseFilterForm(forms.Form):
         village_queryset = models.Village.objects.filter(session__case__isnull=False).order_by('name').distinct()
 
         # set up a list of tuples as additional options
-        CASE_TYPE_CHOICES = [
-            ('All', 'All Case Types'),
-            ('None', '––––––––––––––––––––––––'),
-        ]
-
         EXTRA_VILLAGE_CHOICES = [
             ('None', 'Select a Village'),
             ('All', 'All Villages'),
+            ('None', '––––––––––––––––––––––––'),
+        ]
+
+        CASE_TYPE_CHOICES = [
+            ('All', 'All Case Types'),
             ('None', '––––––––––––––––––––––––'),
         ]
 
@@ -143,6 +169,28 @@ class CaseFilterForm(forms.Form):
         self.fields['select_village'].choices = additional_village_choices
         self.fields['select_verdict_type'].choices = VERDICT_CHOICES
 
+        self.helper = FormHelper()
+        self.helper.form_tag = False
+        self.helper.disable_csrf = True
+        self.helper.label_class = 'col-form-label-lg'
+        self.helper.layout = Layout(
+            Row(
+                Div(
+                    Field('select_village', css_class='form-control mr-sm-2'),
+                    css_class='col-md-4'
+                ),
+                Div(
+                    Field('select_case_type', css_class='form-control mr-sm-2'),
+                    css_class='col-md-4'),
+                Div(
+                    Field('select_verdict_type', css_class='form-control mr-sm-2'),
+                    css_class='col-md-4'),
+            ),
+            Row(
+                StrictButton('Get Cases', id='get_cases', css_class='btn-success'),
+                css_class='justify-content-center'
+            ),
+        )
 
 
 class CaseForm(forms.ModelForm):
