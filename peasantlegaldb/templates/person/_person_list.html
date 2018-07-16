@@ -33,15 +33,9 @@
 {% endblock %}
 
 {% block right_sidebar %}
-    <div class="container" style="position: sticky; top: 65px">
         {% if perms.peasantlegaldb.add_person %}
-            <div class="btn-group" role="group">
                 <a class="btn btn-success" href="{% url 'person:add' %}">Add Person</a>
-            </div>
-            <br>
-            <br>
         {% endif %}
-    </div>
 {% endblock %}
 
 {% block scripts %}

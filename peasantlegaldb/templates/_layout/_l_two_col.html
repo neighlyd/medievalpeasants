@@ -6,8 +6,8 @@
 {% endblock %}
 
 {% block content %}
-    <div class="container-fluid d-flex justify-content-between pt-2">
-        <div class="p-0 col-lg-11">
+    <div class="container-fluid clearfix d-flex flex-wrap justify-content-between pt-2">
+        <div class="col-md-10">
             <div class="card">
                 {% block center_bar %}
                     <div class="card-header text-center">
@@ -16,16 +16,15 @@
                     </div>
 
                 {% endblock %}
-
             </div>
         </div>
 
-        <div class="p-0 col-lg-1">
+        <div class="col-md-1" style="padding-left: 0px">
+            <div class="container" style="position: sticky; top: 65px">
+                {% block right_sidebar %}
 
-            {% block right_sidebar %}
-
-            {% endblock %}
-
+                {% endblock %}
+            </div>
         </div>
 
     </div>

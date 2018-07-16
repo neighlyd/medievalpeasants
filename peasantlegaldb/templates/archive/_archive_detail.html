@@ -69,7 +69,6 @@
 {% endblock %}
 
 {% block right_sidebar %}
-    <div class="container" style="position: sticky; top: 65px">
         {% if perms.peasantlegaldb.add_archive %}
             <div class="btn-group" role="group">
                 <a class="btn btn-success" href="{% url 'archive:add' %}">Add Archive</a>
@@ -89,7 +88,6 @@
                 <a class="btn btn-danger" href="{% url 'archive:delete' archive.id %}">Delete Archive</a>
             </div>
         {% endif %}
-    </div>
 {% endblock %}
 
 {% block scripts %}
