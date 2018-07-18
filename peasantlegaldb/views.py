@@ -16,6 +16,7 @@ from braces.views import GroupRequiredMixin, AjaxResponseMixin
 
 from . import models
 from . import forms
+from .utils.money_conversion import CurrencyConverter
 
 import pdb
 
@@ -1032,3 +1033,45 @@ def RelationshipEditView(request, pk):
     return JsonResponse(data)
 
 
+def currency_conversion(request):
+
+    data = dict()
+    currency = request.GET.get('currency', '')
+    if currency != '' :
+        converted_currency = CurrencyConverter(currency)
+        context = {
+            'd': converted_currency.in_denarius,
+            'lsd': converted_currency.in_lsd,
+            'm': converted_currency.in_marks,
+        }
+    else:
+        context = {
+            'd': '',
+            'lsd': '',
+            'm': ''
+        }
+    data['html_data'] = render_to_string('currency_converter_body.html', context, request=request)
+    return JsonResponse(data)
+
+
+    #
+    # if request.method == 'POST':
+    #     currency = forms.CurrencyConverterForm(data=request.POST)
+    #     converted_currency = CurrencyConverter(currency)
+    #     converted_amounts = {
+    #         'd': converted_currency.in_denarius,
+    #         'lsd': converted_currency.in_lsd,
+    #         'm':converted_currency.in_marks,
+    #     }
+    #     data['converted_form'] = render_to_string('currency_converter_body.html', converted_amounts)
+    #
+    # else:
+    #     form = forms.CurrencyConverterForm()
+    #
+    # context = {
+    #     'form': form,
+    # }
+    #
+    # data['html_form'] = render_to_string('currency_conversion.html', context, request=request)
+    #
+    # return JsonResponse(data)

@@ -6,7 +6,7 @@ from django.urls import reverse_lazy
 from . import models
 
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Submit, Layout, Fieldset, Div, HTML, Field, Row, Button
+from crispy_forms.layout import Layout, Div, Field, Row
 from crispy_forms.bootstrap import StrictButton
 
 from dal import autocomplete
@@ -109,7 +109,7 @@ class CaseFilterForm(forms.Form):
                 'data_case_types_url': case_types_url,
             }
         ),
-        required = False
+        required=False
     )
     select_case_type = forms.ChoiceField(
         label='Case Filter',
@@ -117,20 +117,20 @@ class CaseFilterForm(forms.Form):
         widget=forms.Select(
             attrs={
                 'class':'selector',
-                'data_verdict_types_url': verdict_types_url,
+                'data_verdict_types_url': verdict_types_url
             }
         ),
-        required = False,
+        required=False,
     )
     select_verdict_type = forms.ChoiceField(
             label='Verdict Filter',
             choices=(),
             widget=forms.Select(
                 attrs={
-                    'class':'selector',
+                    'class':'selector'
                 }
             ),
-            required = False,
+            required=False,
         )
 
     def __init__(self, *args, **kwargs):
@@ -232,7 +232,7 @@ class CaseForm(forms.ModelForm):
     class Meta:
         model = models.Case
         fields = ['summary', 'session', 'court_type', 'case_type', 'verdict', 'of_interest', 'ad_legem',
-                  'villeinage_mention', 'active_sale', 'incidental_land',]
+                  'villeinage_mention', 'active_sale', 'incidental_land']
         labels = {
             'case_type': _('Case Type'),
             'court_type': _('Court Type'),
@@ -297,11 +297,13 @@ class PersonForm(forms.ModelForm):
                                                  })
         }
 
+
 class LitigantForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(LitigantForm, self).__init__(*args, **kwargs)
-        self.fields['person'].queryset = self.fields['person'].queryset.order_by('first_name', 'last_name', 'relation_name')
+        self.fields['person'].queryset = self.fields['person']\
+            .queryset.order_by('first_name', 'last_name', 'relation_name')
         self.fields['role'].queryset = self.fields['role'].queryset.order_by('role')
 
         self.helper = FormHelper()

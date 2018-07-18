@@ -1,0 +1,42 @@
+<div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Convert Currency</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+    <div class="modal-body">
+        <form class="form-inline justify-content-between" id="currency-convert-form">
+            <input type="text" class="form-control mb-2 mr-sm-2" id="currencyInput" placeholder="Enter Value to Convert">
+            <button type="button" class="btn btn-success mb-2" id="convert">Convert</button>
+            <p data-toggle="tooltip" data-placement="bottom" title="Currency sign <b><u>must</b></u> come after the Roman Numerals in <b><u>all</b></u> cases (e.g. xij l. vj s. iiij d.).<hr> The tool can convert between both Roman and Arabic numerals, but you need to specify which coinage you are dealing with in all instances (e.g. both 'vij d.' and '7 d.' will work)">Formatting</p>
+        </form>
+    <br>
+        <div id="currency_modal_ajax">
+            {% include 'currency_converter_body.html' %}
+        </div>
+    </div>
+
+    <div class="modal-footer d-flex justify-content-start p-2">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+
+    </div>
+</div>
+
+<script>
+    $('#convert').on('click', function(){
+        let currency = $('#currencyInput').val();
+        let url = Urls.currency_converter() + '?currency=' + currency;
+        $.ajax({
+          url: url,
+          type: 'GET',
+          dataType: 'json',
+          success: function(data){
+              $('#currency_modal_ajax').html(data.html_data)
+          }
+        })
+    })
+</script>

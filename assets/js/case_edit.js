@@ -29,7 +29,7 @@ $(function(){
                     $('#modal-litigant .modal-content').html(data.html_form);
                 }
             }
-        })
+        });
     return false
     };
 
@@ -49,7 +49,6 @@ $(function(){
     };
 
     var saveDeleteForm = function(){
-        console.log('bing!');
         var form = $(this);
         $.ajax({
             url: form.attr('action'),

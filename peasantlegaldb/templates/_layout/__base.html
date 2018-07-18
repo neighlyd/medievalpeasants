@@ -34,28 +34,38 @@
             <script src="{% url 'js_reverse' %}" type="text/javascript"></script>
             <script src="{% static '/js/hideEmptyColumns.js' %}" type="text/javascript"></script>
             <script src="{% static '/js/functions.js' %}" type="text/javascript"></script>
+            <script>
+                $(function () {
+                  $('[data-toggle="tooltip"]').tooltip({html: true,})
+                })
+            </script>
         {% endblock %}
-
-        <style>
-
-        </style>
 
     </head>
 
         <body>
 
         {% block navbar %}
+            {% include '_layout/__navbar.html' %}
         {% endblock %}
 
 
         {% block content %}
         {% endblock %}
 
-    <footer class="container-fluid">
-        <div class="fixed-bottom text-right" style="z-index:-1">
-            <span class="text-muted p-2">V. 0.2.0</span>
-        </div>
-    </footer>
+        {% block footer %}
+            {% include '_layout/__footer.html' %}
+        {% endblock %}
+
+        {% block currency_conversion %}
+            <div class="modal fade" id="currency-converter" tabindex="-1" role="dialog">
+                {% include 'currency_conversion.html' %}
+            </div>
+            <script>
+                $('.currency-converter').on('click', loadCurrencyConverterModal);
+            </script>
+        {% endblock %}
+
 
 
         </body>

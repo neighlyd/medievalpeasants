@@ -196,5 +196,6 @@ urlpatterns = [
     url(r'^relationship/', include(relationship_urls, namespace='relationship')),
     url(r'^case_test/', views.nested_test),
     url(r'^autocomplete/', include(autocomplete_urls, namespace='autocomplete')),
-    url(r'^relationship_fix/', TemplateView.as_view(template_name='analysis/relationships.html'))
+    url(r'^relationship_fix/', TemplateView.as_view(template_name='analysis/relationships.html')),
+    url(r'^currency_converter/', views.currency_conversion, name='currency_converter')
 ]
