@@ -4,7 +4,7 @@ from django.dispatch import receiver
 
 
 @receiver(post_save, sender=models.Litigant)
-def update_litigant_dates_on_create(sender, instance, **kwargs):
+def update_litigant_dates_on_save(sender, instance, **kwargs):
     # check to see if the litigant has an earliest and latest case, if not, assign this case to those fields, if so
     # compare and assign accordingly.
     if not instance.person.earliest_case:

@@ -1052,26 +1052,3 @@ def currency_conversion(request):
         }
     data['html_data'] = render_to_string('currency_converter_body.html', context, request=request)
     return JsonResponse(data)
-
-
-    #
-    # if request.method == 'POST':
-    #     currency = forms.CurrencyConverterForm(data=request.POST)
-    #     converted_currency = CurrencyConverter(currency)
-    #     converted_amounts = {
-    #         'd': converted_currency.in_denarius,
-    #         'lsd': converted_currency.in_lsd,
-    #         'm':converted_currency.in_marks,
-    #     }
-    #     data['converted_form'] = render_to_string('currency_converter_body.html', converted_amounts)
-    #
-    # else:
-    #     form = forms.CurrencyConverterForm()
-    #
-    # context = {
-    #     'form': form,
-    # }
-    #
-    # data['html_form'] = render_to_string('currency_conversion.html', context, request=request)
-    #
-    # return JsonResponse(data)

@@ -285,7 +285,7 @@ class RecordViewSet(ChainFilterQueryMixin, FlexFieldsModelViewSet):
     serializer_class = serializers.RecordSerializer
     queryset = models.Record.objects.all().select_related('archive').order_by('archive__name', 'name')
     chain = {
-        'archive': {'field': 'archive'}
+        'archive': {'field': 'archive'},
     }
 
 
