@@ -14,20 +14,18 @@
 {% endblock %}
 
 {% block center_bar %}
-
-<div class="card-header text-center">
-    <h2 class="card-title" id="county_name">{{ hundred.name }} </h2>
-</div>
-
-<br>
-
-<div class="tab-content" id="list_info">
-    <div class="tab-pane show active fade" id="village_list" role="tabpanel">{% include 'hundred/village_list.html' %}</div>
-    <div class="tab-pane fade" id="case_list" role="tabpanel"></div>
-    <div class="tab-pane fade" id="resident_list" role="tabpanel"></div>
-    <div class="tab-pane fade" id="litigant_list" role="tabpanel"></div>
-</div>
-
+    <div class="card">
+        <div class="card-header text-center">
+            <h2 class="card-title" id="county_name">{{ hundred.name }} </h2>
+        </div>
+        <br>
+        <div class="tab-content" id="list_info">
+            <div class="tab-pane show active fade" id="village_list" role="tabpanel">{% include 'hundred/village_list.html' %}</div>
+            <div class="tab-pane fade" id="case_list" role="tabpanel"></div>
+            <div class="tab-pane fade" id="resident_list" role="tabpanel"></div>
+            <div class="tab-pane fade" id="litigant_list" role="tabpanel"></div>
+        </div>
+    </div>
 {% endblock %}
 
 {% block right_sidebar %}

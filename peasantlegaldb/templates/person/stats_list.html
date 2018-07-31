@@ -14,7 +14,7 @@
                         </tr>
                         <tr>
                             <td>Capitagium Count</td>
-                            <td>{{ person.capitagium_count }}</td>
+                            <td>{{ person.chevage_count }}</td>
                         </tr>
                     </table>
                 </div>
@@ -220,48 +220,48 @@
             {% if person.capitagia_exists %}
                 <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title">Chevage Info</h4>
+                    <h4 class="card-title">Capitagium Info</h4>
                     <table class="table table-sm">
                         <tr>
                             <td>Count</td>
-                            <td>{{ person.chevage_count }}</td>
+                            <td>{{ person.capitagium_count }}</td>
                         </tr>
                         <tr>
                             <td>Minimum (in d.)</td>
-                            {% if person.chevage_min == 0 %}
+                            {% if person.capitagium_min == 0 %}
                                     <td>0</td>
-                            {% elif person.chevage_min > 0 %}
-                                    <td>{{ person.chevage_min|floatformat }}</td>
+                            {% elif person.capitagium_min > 0 %}
+                                    <td>{{ person.capitagium_min|floatformat }}</td>
                             {% else %}
                                     <td>--</td>
                             {% endif %}
                         </tr>
                         <tr>
                             <td>Maximum (in d.)</td>
-                            {% if person.chevage_max == 0 %}
+                            {% if person.capitagium_max == 0 %}
                                     <td>0</td>
-                            {% elif person.chevage_max > 0 %}
-                                    <td>{{ person.chevage_max|floatformat }}</td>
+                            {% elif person.capitagium_max > 0 %}
+                                    <td>{{ person.capitagium_max|floatformat }}</td>
                             {% else %}
                                     <td>--</td>
                             {% endif %}
                         </tr>
                         <tr>
                             <td>Average (in d.)</td>
-                            {% if person.chevage_avg == 0 %}
+                            {% if person.capitagium_avg == 0 %}
                                     <td>0</td>
-                            {% elif person.chevage_avg > 0 %}
-                                    <td>{{ person.chevage_avg|floatformat }}</td>
+                            {% elif person.capitagium_avg > 0 %}
+                                    <td>{{ person.capitagium_avg|floatformat }}</td>
                             {% else %}
                                     <td>--</td>
                             {% endif %}
                         </tr>
                         <tr>
                             <td>Total (in d.)</td>
-                            {% if person.chevage_sum == 0 %}
+                            {% if person.capitagium_sum == 0 %}
                                     <td>0</td>
-                            {% elif person.chevage_sum > 0 %}
-                                    <td>{{ person.chevage_sum|floatformat }}</td>
+                            {% elif person.capitagium_sum > 0 %}
+                                    <td>{{ person.capitagium_sum|floatformat }}</td>
                             {% else %}
                                     <td>--</td>
                             {% endif %}

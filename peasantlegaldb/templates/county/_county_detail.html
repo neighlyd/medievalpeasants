@@ -15,34 +15,31 @@
 {% endblock %}
 
 {% block center_bar %}
+    <div class="card">
+        <div class="card-header text-center">
+            <h2 class="card-title" id="county_name">{{ county.name }} </h2>
+        </div>
+        <div class="card-body clearfix" id="main_info">
+            <div class="d-flex justify-content-between flex-wrap">
+                <div class="card p-0 col-12">
+                    <h3 class="card-header">Map:</h3>
 
-<div class="card-header text-center">
-    <h2 class="card-title" id="county_name">{{ county.name }} </h2>
-</div>
-
-<div class="card-body clearfix" id="main_info">
-    <div class="d-flex justify-content-between flex-wrap">
-        <div class="card p-0 col-12">
-            <h3 class="card-header">Map:</h3>
-
-            <div class="card-body">
-                <div id="map"></div>
-                <footer class="blockquote-footer text-right">Historical maps from <cite title="NLS Maps API"><a href="http://maps.nls.uk/projects/api/">NLS Maps API</a></cite></footer>
+                    <div class="card-body">
+                        <div id="map"></div>
+                        <footer class="blockquote-footer text-right">Historical maps from <cite title="NLS Maps API"><a href="http://maps.nls.uk/projects/api/">NLS Maps API</a></cite></footer>
+                    </div>
+                </div>
             </div>
         </div>
+        <br>
+        <div class="tab-content" id="list_info">
+            <div class="tab-pane show active fade" id="village_list" role="tabpanel">{% include 'county/village_list.html' %}</div>
+            <div class="tab-pane fade" id="case_list" role="tabpanel"></div>
+            <div class="tab-pane fade" id="resident_list" role="tabpanel"></div>
+            <div class="tab-pane fade" id="litigant_list" role="tabpanel"></div>
+            <div class="tab-pane fade" id="hundred_list" role="tabpanel"></div>
+        </div>
     </div>
-</div>
-
-<br>
-
-<div class="tab-content" id="list_info">
-    <div class="tab-pane show active fade" id="village_list" role="tabpanel">{% include 'county/village_list.html' %}</div>
-    <div class="tab-pane fade" id="case_list" role="tabpanel"></div>
-    <div class="tab-pane fade" id="resident_list" role="tabpanel"></div>
-    <div class="tab-pane fade" id="litigant_list" role="tabpanel"></div>
-    <div class="tab-pane fade" id="hundred_list" role="tabpanel"></div>
-</div>
-
 {% endblock %}
 
 {% block right_sidebar %}
@@ -114,6 +111,7 @@
 
             var countyName = $("#county_name").text();
 
+            // use Google's api to get the lat/lng coords of the county.
             var county_api_url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + countyName + "+UK&key=AIzaSyB51yaYfTmJNUIlZCpIr0HU4m11Hmd7Y9E";
 
             var countyLocation = $.ajax({
@@ -122,7 +120,6 @@
                 async: false,
                 dataType: '',
             }).responseJSON;
-
 
             // use .map to iterate through array of objects returned by API and map key-value pairs to variable. Because
             // the Latitude and Longitude are stored as strings, convert them to floats which the Google API can read as
@@ -146,56 +143,71 @@
 
             map.overlayMapTypes.insertAt(0, nlsmap);
 
+            // create an empty variable for the boundary item, which will store the furthest extent for the lat/lng bounds.
+            var bounds = new google.maps.LatLngBounds();
+            // create variable to store infoWindow data for each vill.
             var infoWindow = new google.maps.InfoWindow();
 
             var marker, i;
 
-            for(i = 0; i < locationArray.length; i++){
-                marker = new google.maps.Marker({
-                    position: new google.maps.LatLng(locationArray[i][2], locationArray[i][3]),
-                    map: map
-                });
+            // if the county has vills in the DB, center the map so that they are all included. Otherwise, simply center map on the lat/lng coords provided by Google's api.
+            if(locationArray.length > 0){
+                for(i = 0; i < locationArray.length; i++){
+                    marker = new google.maps.Marker({
+                        position: new google.maps.LatLng(locationArray[i][2], locationArray[i][3]),
+                        map: map
+                    });
+                    // update bounds variable with the marker positions to extend the farthest edge of map according to locations in array.
+                    bounds.extend(marker.position);
 
-                // attempted to create a variable and assign html to it for setContent; however, this would only work for the first iteration of i for some reason.
-                google.maps.event.addListener(marker, 'click', (function(marker, i) {
-                    return function() {
-                        infoWindow.setContent(
-                            "<div class='container'>" +
-                                "<div class='card'>" +
-                                    "<h6 class='card-header'><a href='" + Urls['village:detail'](locationArray[i][0]) + "'>" + locationArray[i][1] + "</a></h6>" +
-                                    "<div class='card-body'> " +
-                                        "<table class='table table-sm' style='width: 200px'>" +
-                                            "<tr class='row m-0>" +
-                                                "<td class='d-inline-block col-8'></td>" +
-                                            "</tr>" +
-                                            "<tr>" + // For some reason this first row is showing up as the header of the table. I hate computers.
-                                                "<td class='d-inline-block col-8'><b>Sessions:</b></td>" +
-                                                "<td class='d-inline-block col-4'>" + locationArray[i][4] + "<td>" +
-                                            "</tr>" +
-                                            "<tr>" +
-                                                "<td class='d-inline-block col-8'><b>Cases:</b></td>" +
-                                                "<td class='d-inline-block col-4'>" + locationArray[i][5] + "<td>" +
-                                            "</tr>" +
-                                            "<tr>" +
-                                                "<td class='d-inline-block col-8'><b>Residents:</b></td>" +
-                                                "<td class='d-inline-block col-4'>" + locationArray[i][6] + "<td>" +
-                                            "</tr>" +
-                                            "<tr>" +
-                                                "<td class='d-inline-block col-8'><b>Litigants:</b></td>" +
-                                                "<td class='d-inline-block col-4'>" + locationArray[i][7] + "<td>" +
-                                            "</tr>" +
-                                        "</table>" +
+                    // attempted to create a variable and assign html to it for setContent; however, this would only work for the first iteration of i for some reason.
+                    google.maps.event.addListener(marker, 'click', (function(marker, i) {
+                        return function() {
+                            infoWindow.setContent(
+                                "<div class='container'>" +
+                                    "<div class='card'>" +
+                                        "<h6 class='card-header'><a href='" + Urls['village:detail'](locationArray[i][0]) + "'>" + locationArray[i][1] + "</a></h6>" +
+                                        "<div class='card-body'> " +
+                                            "<table class='table table-sm' style='width: 200px'>" +
+                                                "<tr class='row m-0>" +
+                                                    "<td class='d-inline-block col-8'></td>" +
+                                                "</tr>" +
+                                                "<tr>" + // For some reason this first row is showing up as the header of the table. I hate computers.
+                                                    "<td class='d-inline-block col-8'><b>Sessions:</b></td>" +
+                                                    "<td class='d-inline-block col-4'>" + locationArray[i][4] + "<td>" +
+                                                "</tr>" +
+                                                "<tr>" +
+                                                    "<td class='d-inline-block col-8'><b>Cases:</b></td>" +
+                                                    "<td class='d-inline-block col-4'>" + locationArray[i][5] + "<td>" +
+                                                "</tr>" +
+                                                "<tr>" +
+                                                    "<td class='d-inline-block col-8'><b>Residents:</b></td>" +
+                                                    "<td class='d-inline-block col-4'>" + locationArray[i][6] + "<td>" +
+                                                "</tr>" +
+                                                "<tr>" +
+                                                    "<td class='d-inline-block col-8'><b>Litigants:</b></td>" +
+                                                    "<td class='d-inline-block col-4'>" + locationArray[i][7] + "<td>" +
+                                                "</tr>" +
+                                            "</table>" +
+                                        "</div>" +
                                     "</div>" +
-                                "</div>" +
-                            "</div>"
-                        );
-                        infoWindow.open(map, marker);
-                    }
-                })(marker, i));
-
+                                "</div>"
+                            );
+                            infoWindow.open(map, marker);
+                        }
+                    })(marker, i));
+                }
+                map.fitBounds(bounds);
             }
 
-
+            // Set zoom level to at least 9 to prevent being hyper-zoomed in (e.g. in case there aren't enough vills in county).
+            let listener = google.maps.event.addListener(map, "idle", function () {
+                let zoomLevel = map.getZoom();
+                if (zoomLevel >= 10){
+                    map.setZoom(9);
+                }
+                    google.maps.event.removeListener(listener);
+            });
 
         }
 

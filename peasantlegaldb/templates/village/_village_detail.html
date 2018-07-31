@@ -17,85 +17,82 @@
 {% endblock %}
 
 {% block center_bar %}
+    <div class="card">
+        <div class="card-header text-center">
+            <h2 class="card-title">{{ village.name }}</h2>
+        </div>
+        <div class="card-body clearfix" id="main_info">
+            <div class="d-flex justify-content-between flex-wrap">
 
-<div class="card-header text-center">
-    <h2 class="card-title">{{ village.name }}</h2>
-</div>
+                            <div class="card p-0 col-lg-5">
+                                <h3 class="card-header">Info:</h3>
+                                <div class="card-body">
+                                    <table class="table table-sm">
+                                        <tr class="row m-0">
+                                            <td class="d-inline-block col-4"><b>County:</b></td>
+                                            <td class="d-inline-block col-8"><a href="{% url 'county:detail' village.county.id %}">{{ village.county.name}}</a></td>
+                                        </tr>
+                                        {% if village.hundred_id %}
+                                        <tr class="row m-0">
+                                            <td class="d-inline-block col-4"><b>Hundred:</b></td>
+                                            <td class="d-inline-block col-8"><a href="{% url 'hundred:detail' village.hundred.id %}">{{ village.hundred.name}}</a></td>
+                                        </tr>
+                                        {% endif %}
+                                        <tr class="row m-0">
+                                            <td class="d-inline-block col-4"><b>Great Rumor:</b></td>
+                                            <td class="d-inline-block col-8">{{ village.great_rumor }}</td>
+                                        </tr>
+                                        <tr class="row m-0">
+                                            <td class="d-inline-block col-4"><b>Ancient Demesne:</b></td>
+                                            <td class="d-inline-block col-8">{{ village.ancient_demesne }}</td>
+                                        </tr>
+                                        <tr class="row m-0">
+                                            <td class="d-inline-block col-4"><b>Sessions:</b></td>
+                                            <td class="d-inline-block col-8">{{ village.session_count }}</td>
+                                        </tr>
+                                        <tr class="row m-0">
+                                            <td class="d-inline-block col-4"><b>Cases:</b></td>
+                                            <td class="d-inline-block col-8">{{ village.case_count }}</td>
+                                        </tr>
+                                        <tr class="row m-0">
+                                            <td class="d-inline-block col-4" data-toggle="tooltip" data-placement="top" title="Please be aware of problems using court rolls for demography. See Poos and Smith's critique - 'Legal Windows'"><b>Known Residents*:</b></td>
+                                            <td class="d-inline-block col-8">{{ village.resident_count }}</td>
+                                        </tr>
+                                        <tr class="row m-0">
+                                            <td class="d-inline-block col-4"><b>Litigants:</b></td>
+                                            <td class="d-inline-block col-8">{{ village.litigant_count }}</td>
+                                        </tr>
 
-<div class="card-body clearfix" id="main_info">
-    <div class="d-flex justify-content-between flex-wrap">
+                                        <tr class="row m-0">
+                                            <td class="d-inline-block col-4"><b>Notes:</b></td>
+                                            <td class="d-inline-block col-8">{{ village.notes | linebreaksbr }}</td>
+                                        </tr>
 
-                    <div class="card p-0 col-lg-5">
-                        <h3 class="card-header">Info:</h3>
-                        <div class="card-body">
-                            <table class="table table-sm">
-                                <tr class="row m-0">
-                                    <td class="d-inline-block col-4"><b>County:</b></td>
-                                    <td class="d-inline-block col-8"><a href="{% url 'county:detail' village.county.id %}">{{ village.county.name}}</a></td>
-                                </tr>
-                                {% if village.hundred_id %}
-                                <tr class="row m-0">
-                                    <td class="d-inline-block col-4"><b>Hundred:</b></td>
-                                    <td class="d-inline-block col-8"><a href="{% url 'hundred:detail' village.hundred.id %}">{{ village.hundred.name}}</a></td>
-                                </tr>
-                                {% endif %}
-                                <tr class="row m-0">
-                                    <td class="d-inline-block col-4"><b>Great Rumor:</b></td>
-                                    <td class="d-inline-block col-8">{{ village.great_rumor }}</td>
-                                </tr>
-                                <tr class="row m-0">
-                                    <td class="d-inline-block col-4"><b>Ancient Demesne:</b></td>
-                                    <td class="d-inline-block col-8">{{ village.ancient_demesne }}</td>
-                                </tr>
-                                <tr class="row m-0">
-                                    <td class="d-inline-block col-4"><b>Sessions:</b></td>
-                                    <td class="d-inline-block col-8">{{ village.session_count }}</td>
-                                </tr>
-                                <tr class="row m-0">
-                                    <td class="d-inline-block col-4"><b>Cases:</b></td>
-                                    <td class="d-inline-block col-8">{{ village.case_count }}</td>
-                                </tr>
-                                <tr class="row m-0">
-                                    <td class="d-inline-block col-4" data-toggle="tooltip" data-placement="top" title="Please be aware of problems using court rolls for demography. See Poos and Smith's critique - 'Legal Windows'"><b>Known Residents*:</b></td>
-                                    <td class="d-inline-block col-8">{{ village.resident_count }}</td>
-                                </tr>
-                                <tr class="row m-0">
-                                    <td class="d-inline-block col-4"><b>Litigants:</b></td>
-                                    <td class="d-inline-block col-8">{{ village.litigant_count }}</td>
-                                </tr>
+                                    </table>
+                                </div>
+                            </div>
 
-                                <tr class="row m-0">
-                                    <td class="d-inline-block col-4"><b>Notes:</b></td>
-                                    <td class="d-inline-block col-8">{{ village.notes | linebreaksbr }}</td>
-                                </tr>
-
-                            </table>
+                            <div class="card p-0 col-lg-6">
+                                <h3 class="card-header">Map:</h3>
+                                    <div class="card-body">
+                                        <div id="map"></div>
+                                        <footer class="blockquote-footer text-right">Historical maps from <cite title="NLS Maps API"><a href="http://maps.nls.uk/projects/api/">NLS Maps API</a></cite></footer>
+                                    </h6>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-
-                    <div class="card p-0 col-lg-6">
-                        <h3 class="card-header">Map:</h3>
-                            <div class="card-body">
-                                <div id="map"></div>
-                                <footer class="blockquote-footer text-right">Historical maps from <cite title="NLS Maps API"><a href="http://maps.nls.uk/projects/api/">NLS Maps API</a></cite></footer>
-                            </h6>
-                        </div>
-                    </div>
-                </div>
-</div>
-
-<br>
-
-<div class="tab-content" id="list_info">
-    <div class="tab-pane show active fade" id="list_cases" role="tabpanel">{% include 'village/case_list.html' %}</div>
-    <div class="tab-pane fade" id="list_residents" role="tabpanel"></div>
-    <div class="tab-pane fade" id="list_litigants" role="tabpanel"></div>
-    <div class="tab-pane fade" id="list_lands" role="tabpanel"></div>
-    <div class="tab-pane fade" id="list_sessions" role="tabpanel"></div>
-    <div class="tab-pane fade" id="list_mentioned_here" role="tabpanel"></div>
-    <div class="tab-pane fade" id="list_mentioned_elsewhere" role="tabpanel"></div>
-</div>
-
+        </div>
+        <br>
+        <div class="tab-content" id="list_info">
+            <div class="tab-pane show active fade" id="list_cases" role="tabpanel">{% include 'village/case_list.html' %}</div>
+            <div class="tab-pane fade" id="list_residents" role="tabpanel"></div>
+            <div class="tab-pane fade" id="list_litigants" role="tabpanel"></div>
+            <div class="tab-pane fade" id="list_lands" role="tabpanel"></div>
+            <div class="tab-pane fade" id="list_sessions" role="tabpanel"></div>
+            <div class="tab-pane fade" id="list_mentioned_here" role="tabpanel"></div>
+            <div class="tab-pane fade" id="list_mentioned_elsewhere" role="tabpanel"></div>
+        </div>
+    </div>
 {% endblock %}
 
 {% block right_sidebar %}
@@ -160,8 +157,6 @@
                 async: false,
                 dataType: '',
             }).responseJSON;
-            // because Dynamic-Rest nests the data one-level deep, strip out the '{ villages:{' layer.
-            locationObject = locationObject;
 
             // assign lat and lng to variables and convert to floats that google maps api can understand.
             var lng = parseFloat(locationObject.longitude);

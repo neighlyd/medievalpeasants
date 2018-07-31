@@ -45,106 +45,103 @@
 {% endblock %}
 
 {% block center_bar %}
+    <div class="card">
+        <div class="card-header text-center">
+            <h2 class="card-title">{{ person.full_name }}</h2>
+            <h3 class="card-subtitle mb-2 text-muted">{{ person.village.name }}</h3>
+        </div>
+        <div class="card-body clearfix" id="main_info">
+            <div class="d-flex justify-content-between flex-wrap">
 
-<div class="card-header text-center">
-    <h2 class="card-title">{{ person.full_name }}</h2>
-    <h3 class="card-subtitle mb-2 text-muted">{{ person.village.name }}</h3>
-</div>
+                <div class="card p-0 col-lg-5">
+                    <h3 class="card-header bg-grey">Person Info:</h3>
+                    <div class="card-body">
+                        <table class="table table-sm">
+                            <tr class="row m-0">
+                                <td class="d-inline-block col-4"><b>First Name:</b></td>
+                                <td class="d-inline-block col-8">{{ person.first_name }}</td>
+                            </tr>
+                            <tr class="row m-0">
+                                <td class="d-inline-block col-4"><b>Relation Name:</b></td>
+                                <td class="d-inline-block col-8">{{ person.relation_name }}</td>
+                            </tr>
+                            <tr class="row m-0">
+                                <td class="d-inline-block col-4"><b>Last Name:</b></td>
+                                <td class="d-inline-block col-8">{{ person.last_name }}</td>
+                            </tr>
+                            <tr class="row m-0">
+                                <td class="d-inline-block col-4"><b>Status:</b></td>
+                                <td class="d-inline-block col-8">{{ person.get_status_display}}</td>
+                            </tr>
+                            <tr class="row m-0">
+                                <td class="d-inline-block col-4"><b>Gender:</b></td>
+                                <td class="d-inline-block col-8">{{ person.get_gender_display}}</td>
+                            </tr>
+                            <tr class="row m-0">
+                                <td class="d-inline-block col-4"><b>Home Village:</b></td>
+                                <td class="d-inline-block col-8"><a href="{% url 'village:detail' person.village.id %}">{{ person.village.name }}</a></td>
+                            </tr>
+                            {% if person.tax_1332 %}
+                            <tr class="row m-0">
+                                <td class="d-inline-block col-4"><b>1332 Tax</b></td>
+                                <td class="d-inline-block col-8">{{ person.tax_1332 }}</td>
+                            </tr>
+                            {% endif %}
+                            {% if person.tax_1379 %}
+                            <tr class="row m-0">
+                                <td class="d-inline-block col-4"><b>1379 Tax</b></td>
+                                <td class="d-inline-block col-8">{{ person.tax_1379 }}</td>
+                            </tr>
+                            {% endif %}
+                            <tr class="row m-0">
+                                <td class="d-inline-block col-4"><b>Earliest Case</b></td>
+                                {% if person.earliest_case.id is not None %}
+                                <td class="d-inline-block col-8"><a href="{% url 'case:detail' person.earliest_case.id %}">{{ person.earliest_case.session.village.name }} | {{ person.earliest_case.session.get_law_term_display }}, {{ person.earliest_case.session.year }}</a></td>
+                                {% else %}
+                                <td class="d-inline-block col-8">None</td>
+                                {% endif %}
+                            </tr>
+                            <tr class="row m-0">
+                                <td class="d-inline-block col-4"><b>Latest Case</b></td>
+                                {% if person.latest_case.id is not None %}
+                                <td class="d-inline-block col-8"><a href="{% url 'case:detail' person.latest_case.id %}">{{ person.latest_case.session.village.name }} | {{ person.latest_case.session.get_law_term_display }}, {{ person.latest_case.session.year }}</a></td>
+                                {% else %}
+                                <td class="d-inline-block col-8">None</td>
+                                {% endif %}
+                            </tr>
 
-<div class="card-body clearfix" id="main_info">
-    <div class="d-flex justify-content-between flex-wrap">
+                        </table>
+                    </div>
+                </div>
 
-        <div class="card p-0 col-lg-5">
-            <h3 class="card-header bg-grey">Person Info:</h3>
-            <div class="card-body">
-                <table class="table table-sm">
-                    <tr class="row m-0">
-                        <td class="d-inline-block col-4"><b>First Name:</b></td>
-                        <td class="d-inline-block col-8">{{ person.first_name }}</td>
-                    </tr>
-                    <tr class="row m-0">
-                        <td class="d-inline-block col-4"><b>Relation Name:</b></td>
-                        <td class="d-inline-block col-8">{{ person.relation_name }}</td>
-                    </tr>
-                    <tr class="row m-0">
-                        <td class="d-inline-block col-4"><b>Last Name:</b></td>
-                        <td class="d-inline-block col-8">{{ person.last_name }}</td>
-                    </tr>
-                    <tr class="row m-0">
-                        <td class="d-inline-block col-4"><b>Status:</b></td>
-                        <td class="d-inline-block col-8">{{ person.get_status_display}}</td>
-                    </tr>
-                    <tr class="row m-0">
-                        <td class="d-inline-block col-4"><b>Gender:</b></td>
-                        <td class="d-inline-block col-8">{{ person.get_gender_display}}</td>
-                    </tr>
-                    <tr class="row m-0">
-                        <td class="d-inline-block col-4"><b>Home Village:</b></td>
-                        <td class="d-inline-block col-8"><a href="{% url 'village:detail' person.village.id %}">{{ person.village.name }}</a></td>
-                    </tr>
-                    {% if person.tax_1332 %}
-                    <tr class="row m-0">
-                        <td class="d-inline-block col-4"><b>1332 Tax</b></td>
-                        <td class="d-inline-block col-8">{{ person.tax_1332 }}</td>
-                    </tr>
-                    {% endif %}
-                    {% if person.tax_1379 %}
-                    <tr class="row m-0">
-                        <td class="d-inline-block col-4"><b>1379 Tax</b></td>
-                        <td class="d-inline-block col-8">{{ person.tax_1379 }}</td>
-                    </tr>
-                    {% endif %}
-                    <tr class="row m-0">
-                        <td class="d-inline-block col-4"><b>Earliest Case</b></td>
-                        {% if person.earliest_case.id is not None %}
-                        <td class="d-inline-block col-8"><a href="{% url 'case:detail' person.earliest_case.id %}">{{ person.earliest_case.session.village.name }} | {{ person.earliest_case.session.get_law_term_display }}, {{ person.earliest_case.session.year }}</a></td>
-                        {% else %}
-                        <td class="d-inline-block col-8">None</td>
-                        {% endif %}
-                    </tr>
-                    <tr class="row m-0">
-                        <td class="d-inline-block col-4"><b>Latest Case</b></td>
-                        {% if person.latest_case.id is not None %}
-                        <td class="d-inline-block col-8"><a href="{% url 'case:detail' person.latest_case.id %}">{{ person.latest_case.session.village.name }} | {{ person.latest_case.session.get_law_term_display }}, {{ person.latest_case.session.year }}</a></td>
-                        {% else %}
-                        <td class="d-inline-block col-8">None</td>
-                        {% endif %}
-                    </tr>
+                <div class="card p-0 col-lg-6">
+                    <h3 class="card-header bg-grey">Notes:</h3>
+                        <div class="card-body">
 
-                </table>
+                            <h6 class="card-text">
+                                {{ person.notes | linebreaksbr }}
+                        </h6>
+                    </div>
+                </div>
+
             </div>
         </div>
-
-        <div class="card p-0 col-lg-6">
-            <h3 class="card-header bg-grey">Notes:</h3>
-                <div class="card-body">
-
-                    <h6 class="card-text">
-                        {{ person.notes | linebreaksbr }}
-                </h6>
-            </div>
+        <br>
+        <div class="tab-content" id="list_info">
+            <div class="tab-pane show active fade" id="stats_list" role="tabpanel">{% include 'person/stats_list.html' %}</div>
+            <div class="tab-pane fade" id="case_list" role="tabpanel"></div>
+            <div class="tab-pane fade" id="pledge_list" role="tabpanel"></div>
+            <div class="tab-pane fade" id="land_list" role="tabpanel"></div>
+            <div class="tab-pane fade" id="relationship_list" role="tabpanel"></div>
+            <div class="tab-pane fade" id="position_list" role="tabpanel"></div>
+            <div class="tab-pane fade" id="amercement_list" role="tabpanel"></div>
+            <div class="tab-pane fade" id="damage_list" role="tabpanel"></div>
+            <div class="tab-pane fade" id="fine_list" role="tabpanel"></div>
+            <div class="tab-pane fade" id="capitagium_list" role="tabpanel"></div>
+            <div class="tab-pane fade" id="impercamentum_list" role="tabpanel"></div>
+            <div class="tab-pane fade" id="heriot_list" role="tabpanel"></div>
         </div>
-
     </div>
-</div>
-
-<br>
-
-<div class="tab-content" id="list_info">
-    <div class="tab-pane show active fade" id="stats_list" role="tabpanel">{% include 'person/stats_list.html' %}</div>
-    <div class="tab-pane fade" id="case_list" role="tabpanel"></div>
-    <div class="tab-pane fade" id="pledge_list" role="tabpanel"></div>
-    <div class="tab-pane fade" id="land_list" role="tabpanel"></div>
-    <div class="tab-pane fade" id="relationship_list" role="tabpanel"></div>
-    <div class="tab-pane fade" id="position_list" role="tabpanel"></div>
-    <div class="tab-pane fade" id="amercement_list" role="tabpanel"></div>
-    <div class="tab-pane fade" id="damage_list" role="tabpanel"></div>
-    <div class="tab-pane fade" id="fine_list" role="tabpanel"></div>
-    <div class="tab-pane fade" id="capitagium_list" role="tabpanel"></div>
-    <div class="tab-pane fade" id="impercamentum_list" role="tabpanel"></div>
-    <div class="tab-pane fade" id="heriot_list" role="tabpanel"></div>
-</div>
-
 {% endblock %}
 
 {% block right_sidebar %}

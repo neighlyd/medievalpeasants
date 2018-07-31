@@ -8,32 +8,34 @@
 
 {% block additional_title %}
         <form id="select_cases">
-                    {% crispy filter_case_form %}
+            {% crispy filter_case_form %}
         </form>
 {% endblock %}
 
 {% block center_bar %}
     {{ block.super }}
-<div id="list_cases" style="display: none">
     <div class="card">
-        <div class="card-body clearfix" id="main_info">
-            <table class="table table-bordered table-hover" id="table" data-page-length="25">
-                <thead>
-                    <th>Notes</th>
-                    <th>Case ID</th>
-                    <th>Village</th>
-                    <th>Session</th>
-                    <th>Court Type</th>
-                    <th>Case Type</th>
-                    <th>Verdict</th>
-                    <th>Litigant Count</th>
-                    <th>Pledge Count</th>
-                    <th>Of Note?</th>
-                </thead>
-            </table>
+        <div id="list_cases" style="display: none">
+            <div class="card">
+                <div class="card-body clearfix" id="main_info">
+                    <table class="table table-bordered table-hover" id="table" data-page-length="25">
+                        <thead>
+                            <th>Notes</th>
+                            <th>Case ID</th>
+                            <th>Village</th>
+                            <th>Session</th>
+                            <th>Court Type</th>
+                            <th>Case Type</th>
+                            <th>Verdict</th>
+                            <th>Litigant Count</th>
+                            <th>Pledge Count</th>
+                            <th>Of Note?</th>
+                        </thead>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
-</div>
 {% endblock %}
 
 {% block right_sidebar %}

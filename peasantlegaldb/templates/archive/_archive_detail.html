@@ -14,58 +14,55 @@
 {% endblock %}
 
 {% block center_bar %}
+     <div class="card">
+        <div class="card-header text-center">
+            <h2 class="card-title">Archive - {{ archive.name }}</h2>
+        </div>
+        <div class="card-body clearfix" id="main_info">
+            <div class="d-flex justify-content-between flex-wrap">
 
-<div class="card-header text-center">
-    <h2 class="card-title">Archive - {{ archive.name }}</h2>
-</div>
+                            <div class="card p-0 col-lg-5">
+                                <h3 class="card-header">Info:</h3>
+                                <div class="card-body">
+                                    <table class="table table-sm">
+                                        <tr class="row m-0">
+                                            <td class="d-inline-block col-4"><b>Website:</b></td>
+                                            <td class="d-inline-block col-8"><a href="{{ archive.website }}">Website</a></td>
+                                        </tr>
+                                        <tr class="row m-0">
+                                            <td class="d-inline-block col-4"><b>Record Count:</b></td>
+                                            <td class="d-inline-block col-8">{{ archive.record_count }}</td>
+                                        </tr>
+                                        <tr class="row m-0">
+                                            <td class="d-inline-block col-4"><b>Session Count:</b></td>
+                                            <td class="d-inline-block col-8">{{ archive.session_count }}</td>
+                                        </tr>
+                                        <tr class="row m-0">
+                                            <td class="d-inline-block col-4"><b>Case Count:</b></td>
+                                            <td class="d-inline-block col-8">{{ archive.case_count }}</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
 
-<div class="card-body clearfix" id="main_info">
-    <div class="d-flex justify-content-between flex-wrap">
+                            <div class="card p-0 col-lg-6">
+                                <h3 class="card-header">Notes:</h3>
+                                    <div class="card-body">
 
-                    <div class="card p-0 col-lg-5">
-                        <h3 class="card-header">Info:</h3>
-                        <div class="card-body">
-                            <table class="table table-sm">
-                                <tr class="row m-0">
-                                    <td class="d-inline-block col-4"><b>Website:</b></td>
-                                    <td class="d-inline-block col-8"><a href="{{ archive.website }}">Website</a></td>
-                                </tr>
-                                <tr class="row m-0">
-                                    <td class="d-inline-block col-4"><b>Record Count:</b></td>
-                                    <td class="d-inline-block col-8">{{ archive.record_count }}</td>
-                                </tr>
-                                <tr class="row m-0">
-                                    <td class="d-inline-block col-4"><b>Session Count:</b></td>
-                                    <td class="d-inline-block col-8">{{ archive.session_count }}</td>
-                                </tr>
-                                <tr class="row m-0">
-                                    <td class="d-inline-block col-4"><b>Case Count:</b></td>
-                                    <td class="d-inline-block col-8">{{ archive.case_count }}</td>
-                                </tr>
-                            </table>
+                                    <h6 class="card-text">
+                                            {{ archive.notes | linebreaksbr }}
+                                    </h6>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-
-                    <div class="card p-0 col-lg-6">
-                        <h3 class="card-header">Notes:</h3>
-                            <div class="card-body">
-
-                            <h6 class="card-text">
-                                    {{ archive.notes | linebreaksbr }}
-                            </h6>
-                        </div>
-                    </div>
-                </div>
-</div>
-
-<br>
-
-<div class="tab-content" id="list_info">
-    <div class="tab-pane fade" id="record_list" role="tabpanel"></div>
-    <div class="tab-pane fade" id="session_list" role="tabpanel"></div>
-    <div class="tab-pane fade" id="case_list" role="tabpanel"></div>
-</div>
-
+        </div>
+        <br>
+        <div class="tab-content" id="list_info">
+            <div class="tab-pane fade" id="record_list" role="tabpanel"></div>
+            <div class="tab-pane fade" id="session_list" role="tabpanel"></div>
+            <div class="tab-pane fade" id="case_list" role="tabpanel"></div>
+        </div>
+     </div>
 {% endblock %}
 
 {% block right_sidebar %}
