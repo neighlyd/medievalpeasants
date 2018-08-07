@@ -1,30 +1,52 @@
-from django.db.models import Q
-
-from dynamic_rest.viewsets import DynamicModelViewSet
-
-from rest_flex_fields import FlexFieldsModelViewSet
+from django.db.models import Q, Count
 
 from rest_framework import permissions
-from rest_framework.viewsets import ModelViewSet
+from rest_flex_fields import FlexFieldsModelViewSet
 
-from api import serializers
 from peasantlegaldb import models
+from . import serializers
 
 
-# Function created in order to be able to search for both isnull and FKs. In order to work, you need to create a
+# Class created in order to be able to search for both isnull and FKs. In order to work, you need to create a
 # dictionary of key, value pairs using self.request.query_params.get(x, None) where the key is the name of the field you
 # want to filter and x is the query_param you want to use in the URL (see the get_queryset function in the
 # LitigantViewset class for examples). Pass this dictionary and the ViewSet's queryset to check_chain(), which will
 # iterate through the dictionary, checking to see if there is a value or not. If there is, it checks to see if it should
 # treat it as a boolean check or not ("true" or "false"), or whether it is a filter check. It then filters the queryset
 # based on that, and returns the queryset to the ViewSet class. Again, see the LitigantViewSet for example.
+
 class ChainFilterQueryMixin(object):
 
+    def _flip_booleans(self, value):
+        # query_params are strings. Convert to python boolean objects for filtering.
+        # I prefer to search for isnull using opposite true/false tests (e.g. are there fines?). Sue me.
+        if value == 'true' or value == 'True':
+            value = False
+        if value == 'false' or value == 'False':
+            value = True
+        return value
+
     def _get_chain_params(self, chain):
+        filtered_dict = dict()
         for key, value in chain.items():
-            chain[key]['field'] = value['field'].replace('.', '__')
-            chain[key]['search'] = self.request.query_params.get(key)
-        return chain
+            search_params = self.request.query_params.get(key, None)
+            if search_params:
+                filtered_dict[key] = chain[key]
+                # if user entered a comma separated list of search params, convert to list (for searching via 'in')
+                if ',' in search_params:
+                    search_params = [x for x in search_params.split(',')]
+                else:
+                    search_params = self._flip_booleans(search_params)
+                filtered_dict[key]['search'] = search_params
+
+                search_field = chain[key]['field'].replace('.', '__')
+                # for some reason, the _get_chain_params() method is running on every page load. So only add the type on
+                # the first iteration.
+                if 'type' in chain[key] and not filtered_dict[key]['field'].endswith(chain[key]['type']):
+                    filtered_dict[key]['field'] = search_field + '__' + chain[key]['type']
+                else:
+                    filtered_dict[key]['field'] = search_field
+        return filtered_dict
 
     def _get_distinct_params(self):
         distinct_param = self.request.query_params.get('distinct', None)
@@ -43,31 +65,18 @@ class ChainFilterQueryMixin(object):
     def _filter_chain(self, queryset, chain):
         filtered_chain = self._get_chain_params(chain)
         distinct = self._get_distinct_params()
-        for key, value in filtered_chain.items():
-            if value['search'] is not None:
-                # query_params are strings. Convert to python boolean objects.
-                if value['search'] == 'true' or value['search'] == 'True':
-                    search_val = True
-                elif value['search'] == 'false' or value['search'] == 'False':
-                    search_val = False
-                else:
-                    search_val = value['search']
-                if 'type' in value:
-                    # I prefer to search for isnull using opposite true/false tests (e.g. are there fines?). Sue me.
-                    if value['type'] == 'isnull':
-                        if value['search'] == 'true' or value['search'] == 'True':
-                            new_filter = value['field'] + '__isnull'
-                            queryset = queryset.filter(**{new_filter: False})
-                        elif value['search'] == 'false' or value['search'] == 'False':
-                            new_filter = value['field'] + '__isnull'
-                            queryset = queryset.filter(**{new_filter: True})
-                    else:
-                        continue
-                else:
-                    queryset = queryset.filter(**{value['field']: search_val})
         # import ipdb
         # ipdb.set_trace()
-        if distinct == True:
+        for key, value in filtered_chain.items():
+            search_val = value['search']
+            if type(value['search']) == list:
+                q = Q()
+                for val in search_val:
+                    q |= Q(**{value['field']: val})
+                queryset = queryset.filter(q)
+            else:
+                queryset = queryset.filter(**{value['field']: search_val})
+        if distinct:
             return queryset.distinct()
         else:
             return queryset
@@ -81,7 +90,6 @@ class ChainFilterQueryMixin(object):
             return queryset
 
 
-# API views
 class ArchiveViewSet(FlexFieldsModelViewSet):
 
     # Must be logged in to edit
@@ -90,7 +98,6 @@ class ArchiveViewSet(FlexFieldsModelViewSet):
     # API endpoint that allows the model to be viewed or edited.
     queryset = models.Archive.objects.all()
     serializer_class = serializers.ArchiveSerializer
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     def list(self, request, *args, **kwargs):
         return super(ArchiveViewSet, self).list(request, *args, **kwargs)
@@ -103,7 +110,6 @@ class MoneyViewSet(FlexFieldsModelViewSet):
 
     queryset = models.Money.objects.all().order_by('in_denarius', 'amount')
     serializer_class = serializers.MoneySerializer
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
 
 class ChattelViewSet(FlexFieldsModelViewSet):
@@ -113,7 +119,6 @@ class ChattelViewSet(FlexFieldsModelViewSet):
 
     queryset = models.Chattel.objects.all().order_by('name')
     serializer_class = serializers.ChattelSerializer
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
 
 class CaseTypeViewSet(FlexFieldsModelViewSet):
@@ -123,7 +128,6 @@ class CaseTypeViewSet(FlexFieldsModelViewSet):
 
     queryset = models.CaseType.objects.all().order_by('case_type')
     serializer_class = serializers.CaseTypeSerializer
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
 
 class CountyViewSet(ChainFilterQueryMixin, FlexFieldsModelViewSet):
@@ -132,8 +136,11 @@ class CountyViewSet(ChainFilterQueryMixin, FlexFieldsModelViewSet):
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     serializer_class = serializers.CountySerializer
-    queryset = models.County.objects.all().order_by('name')
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+    queryset = models.County.objects.all().annotate(village_count=Count('village')).order_by('name')
+    chain = {
+        'village_count_gte': {'field': 'village_count', 'type': 'gte'},
+        'village_count_lte': {'field': 'village_count', 'type': 'lte'},
+    }
 
 
 class LandViewSet(ChainFilterQueryMixin, FlexFieldsModelViewSet):
@@ -150,6 +157,7 @@ class LandViewSet(ChainFilterQueryMixin, FlexFieldsModelViewSet):
         'village': {'field': 'tenants.litigant.case.session.village'},
     }
 
+
 class ParcelTenureViewSet(FlexFieldsModelViewSet):
 
     # Must be logged in to edit
@@ -157,7 +165,6 @@ class ParcelTenureViewSet(FlexFieldsModelViewSet):
 
     queryset = models.ParcelTenure.objects.all().order_by('tenure')
     serializer_class = serializers.ParcelTenureSerializer
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
 
 class ParcelTypeViewSet(FlexFieldsModelViewSet):
@@ -167,7 +174,6 @@ class ParcelTypeViewSet(FlexFieldsModelViewSet):
 
     queryset = models.ParcelType.objects.all().order_by('parcel_type')
     serializer_class = serializers.ParcelTypeSerializer
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
 
 class PositionTypeViewSet(FlexFieldsModelViewSet):
@@ -177,7 +183,6 @@ class PositionTypeViewSet(FlexFieldsModelViewSet):
 
     queryset = models.PositionType.objects.all().order_by('title')
     serializer_class = serializers.PositionTypeSerializer
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
 
 class RelationViewSet(FlexFieldsModelViewSet):
@@ -187,7 +192,6 @@ class RelationViewSet(FlexFieldsModelViewSet):
 
     queryset = models.Relation.objects.all().order_by('relation')
     serializer_class = serializers.RelationSerializer
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
 
 class RoleViewSet(FlexFieldsModelViewSet):
@@ -197,7 +201,6 @@ class RoleViewSet(FlexFieldsModelViewSet):
 
     queryset = models.Role.objects.all().order_by('role')
     serializer_class = serializers.RoleSerializer
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
 
 class VerdictViewSet(FlexFieldsModelViewSet):
@@ -207,7 +210,6 @@ class VerdictViewSet(FlexFieldsModelViewSet):
 
     queryset = models.Verdict.objects.all().order_by('verdict')
     serializer_class = serializers.VerdictSerializer
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
 
 class HundredViewSet(ChainFilterQueryMixin, FlexFieldsModelViewSet):
@@ -239,6 +241,9 @@ class VillageViewSet(ChainFilterQueryMixin, FlexFieldsModelViewSet):
         'village': {'field': 'name'},
         'county': {'field': 'county'},
         'hundred': {'field': 'hundred'},
+        'cases_present': {'field': 'session.case', 'type': 'isnull'},
+        'ancient_demesne': {'field': 'ancient_demesne'},
+        'great_rumor': {'field': 'great_rumor'},
     }
 
 
@@ -253,11 +258,14 @@ class PersonViewSet(ChainFilterQueryMixin, FlexFieldsModelViewSet):
         'village',
         'earliest_case__session__village',
         'latest_case__session__village').order_by('first_name', 'last_name')
+    # filter_backends = [DjangoFilterBackend]
+    # filter_class = api_filters.PersonFilter
     chain = {
         'county_to_litigant': {'field': 'cases.case.session.village.county'},
         'county_to_resident': {'field': 'village.county'},
-        'village_to_resident': {'field': 'village'},
-        'village_to_litigant': {'field': 'cases.case.session.village'},
+        'village_to_resident': {'field': 'village',},
+        'village_to_litigant': {'field': 'cases.case.session.village',},
+        # 'village_to_both': {'field': ('village', 'cases.case.session.village')},
         'hundred_to_litigant': {'field': 'cases.case.session.village.hundred'},
         'hundred_to_resident': {'field': 'village.hundred'},
         'hundred': {'field': 'village.hundred'},
@@ -267,11 +275,16 @@ class PersonViewSet(ChainFilterQueryMixin, FlexFieldsModelViewSet):
         'damaged': {'field': 'cases.damages', 'type': 'isnull'},
         'fined': {'field': 'cases.fines', 'type': 'isnull'},
         'heriot': {'field': 'cases.heriots', 'type': 'isnull'},
-        'impercamenta':{'field': 'cases.impercamenta', 'type': 'isnull'},
+        'impercamenta': {'field': 'cases.impercamenta', 'type': 'isnull'},
         'lands': {'field': 'cases.lands', 'type': 'isnull'},
         'pledges_given': {'field': 'pledge_giver', 'type': 'isnull'},
         'pledges_received': {'field': 'cases.pledges', 'type': 'isnull'},
         'case': {'field': 'cases.case'},
+        'gender': {'field': 'gender'},
+        'name': {'field': 'full_name', 'type': 'icontains'},
+        'status': {'field': 'status'},
+        'earliest_case': {'field': 'earliest_case.session.date.year', 'type': 'gte'},
+        'latest_case': {'field': 'latest_case.session.date.year', 'type': 'lte'},
     }
 
 
@@ -286,6 +299,7 @@ class RecordViewSet(ChainFilterQueryMixin, FlexFieldsModelViewSet):
     queryset = models.Record.objects.all().select_related('archive').order_by('archive__name', 'name')
     chain = {
         'archive': {'field': 'archive'},
+        'record_type': {'field': 'record_type'}
     }
 
 
@@ -304,6 +318,9 @@ class SessionViewSet(ChainFilterQueryMixin, FlexFieldsModelViewSet):
         'village': {'field': 'village'},
         'record': {'field': 'record'},
         'archive': {'field': 'record.archive'},
+        'term': {'field': 'law_term'},
+        'earliest_session': {'field': 'date__year', 'type': 'gte'},
+        'latest_session': {'field': 'date__year', 'type': 'lte'},
     }
 
 
@@ -329,7 +346,9 @@ class CaseViewSet(ChainFilterQueryMixin, FlexFieldsModelViewSet):
         'case_type': {'field': 'case_type'},
         'verdict': {'field': 'verdict'},
         'litigant': {'field': 'litigants.in'},
-        'pledge_receiver': {'field': 'cases.pledges'} ,
+        'pledge_receiver': {'field': 'cases.pledges'},
+        'earliest_case': {'field': 'session.date.year', 'type': 'gte'},
+        'latest_case': {'field': 'session.date.year', 'type': 'lte'},
     }
 
 
@@ -399,9 +418,10 @@ class LandParcelViewSet(FlexFieldsModelViewSet):
     # Must be logged in to edit
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
-    queryset = models.LandParcel.objects.all().select_related('parcel_type').order_by('land', 'parcel_type__parcel_type')
+    queryset = models.LandParcel.objects.all()\
+        .select_related('parcel_type')\
+        .order_by('land', 'parcel_type__parcel_type')
     serializer_class = serializers.LandParcelSerializer
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
 
 class LitigantViewSet(ChainFilterQueryMixin, FlexFieldsModelViewSet):
@@ -445,7 +465,7 @@ class PledgeViewSet(ChainFilterQueryMixin, FlexFieldsModelViewSet):
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
     serializer_class = serializers.PledgeSerializer
     queryset = models.Pledge.objects.all()\
-        .select_related('giver','receiver__case', 'receiver__person')\
+        .select_related('giver', 'receiver__case', 'receiver__person')\
         .order_by('giver__last_name', 'giver__first_name')
     chain = {
         'giver': {'field': 'giver'},
@@ -460,9 +480,10 @@ class LandSplitViewSet(FlexFieldsModelViewSet):
     # Must be logged in to edit
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
     serializer_class = serializers.LandSplitSerializer
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
-    def get_queryset(self, queryset=models.LandSplit.objects.all().order_by('old_land__case_to_land__case__session__date')):
+    def get_queryset(self, queryset=models.LandSplit.objects.all()
+                     .order_by('old_land__case_to_land__case__session__date')
+                     ):
         land = self.request.query_params.get('land')
         if not land:
             return queryset

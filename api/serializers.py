@@ -233,17 +233,18 @@ class RecordSerializer(FlexFieldsModelSerializer):
 class CountySerializer(FlexFieldsModelSerializer):
 
     counts = serializers.SerializerMethodField()
+    village_count = serializers.IntegerField()
 
     class Meta:
         model = models.County
-        fields = ('id', 'name', 'abbreviation', 'counts',)
+        fields = ('id', 'name', 'abbreviation', 'counts', 'village_count')
         datatables_always_serialize = ('id',)
 
     @staticmethod
     def get_counts(record):
         counts = dict()
         counts['hundred'] = record.hundred_count
-        counts['village'] = record.village_count
+        # counts['village'] = record.village_count
         counts['great_rumor'] = record.great_rumor_count
         counts['ancient_demesne'] = record.ancient_demesne_count
         counts['session'] = record.session_count

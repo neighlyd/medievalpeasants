@@ -1,10 +1,12 @@
 from django.db import models
-from django.db.models import Count, Max, Min, Avg, Sum
+from django.db.models import Count, Max, Min, Avg, Sum, When
+# Import Case as C so as to not conflict with the Case model.
+from django.db.models import Case as C
 from django.urls import reverse
 
 from decimal import *
 
-from datetime import date
+from model_utils import FieldTracker
 
 
 '''
@@ -106,9 +108,9 @@ class County(models.Model):
     def hundred_count(self):
         return self.hundred_set.count()
 
-    @property
-    def village_count(self):
-        return self.village_set.count()
+    # @property
+    # def village_count(self):
+    #     return self.village_set.count()
 
     @property
     def great_rumor_count(self):
@@ -327,11 +329,11 @@ class Village(models.Model):
                                           damage_count=Count('case__litigants__damage'),
                                           damage_avg=Avg('case__litigants__damage__in_denarius'),
                                           damage_sum=Sum('case__litigants__damage__in_denarius'),
-                                          chevage_count=Count('case__litigants__chevage'),
-                                          chevage_max=Max('case__litigants__chevage__in_denarius'),
-                                          chevage_min=Min('case__litigants__chevage__in_denarius'),
-                                          chevage_avg=Avg('case__litigants__chevage__in_denarius'),
-                                          chevage_sum=Sum('case__litigants__chevage__in_denarius'),
+                                          capitagium_count=Count('case__litigants__capitagia'),
+                                          capitagium_max=Max('case__litigants__capitagia__in_denarius'),
+                                          capitagium_min=Min('case__litigants__capitagia__in_denarius'),
+                                          capitagium_avg=Avg('case__litigants__capitagia__in_denarius'),
+                                          capitagium_sum=Sum('case__litigants__capitagia__in_denarius'),
                                           heriot_count=Count('case__litigants__heriot'),
                                           heriot_max=Max('case__litigants__heriot__in_denarius'),
                                           heriot_min=Min('case__litigants__heriot__in_denarius'),
@@ -344,9 +346,9 @@ class Village(models.Model):
                                           impercamentum_sum=Sum('case__litigants__impercamentum__in_denarius') )
 
     @property
-    def median_chevage(self):
-        queryset = Litigant.objects.all().filter(case__session__village=self.id).filter(chevage__isnull=False)
-        return median_value(queryset, 'chevage__in_denarius')
+    def median_capitagium(self):
+        queryset = Litigant.objects.all().filter(case__session__village=self.id).filter(capitagia__isnull=False)
+        return median_value(queryset, 'capitagium__in_denarius')
 
     @property
     def median_heriot(self):
@@ -383,7 +385,6 @@ class Person(models.Model):
     GENDER_CHOICES = {
         ('M', 'Male'),
         ('F', 'Female'),
-        ('I', 'Institution'),
         ('U', 'Unknown')
     }
 
@@ -463,29 +464,36 @@ class Person(models.Model):
     @property
     def monetary_counts(self):
         return self.cases.aggregate(amercement_count=Count('amercements'),
-                                             amercement_max=Max('amercements__amercement__in_denarius'),
-                                             amercement_min=Min('amercements__amercement__in_denarius'),
-                                             amercement_avg=Avg('amercements__amercement__in_denarius'),
-                                             amercement_sum=Sum('amercements__amercement__in_denarius'), fine_count=Count('fines'),
-                                             fine_max=Max('fines__fine__in_denarius'), fine_min=Min('fines__fine__in_denarius'),
-                                             fine_avg=Avg('fines__fine__in_denarius'), fine_sum=Sum('fines__fine__in_denarius'),
-                                             damage_count=Count('damages'), damage_max=Max('damages__damage__in_denarius'),
-                                             damage_min=Min('damages__damage__in_denarius'),
-                                             damage_avg=Avg('damages__damage__in_denarius'),
-                                             damage_sum=Sum('damages__damage__in_denarius'), capitagium_count=Count('capitagia'),
-                                             capitagium_max=Max('capitagia__capitagium__in_denarius'),
-                                             capitagium_min=Min('capitagia__capitagium__in_denarius'),
-                                             capitagium_avg=Avg('capitagia__capitagium__in_denarius'),
-                                             capitagium_sum=Sum('capitagia__capitagium__in_denarius'), heriot_count=Count('heriots'),
-                                             heriot_max=Max('heriots__heriot__in_denarius'),
-                                             heriot_min=Min('heriots__heriot__in_denarius'),
-                                             heriot_avg=Avg('heriots__heriot__in_denarius'),
-                                             heriot_sum=Sum('heriots__heriot__in_denarius'),
-                                             impercamentum_count=Count('impercamenta'),
-                                             impercamentum_max=Max('impercamenta__impercamentum__in_denarius'),
-                                             impercamentum_min=Min('impercamenta__impercamentum__in_denarius'),
-                                             impercamentum_avg=Avg('impercamenta__impercamentum__in_denarius'),
-                                             impercamentum_sum=Sum('impercamenta__impercamentum__in_denarius') )
+                                    amercement_max=Max('amercements__amercement__in_denarius'),
+                                    amercement_min=Min('amercements__amercement__in_denarius'),
+                                    amercement_avg=Avg('amercements__amercement__in_denarius'),
+                                    amercement_sum=Sum('amercements__amercement__in_denarius'),
+                                    fine_count=Count('fines'),
+                                    fine_max=Max('fines__fine__in_denarius'),
+                                    fine_min=Min('fines__fine__in_denarius'),
+                                    fine_avg=Avg('fines__fine__in_denarius'),
+                                    fine_sum=Sum('fines__fine__in_denarius'),
+                                    damage_count=Count('damages'),
+                                    damage_max=Max('damages__damage__in_denarius'),
+                                    damage_min=Min('damages__damage__in_denarius'),
+                                    damage_avg=Avg('damages__damage__in_denarius'),
+                                    damage_sum=Sum('damages__damage__in_denarius'),
+                                    capitagium_count=Count('capitagia'),
+                                    capitagium_max=Max('capitagia__capitagium__in_denarius'),
+                                    capitagium_min=Min('capitagia__capitagium__in_denarius'),
+                                    capitagium_avg=Avg('capitagia__capitagium__in_denarius'),
+                                    capitagium_sum=Sum('capitagia__capitagium__in_denarius'),
+                                    heriot_count=Count('heriots'),
+                                    heriot_max=Max('heriots__heriot__in_denarius'),
+                                    heriot_min=Min('heriots__heriot__in_denarius'),
+                                    heriot_avg=Avg('heriots__heriot__in_denarius'),
+                                    heriot_sum=Sum('heriots__heriot__in_denarius'),
+                                    impercamentum_count=Count('impercamenta'),
+                                    impercamentum_max=Max('impercamenta__impercamentum__in_denarius'),
+                                    impercamentum_min=Min('impercamenta__impercamentum__in_denarius'),
+                                    impercamentum_avg=Avg('impercamenta__impercamentum__in_denarius'),
+                                    impercamentum_sum=Sum('impercamenta__impercamentum__in_denarius')
+                                    )
 
     @property
     def amercement_exists(self):
@@ -516,10 +524,10 @@ class Person(models.Model):
         case_count = self.cases.exclude(capitagia__isnull=False).values_list('case').distinct().count()
         return case_count
 
-    @property
-    def capitagium_count(self):
-        capitagium_count = self.cases.exclude(capitagia__isnull=True).values_list('case').distinct().count()
-        return capitagium_count
+    # @property
+    # def capitagium_count(self):
+    #     capitagium_count = self.cases.exclude(capitagia__isnull=True).values_list('case').distinct().count()
+    #     return capitagium_count
 
     @property
     def case_count_all(self):
@@ -830,6 +838,9 @@ class Litigant(models.Model):
     attached = models.BooleanField()
     # Added at Case 1424
     bail = models.BooleanField()
+    # a field that tracks changes to fields in the model. Used to update the earliest and latest cases for person models
+    # upon save, including both new and updated people.
+    tracker = FieldTracker(fields=['person'])
 
     @property
     def impercamentum_denarius_total(self):
@@ -933,6 +944,7 @@ class LandtoCase(models.Model):
 class Pledge(models.Model):
     giver = models.ForeignKey(Person, on_delete=models.CASCADE, related_name='pledge_giver')
     receiver = models.ForeignKey(Litigant, on_delete=models.CASCADE, related_name='pledges')
+    tracker = FieldTracker(fields=['giver', 'receiver'])
 
     def __str__(self):
         return "%s pledged %s" % (self.giver.full_name, self.receiver.person.full_name)
@@ -986,3 +998,29 @@ class Relationship(models.Model):
 
     def __str__(self):
         return '{0} - {1} and {2}'.format(self.id, self.person_one.full_name, self.person_two.full_name)
+
+
+class Manor(models.Model):
+
+    name = models.CharField(max_length=250)
+    villages = models.ManyToManyField(Village)
+    notes = models.TextField(blank=True)
+
+
+class ManorOwner(models.Model):
+
+    CONFIDENCE_LEVEL = [
+        (1, '1 - Low'),
+        (2, '2'),
+        (3, '3 - Medium'),
+        (4, '4'),
+        (5, '5 - High')
+    ]
+
+    owner = models.ForeignKey(Person, on_delete=models.CASCADE, related_name='owner')
+    manor = models.ForeignKey(Manor, on_delete=models.CASCADE)
+    begin_date = models.DateField(blank=True, null=True)
+    begin_date_certainty = models.IntegerField(choices=CONFIDENCE_LEVEL)
+    end_date = models.DateField(blank=True, null=True)
+    end_date_certainty = models.IntegerField(choices=CONFIDENCE_LEVEL)
+    notes = models.TextField(blank=True)
