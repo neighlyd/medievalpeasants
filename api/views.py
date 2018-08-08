@@ -349,6 +349,7 @@ class CaseViewSet(ChainFilterQueryMixin, FlexFieldsModelViewSet):
         'pledge_receiver': {'field': 'cases.pledges'},
         'earliest_case': {'field': 'session.date.year', 'type': 'gte'},
         'latest_case': {'field': 'session.date.year', 'type': 'lte'},
+        'of_interest': {'field': 'of_interest'},
     }
 
 

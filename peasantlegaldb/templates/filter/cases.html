@@ -34,6 +34,10 @@
             <label for="latestCase">Latest Case (Year)</label>
             <input type="number" class="form-control" id="latestCase" autocomplete="off">
         </div>
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="of_interest" value="of_interest">
+            <label class="form-check-label" for="of_interest">Of Interest</label>
+        </div>
 <button class="btn btn-success" id="filterCasesButton">Search</button>
 </form>
 
@@ -55,6 +59,8 @@
         let form = $('#caseFilterForm :input');
         let values = {};
         let du = $(this).attr('data-url');
+
+        let of_interest = $('#of_interest').is(':checked');
 
         form.each(function(){
             values[this.id] = $(this).val();
@@ -82,6 +88,9 @@
                 }
             }
         });
+        if (of_interest){
+            urlParams["url_params"] = urlParams["url_params"] + "&of_interest=false";
+        }
 
         $.ajax({
             url: du,
