@@ -1,0 +1,75 @@
+<table class="table table-bordered table-hover" id="sessionTable" data-page-length="25">
+            <thead>
+                <th>ID</th>
+                <th>Village</th>
+                <th>Date</th>
+                <th>Law Term</th>
+                <th>Cases</th>
+                <th>Litigants</th>
+                <th>Capitagia</th>
+                <th>Impercamenta</th>
+                <th>Land Cases</th>
+            </thead>
+        </table>
+
+<script>
+    var urlParams = "{{ url_params }}";
+    var du = Urls['api:session-list']() + "?format=datatables&keep=human_date&expand=village" + urlParams;
+    var sessionTable = $("#sessionTable").DataTable({
+        serverSide: true,
+        ajax: du,
+        hideEmptyCols: true,
+        order: [2, "asc"],
+        columns: [
+            {data: "id",
+                searchable: false,
+                orderable: false,
+                render: {
+                    display: function(data){
+                        url = Urls['session:detail'](data);
+                        return "<a href='" + url + "'>" + data + "</a>";
+                    }
+                }
+            },
+            {data: 'village.name',
+                render: {
+                    display: function(data, type, row){
+                        url = Urls['village:detail'](row.village.id);
+                        return "<a href='" + url + "'>" + data + "</a>";
+                    }
+                }
+            },
+            {data: "date",
+                render: {
+                    display: function(data, type, row){
+                        return row.human_date;
+                    }
+                }
+            },
+            {data: "law_term",
+                searchable: false,
+                orderable: false,
+            },
+            {data: "counts.case",
+                searchable: false,
+                orderable: false,
+            },
+            {data: "counts.litigant",
+                searchable: false,
+                orderable: false,
+            },
+            {data: "counts.capitagium_payer",
+                searchable: false,
+                orderable: false,
+            },
+            {data: "counts.impercamentum_payer",
+                searchable: false,
+                orderable: false,
+            },
+            {data: "counts.land",
+                searchable: false,
+                orderable: false,
+            }
+        ]
+    });
+</script>

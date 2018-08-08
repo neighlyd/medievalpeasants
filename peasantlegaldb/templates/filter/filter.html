@@ -1,0 +1,101 @@
+{% extends '_layout/_l_two_col.html' %}
+{% load crispy_forms_tags %}
+
+{% block center_bar %}
+    <div class="card-header text-center">
+        <h5>Search For</h5>
+
+        <div id="mainFilter" class="accordion">
+            <div class="btn-group" role="group" aria-label="Filter By People or Case">
+                <button class="btn btn-success" data-toggle="modal" data-target="#filterModal" data-url="{% url 'filter:people' %}">People</button>
+                <button class="btn btn-success" data-toggle="modal" data-target="#filterModal" data-url="{% url 'filter:cases' %}">Cases</button>
+            </div>
+            <div class="btn-group" role="group" aria-label="Filter By Locations">
+                <button class="btn btn-success" data-toggle="modal" data-target="#filterModal" data-url="{% url 'filter:counties' %}">Counties</button>
+                <button class="btn btn-success" data-toggle="modal" data-target="#filterModal" data-url="{% url 'filter:hundreds' %}">Hundreds</button>
+                <button class="btn btn-success" data-toggle="modal" data-target="#filterModal" data-url="{% url 'filter:villages' %}">Villages</button>
+            </div>
+            <div class="btn-group" role="group" aria-label="Filter By Documents">
+                <button class="btn btn-success" data-url="{% url 'filter:archives' %}" id="archivesButton">Archives</button>
+                <button class="btn btn-success" data-toggle="modal" data-target="#filterModal" data-url="{% url 'filter:records' %}">Records</button>
+                <button class="btn btn-success" data-toggle="modal" data-target="#filterModal" data-url="{% url 'filter:sessions' %}">Sessions</button>
+            </div>
+
+            <br/>
+            <br/>
+            <div class="accordion-group">
+                <div class="collapse" id="people" data-parent="#mainFilter">
+                </div>
+                <div class="collapse" id="cases" data-parent="#mainFilter">
+                </div>
+                <div class="collapse" id="counties" data-parent="#mainFilter">
+                </div>
+                <div class="collapse" id="hundreds" data-parent="#mainFilter">
+                </div>
+                <div class="collapse" id="villages" data-parent="#mainFilter">
+                </div>
+                <div class="collapse" id="archives" data-parent="#mainFilter">
+                </div>
+                <div class="collapse" id="records" data-parent="#mainFilter">
+                </div>
+                <div class="collapse" id="sessions" data-parent="#mainFilter">
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div class="card-body" id="tableBody">
+
+    </div>
+
+    <div class="modal left fade" id="filterModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-body" id="filterModalContent">
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+
+    {{ block.super }}
+    <script>
+    $(document).ready(function(){
+        $('#mainFilter button').click(function(){
+            if(this.id !== 'archivesButton'){
+                let dt = $(this).attr('data-target');
+                let du = $(this).attr('data-url');
+                $.ajax({
+                    url: du,
+                    success: function(results){
+                        $('#filterModalContent').html(results);
+                    }
+                });
+            } else {
+                let du = $(this).attr('data-url');
+                $.ajax({
+                    url: du,
+                    success: function(results){
+                        $('#tableBody').html(results);
+                    }
+                })
+            }
+            let children = $('#mainFilter').find('button');
+            for (var i=0; i < children.length; i++){
+                var child = children[i];
+                if($(child) !== this) {
+                    if ($(child).hasClass('active')) {
+                        $(child).removeClass('active')
+                    }
+                }
+            }
+            $(this).button('toggle');
+        })
+    })
+    </script>
+
+{% endblock %}
+
+

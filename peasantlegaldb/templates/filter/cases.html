@@ -1,0 +1,98 @@
+<form id="caseFilterForm" data-url="{% url 'filter:cases_table' %}">
+        <div class="form-group">
+            <label for="village">Village</label>
+            <select multiple class="form-control" id="village">
+                {% for village in villages %}
+                    <option value="{{ village.id }}">{{ village.name }}</option>
+                {% endfor %}
+            </select>
+            <button type="button" class="btn btn-outline-secondary btn-sm" id="clearVillage">Clear Selection</button>
+        </div>
+        <div class="form-group">
+            <label for="caseType">Case Type</label>
+            <select multiple class="form-control" id="caseType">
+                {% for type in case_types %}
+                    <option value="{{ type.id }}">{{ type.case_type }}</option>
+                {% endfor %}
+            </select>
+            <button type="button" class="btn btn-outline-secondary btn-sm" id="clearCaseType">Clear Selection</button>
+        </div>
+        <div class="form-group">
+            <label for="verdict">Verdict</label>
+            <select multiple class="form-control" id="verdict">
+                {% for verdict in verdicts %}
+                    <option value="{{ verdict.id }}">{{ verdict.verdict }}</option>
+                {% endfor %}
+            </select>
+            <button type="button" class="btn btn-outline-secondary btn-sm" id="clearVerdict">Clear Selection</button>
+        </div>
+        <div class="form-group">
+            <label for="earliestCase">Earliest Case (Year)</label>
+            <input type="number" class="form-control" id="earliestCase" autocomplete="off">
+        </div>
+        <div class="form-group">
+            <label for="latestCase">Latest Case (Year)</label>
+            <input type="number" class="form-control" id="latestCase" autocomplete="off">
+        </div>
+<button class="btn btn-success" id="filterCasesButton">Search</button>
+</form>
+
+<script>
+    $('#clearVillage').on('click', function(){
+        $('#village option:selected').prop('selected', false);
+    });
+
+    $('#clearCaseType').on('click', function(){
+        $('#caseType option:selected').prop('selected', false);
+    });
+
+    $('#clearVerdict').on('click', function(){
+        $('#verdict option:selected').prop('selected', false);
+    });
+
+    $('#caseFilterForm').on('submit', function(e){
+        e.preventDefault();
+        let form = $('#caseFilterForm :input');
+        let values = {};
+        let du = $(this).attr('data-url');
+
+        form.each(function(){
+            values[this.id] = $(this).val();
+        });
+
+        let urlParams = {"url_params" : ""};
+        $.each(values, function(key, value){
+            if(value.length !== 0){
+                switch(key){
+                    case 'village':
+                        urlParams["url_params"] = urlParams["url_params"] + '&' + key + '=' + value;
+                        break;
+                    case 'caseType':
+                        urlParams["url_params"] = urlParams["url_params"] + '&case_type=' + value;
+                        break;
+                    case 'verdict':
+                        urlParams["url_params"] = urlParams["url_params"] + '&' + key + '=' + value;
+                        break;
+                    case 'earliestCase':
+                        urlParams["url_params"] = urlParams["url_params"] + '&earliest_case=' + value;
+                        break;
+                    case 'latestCase':
+                        urlParams["url_params"] = urlParams["url_params"] + '&latest_case=' + value;
+                        break;
+                }
+            }
+        });
+
+        $.ajax({
+            url: du,
+            data: urlParams,
+            type: 'POST',
+            dataType: 'json',
+            success: function(data){
+                $('#tableBody').html(data.html_table);
+                $('#filterModal').modal('hide');
+            },
+        });
+
+    })
+</script>

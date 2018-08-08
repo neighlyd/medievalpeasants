@@ -1,0 +1,77 @@
+<table class="table table-bordered table-hover" id="villageTable" data-page-length="25">
+            <thead>
+                <th>Notes</th>
+                <th>Village</th>
+                <th>County</th>
+                <th>Hundred</th>
+                <th>Great Rumor</th>
+                <th>Ancient Demesne</th>
+            </thead>
+        </table>
+
+<script>
+    var urlParams = "{{ url_params }}";
+    var du = Urls['api:village-list']() + "?format=datatables&expand=hundred,county" + urlParams;
+    var villageTable = $("#villageTable").DataTable({
+        scrollX: true,
+        serverSide: true,
+        ajax: du,
+        order: [1, "asc"],
+        columns: [
+            {
+                "class": "details-control",
+                "orderable": false,
+                "data": "notes",
+                "defaultContent": "",
+                "render": checkNotes,
+                width:"15px"
+            },
+            {data: "name",
+                render: {
+                    display: function(data, type, row, meta){
+                        var url = Urls['village:detail'](row.id);
+                        return '<a href="' + url + '">' + row.name + '</a>';
+                    }
+                }
+            },
+            {data: "county.name",
+                defaultContent: '',
+                render: {
+                    display: function(data, type, row, meta){
+                        if (data){
+                            var url = Urls['county:detail'](row.county.id);
+                            return '<a href="' + url + '">' + row.county.name + '</a>';
+                        } else {
+                            return 'N/A'
+                        }
+                    }
+                }
+            },
+            {data: "hundred.name",
+                defaultContent: '',
+                render: {
+                    display: function(data, type, row, meta){
+                        if (data){
+                            var url = Urls['hundred:detail'](row.hundred.id);
+                            return '<a href="' + url + '">' + row.hundred.name + '</a>';
+                        } else {
+                            return 'N/A'
+                        }
+                    }
+                }
+            },
+            {data: "great_rumor",
+                defaultContent: '',
+                render: {
+                    display: checkMaker,
+                }
+            },
+            {data: "ancient_demesne",
+                defaultContent: '',
+                render: {
+                    display: checkMaker,
+                }
+            },
+        ]
+    });
+</script>

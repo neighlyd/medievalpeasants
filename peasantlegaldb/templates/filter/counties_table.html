@@ -1,0 +1,67 @@
+<table class="table table-bordered table-hover" id="countyTable" data-page-length="50">
+    <thead>
+        <th>Name</th>
+        <th>Hundreds</th>
+        <th>Villages</th>
+        <th>Great Rumor</th>
+        <th>Ancient Demesne</th>
+        <th>Sessions</th>
+        <th>Cases</th>
+        <th>Residents</th>
+        <th>Litigants</th>
+    </thead>
+</table>
+
+<script>
+    var urlParams = "{{ url_params }}";
+    var du = Urls['api:county-list']() + "?format=datatables" + urlParams;
+    console.log(du);
+    $('#countyTable').DataTable().destroy();
+    var countyTable = $("#countyTable").DataTable({
+        scrollX: true,
+        serverSide: true,
+        ajax: du,
+        order: [0, "asc"],
+        columns: [
+            {data: "name",
+                render: {
+                    display: function(data, type, row, meta){
+                        var url = Urls['county:detail'](row.id);
+                        return "<a href='"+ url +"'>" + data + "</a>"
+                    }
+                }
+            },
+            {data: "counts.hundred",
+                searchable: false,
+                orderable: false,
+            },
+            {data: "village_count",
+                searchable: false,
+            },
+            {data: "counts.great_rumor",
+                searchable: false,
+                orderable: false,
+            },
+            {data: "counts.ancient_demesne",
+                searchable: false,
+                orderable: false,
+            },
+            {data: "counts.session",
+                searchable: false,
+                orderable: false,
+            },
+            {data: "counts.case",
+                searchable: false,
+                orderable: false,
+            },
+            {data: "counts.resident",
+                searchable: false,
+                orderable: false,
+            },
+            {data: "counts.litigant",
+                searchable: false,
+                orderable: false,
+            },
+        ]
+    });
+</script>

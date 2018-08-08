@@ -1,0 +1,66 @@
+
+<form id="countyFilterForm" data-url="{% url 'filter:counties_table' %}">
+    <div class="form-group" id="village_count_filter">
+            <label for="village_count">Village Count</label>
+            <input type="number" class="form-control" id="village_count" autocomplete="off">
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="inlineRadioOptions" id="village_count_gte" value="gte">
+              <label class="form-check-label" for="village_count_gte">Greater Than</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="inlineRadioOptions" id="village_count_lte" value="lte">
+              <label class="form-check-label" for="village_count_lte">Less Than</label>
+            </div>
+            <button type="button" class="btn btn-outline-secondary btn-sm" id="clearVillageCount">Clear Selection</button>
+        </div>
+    <button class="btn btn-success" id="filterCountyButton">Search</button>
+</form>
+
+<script>
+    $('#clearVillageCount').on('click', function(){
+        $('#village_count').val(null);
+        $('input[id="village_count_gte"]').prop('checked', false);
+        $('input[id="village_count_lte"]').prop('checked', false);
+
+    });
+
+    $('#countyFilterForm').on('submit', function(e) {
+        e.preventDefault();
+
+        let form = $("#countyFilterForm :input");
+        let values = {};
+        let du = $(this).attr('data-url');
+        
+        let gte = $('#village_count_gte').is(':checked');
+        let lte = $('#village_count_lte').is(':checked');
+        form.each(function () {
+            values[this.id] = $(this).val();
+        });
+
+        var urlParams = {"url_params": ""};
+        $.each(values, function(key, value){
+            if (value.length !== 0) {
+                switch (key){
+                    case 'village_count':
+                        if (gte){
+                            urlParams["url_params"] = urlParams["url_params"] + '&village_count_gte=' + value;
+                        } else if (lte){
+                            urlParams["url_params"] = urlParams["url_params"] + '&village_count_lte=' + value;
+                        }
+                        break;
+                }
+            }
+        });
+
+        $.ajax({
+            url: du,
+            data: urlParams,
+            type: 'POST',
+            dataType: 'json',
+            success: function(data){
+                $('#tableBody').html(data.html_table);
+                $('#filterModal').modal('hide');
+            },
+        });
+    });
+</script>

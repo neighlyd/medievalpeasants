@@ -42,7 +42,7 @@ case_urls = [
     url(r'^(?P<pk>\d+)/murrain$', TemplateView.as_view(template_name='case/murrain_list.html'), name='murrain'),
     url(r'^(?P<pk>\d+)/pledges$', TemplateView.as_view(template_name='case/pledge_list.html'), name='pledges'),
     url(r'^add/$', views.add_case, name='add'),
-    url(r'^(?P<pk>\d+)/edit/$', views.CaseEditView, name='edit'),
+    url(r'^(?P<pk>\d+)/edit/$', views.case_edit_view, name='edit'),
     url(r'^(?P<pk>\d+)/delete/$', views.CaseDeleteView.as_view(), name='delete'),
     url(r'^(?P<pk>\d+)/litigants/$', views.LitigantListforAddCase.as_view(template_name='case/litigant_table_body_for_case.html')
         , name='litigant_list_for_add_case'),
@@ -180,9 +180,29 @@ village_urls = [
         name='list'),
 ]
 
+filter_urls = [
+    url(r'^$', TemplateView.as_view(template_name='filter/filter.html'), name='main'),
+    url(r'^people$', views.PeopleFilterView.as_view(), name='people'),
+    url(r'^people/table', views.people_filter_table_view, name='people_table'),
+    url(r'^cases$', views.CaseFilterView.as_view(), name='cases'),
+    url(r'^cases/table', views.cases_filter_table_view, name='cases_table'),
+    url(r'^counties$', views.CountyFilterView.as_view(), name='counties'),
+    url(r'^counties/table', views.counties_filter_table_view, name='counties_table'),
+    url(r'^hundreds$', views.HundredFilterView.as_view(), name='hundreds'),
+    url(r'^hundreds/table', views.hundreds_filter_table_view, name='hundreds_table'),
+    url(r'^villages$', views.VillageFilterView.as_view(), name='villages'),
+    url(r'^villages/table', views.villages_filter_table_view, name='villages_table'),
+    url(r'^archives$', views.ArchiveFilterView.as_view(), name='archives'),
+    url(r'^records$', views.RecordFilterView.as_view(), name='records'),
+    url(r'^records/table', views.records_filter_table_view, name='records_table'),
+    url(r'^sessions$', views.SessionFilterView.as_view(), name='sessions'),
+    url(r'^sessions/table', views.sessions_filter_table_view, name='sessions_table'),
+]
+
 # consolidation of detail views.
 urlpatterns = [
     url(r'^', include(index_urls)),
+    url(r'^filter/', include(filter_urls, namespace='filter')),
     url(r'^archive/', include(archive_urls, namespace='archive')),
     url(r'^case/', include(case_urls, namespace='case')),
     url(r'^county/', include(county_urls, namespace='county')),

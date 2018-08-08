@@ -10,33 +10,7 @@
         <ul class="navbar-nav mr-auto">
 
             <li class="nav-item">
-                <a class="nav-link" href="{% url 'person:list' %}">People</a>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'case:list' %}">Cases</a>
-            </li>
-
-            <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="navbarPlacesDropdown" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                    Places
-                </a>
-                <div class="dropdown-menu" aria-labelledby="navbarPlacesDropdown" style="background-color: #245602">
-                    <a class="dropdown-item" href="{% url 'village:list' %}">Villages</a>
-                    <a class="dropdown-item" href="{% url 'hundred:list' %}">Hundreds</a>
-                    <a class="dropdown-item" href="{% url 'county:list' %}">Counties</a>
-                </div>
-            </li>
-
-            <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="navbarSourcesDropdown" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                    Sources
-                </a>
-                <div class="dropdown-menu" aria-labelledby="navbarSourcesDropdown" style="background-color: #245602">
-                    <a class="dropdown-item" href="{% url 'archive:list' %}">Archives</a>
-                    <a class="dropdown-item" href="{% url 'session:list' %}">Sessions</a>
-                    <a class="dropdown-item" href="{% url 'record:list' %}">Records</a>
-                </div>
+                <a class="nav-link" href="{% url 'filter:main' %}">Browse</a>
             </li>
 
             <li class="nav-item dropdown">
@@ -46,6 +20,10 @@
                 <div class="dropdown-menu" aria-labelledby="navbarToolsDropdown" style="background-color: #245602">
                     <a class="dropdown-item" href="#" data-toggle="modal" data-target="#currency-converter">Currency Converter</a>
                 </div>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" href="#">About</a>
             </li>
 
             <li class="nav-item">

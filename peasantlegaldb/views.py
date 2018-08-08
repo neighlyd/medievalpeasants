@@ -1,24 +1,25 @@
-from django.views.generic.detail import DetailView
-from django.views.generic.edit import UpdateView, CreateView, DeleteView, FormView
-from django.views.generic import ListView, TemplateView
+import json
 
+from django.views.generic.detail import DetailView
+from django.views.generic.edit import UpdateView, CreateView, DeleteView
+from django.views.generic import ListView, TemplateView
 from django.shortcuts import render, get_object_or_404, redirect
 from django.template.loader import render_to_string
 from django.http import JsonResponse
-
-from django.urls import reverse_lazy, reverse
-from django.db.models import Count, Max, Min, Avg, Sum, Q, Case, When
+from django.urls import reverse
+from django.db.models import Count, Max, Min, Avg, Sum, Q, When
+# import Case as C to not conflict with the database model Case.
+from django.db.models import Case as C
 from django.core.urlresolvers import resolve
 from django.http import HttpResponseRedirect
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.views.decorators.csrf import csrf_exempt
 
-from braces.views import GroupRequiredMixin, AjaxResponseMixin
+from braces.views import GroupRequiredMixin
 
 from . import models
 from . import forms
 from .utils.money_conversion import CurrencyConverter
-
-import pdb
 
 # TODO: Finish comparison of case/litigant/person btwn litigant table and amercements, damages, fines, impercamentum, landtocase
 # TODO: Merge litigant btwn Litigant table and landtocase, fixing Role between the two.
@@ -28,8 +29,10 @@ Delete = [u"Full Editor"]
 Edit = [u"Full Editor", u"Editor"]
 Add = [u"Full Editor", u"Editor", u"Contributor"]
 
+
 def nested_test(request):
     return render(request, 'case/_case_test.html')
+
 
 class ArchiveDetailView(DetailView):
 
@@ -121,7 +124,6 @@ class RecordEditView(GroupRequiredMixin, UpdateView):
         return reverse('record:detail', kwargs={'pk': pk})
 
 
-
 class RecordAddView(GroupRequiredMixin, CreateView):
 
     model = models.Record
@@ -139,7 +141,6 @@ class RecordAddView(GroupRequiredMixin, CreateView):
         archive = self.request.GET.get('archive')
         initial['archive'] = archive
         return initial
-
 
 
 class RecordDeleteView(GroupRequiredMixin, DeleteView):
@@ -192,20 +193,38 @@ def load_verdict_types(request):
 class CaseDetailView(DetailView):
 
     model = models.Case
-    queryset = models.Case.objects.all().prefetch_related('litigants__person', 'litigants__amercements',
-                                                          'litigants__capitagia', 'litigants__damages',
-                                                          'litigants__fines', 'litigants__heriots',
-                                                          'litigants__impercamenta', 'litigants__lands')\
-        .order_by('litigants__person__last_name', 'litigants__person__first_name')\
-        .annotate(amercement_count=Count('litigants__amercements'), cap_count=Count('litigants__capitagia'),
-                  damage_count=Count('litigants__damages'), fine_count=Count('litigants__fines'),
-                  heriot_count=Count('litigants__heriots'), imperc_count=Count('litigants__impercamenta'),
-                  land_count=Count('litigants__lands'),
-                  ad_proximum_count=Count(Case(When(litigants__ad_proximum=True, then=1))),
-                  attached_count=Count(Case(When(litigants__attached=True, then=1))),
-                  bail_count=Count(Case(When(litigants__bail=True, then=1))),
-                  distrain_count=Count(Case(When(litigants__distrained=True, then=1))),
-                  pledges_count=Count('litigants__pledges'))
+    queryset = models.Case.objects.annotate(amercement_count=Count('litigants__amercements'),
+                                            capitagium_count=Count('litigants__capitagia'),
+                                            capitagium_min=Min('litigants__capitagia__capitagium__in_denarius'),
+                                            capitagium_max=Max('litigants__capitagia__capitagium__in_denarius'),
+                                            capitagium_avg=Avg('litigants__capitagia__capitagium__in_denarius'),
+                                            capitagium_sum=Sum('litigants__capitagia__capitagium__in_denarius'),
+                                            damage_count=Count('litigants__damages'),
+                                            damage_min=Min('litigants__damages__damage__in_denarius'),
+                                            damage_max=Max('litigants__damages__damage__in_denarius'),
+                                            damage_avg=Avg('litigants__damages__damage__in_denarius'),
+                                            damage_sum=Sum('litigants__damages__damage__in_denarius'),
+                                            fine_count=Count('litigants__fines'),
+                                            fine_min=Min('litigants__fines__fine__in_denarius'),
+                                            fine_max=Max('litigants__fines__fine__in_denarius'),
+                                            fine_avg=Avg('litigants__fines__fine__in_denarius'),
+                                            fine_sum=Sum('litigants__fines__fine__in_denarius'),
+                                            heriot_count=Count('litigants__heriots'),
+                                            heriot_min=Min('litigants__heriots__heriot__in_denarius'),
+                                            heriot_max=Max('litigants__heriots__heriot__in_denarius'),
+                                            heriot_avg=Avg('litigants__heriots__heriot__in_denarius'),
+                                            heriot_sum=Sum('litigants__heriots__heriot__in_denarius'),
+                                            impercamentum_count=Count('litigants__impercamenta'),
+                                            impercamentum_min=Min('litigants__impercamenta__impercamentum__in_denarius'),
+                                            impercamentum_max=Max('litigants__impercamenta__impercamentum__in_denarius'),
+                                            impercamentum_avg=Avg('litigants__impercamenta__impercamentum__in_denarius'),
+                                            impercamentum_sum=Sum('litigants__impercamenta__impercamentum__in_denarius'),
+                                            land_count=Count('litigants__lands'),
+                                            ad_proximum_count=Count(C(When(litigants__ad_proximum=True, then=1))),
+                                            attached_count=Count(C(When(litigants__attached=True, then=1))),
+                                            bail_count=Count(C(When(litigants__bail=True, then=1))),
+                                            distrain_count=Count(C(When(litigants__distrained=True, then=1))),
+                                            pledges_count=Count('litigants__pledges'))
     
     def get_context_data(self, **kwargs):
         context = super(CaseDetailView, self).get_context_data(**kwargs)
@@ -215,7 +234,7 @@ class CaseDetailView(DetailView):
         return context
 
 
-def CaseEditView(request, pk):
+def case_edit_view(request, pk):
 
     case = get_object_or_404(models.Case, pk=pk)
     litigant_list = models.Litigant.objects.filter(case = case).prefetch_related('person')\
@@ -353,6 +372,7 @@ def add_litigant(request, pk):
     data['html_form'] = render_to_string('case/_case_add_litigant_modal.html', context, request=request)
 
     return JsonResponse(data)
+
 
 def delete_litigant(request, pk):
     litigant = get_object_or_404(models.Litigant, pk=pk)
@@ -503,6 +523,7 @@ class LitigantListforAddCase(ListView):
     def get_queryset(self):
         return models.Litigant.objects.filter(case=self.kwargs['pk'])
 
+
 class CaseDeleteView(GroupRequiredMixin, DeleteView):
 
     model = models.Case
@@ -517,7 +538,7 @@ class CaseDeleteView(GroupRequiredMixin, DeleteView):
 class CountyDetailView(DetailView):
 
     model = models.County
-    queryset = models.County.objects.all()
+    queryset = models.County.objects.annotate(village_count=Count('village'))
     
     def get_context_data(self, **kwargs):
         context = super(CountyDetailView, self).get_context_data(**kwargs)
@@ -608,7 +629,6 @@ class HundredEditView(GroupRequiredMixin, UpdateView):
         return reverse('hundred:detail', kwargs={'pk': pk})
 
 
-
 class HundredAddView(GroupRequiredMixin, CreateView):
 
     model = models.Hundred
@@ -626,7 +646,6 @@ class HundredAddView(GroupRequiredMixin, CreateView):
         county = self.request.GET.get('county')
         initial['county'] = county
         return initial
-
 
 
 class HundredDeleteView(GroupRequiredMixin, DeleteView):
@@ -740,78 +759,78 @@ def village_case_list(request, pk):
     return JsonResponse(data)
 
 
-def case_lists(request, pk):
-
-    # see person_lists for details on logic.
-    data = dict()
-    path = request.path.split('/').pop()
-    case = models.Case.objects.get(id=pk)
-    if path == 'litigant_list':
-        query_list = models.Case.objects.filter(id=pk).prefetch_related('litigants__person', 'litigants__amercements',
-                                                                        'litigants__capitagia', 'litigants__damages',
-                                                                        'litigants__fines', 'litigants__heriots',
-                                                                        'litigants__impercamenta', 'litigants__lands')\
-            .order_by('litigants__person__last_name', 'litigants__person__first_name')\
-            .annotate(amercement_count=Count('litigants__amercements'), cap_count=Count('litigants__capitagia'),
-                      damage_count=Count('litigants__damages'), fine_count=Count('litigants__fines'),
-                      heriot_count=Count('litigants__heriots'), imperc_count=Count('litigants__impercamenta'),
-                      land_count=Count('litigants__lands'))
-
-    page = request.GET.get('page', 1)
-    paginator = Paginator(query_list, 10)
-
-    try:
-        query_list = paginator.page(page)
-    except PageNotAnInteger:
-        query_list = paginator.page(1)
-    except EmptyPage:
-        query_list = paginator.page(paginator.num_pages)
-
-    template = 'case/' + path + '.html'
-
-    context = {
-        'list': query_list,
-        'case': case,
-    }
-
-    data['html_list'] = render_to_string(template, context, request=request)
-
-    return JsonResponse(data)
+# def case_lists(request, pk):
+#
+#     # see person_lists for details on logic.
+#     data = dict()
+#     path = request.path.split('/').pop()
+#     case = models.Case.objects.get(id=pk)
+#     if path == 'litigant_list':
+#         query_list = models.Case.objects.filter(id=pk).prefetch_related('litigants__person', 'litigants__amercements',
+#                                                                         'litigants__capitagia', 'litigants__damages',
+#                                                                         'litigants__fines', 'litigants__heriots',
+#                                                                         'litigants__impercamenta', 'litigants__lands')\
+#             .order_by('litigants__person__last_name', 'litigants__person__first_name')\
+#             .annotate(amercement_count=Count('litigants__amercements'), cap_count=Count('litigants__capitagia'),
+#                       damage_count=Count('litigants__damages'), fine_count=Count('litigants__fines'),
+#                       heriot_count=Count('litigants__heriots'), imperc_count=Count('litigants__impercamenta'),
+#                       land_count=Count('litigants__lands'))
+#
+#     page = request.GET.get('page', 1)
+#     paginator = Paginator(query_list, 10)
+#
+#     try:
+#         query_list = paginator.page(page)
+#     except PageNotAnInteger:
+#         query_list = paginator.page(1)
+#     except EmptyPage:
+#         query_list = paginator.page(paginator.num_pages)
+#
+#     template = 'case/' + path + '.html'
+#
+#     context = {
+#         'list': query_list,
+#         'case': case,
+#     }
+#
+#     data['html_list'] = render_to_string(template, context, request=request)
+#
+#     return JsonResponse(data)
 
 
 class PersonDetailView(DetailView):
 
     model = models.Person
-    queryset = models.Person.objects.all().annotate(amercement_count=Count('cases__amercements'),
-                                                    amercement_max=Max('cases__amercements__amercement__in_denarius'),
-                                                    amercement_min=Min('cases__amercements__amercement__in_denarius'),
-                                                    amercement_avg=Avg('cases__amercements__amercement__in_denarius'),
-                                                    amercement_sum=Sum('cases__amercements__amercement__in_denarius'),
-                                                    fine_count=Count('cases__fines'),
-                                                    fine_max=Max('cases__fines__fine__in_denarius'),
-                                                    fine_min=Min('cases__fines__fine__in_denarius'),
-                                                    fine_avg=Avg('cases__fines__fine__in_denarius'),
-                                                    fine_sum=Sum('cases__fines__fine__in_denarius'),
-                                                    damage_count=Count('cases__damages'),
-                                                    damage_max=Max('cases__damages__damage__in_denarius'),
-                                                    damage_min=Min('cases__damages__damage__in_denarius'),
-                                                    damage_avg=Avg('cases__damages__damage__in_denarius'),
-                                                    damage_sum=Sum('cases__damages__damage__in_denarius'),
-                                                    chevage_count=Count('cases__capitagia'),
-                                                    chevage_max=Max('cases__capitagia__capitagium__in_denarius'),
-                                                    chevage_min=Min('cases__capitagia__capitagium__in_denarius'),
-                                                    chevage_avg=Avg('cases__capitagia__capitagium__in_denarius'),
-                                                    chevage_sum=Sum('cases__capitagia__capitagium__in_denarius'),
-                                                    heriot_count=Count('cases__heriots'),
-                                                    heriot_max=Max('cases__heriots__heriot__in_denarius'),
-                                                    heriot_min=Min('cases__heriots__heriot__in_denarius'),
-                                                    heriot_avg=Avg('cases__heriots__heriot__in_denarius'),
-                                                    heriot_sum=Sum('cases__heriots__heriot__in_denarius'),
-                                                    impercamentum_count=Count('cases__impercamenta'),
-                                                    impercamentum_max=Max('cases__impercamenta__impercamentum__in_denarius'),
-                                                    impercamentum_min=Min('cases__impercamenta__impercamentum__in_denarius'),
-                                                    impercamentum_avg=Avg('cases__impercamenta__impercamentum__in_denarius'),
-                                                    impercamentum_sum=Sum('cases__impercamenta__impercamentum__in_denarius'))
+    queryset = models.Person.objects.annotate(amercement_count=Count('cases__amercements'),
+                                              amercement_max=Max('cases__amercements__amercement__in_denarius'),
+                                              amercement_min=Min('cases__amercements__amercement__in_denarius'),
+                                              amercement_avg=Avg('cases__amercements__amercement__in_denarius'),
+                                              amercement_sum=Sum('cases__amercements__amercement__in_denarius'),
+                                              fine_count=Count('cases__fines'),
+                                              fine_max=Max('cases__fines__fine__in_denarius'),
+                                              fine_min=Min('cases__fines__fine__in_denarius'),
+                                              fine_avg=Avg('cases__fines__fine__in_denarius'),
+                                              fine_sum=Sum('cases__fines__fine__in_denarius'),
+                                              damage_count=Count('cases__damages'),
+                                              damage_max=Max('cases__damages__damage__in_denarius'),
+                                              damage_min=Min('cases__damages__damage__in_denarius'),
+                                              damage_avg=Avg('cases__damages__damage__in_denarius'),
+                                              damage_sum=Sum('cases__damages__damage__in_denarius'),
+                                              capitagium_count=Count('cases__capitagia'),
+                                              capitagium_max=Max('cases__capitagia__capitagium__in_denarius'),
+                                              capitagium_min=Min('cases__capitagia__capitagium__in_denarius'),
+                                              capitagium_avg=Avg('cases__capitagia__capitagium__in_denarius'),
+                                              capitagium_sum=Sum('cases__capitagia__capitagium__in_denarius'),
+                                              heriot_count=Count('cases__heriots'),
+                                              heriot_max=Max('cases__heriots__heriot__in_denarius'),
+                                              heriot_min=Min('cases__heriots__heriot__in_denarius'),
+                                              heriot_avg=Avg('cases__heriots__heriot__in_denarius'),
+                                              heriot_sum=Sum('cases__heriots__heriot__in_denarius'),
+                                              impercamentum_count=Count('cases__impercamenta'),
+                                              impercamentum_max=Max('cases__impercamenta__impercamentum__in_denarius'),
+                                              impercamentum_min=Min('cases__impercamenta__impercamentum__in_denarius'),
+                                              impercamentum_avg=Avg('cases__impercamenta__impercamentum__in_denarius'),
+                                              impercamentum_sum=Sum('cases__impercamenta__impercamentum__in_denarius'))
 
     def get_context_data(self, **kwargs):
         context = super(PersonDetailView, self).get_context_data(**kwargs)
@@ -937,7 +956,6 @@ class SessionDeleteView(GroupRequiredMixin, DeleteView):
     def get_success_url(self):
         return reverse('session:list')
 
-    
 
 class VillageDetailView(DetailView):
 
@@ -1036,8 +1054,8 @@ def RelationshipEditView(request, pk):
 def currency_conversion(request):
 
     data = dict()
-    currency = request.GET.get('currency', '')
-    if currency != '' :
+    currency = request.GET.get('currency', None)
+    if currency is not None:
         converted_currency = CurrencyConverter(currency)
         context = {
             'd': converted_currency.in_denarius,
@@ -1052,3 +1070,218 @@ def currency_conversion(request):
         }
     data['html_data'] = render_to_string('currency_converter_body.html', context, request=request)
     return JsonResponse(data)
+
+
+class ManorDetailView(DetailView):
+
+    model = models.Manor
+    queryset = models.Manor.objects.all().prefetch_related('villages')
+
+    def get_context_data(self, **kwargs):
+        context = super(ManorDetailView, self).get_context_data(**kwargs)
+        context['page_title'] = 'Manor'
+        return context
+
+
+class PeopleFilterView(TemplateView):
+
+    template_name = 'filter/people.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['villages'] = models.Village.objects.filter(Q(person__isnull=False) | Q(session__case__litigants__isnull=False)).order_by('name').distinct()
+        return context
+
+
+@csrf_exempt
+def people_filter_table_view(request):
+    data = dict()
+    if request.method == 'POST':
+        url_params = request.POST.get('url_params', None)
+        context = {
+            'url_params': url_params
+        }
+        data['html_table'] = render_to_string('filter/people_table.html', context, request=request)
+        return JsonResponse(data)
+    else:
+        context = {
+            'url_params': None
+        }
+        data['html_table'] = render_to_string('filter/people_table.html', context, request=request)
+        return JsonResponse(data)
+
+
+class CaseFilterView(TemplateView):
+
+    template_name = 'filter/cases.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['villages'] = models.Village.objects.filter(session__isnull=False).order_by('name').distinct()
+        context['case_types'] = models.CaseType.objects.all()
+        context['verdicts'] = models.Verdict.objects.all()
+        return context
+
+
+@csrf_exempt
+def cases_filter_table_view(request):
+    data = dict()
+    if request.method == 'POST':
+        url_params = request.POST.get('url_params', None)
+        context = {
+            'url_params': url_params
+        }
+        data['html_table'] = render_to_string('filter/cases_table.html', context, request=request)
+        return JsonResponse(data)
+    else:
+        context = {
+            'url_params': None
+        }
+        data['html_table'] = render_to_string('filter/cases_table.html', context, request=request)
+        return JsonResponse(data)
+
+
+class CountyFilterView(TemplateView):
+
+    template_name = 'filter/counties.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
+
+
+@csrf_exempt
+def counties_filter_table_view(request):
+    data = dict()
+    if request.method == 'POST':
+        url_params = request.POST.get('url_params', None)
+        context = {
+            'url_params': url_params
+        }
+        data['html_table'] = render_to_string('filter/counties_table.html', context, request=request)
+        return JsonResponse(data)
+    else:
+        context = {
+            'url_params': None
+        }
+        data['html_table'] = render_to_string('filter/counties_table.html', context, request=request)
+        return JsonResponse(data)
+
+
+class HundredFilterView(TemplateView):
+
+    template_name = 'filter/hundreds.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['counties'] = models.County.objects.filter(hundred__isnull=False).order_by('name').distinct()
+        return context
+
+
+@csrf_exempt
+def hundreds_filter_table_view(request):
+    data = dict()
+    if request.method == 'POST':
+        url_params = request.POST.get('url_params', None)
+        context = {
+            'url_params': url_params
+        }
+        data['html_table'] = render_to_string('filter/hundreds_table.html', context, request=request)
+        return JsonResponse(data)
+    else:
+        context = {
+            'url_params': None
+        }
+        data['html_table'] = render_to_string('filter/hundreds_table.html', context, request=request)
+        return JsonResponse(data)
+
+
+class VillageFilterView(TemplateView):
+
+    template_name = 'filter/villages.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['counties'] = models.County.objects.filter(village__isnull=False).order_by('name').distinct()
+        return context
+
+
+@csrf_exempt
+def villages_filter_table_view(request):
+    data = dict()
+    if request.method == 'POST':
+        url_params = request.POST.get('url_params', None)
+        context = {
+            'url_params': url_params
+        }
+        data['html_table'] = render_to_string('filter/villages_table.html', context, request=request)
+        return JsonResponse(data)
+    else:
+        context = {
+            'url_params': None
+        }
+        data['html_table'] = render_to_string('filter/villages_table.html', context, request=request)
+        return JsonResponse(data)
+
+
+class ArchiveFilterView(TemplateView):
+
+    template_name = 'filter/archives.html'
+
+
+class RecordFilterView(TemplateView):
+
+    template_name = 'filter/records.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['archives'] = models.Archive.objects.filter(record__isnull=False).distinct()
+        context['record_types'] = models.Record.RECORD_TYPE
+        return context
+
+
+@csrf_exempt
+def records_filter_table_view(request):
+    data = dict()
+    if request.method == 'POST':
+        url_params = request.POST.get('url_params', None)
+        context = {
+            'url_params': url_params
+        }
+        data['html_table'] = render_to_string('filter/records_table.html', context, request=request)
+        return JsonResponse(data)
+    else:
+        context = {
+            'url_params': None
+        }
+        data['html_table'] = render_to_string('filter/records_table.html', context, request=request)
+        return JsonResponse(data)
+
+
+class SessionFilterView(TemplateView):
+
+    template_name = 'filter/sessions.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['villages'] = models.Village.objects.filter(session__isnull=False).distinct()
+        context['terms'] = sorted(models.Session.TERM_CHOICES)
+        return context
+
+
+@csrf_exempt
+def sessions_filter_table_view(request):
+    data = dict()
+    if request.method == 'POST':
+        url_params = request.POST.get('url_params', None)
+        context = {
+            'url_params': url_params
+        }
+        data['html_table'] = render_to_string('filter/sessions_table.html', context, request=request)
+        return JsonResponse(data)
+    else:
+        context = {
+            'url_params': None
+        }
+        data['html_table'] = render_to_string('filter/sessions_table.html', context, request=request)
+        return JsonResponse(data)

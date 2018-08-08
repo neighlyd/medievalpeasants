@@ -1,0 +1,83 @@
+<form id="sessionFilterForm" data-url="{% url 'filter:sessions_table' %}">
+        <div class="form-group">
+            <label for="village">Village</label>
+            <select multiple class="form-control" id="village">
+                {% for village in villages %}
+                    <option value="{{ village.id }}">{{ village.name }}</option>
+                {% endfor %}
+            </select>
+            <button type="button" class="btn btn-outline-secondary btn-sm" id="clearVillage">Clear Selection</button>
+        </div>
+        <div class="form-group">
+            <label for="earliestSession">Earliest Session (Year)</label>
+            <input type="number" class="form-control" id="earliestSession" autocomplete="off">
+        </div>
+        <div class="form-group">
+            <label for="latestSession">Latest Session (Year)</label>
+            <input type="number" class="form-control" id="latestSession" autocomplete="off">
+        </div>
+        <div class="form-group">
+                <label for="term">Term</label>
+                <select multiple class="form-control" id="term">
+                    {% for term_id, term_name in terms %}
+                        <option value="{{ term_id }}">{{ term_name }}</option>
+                    {% endfor %}
+                </select>
+                <button type="button" class="btn btn-outline-secondary btn-sm" id="clearTerm">Clear Selection</button>
+            </div>
+        <button class="btn btn-success" id="filterSessionsButton">Search</button>
+    </form>
+
+<script>
+    $('#clearVillage').on('click', function(){
+        $('#village option:selected').prop('selected', false);
+    });
+
+    $('#clearTerm').on('click', function(){
+        $('#term option:selected').prop('selected', false);
+    });
+
+    $('#sessionFilterForm').on('submit', function(e){
+        e.preventDefault();
+
+        let form = $('#sessionFilterForm :input');
+        let values = {};
+        let du = $(this).attr('data-url');
+
+        form.each(function(){
+            values[this.id] = $(this).val();
+        });
+
+        var urlParams = {"url_params": ""};
+        $.each(values, function(key, value){
+            if (value.length !== 0){
+                switch(key){
+                    case 'village':
+                        urlParams["url_params"] = urlParams["url_params"] + '&' + key + '=' + value;
+                        break;
+                    case 'earliestSession':
+                        urlParams["url_params"] = urlParams["url_params"] + '&earliest_session=' + value;
+                        break;
+                    case 'latestSession':
+                        urlParams["url_params"] = urlParams["url_params"] + '&latest_session=' + value;
+                        break;
+                    case 'term':
+                        urlParams["url_params"] = urlParams["url_params"] + '&term=' + value;
+                        break;
+                }
+            }
+        });
+
+        $.ajax({
+            url: du,
+            data: urlParams,
+            type: 'POST',
+            dataType: 'json',
+            success: function(data){
+                $('#tableBody').html(data.html_table);
+                $('#filterModal').modal('hide');
+            },
+        });
+
+    });
+</script>

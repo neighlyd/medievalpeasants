@@ -1,0 +1,83 @@
+<table class="table table-bordered table-hover" id="peopleTable" data-page-length="25">
+    <thead>
+        <th>Name</th>
+        <th>Village</th>
+        <th>Status</th>
+        <th>Gender</th>
+        <th>Earliest Case</th>
+        <th>Latest Case</th>
+    </thead>
+</table>
+
+<script>
+    var urlParams = "{{ url_params }}";
+    var du = Urls['api:person-list']() + "?format=datatables&expand=village,earliest_case,latest_case" + urlParams;
+    $("#peopleTable").DataTable().destroy();
+    var peopleTable = $('#peopleTable').DataTable({
+            order: [0, "asc"],
+            scrollX: true,
+            scrollY: 500,
+            scrollCollapse: true,
+            paging: true,
+            serverSide: true,
+            ajax: du,
+            "columns": [
+                {data: "full_name",
+                    defaultContent: '',
+                    render: {
+                        display: function(data, type, row){
+                            var url = Urls['person:detail'](row.id);
+                            return "<a href='" + url + "'>" + data + "</a>";
+                        },
+                    }
+                },
+                {data: "village",
+                    name: 'village.name',
+                    defaultContent: '',
+                    render: {
+                        display: function(data, type, row){
+                            var url = Urls['village:detail'](data.id);
+                            return "<a href='" + url + "'>" + data.name + "</a>";
+                        },
+                    }
+                },
+                {data: "status_display",
+                    searchable: false,
+                    name: 'status'
+                },
+                {data: "gender_display",
+                    searchable: false,
+                    name: 'gender'
+                },
+                {data: 'earliest_case',
+                    name: 'earliest_case.session.date, earliest_case.session.village.name',
+                    defaultContent: '',
+                    render: {
+                        display: function(data, type, row){
+                            if (data){
+                                var url = Urls['case:detail'](data.id);
+                                return "<a href='" + url + "'>" + data.session.village.name + ' | ' + data.session.law_term + ', ' + data.session.year + "</a>";
+                            } else {
+                                return 'N/A';
+                            }
+                        }
+                    }
+                },
+                {data: 'latest_case',
+                    name: 'latest_case.session.date, latest_case.session.village.name',
+                    defaultContent: '',
+                    render: {
+                        display: function (data, type, row) {
+                            if (data) {
+                                var url = Urls['case:detail'](data.id);
+                                return "<a href='" + url + "'>" + data.session.village.name + ' | ' + data.session.law_term + ', ' + data.session.year + "</a>";
+                            } else {
+                                return 'N/A';
+                            }
+                        }
+                    }
+                },
+            ],
+
+        });
+</script>

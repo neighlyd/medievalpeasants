@@ -1,0 +1,94 @@
+<table class="table table-bordered table-hover" id="caseTable" data-page-length="25">
+    <thead>
+        <th>Notes</th>
+        <th>Case ID</th>
+        <th>Village</th>
+        <th>Session</th>
+        <th>Court Type</th>
+        <th>Case Type</th>
+        <th>Verdict</th>
+        <th>Litigant Count</th>
+        <th>Pledge Count</th>
+        <th>Of Note?</th>
+    </thead>
+</table>
+
+<script>
+    var urlParams = "{{ url_params }}";
+    var du = Urls['api:case-list']() + "?format=datatables&expand=session" + urlParams;
+    var caseTable = $('#caseTable').DataTable({
+        scrollX: true,
+        scrollY: 500,
+        scrollCollapse: true,
+        paging: true,
+        serverSide: true,
+        ajax: du,
+        order: [[3, "asc"], [4, "asc"]],
+        "columns": [
+            {
+                class: 'details-control',
+                orderable: false,
+                data: 'summary',
+                defaultContent: '',
+                render: checkNotes,
+                width:'15px'
+            },
+            {data: "id",
+                defaultContent: '',
+                render: {
+                    display: function(data, type, row){
+                    var url = Urls['case:detail'](data);
+                    return "<a href='"+ url +"'>" + data + "</a>"
+                    }
+                }
+            },
+            {data: "session.village",
+                defaultContent: '',
+                name: 'session.village.name',
+                render:{
+                    display: function(data, type, row, meta){
+                        var url = Urls['village:detail'](data.id);
+                        return "<a href='" + url + "'>" + data.name + "</a>";
+                    }
+                }
+            },
+            {data: "session",
+                defaultContent: '',
+                name: 'session.date, session.village.name',
+                render:{
+                    display: function(data, type, row, meta){
+                        var url = Urls['session:detail'](data.id);
+                        return "<a href='" + url + "'>" + data.law_term + ', ' + data.human_date + "</a>";
+
+                    },
+                }
+            },
+            {data: "court_type",
+                searchable: false,
+            },
+            {data: "case_type.case_type",
+                name: 'case_type.case_type',
+            },
+            {data: "verdict.verdict",
+                name: 'verdict.verdict',
+            },
+            {data: "litigant_count",
+                searchable: false,
+                orderable: false,
+            },
+            {data: "pledge_count",
+                searchable: false,
+                orderable: false,
+            },
+            {data: "of_interest",
+                defaultContent: '',
+                searchable: false,
+                orderable: false,
+                render:{
+                    display: checkMaker,
+                }
+            },
+        ],
+
+    });
+</script>

@@ -26,7 +26,7 @@
         <a class="list-group-item list-group-item-action" data-toggle="list" role="tab" href="#list_pledges" data-url="{% url 'case:pledges' case.id %}" aria-controls="list_pledges" aria-selected="false">Show Pledges</a>
     {% endif %}
     <br/>
-    {% if case.cap_count > 0 %}
+    {% if case.capitagium_count > 0 %}
         <div class="card">
             <span data-toggle="collapse" data-target="#capitagiumAccordionCollapse" aria-expanded="true" aria-controls="capitagiumAccordion">
             <div class="card-header bg-grey" id="capitagiumAccordion">

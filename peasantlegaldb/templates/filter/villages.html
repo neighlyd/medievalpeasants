@@ -1,0 +1,95 @@
+<form id="villageFilterForm" data-url="{% url 'filter:villages_table' %}">
+    <div class="form-group">
+        <label for="county">County</label>
+        <select multiple class="form-control" id="county">
+            {% for county in counties %}
+                <option value="{{ county.id }}">{{ county.name }}</option>
+            {% endfor %}
+        </select>
+        <button type="button" class="btn btn-outline-secondary btn-sm" id="clearCounty">Clear Selection</button>
+    </div>
+    <div class="form-group">
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="gridRadios" id="cases_present" value="cases_present">
+          <label class="form-check-label" for="cases_present">Cases in D.B.</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="gridRadios" id="cases_null" value="cases_null">
+          <label class="form-check-label" for="cases_null">No Cases in D.B.</label>
+        </div>
+        <button type="button" class="btn btn-outline-secondary btn-sm" id="clearCaseCount">Clear Selection</button>
+    </div>
+    <div class="form-group">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="ancient_demesne" value="ancient_demesne">
+              <label class="form-check-label" for="ancient_demesne">Ancient Demesne</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="great_rumor" value="great_rumor">
+              <label class="form-check-label" for="great_rumor">Great Rumor</label>
+            </div>
+</div>
+    <button class="btn btn-success" id="filterVillagesButton">Search</button>
+</form>
+
+<script>
+    $('#clearCounty').on('click', function(){
+        $('#county option:selected').prop('selected', false);
+    });
+
+    $('#clearCaseCount').on('click', function(){
+        $('input[id="cases_present"]').prop('checked', false);
+        $('input[id="cases_null"]').prop('checked', false);
+    });
+
+    $('#villageFilterForm').on('submit', function(e){
+        e.preventDefault();
+
+        let form = $('#villageFilterForm :input');
+        let values = {};
+        let du = $(this).attr('data-url');
+
+        let cases_present = $('#cases_present').is(':checked');
+        let cases_null = $('#cases_null').is(':checked');
+        let ancient_demesne = $('#ancient_demesne').is(':checked');
+        let great_rumor = $('#great_rumor').is(':checked');
+
+        form.each(function(){
+            values[this.id] = $(this).val();
+        });
+
+        var urlParams = {"url_params": ""};
+        $.each(values, function(key, value){
+            if (value.length !== 0){
+                switch(key){
+                    case 'county':
+                        urlParams["url_params"] = urlParams["url_params"] + '&county=' + value;
+                        break;
+                }
+            }
+        });
+        if (cases_present){
+            urlParams["url_params"] = urlParams["url_params"] + '&cases_present=true';
+        } else if (cases_null){
+            urlParams["url_params"] = urlParams["url_params"] + '&cases_present=false';
+        }
+        if (ancient_demesne){
+            urlParams["url_params"] = urlParams["url_params"] + '&ancient_demesne=false';
+        }
+        if (great_rumor){
+            urlParams["url_params"] = urlParams["url_params"] + '&great_rumor=false';
+        }
+
+        $.ajax({
+            url: du,
+            data: urlParams,
+            type: 'POST',
+            dataType: 'json',
+            success: function(data){
+                $('#tableBody').html(data.html_table);
+                $('#filterModal').modal('hide');
+            },
+        });
+
+    });
+</script>

@@ -1,0 +1,73 @@
+    <form id="FilterForm" data-url="{% url 'filter:records_table' %}">
+            <div class="form-group">
+                <label for="archive">Archive</label>
+                <select multiple class="form-control" id="archive">
+                    {% for archive in archives %}
+                        <option value="{{ archive.id }}">{{ archive.name }}</option>
+                    {% endfor %}
+                </select>
+            <button type="button" class="btn btn-outline-secondary btn-sm" id="clearArchive">Clear Selection</button>
+            </div>
+            <div class="form-group">
+                <label for="recordType">Case Type</label>
+                <select multiple class="form-control" id="recordType">
+                    {% for type_id, type_name in record_types %}
+                        <option value="{{ type_id }}">{{ type_name }}</option>
+                    {% endfor %}
+                </select>
+            <button type="button" class="btn btn-outline-secondary btn-sm" id="clearRecordType">Clear Selection</button>
+            </div>
+    <button class="btn btn-success" id="filterRecordsButton">Search</button>
+    </form>
+
+<script>
+    $('#clearArchive').on('click', function(){
+        $('#archive option:selected').prop('selected', false);
+    });
+
+    $('#clearRecordType').on('click', function(){
+        $('#recordType option:selected').prop('selected', false);
+    });
+
+    $('#FilterForm').on('submit', function(e) {
+        e.preventDefault();
+
+        let form = $('#FilterForm :input');
+        let values = {};
+
+        form.each(function () {
+            values[this.id] = $(this).val();
+        });
+
+        let urlParams = {url_params: ""};
+        let du = $(this).attr('data-url');
+        $.each(values, function (key, value) {
+            if (value.length !== 0) {
+                switch (key) {
+                    case 'archive':
+                        urlParams['url_params'] = urlParams['url_params'] + "&" + key + "=" + value;
+                        break;
+                    case 'recordType':
+                        urlParams['url_params'] = urlParams['url_params'] + "&record_type=" + value;
+                        break;
+                    case 'earliestCase':
+                        urlParams['url_params'] = urlParams['url_params'] + "&earliest_case=" + value;
+                        break;
+                    case 'latestCase':
+                        urlParams['url_params'] = urlParams['url_params'] + "&latest_case=" + value;
+                        break;
+                }
+            }
+        });
+        $.ajax({
+            url: du,
+            data: urlParams,
+            type: 'POST',
+            dataType: 'json',
+            success: function(data){
+                $('#tableBody').html(data.html_table);
+                $('#filterModal').modal('hide');
+            },
+        });
+    });
+</script>

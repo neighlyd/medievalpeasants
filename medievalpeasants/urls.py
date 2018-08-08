@@ -13,7 +13,6 @@ Including another URLconf
     1. Import the include() function: from django.conf.urls import url, include
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
-
 from django.conf.urls import url, include
 from django.contrib import admin
 from django.views.generic import TemplateView
@@ -30,7 +29,6 @@ urlpatterns = [
     url(r'^acknowledgements/', TemplateView.as_view(template_name='acknowledgements.html'), name='acknowledgements'),
     # registration is currently disabled. Uncomment later to enable registration.
     # url(r'^register/', accounts_views.register, name='register'),
-
 ]
 
 # Account urls (e.g. registration, pw reset, login, etc.) are in accounts/urls.py. They are then imported to the main

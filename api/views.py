@@ -263,7 +263,7 @@ class PersonViewSet(ChainFilterQueryMixin, FlexFieldsModelViewSet):
     chain = {
         'county_to_litigant': {'field': 'cases.case.session.village.county'},
         'county_to_resident': {'field': 'village.county'},
-        'village_to_resident': {'field': 'village',},
+        'village_to_resident': {'field': 'village'},
         'village_to_litigant': {'field': 'cases.case.session.village',},
         # 'village_to_both': {'field': ('village', 'cases.case.session.village')},
         'hundred_to_litigant': {'field': 'cases.case.session.village.hundred'},

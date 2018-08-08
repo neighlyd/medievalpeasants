@@ -1,0 +1,52 @@
+<div class="card card-body">
+    <table class="table table-bordered table-hover" id="archive_table" data-page-length="25">
+        <thead>
+            <th>Name</th>
+            <th>Website</th>
+            <th>Notes</th>
+            <th>Records</th>
+            <th>Sessions</th>
+            <th>Cases</th>
+        </thead>
+    </table>
+</div>
+
+<script>
+    var archiveDataUrl = Urls['api:archive-list']() + '?format=datatables';
+    var archive_table = $('#archive_table').DataTable({
+        serverSide: true,
+        ajax: archiveDataUrl,
+        scrollX: true,
+        columns: [
+            {data: "name",
+                fnCreatedCell: function(nTd, cellData, rowData, row, col) {
+                    $(nTd).html("<a href='" + '/archive/' + rowData.id + "'>" + rowData.name + "</a>");
+                }
+            },
+            {data: "website",
+                defaultContent: '',
+                render:{
+                    display: function(data, type, row, col){
+                        if (data){
+                            return "<a href='" + (data) + "'> Website </a>"
+                        }
+                    }
+                }
+            },
+            {data: "notes"},
+            {data: "counts.record",
+                searchable: false,
+                orderable: false,
+            },
+            {data: "counts.session",
+                searchable: false,
+                orderable: false,
+            },
+            {data: "counts.case",
+                searchable: false,
+                orderable: false,
+            },
+        ],
+
+    });
+</script>

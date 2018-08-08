@@ -1,0 +1,99 @@
+<table class="table table-bordered table-hover" id="recordTable" data-page-length="25">
+    <thead>
+        <th></th>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Archive</th>
+        <th>Reel</th>
+        <th>Earliest Session</th>
+        <th>Latest Session</th>
+        <th>Sessions</th>
+        <th>Cases</th>
+    </thead>
+</table>
+
+<script>
+    var urlParams = "{{ url_params }}";
+    var du = Urls['api:record-list']() + "?format=datatables&expand=sessions,archive" + urlParams;
+    var recordTable = $('#recordTable').DataTable({
+        serverSide: true,
+        ajax: du,
+        order: [1, "asc"],
+        columns: [
+            {
+                class: "details-control",
+                orderable: false,
+                data: "sessions",
+                defaultContent: "",
+                render: checkNotes,
+                width:"15px"
+            },
+            {data: "name",
+                render: {
+                    display: function(data, type, row){
+                        url = Urls['record:detail'](row.id);
+                        return "<a href='"+ url +"'>" + data + "</a>"
+                    }
+                }
+            },
+            {data: "record_type"},
+            {data: "archive.name",
+                render: {
+                    display: function(data, type, row){
+                        url = Urls['archive:detail'](row.archive.id)
+                        return "<a href='"+ url +"'>" + data + "</a>"
+                    }
+                }
+            },
+            {data: "reel"},
+            {data: "earliest_session",
+                searchable: false,
+                orderable: false,
+                defaultContent: '',
+                render: {
+                    display: formatSessionDate,
+                }
+            },
+            {data: "latest_session",
+                searchable: false,
+                orderable: false,
+                defaultContent: '',
+                render: {
+                    display: formatSessionDate,
+                }
+            },
+            {data: "counts",
+                defaultContent: '',
+                searchable: false,
+                orderable: false,
+
+                render: {
+                    display: function (data, type, row, meta) {
+                            if (data.session) {
+                                return data.session;
+                            } else {
+                                return "N/A";
+                            }
+                        },
+                    sort: "session",
+                }
+            },
+            {data: "counts",
+                defaultContent: '',
+                searchable: false,
+                orderable: false,
+
+                render: {
+                    display: function (data, type, row, meta) {
+                            if (data.case) {
+                                return data.case;
+                            } else {
+                                return "N/A";
+                            }
+                        },
+                    sort: "case",
+                }
+            },
+        ]
+    });
+</script>

@@ -664,7 +664,7 @@ class Session(models.Model):
     # Hilary - January to April
     # Easter - April to May (Hockday in Glastonbury Records)
     # Trinity - June to July
-    # Michaelas - October to December
+    # Michaelmas - October to December
     date = models.DateField()
     law_term = models.IntegerField(choices=TERM_CHOICES)
     folio = models.CharField(max_length=50)

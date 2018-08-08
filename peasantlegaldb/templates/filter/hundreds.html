@@ -1,0 +1,50 @@
+    <form id="hundredsFilterForm" data-url="{% url 'filter:hundreds_table' %}">
+        <div class="form-group">
+                <label for="county">County</label>
+                <select multiple class="form-control" id="county">
+                    {% for county in counties %}
+                        <option value="{{ county.id }}">{{ county.name }}</option>
+                    {% endfor %}
+                </select>
+                <button type="button" class="btn btn-outline-secondary btn-sm" id="clearCounty">Clear Selection</button>
+            </div>
+        <button class="btn btn-success" id="filterHundredsButton">Search</button>
+    </form>
+
+<script>
+    $('#clearCounty').on('click', function(){
+        $('#county option:selected').prop('selected', false);
+    });
+
+    $('#hundredsFilterForm').on('submit', function(e){
+        e.preventDefault();
+        let form = $('#hundredsFilterForm :input');
+        let values = {};
+        let du = $(this).attr('data-url');
+
+        form.each(function(){
+            values[this.id] = $(this).val();
+        });
+
+        var urlParams = {"url_params": ""};
+        $.each(values, function(key, value){
+            if(value.length !== 0){
+                switch(key){
+                    case 'county':
+                        urlParams['url_params'] = urlParams['url_params'] + '&county=' + value;
+                        break;
+                }
+            }
+        });
+        $.ajax({
+            url: du,
+            data: urlParams,
+            type: 'POST',
+            dataType: 'json',
+            success: function(data){
+                $('#tableBody').html(data.html_table);
+                $('#filterModal').modal('hide');
+            },
+        });
+    });
+</script>

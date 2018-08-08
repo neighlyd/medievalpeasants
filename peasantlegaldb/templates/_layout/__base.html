@@ -1,10 +1,7 @@
 {% load static %}
 {% load template_tags %}
-
-<!DOCTYPE html>
-
-<html>
-
+<!DOCTYPE HTML>
+<html lang="en">
     <head>
         <meta charset="utf-8">
         <meta http-equiv="Content-Language" content="en">
@@ -41,11 +38,8 @@
                 })
             </script>
         {% endblock %}
-
     </head>
-
-        <body>
-
+    <body>
         {% block navbar %}
             {% include '_layout/__navbar.html' %}
         {% endblock %}
@@ -63,10 +57,7 @@
                 {% include 'currency_conversion.html' %}
             </div>
         {% endblock %}
-
-
-
-        </body>
+    </body>
 </html>
 
 

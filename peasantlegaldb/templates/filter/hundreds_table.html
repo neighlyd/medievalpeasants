@@ -1,0 +1,45 @@
+<table class="table table-bordered table-hover" id="hundredTable" data-page-length="10">
+    <thead>
+        <th>Hundred</th>
+        <th>County</th>
+        <th>Village Count</th>
+    </thead>
+</table>
+
+<script>
+    var urlParams = "{{ url_params }}";
+    var du = Urls['api:hundred-list']() + "?format=datatables&expand=county" + urlParams;
+    $('#hundredTable').DataTable().destroy();
+    var hundredTable = $("#hundredTable").DataTable({
+        scrollX: true,
+        serverSide: true,
+        ajax: du,
+        columns: [
+            {data: "name",
+                render: {
+                    display: function(data, type, row){
+                        var url = Urls['hundred:detail'](row.id);
+                        return '<a href="' + url + '">' + data + '</a>';
+                    }
+                }
+            },
+            {data: "county.name",
+                defaultContent: '',
+                render: {
+                    display: function(data, type, row, meta){
+                        if (data){
+                            var url = Urls['county:detail'](row.county.id);
+                            return '<a href="' + url + '">' + row.county.name + '</a>';
+                        } else {
+                            return 'N/A'
+                        }
+                    }
+                }
+            },
+            {data: "counts.village",
+                searchable: false,
+                orderable: false,
+            }
+        ]
+    });
+</script>

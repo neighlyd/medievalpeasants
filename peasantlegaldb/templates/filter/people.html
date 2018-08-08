@@ -1,0 +1,180 @@
+<form id="peopleFilterForm" data-url="{% url 'filter:people_table' %}">
+        <div class="form-group">
+            <label for="name">Name</label>
+            <input type="text" class="form-control" id="name" autocomplete="off">
+        </div>
+        <div class="form-group">
+            <label for="gender">Gender</label>
+            <select multiple class="form-control" id="gender">
+                <option value="f">Female</option>
+                <option value="m">Male</option>
+                <option value="u">Unknown</option>
+            </select>
+            <button type="button" class="btn btn-outline-secondary btn-sm" id="clearGender">Clear Selection</button>
+        </div>
+        <div class="form-group">
+            <label for="status">Status</label>
+            <select multiple class="form-control" id="status">
+                <option value="1">Villein</option>
+                <option value="2">Free</option>
+                <option value="3">Unknown</option>
+                <option value="4">Institution</option>
+            </select>
+            <button type="button" class="btn btn-outline-secondary btn-sm" id="clearStatus">Clear Selection</button>
+        </div>
+        <div class="form-group">
+            <label for="village">Village</label>
+            <select multiple class="form-control" id="village">
+                {% for village in villages %}
+                    <option value="{{ village.id }}">{{ village.name }}</option>
+                {% endfor %}
+            </select>
+        <div class="text-left">
+
+            Filter for
+            <small class="text-muted">
+                (AND)
+            </small>:
+            <br/>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" id="residentCheckbox" value="">
+                <label class="form-check-label" for="residentCheckbox">Resided in</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" id="litigantCheckbox" value="">
+                <label class="form-check-label" for="litigantCheckbox">Litigated in</label>
+            </div>
+            <button type="button" class="btn btn-outline-secondary btn-sm" id="clearVillage">Clear Selection</button>
+        </div>
+        <br/>
+        <div class="text-left">
+        </div>
+        </div>
+        <div class="form-group">
+            <label for="misc">Additional Filters</label>
+            <select multiple class="form-control" id="misc">
+                <option value="amerced">Amerced</option>
+                <option value="impercamenta">Animals Emparked</option>
+                <option value="heriot">Assessed Heriot</option>
+                <option value="capitagia">In Capitagium</option>
+                <option value="lands">Land</option>
+                <option value="fined">Paid Fine</option>
+                <option value="pledges_given">Pledge Giver</option>
+                <option value="pledges_received">Pledge Receiver</option>
+                <option value="damaged">Received Damages</option>
+            </select>
+            <button type="button" class="btn btn-outline-secondary btn-sm" id="clearMisc">Clear Selection</button>
+        </div>
+        <div class="form-group">
+            <label for="earliestCase">Earliest Case After (Year)</label>
+            <input type="number" class="form-control" id="earliestCase" autocomplete="off">
+        </div>
+        <div class="form-group">
+            <label for="latestCase">Latest Case Before (Year)</label>
+            <input type="number" class="form-control" id="latestCase" autocomplete="off">
+        </div>
+    <button class="btn btn-success" id="filterPeopleButton">Search</button>
+</form>
+
+<script>
+    $('#village').on('click', function(){
+        let res = $('#residentCheckbox').is(':checked');
+        let lit = $('#litigantCheckbox').is(':checked');
+        if ((res === false) && (lit === false)){
+            $('#residentCheckbox').prop('checked', true)
+        }
+    });
+
+    $('#clearGender').on('click', function(){
+        $('#gender option:selected').prop('selected', false);
+    });
+
+    $('#clearStatus').on('click', function(){
+        $('#status option:selected').prop('selected', false);
+    });
+
+    $('#clearVillage').on('click', function(){
+        $('#village option:selected').prop('selected', false);
+        $('#residentCheckbox').prop('checked', false);
+        $('#litigantCheckbox').prop('checked', false);
+    });
+
+    $('#clearMisc').on('click', function(){
+        $('#misc option:selected').prop('selected', false);
+    });
+
+    $('#peopleFilterForm').on('submit', function(e){
+        e.preventDefault();
+
+        let form = $("#peopleFilterForm :input");
+        let values = {};
+        let du = $(this).attr('data-url');
+
+        let litigant = $('#litigantRadio').is(':checked');
+        let resident = $('#residentRadio').is(':checked');
+
+        form.each(function(){
+            values[this.id] = $(this).val();
+        });
+
+        let urlParams = {"url_params": ""};
+        {#Create url to feed into datatables.#}
+        $.each(values, function(key, value){
+            if(value.length !== 0 ){
+                switch(key){
+                    case 'name':
+                        urlParams['url_params'] = urlParams['url_params'] + '&' + key + '=' + value;
+                        break;
+                    case 'gender':
+                        switch(value){
+                            case 'a':
+                                break;
+                            default:
+                                urlParams['url_params'] = urlParams['url_params'] + '&' + key + '=' + value;
+                                break;
+                        }
+                        break;
+                    case 'status':
+                        switch(value){
+                            case 'a':
+                                break;
+                            default:
+                                urlParams['url_params'] = urlParams['url_params'] + '&' + key + '=' + value;
+                                break;
+                        }
+                        break;
+                    case 'village':
+                        if( litigant ){
+                            urlParams['url_params'] = urlParams['url_params'] + '&village_to_litigant=' + value;
+                        }
+                        if ( resident ){
+                            urlParams['url_params'] = urlParams['url_params'] + '&village_to_resident=' + value;
+                        }
+                        break;
+                    case 'misc':
+                        value.forEach(function(subValue){
+                            urlParams['url_params'] = urlParams['url_params'] + '&' + subValue + '=true';
+                        });
+                        break;
+                    case 'earliestCase':
+                        urlParams['url_params'] = urlParams['url_params'] + '&earliest_case=' + value;
+                        break;
+                    case 'latestCase':
+                        urlParams['url_params'] = urlParams['url_params'] + '&latest_case=' + value;
+                        break;
+                }
+            }
+        });
+
+        $.ajax({
+            url: du,
+            data: urlParams,
+            type: 'POST',
+            dataType: 'json',
+            success: function(data){
+                $('#tableBody').html(data.html_table);
+                $('#filterModal').modal('hide');
+            },
+        });
+    });
+</script>
