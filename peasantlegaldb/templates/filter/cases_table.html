@@ -14,6 +14,15 @@
 </table>
 
 <script>
+    function format( d ) {
+        return "<table class='table'>" +
+            "<tr>" +
+            "<td><b>Summary:</b></td>" +
+            "<td>" + d.summary + "</td>" +
+            "</tr>"
+    }
+
+
     var urlParams = "{{ url_params }}";
     var du = Urls['api:case-list']() + "?format=datatables&expand=session" + urlParams;
     var caseTable = $('#caseTable').DataTable({
@@ -89,6 +98,24 @@
                 }
             },
         ],
-
+    });
+    // Used to activate the + expansion and trigger the format function.
+     $('#caseTable tbody').on('click', 'td.details-control', function(){
+        var tr = $(this).closest('tr');
+        var tdi = tr.find('#check');
+        var row = caseTable.row( tr );
+        if (tdi.prop('style').color !== 'gray'){
+            if ( row.child.isShown()) {
+                row.child.hide();
+                tr.removeClass('shown');
+                tdi.first().removeClass('fa-minus-square');
+                tdi.first().addClass('fa-plus-square');
+            } else {
+                row.child( format( row.data() ) ).show();
+                tr.addClass('shown');
+                tdi.first().removeClass('fa-plus-square');
+                tdi.first().addClass('fa-minus-square');
+            }
+        }
     });
 </script>

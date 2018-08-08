@@ -10,6 +10,14 @@
         </table>
 
 <script>
+    function format( data ){
+            return "<table class='table'>" +
+                "<tr>" +
+                "<td><b>Notes</b></td>" +
+                "<td>" + data.notes + "</td>" +
+                "</tr>" +
+                "</table>"
+        }
     var urlParams = "{{ url_params }}";
     var du = Urls['api:village-list']() + "?format=datatables&expand=hundred,county" + urlParams;
     var villageTable = $("#villageTable").DataTable({
@@ -74,4 +82,23 @@
             },
         ]
     });
+
+    $('#villageTable tbody').on('click', 'td.details-control', function(){
+            var tr = $(this).closest('tr');
+            var tdi = tr.find("#check");
+            var row = villageTable.row( tr );
+            if (tdi.prop('style').color !== 'gray'){
+                if ( row.child.isShown() ) {
+                    row.child.hide();
+                    tr.removeClass('shown');
+                    tdi.first().removeClass('fa-minus-square');
+                    tdi.first().addClass('fa-plus-square');
+                } else{
+                    row.child( format( row.data() ) ).show();
+                    tr.addClass('shown');
+                    tdi.first().removeClass('fa-plus-square');
+                    tdi.first().addClass('fa-minus-square');
+                }
+            }
+        });
 </script>

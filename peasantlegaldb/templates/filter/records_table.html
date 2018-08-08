@@ -1,6 +1,5 @@
 <table class="table table-bordered table-hover" id="recordTable" data-page-length="25">
     <thead>
-        <th></th>
         <th>Name</th>
         <th>Type</th>
         <th>Archive</th>
@@ -18,16 +17,8 @@
     var recordTable = $('#recordTable').DataTable({
         serverSide: true,
         ajax: du,
-        order: [1, "asc"],
+        order: [0, "asc"],
         columns: [
-            {
-                class: "details-control",
-                orderable: false,
-                data: "sessions",
-                defaultContent: "",
-                render: checkNotes,
-                width:"15px"
-            },
             {data: "name",
                 render: {
                     display: function(data, type, row){
@@ -96,4 +87,5 @@
             },
         ]
     });
+
 </script>
