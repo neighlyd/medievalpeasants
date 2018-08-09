@@ -1,24 +1,17 @@
-<div class="card">
-    <h3 class="card-header text-center bg-grey">Amercement List</h3>
-    <div class="card-body">
-            <table class="table table-bordered table-hover" id="amercement_list_table" data-ajax="{% url 'api:litigant-list' %}?amercements=true&litigant={{ view.kwargs.pk }}&expand=amercements,case&format=datatables" data-table-length="10">
-                <thead>
-                    <th>Details</th>
-                    <th>Case</th>
-                    <th>Session</th>
-                    <th class="text-center">Amercement</th>
-                    <th>Court</th>
-                    <th>Case Type</th>
-                    <th>Role</th>
-                    <th>Verdict</th>
-                    <th>Litigants</th>
-                </thead>
-            </table>
-    </div>
+<table class="table table-bordered table-hover" id="amercement_list_table" data-ajax="{% url 'api:litigant-list' %}?amercements=true&litigant={{ view.kwargs.pk }}&expand=amercements,case&format=datatables" data-table-length="10">
+    <thead>
+        <th>Details</th>
+        <th>Case</th>
+        <th>Session</th>
+        <th class="text-center">Amercement</th>
+        <th>Court</th>
+        <th>Case Type</th>
+        <th>Role</th>
+        <th>Verdict</th>
+        <th>Litigants</th>
+    </thead>
+</table>
 
-</div>
-
-<!-- used to navigate pagination -->
 <script>
     var format_amercement_summary = function( d ) {
         return "<table class='table'>" +
@@ -39,6 +32,7 @@
     };
 
     var amercement_list_table = $('#amercement_list_table').DataTable({
+
         serverSide: true,
         ajax: {
             source: 'cases.'

@@ -1,124 +1,110 @@
-{% extends '_layout/_l_three_col.html' %}
-
-{% block navbar %}
-    {% include '_layout/__navbar.html' %}
-{% endblock %}
-
-{% block left_sidebar %}
-    <div class="list-group" id="selection_list" role="tablist">
-        <a class="list-group-item list-group-item-action active" data-toggle="list" role="tab" href="#list_cases" data-url="{% url 'village:cases' village.id %}" aria-controls="list_cases" aria-selected="true">Cases</a>
-        <a class="list-group-item list-group-item-action" data-toggle="list" role="tab" href="#list_residents" data-url="{% url 'village:residents' village.id %}" aria-controls="list_residents" aria-selected="false">Residents</a>
-        <a class="list-group-item list-group-item-action" data-toggle="list" role="tab" href="#list_litigants" data-url="{% url 'village:litigants' village.id %}" aria-controls="list_litigants" aria-selected="false">Litigants</a>
-        <a class="list-group-item list-group-item-action" data-toggle="list" role="tab" href="#list_lands" data-url="{% url 'village:lands' village.id %}" aria-controls="list_lands" aria-selected="false">Lands</a>
-        <a class="list-group-item list-group-item-action" data-toggle="list" role="tab" href="#list_sessions" data-url="{% url 'village:sessions' village.id %}" aria-controls="list_sessions" aria-selected="false">Sessions</a>
-        <a class="list-group-item list-group-item-action" data-toggle="list" role="tab" href="#list_mentioned_here" data-url="{% url 'village:mentioned_here' village.id %}" aria-controls="list_mentioned_here" aria-selected="false">Places Mentioned</a>
-        <a class="list-group-item list-group-item-action" data-toggle="list" role="tab" href="#list_mentioned_elsewhere" data-url="{% url 'village:mentioned_elsewhere' village.id %}" aria-controls="list_mentioned_elsewhere" aria-selected="false">Mentioned Elsewhere</a>
-    </div>
-{% endblock %}
+{% extends '_layout/_l_two_col.html' %}
 
 {% block center_bar %}
     <div class="card">
-        <div class="card-header text-center">
+        <div class="card-header text-center bg-grey">
             <h2 class="card-title">{{ village.name }}</h2>
         </div>
         <div class="card-body clearfix" id="main_info">
             <div class="d-flex justify-content-between flex-wrap">
 
-                            <div class="card p-0 col-lg-5">
-                                <h3 class="card-header">Info:</h3>
-                                <div class="card-body">
-                                    <table class="table table-sm">
-                                        <tr class="row m-0">
-                                            <td class="d-inline-block col-4"><b>County:</b></td>
-                                            <td class="d-inline-block col-8"><a href="{% url 'county:detail' village.county.id %}">{{ village.county.name}}</a></td>
-                                        </tr>
-                                        {% if village.hundred_id %}
-                                        <tr class="row m-0">
-                                            <td class="d-inline-block col-4"><b>Hundred:</b></td>
-                                            <td class="d-inline-block col-8"><a href="{% url 'hundred:detail' village.hundred.id %}">{{ village.hundred.name}}</a></td>
-                                        </tr>
-                                        {% endif %}
-                                        <tr class="row m-0">
-                                            <td class="d-inline-block col-4"><b>Great Rumor:</b></td>
-                                            <td class="d-inline-block col-8">{{ village.great_rumor }}</td>
-                                        </tr>
-                                        <tr class="row m-0">
-                                            <td class="d-inline-block col-4"><b>Ancient Demesne:</b></td>
-                                            <td class="d-inline-block col-8">{{ village.ancient_demesne }}</td>
-                                        </tr>
-                                        <tr class="row m-0">
-                                            <td class="d-inline-block col-4"><b>Sessions:</b></td>
-                                            <td class="d-inline-block col-8">{{ village.session_count }}</td>
-                                        </tr>
-                                        <tr class="row m-0">
-                                            <td class="d-inline-block col-4"><b>Cases:</b></td>
-                                            <td class="d-inline-block col-8">{{ village.case_count }}</td>
-                                        </tr>
-                                        <tr class="row m-0">
-                                            <td class="d-inline-block col-4" data-toggle="tooltip" data-placement="top" title="Please be aware of problems using court rolls for demography. See Poos and Smith's critique - 'Legal Windows'"><b>Known Residents*:</b></td>
-                                            <td class="d-inline-block col-8">{{ village.resident_count }}</td>
-                                        </tr>
-                                        <tr class="row m-0">
-                                            <td class="d-inline-block col-4"><b>Litigants:</b></td>
-                                            <td class="d-inline-block col-8">{{ village.litigant_count }}</td>
-                                        </tr>
+                <div class="card p-0 col-lg-5">
+                    <h3 class="card-header bg-grey">Info:</h3>
+                    <div class="card-body">
+                        <table class="table table-sm">
+                            <tr class="row m-0">
+                                <td class="d-inline-block col-4"><b>County:</b></td>
+                                <td class="d-inline-block col-8"><a href="{% url 'county:detail' village.county.id %}">{{ village.county.name}}</a></td>
+                            </tr>
+                            {% if village.hundred_id %}
+                            <tr class="row m-0">
+                                <td class="d-inline-block col-4"><b>Hundred:</b></td>
+                                <td class="d-inline-block col-8"><a href="{% url 'hundred:detail' village.hundred.id %}">{{ village.hundred.name}}</a></td>
+                            </tr>
+                            {% endif %}
+                            <tr class="row m-0">
+                                <td class="d-inline-block col-4"><b>Great Rumor:</b></td>
+                                <td class="d-inline-block col-8">{{ village.great_rumor }}</td>
+                            </tr>
+                            <tr class="row m-0">
+                                <td class="d-inline-block col-4"><b>Ancient Demesne:</b></td>
+                                <td class="d-inline-block col-8">{{ village.ancient_demesne }}</td>
+                            </tr>
+                            <tr class="row m-0">
+                                <td class="d-inline-block col-4"><b>Sessions:</b></td>
+                                <td class="d-inline-block col-8">{{ village.session_count }}</td>
+                            </tr>
+                            <tr class="row m-0">
+                                <td class="d-inline-block col-4"><b>Cases:</b></td>
+                                <td class="d-inline-block col-8">{{ village.case_count }}</td>
+                            </tr>
+                            <tr class="row m-0">
+                                <td class="d-inline-block col-4" data-toggle="tooltip" data-placement="top" title="Please be aware of problems using court rolls for demography. See Poos and Smith's critique - 'Legal Windows'"><b>Known Residents*:</b></td>
+                                <td class="d-inline-block col-8">{{ village.resident_count }}</td>
+                            </tr>
+                            <tr class="row m-0">
+                                <td class="d-inline-block col-4"><b>Litigants:</b></td>
+                                <td class="d-inline-block col-8">{{ village.litigant_count }}</td>
+                            </tr>
 
-                                        <tr class="row m-0">
-                                            <td class="d-inline-block col-4"><b>Notes:</b></td>
-                                            <td class="d-inline-block col-8">{{ village.notes | linebreaksbr }}</td>
-                                        </tr>
+                            <tr class="row m-0">
+                                <td class="d-inline-block col-4"><b>Notes:</b></td>
+                                <td class="d-inline-block col-8">{{ village.notes | linebreaksbr }}</td>
+                            </tr>
 
-                                    </table>
-                                </div>
-                            </div>
+                        </table>
+                    </div>
+                </div>
 
-                            <div class="card p-0 col-lg-6">
-                                <h3 class="card-header">Map:</h3>
-                                    <div class="card-body">
-                                        <div id="map"></div>
-                                        <footer class="blockquote-footer text-right">Historical maps from <cite title="NLS Maps API"><a href="http://maps.nls.uk/projects/api/">NLS Maps API</a></cite></footer>
-                                    </h6>
-                                </div>
-                            </div>
-                        </div>
+                <div class="card p-0 col-lg-6">
+                    <h3 class="card-header bg-grey">Map:</h3>
+                        <div class="card-body">
+                            <div id="map"></div>
+                            <footer class="blockquote-footer text-right">Historical maps from <cite title="NLS Maps API"><a href="http://maps.nls.uk/projects/api/">NLS Maps API</a></cite></footer>
+                        </h6>
+                    </div>
+                </div>
+            </div>
         </div>
-        <br>
-        <div class="tab-content" id="list_info">
-            <div class="tab-pane show active fade" id="list_cases" role="tabpanel">{% include 'village/case_list.html' %}</div>
-            <div class="tab-pane fade" id="list_residents" role="tabpanel"></div>
-            <div class="tab-pane fade" id="list_litigants" role="tabpanel"></div>
-            <div class="tab-pane fade" id="list_lands" role="tabpanel"></div>
-            <div class="tab-pane fade" id="list_sessions" role="tabpanel"></div>
-            <div class="tab-pane fade" id="list_mentioned_here" role="tabpanel"></div>
-            <div class="tab-pane fade" id="list_mentioned_elsewhere" role="tabpanel"></div>
+        <nav class="nav nav-pills mb-2 ml-4" id="selection_list" role="tablist">
+            <a class="nav-item nav-link active" data-toggle="list" role="tab" href="#list_cases" data-url="{% url 'village:cases' village.id %}" aria-controls="list_cases" aria-selected="true">Cases</a>
+            <a class="nav-item nav-link" data-toggle="pills" role="tab" href="#list_residents" data-url="{% url 'village:residents' village.id %}" aria-controls="list_residents" aria-selected="false">Known Residents</a>
+            <a class="nav-item nav-link" data-toggle="pills" role="tab" href="#list_litigants" data-url="{% url 'village:litigants' village.id %}" aria-controls="list_litigants" aria-selected="false">Litigants</a>
+            <a class="nav-item nav-link" data-toggle="pills" role="tab" href="#list_lands" data-url="{% url 'village:lands' village.id %}" aria-controls="list_lands" aria-selected="false">Lands</a>
+            <a class="nav-item nav-link" data-toggle="pills" role="tab" href="#list_sessions" data-url="{% url 'village:sessions' village.id %}" aria-controls="list_sessions" aria-selected="false">Sessions</a>
+            <a class="nav-item nav-link" data-toggle="pills" role="tab" href="#list_mentioned_here" data-url="{% url 'village:mentioned_here' village.id %}" aria-controls="list_mentioned_here" aria-selected="false">Places Mentioned Here</a>
+            <a class="nav-item nav-link" data-toggle="pills" role="tab" href="#list_mentioned_elsewhere" data-url="{% url 'village:mentioned_elsewhere' village.id %}" aria-controls="list_mentioned_elsewhere" aria-selected="false">Mentioned Elsewhere</a>
+        </nav>
+        <div class="card card-body">
+            <div class="tab-content" id="list_info">
+                <div class="tab-pane show active fade" id="list_cases" role="tabpanel">{% include 'village/case_list.html' %}</div>
+                <div class="tab-pane fade" id="list_residents" role="tabpanel"></div>
+                <div class="tab-pane fade" id="list_litigants" role="tabpanel"></div>
+                <div class="tab-pane fade" id="list_lands" role="tabpanel"></div>
+                <div class="tab-pane fade" id="list_sessions" role="tabpanel"></div>
+                <div class="tab-pane fade" id="list_mentioned_here" role="tabpanel"></div>
+                <div class="tab-pane fade" id="list_mentioned_elsewhere" role="tabpanel"></div>
+            </div>
         </div>
     </div>
 {% endblock %}
 
 {% block right_sidebar %}
-
-    <div class="container" style="position: sticky; top: 65px">
-        {% if perms.peasantlegaldb.add_village %}
-            <div class="btn-group" role="group">
-                <a class="btn btn-success" href="#">Add Village</a>
-            </div>
-            <br>
-            <br>
-        {% endif %}
-        {% if perms.peasantlegaldb.change_village %}
-            <div class="btn-group" role="group">
-                <a class="btn btn-warning" href="#">Edit Village</a>
-            </div>
-            <br>
-            <br>
-        {% endif %}
-        {% if perms.peasantlegaldb.delete_village %}
-            <div class="btn-group" role="group">
-                <a class="btn btn-danger" href="#">Delete Village</a>
-            </div>
-        {% endif %}
-    </div>
-
+    {% if perms.peasantlegaldb.add_village %}
+        <div class="btn-group" role="group">
+            <a class="btn btn-success mb-3" href="#">Add Village</a>
+        </div>
+    {% endif %}
+    {% if perms.peasantlegaldb.change_village %}
+        <div class="btn-group" role="group">
+            <a class="btn btn-warning mb-3" href="#">Edit Village</a>
+        </div>
+    {% endif %}
+    {% if perms.peasantlegaldb.delete_village %}
+        <div class="btn-group" role="group">
+            <a class="btn btn-danger" href="#">Delete Village</a>
+        </div>
+    {% endif %}
 {% endblock %}
 
 {% block scripts %}

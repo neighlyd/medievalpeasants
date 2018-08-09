@@ -16,6 +16,7 @@
     var urlParams = "{{ url_params }}";
     var du = Urls['api:session-list']() + "?format=datatables&keep=human_date&expand=village" + urlParams;
     var sessionTable = $("#sessionTable").DataTable({
+
         serverSide: true,
         ajax: du,
         hideEmptyCols: true,

@@ -1,25 +1,15 @@
-<div class="card">
-    <div class="card-header text-center bg-grey">
-        <h3>Case List</h3>
-    </div>
-
-    <div class="card-body">
-        <table class="table table-bordered table-hover" id="case_table" data-ajax="{% url 'api:case-list' %}?archive={{ archive.id }}&expand=session&format=datatables" data-page-length="10">
-            <thead>
-                <th>Notes</th>
-                <th>ID</th>
-                <th>Village</th>
-                <th>Session</th>
-                <th>Court</th>
-                <th>Case Type</th>
-                <th>Verdict</th>
-                <th>Litigants</th>
-            </thead>
-        </table>
-    </div>
-
-</div>
-
+<table class="table table-bordered table-hover" id="case_table" data-ajax="{% url 'api:case-list' %}?archive={{ archive.id }}&expand=session&format=datatables" data-page-length="10">
+    <thead>
+        <th>Notes</th>
+        <th>ID</th>
+        <th>Village</th>
+        <th>Session</th>
+        <th>Court</th>
+        <th>Case Type</th>
+        <th>Verdict</th>
+        <th>Litigants</th>
+    </thead>
+</table>
 <script>
     function format( data ) {
         return "<table class='table'>" +
@@ -31,6 +21,7 @@
     }
 
     var case_table = $("#case_table").DataTable({
+
         serverSide: true,
         order: [3, "asc"],
         "columns": [

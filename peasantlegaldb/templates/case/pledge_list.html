@@ -1,20 +1,18 @@
-<h3 class="card-header text-center bg-grey">Pledges</h3>
-<div class="card-body">
-    <table class="table table-bordered table-hover" id="pledge_table" data-ajax="{% url 'api:pledge-list' %}?case={{ view.kwargs.pk }}&format=datatables&expand=giver,receiver" data-page-length="25">
-        <thead>
-            <th>Grantor</th>
-            <th>Grantor Status</th>
-            <th>Grantor Gender</th>
-            <th>Recipient</th>
-            <th>Recipient Status</th>
-            <th>Recipient Gender</th>
-        </thead>
-    </table>
-</div>
+<table class="table table-bordered table-hover" id="pledge_table" data-ajax="{% url 'api:pledge-list' %}?case={{ view.kwargs.pk }}&format=datatables&expand=giver,receiver" data-page-length="25">
+    <thead>
+        <th>Grantor</th>
+        <th>Grantor Status</th>
+        <th>Grantor Gender</th>
+        <th>Recipient</th>
+        <th>Recipient Status</th>
+        <th>Recipient Gender</th>
+    </thead>
+</table>
 
 <script>
     var pledge_table = $('#pledge_table').dataTable({
-       serverSide: true,
+
+        serverSide: true,
        columns:[
            {data: 'giver.full_name',
                render:{

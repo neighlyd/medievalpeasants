@@ -1,19 +1,14 @@
-<div class="card">
-<h3 class="card-header text-center bg-grey">Case List</h3>
-    <div class="card-body">
-            <table class="table table-bordered table-hover" id="person_table" data-ajax="{% url 'api:person-list' %}?session={{ session.id }}&expand=village,earliest_case,latest_case&format=datatables">
-                <thead>
-                    <th></th>
-                    <th>Person</th>
-                    <th>Village</th>
-                    <th>Status</th>
-                    <th>Gender</th>
-                    <th>Earliest Case</th>
-                    <th>Latest Case</th>
-                </thead>
-            </table>
-    </div>
-</div>
+<table class="table table-bordered table-hover" id="person_table" data-ajax="{% url 'api:person-list' %}?session={{ session.id }}&expand=village,earliest_case,latest_case&format=datatables">
+    <thead>
+        <th></th>
+        <th>Person</th>
+        <th>Village</th>
+        <th>Status</th>
+        <th>Gender</th>
+        <th>Earliest Case</th>
+        <th>Latest Case</th>
+    </thead>
+</table>
 
 <script>
     function format( data ) {
@@ -26,6 +21,7 @@
     }
 
     var person_table = $("#person_table").DataTable({
+
         serverSide: true,
         order: [1, "asc"],
         "columns": [

@@ -1,26 +1,17 @@
-
-<div class="card">
-    <div class="card-header">
-        <h3 class="text-center">Parcel Split History</h3>
-    </div>
-
-    <div class="card-body">
-        <table class="table table-bordered table-hover" id="split_table" data-ajax="{% url 'api:land-split-list' %}?land={{ view.kwargs.pk }}&expand=old_land,new_land&format=datatables" data-page-length="10">
-            <thead>
-                <th>Old Land ID</th>
-                <th>Old Land Parcels</th>
-                <th>Old Land Notes</th>
-                <th>New Land ID</th>
-                <th>New Land Parcels</th>
-                <th>New Land Notes</th>
-            </thead>
-        </table>
-    </div>
-
-</div>
+<table class="table table-bordered table-hover" id="split_table" data-ajax="{% url 'api:land-split-list' %}?land={{ view.kwargs.pk }}&expand=old_land,new_land&format=datatables" data-page-length="10">
+    <thead>
+        <th>Old Land ID</th>
+        <th>Old Land Parcels</th>
+        <th>Old Land Notes</th>
+        <th>New Land ID</th>
+        <th>New Land Parcels</th>
+        <th>New Land Notes</th>
+    </thead>
+</table>
 
 <script>
     var split_table = $('#split_table').DataTable({
+
         serverSide: true,
         columns: [
             {data: "old_land",

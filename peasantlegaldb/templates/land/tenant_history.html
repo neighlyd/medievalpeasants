@@ -1,22 +1,14 @@
-<div class="card">
-    <div class="card-header">
-        <h3 class="text-center">Tenant History</h3>
-    </div>
+<table class="table table-bordered table-hover" id="tenant_table" data-ajax="{% url 'api:landtocase-list' %}?land={{ view.kwargs.pk }}&expand=litigant&format=datatables" data-page-length="10">
+    <thead>
+        <th></th>
+        <th>Name</th>
+        <th>Role</th>
+        <th>Villeinage?</th>
+        <th>Session</th>
+        <th>Case</th>
+    </thead>
+</table>
 
-    <div class="card-body">
-        <table class="table table-bordered table-hover" id="tenant_table" data-ajax="{% url 'api:landtocase-list' %}?land={{ view.kwargs.pk }}&expand=litigant&format=datatables" data-page-length="10">
-            <thead>
-                <th></th>
-                <th>Name</th>
-                <th>Role</th>
-                <th>Villeinage?</th>
-                <th>Session</th>
-                <th>Case</th>
-            </thead>
-        </table>
-    </div>
-
-</div>
 <script>
 
     var format_notes = function format( data ) {
@@ -29,9 +21,10 @@
     }
 
     var tenant_table = $('#tenant_table').DataTable({
+
         serverSide: true,
         order: [[4, "asc"]],
-        "columns": [
+        columns: [
             {
                 class: "details-control",
                 orderable: "false",

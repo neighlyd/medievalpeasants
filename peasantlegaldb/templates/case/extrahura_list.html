@@ -1,23 +1,13 @@
-<h3 class="card-header text-center bg-grey">Extrahura</h3>
-    <div class="card-body">
-            <table class="table table-bordered" id="extrahura_table" data-ajax="{% url 'api:extrahura-list' %}?case={{ view.kwargs.pk }}&keep=amount&expand=animal,price&format=datatables" data-page-length="25">
-                <thead>
-                    <th>Animal</th>
-                    <th>Assessed Price</th>
-                </thead>
-                <tbody>
-                    {% for extrahura in case.extrahura.all %}
-                        <tr>
-                            <td>{{ extrahura.amount }} {{ extrahura.animal }}</td>
-                            <td>{{ extrahura.price }}</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-    </div>
+<table class="table table-bordered" id="extrahura_table" data-ajax="{% url 'api:extrahura-list' %}?case={{ view.kwargs.pk }}&keep=amount&expand=animal,price&format=datatables" data-page-length="25">
+    <thead>
+        <th>Animal</th>
+        <th>Assessed Price</th>
+    </thead>
+</table>
 
 <script>
     var extrahura_table = $("#extrahura_table").dataTable({
+
         serverSide: true,
         columns: [
             {data: 'animal.name',

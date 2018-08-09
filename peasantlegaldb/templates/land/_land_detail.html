@@ -1,23 +1,14 @@
-{% extends '_layout/_l_three_col.html' %}
-
-{% block left_sidebar %}
-    <div class="list-group" id="selection_list" role="tablist">
-        <a class="list-group-item list-group-item-action active" href="#tenant_list" data-url="{% url 'land:tenants' land.id %}" role="tab" data-toggle="list">Tenant History</a>
-        <a class="list-group-item list-group-item-action" href="#case_list" data-url="{% url 'land:cases' land.id %}" role="tab" data-toggle="list">Case History</a>
-        <a class="list-group-item list-group-item-action" href="#split_list" data-url="{% url 'land:split_history' land.id %}" >Land Split History</a>
-    </div>
-{% endblock %}
+{% extends '_layout/_l_two_col.html' %}
 
 {% block center_bar %}
     <div class="card">
-        <div class="card-header text-center">
+        <div class="card-header text-center bg-grey">
             <h2 class="card-title">Land ID: {{ land.id }}</h2>
         </div>
         <div class="card-body clearfix" id="main_info">
             <div class="d-flex justify-content-between flex-wrap">
-
                 <div class="card p-0 col-5">
-                    <h4 class="card-header">Parcels:</h4>
+                    <h4 class="card-header bg-grey">Parcels:</h4>
                         <div class="card-body">
                             <ul class="list-group list-group-flush">
                                 {% for x in land.parcels.all %}
@@ -26,9 +17,8 @@
                             </ul>
                         </div>
                 </div>
-
                 <div class="card p-0 col-6">
-                     <h4 class="card-header">Notes:</h4>
+                     <h4 class="card-header bg-grey">Notes:</h4>
                         <div class="card-body">
 
                             <h6 class="card-text">
@@ -36,42 +26,41 @@
                         </h6>
                     </div>
                 </div>
-
             </div>
         </div>
-        <br>
-        <div class="tab-content" id="list_info">
-            <div class="tab-pane show active fade" id="tenant_list" role="tabpanel">{% include 'land/tenant_history.html' %}</div>
-            <div class="tab-pane fade" id="case_list" role="tabpanel"></div>
-            <div class="tab-pane fade" id="split_list" role="tabpanel"></div>
+        <nav class="nav nav-pills mb-2 ml-4" id="selection_list" role="tablist">
+        <a class="nav-item nav-link active" href="#tenant_list" data-url="{% url 'land:tenants' land.id %}" role="tab" data-toggle="pill">Tenant History</a>
+        <a class="nav-item nav-link" href="#case_list" data-url="{% url 'land:cases' land.id %}" role="tab" data-toggle="pill">Case History</a>
+        <a class="nav-item nav-link" href="#split_list" data-url="{% url 'land:split_history' land.id %}" data-toggle="pill">Land Split History</a>
+    </nav>
+        <div class="card card-body">
+            <div class="tab-content" id="list_info">
+                <div class="tab-pane show active fade" id="tenant_list" role="tabpanel">{% include 'land/tenant_history.html' %}</div>
+                <div class="tab-pane fade" id="case_list" role="tabpanel"></div>
+                <div class="tab-pane fade" id="split_list" role="tabpanel"></div>
+            </div>
         </div>
     </div>
 {% endblock %}
 
 {% block right_sidebar %}
-
-    <div class="container" style="position: sticky; top: 65px">
-        {% if perms.peasantlegaldb.add_land %}
-            <div class="btn-group" role="group">
-                <a class="btn btn-success" href="#">Add Land</a>
-            </div>
-            <br>
-            <br>
-        {% endif %}
-        {% if perms.peasantlegaldb.change_land %}
-            <div class="btn-group" role="group">
-                <a class="btn btn-warning" href="#">Edit Land</a>
-            </div>
-            <br>
-            <br>
-        {% endif %}
-        {% if perms.peasantlegaldb.delete_land %}
-            <div class="btn-group" role="group">
-                <a class="btn btn-danger" href="#">Delete Land</a>
-            </div>
-        {% endif %}
-    </div>
-
+    {% if perms.peasantlegaldb.add_land %}
+        <div class="btn-group" role="group">
+            <a class="btn btn-success mb-3" href="#">Add Land</a>
+        </div>
+    {% endif %}
+    {% if perms.peasantlegaldb.change_land %}
+        <hr>
+        <div class="btn-group" role="group">
+            <a class="btn btn-warning mb-3" href="#">Edit Land</a>
+        </div>
+    {% endif %}
+    {% if perms.peasantlegaldb.delete_land %}
+        <hr>
+        <div class="btn-group" role="group">
+            <a class="btn btn-danger" href="#">Delete Land</a>
+        </div>
+    {% endif %}
 {% endblock %}
 
 {% block scripts %}

@@ -1,25 +1,16 @@
-<div class="card">
-    <div class="card-header">
-        <h3 class="text-center">Case History</h3>
+<table class="table table-bordered table-hover" id="case_table" data-ajax="{% url 'api:case-list' %}?land_id={{ view.kwargs.pk }}&expand=session,litigants&keep=summary,litigants&format=datatables" data-page-length="10">
+    <thead>
+        <th></th>
+        <th>Case</th>
+        <th>Village</th>
+        <th>Session</th>
+        <th>Court</th>
+        <th>Case Type</th>
+        <th>Verdict</th>
+        <th>Litigants</th>
+    </thead>
+</table>
 
-    </div>
-
-    <div class="card-body">
-        <table class="table table-bordered table-hover" id="case_table" data-ajax="{% url 'api:case-list' %}?land_id={{ view.kwargs.pk }}&expand=session,litigants&keep=summary,litigants&format=datatables" data-page-length="10">
-            <thead>
-                <th></th>
-                <th>Case</th>
-                <th>Village</th>
-                <th>Session</th>
-                <th>Court</th>
-                <th>Case Type</th>
-                <th>Verdict</th>
-                <th>Litigants</th>
-            </thead>
-        </table>
-    </div>
-
-</div>
 <script>
 
     var format_litigants = function(data){
@@ -47,6 +38,7 @@
     };
 
     var case_table = $('#case_table').DataTable({
+
         serverSide: true,
         order: [3, "asc"],
         columns: [

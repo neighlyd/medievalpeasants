@@ -1,35 +1,15 @@
-<div class="card" id="relationship_list">
-    <div class="card-header text-center bg-grey">
-        <div class="d-flex justify-content-center">
-            <div class="col-md-4"></div>
-            <div class="col-md-4">
-                <h3 class="text-center">Relationships</h3>
-            </div>
-            <div class="col-md-4">
-            {% if perms.peasantlegaldb.change_person %}
-                <button class="btn btn-success float-right" id="add_relationship" data-url="{% url 'person:add_relationship' view.kwargs.pk %}">Add Relationship</button>
-            {% endif %}
-            </div>
-        </div>
-    </div>
-    <div class="card-body">
-            <table class="table table-bordered table-hover" id="relationship_table" data-ajax="{% url 'api:relationship-list' %}?relations={{ pk }}&expand=person_one,person_two&format=datatables&keep=person_one,person_two" data-table-length="10">
-                <thead>
-                    <th>Relation</th>
-                    <th>Relationship</th>
-                    <th>Confidence</th>
-                    {% if perms.peasantlegaldb.change_person %}
-                    <th>Edit</th>
-                    {% endif %}
-                </thead>
-    </div>
-</div>
-<div class="modal fade" id="modal_relationship">
-    <div class="modal-dialog">
-        <div class="modal-content">
-        </div>
-    </div>
-</div>
+<table class="table table-bordered table-hover" id="relationship_table" data-ajax="{% url 'api:relationship-list' %}?relations={{ pk }}&expand=person_one,person_two&format=datatables&keep=person_one,person_two" data-table-length="10">
+    <thead>
+        <th>Relation</th>
+        <th>Relationship</th>
+        <th>Confidence</th>
+        {% if perms.peasantlegaldb.change_person %}
+        <th>Edit</th>
+        {% endif %}
+    </thead>
+</table>
+
+
 
 <script>
     var url = window.location.pathname;
@@ -37,6 +17,7 @@
 
     {% if perms.peasantlegaldb.change_relationship %}
         var relationship_table = $('#relationship_table').DataTable({
+
             serverSide: true,
             columns: [
                 {data: 'person_one',
@@ -76,6 +57,7 @@
     {% else %}
 
         var relationship_table = $('#relationship_table').DataTable({
+
             serverSide: true,
             columns: [
                 {data: 'person_one',
@@ -105,9 +87,8 @@
         });
     {% endif %}
 
-
-    var loadForm = function(){
-        event.preventDefault();
+    var loadRelationshipForm = function(e){
+        e.preventDefault();
         var url = $(this).attr('data-url');
         $.ajax({
             url: url,
@@ -122,7 +103,7 @@
         })
     };
 
-    var saveForm = function(){
+    var saveRelationshipForm = function(){
         var form = $(this);
         $.ajax({
             url: form.attr('action'),
@@ -141,10 +122,9 @@
     return false
     };
 
-    $('#add_relationship').click(loadForm);
-    $('#modal_relationship').on('submit', '.add_relationship_form', saveForm);
+    $('#add_relationship').click(loadRelationshipForm);
+    $('#modal_relationship').on('submit', '.add_relationship_form', saveRelationshipForm);
 
-    $('#relationship_table').on('click', '.edit_relationship', loadForm);
-    $('#modal_relationship').on('submit', '.edit_relationship_form', saveForm);
-
+    $('#relationship_table').on('click', '.edit_relationship', loadRelationshipForm);
+    $('#modal_relationship').on('submit', '.edit_relationship_form', saveRelationshipForm);
 </script>

@@ -1,21 +1,16 @@
-<div class="card-header">
-    <h3 class="text-center">Resident List</h3>
-</div>
-    <div class="card-body">
-            <table class="table table-bordered table-hover" id="resident_table" data-ajax="{% url 'api:person-list' %}?county_to_resident={{ view.kwargs.pk }}&expand=village,earliest_case,latest_case&format=datatables" data-page-length="10">
-                <thead>
-                    <th>Notes</th>
-                    <th>Name</th>
-                    <th>Village</th>
-                    <th>Status</th>
-                    <th>Gender</th>
-                    <th>Earliest Case</th>
-                    <th>Latest Case</th>
-                    <th>1332 Tax</th>
-                    <th>1379 Tax</th>
-                </thead>
-            </table>
-    </div>
+<table class="table table-bordered table-hover" id="resident_table" data-ajax="{% url 'api:person-list' %}?county_to_resident={{ view.kwargs.pk }}&expand=village,earliest_case,latest_case&format=datatables" data-page-length="10">
+    <thead>
+        <th>Notes</th>
+        <th>Name</th>
+        <th>Village</th>
+        <th>Status</th>
+        <th>Gender</th>
+        <th>Earliest Case</th>
+        <th>Latest Case</th>
+        <th>1332 Tax</th>
+        <th>1379 Tax</th>
+    </thead>
+</table>
 
 <script>
 
@@ -29,76 +24,77 @@
 
             };
 
-        var resident_table = $("#resident_table").DataTable({
-            serverSide: true,
-            order: [1, "asc"],
-            columns: [
-                {
-                    class: "details-control",
-                    orderable: "false",
-                    data: "notes",
-                    defaultContent: "",
-                    render: checkNotes,
-                    width: "15px"
-                },
-                {data: "full_name",
-                    render:{
-                        display: function(data, type, row){
-                            var url = Urls['person:detail'](row.id);
-                            return "<a href='"+ url +"'>" + data + "</a>"
-                        }
-                    }
-                },
-                {data: "village.name",
-                    render:{
-                        display: function(data, type, row){
-                            var url = Urls['village:detail'](row.village.id);
-                            return "<a href='"+ url +"'>" + data + "</a>"
-                        }
-                    }
-                },
-                {data: "status_display",
-                    searchable: false,
-                    orderable: false,
-                },
-                {data: "gender_display",
-                    searchable: false,
-                    orderable: false,
-                },
-                {data: "earliest_case.id",
-                    name: 'earliest_case.session.date',
-                    defaultContent: '',
-                    render:{
-                        display: function(data, type, row){
-                            if (data){
-                                var url = Urls['case:detail'](data);
-                                return "<a href='" + url + "'>" + row.earliest_case.session.law_term + ", " + row.earliest_case.session.year + "</a>";
-                            } else {
-                                return "N/A"
-                            }
-                        }
-                    }
-                },
-                {data: "latest_case.id",
-                    name: 'latest_case.session.date',
-                    defaultContent: '',
-                    render:{
-                        display: function(data, type, row){
-                            if (data){
-                                var url = Urls['case:detail'](data);
-                                return "<a href='" + url + "'>" + row.latest_case.session.law_term + ", " + row.latest_case.session.year + "</a>";
-                            } else {
-                                return "N/A"
-                            }
-                        }
-                    }
-                },
-                {data: "tax_1332"},
-                {data: "tax_1379"},
-            ]
-        });
+    var resident_table = $("#resident_table").DataTable({
 
-       $('#resident_table').on('click', 'td.details-control', function(){
+        serverSide: true,
+        order: [1, "asc"],
+        columns: [
+            {
+                class: "details-control",
+                orderable: "false",
+                data: "notes",
+                defaultContent: "",
+                render: checkNotes,
+                width: "15px"
+            },
+            {data: "full_name",
+                render:{
+                    display: function(data, type, row){
+                        var url = Urls['person:detail'](row.id);
+                        return "<a href='"+ url +"'>" + data + "</a>"
+                    }
+                }
+            },
+            {data: "village.name",
+                render:{
+                    display: function(data, type, row){
+                        var url = Urls['village:detail'](row.village.id);
+                        return "<a href='"+ url +"'>" + data + "</a>"
+                    }
+                }
+            },
+            {data: "status_display",
+                searchable: false,
+                orderable: false,
+            },
+            {data: "gender_display",
+                searchable: false,
+                orderable: false,
+            },
+            {data: "earliest_case.id",
+                name: 'earliest_case.session.date',
+                defaultContent: '',
+                render:{
+                    display: function(data, type, row){
+                        if (data){
+                            var url = Urls['case:detail'](data);
+                            return "<a href='" + url + "'>" + row.earliest_case.session.law_term + ", " + row.earliest_case.session.year + "</a>";
+                        } else {
+                            return "N/A"
+                        }
+                    }
+                }
+            },
+            {data: "latest_case.id",
+                name: 'latest_case.session.date',
+                defaultContent: '',
+                render:{
+                    display: function(data, type, row){
+                        if (data){
+                            var url = Urls['case:detail'](data);
+                            return "<a href='" + url + "'>" + row.latest_case.session.law_term + ", " + row.latest_case.session.year + "</a>";
+                        } else {
+                            return "N/A"
+                        }
+                    }
+                }
+            },
+            {data: "tax_1332"},
+            {data: "tax_1379"},
+        ]
+    });
+
+   $('#resident_table').on('click', 'td.details-control', function(){
         var tr = $(this).closest('tr');
         var tdi = tr.find('#check');
         var row = resident_table.row( tr );

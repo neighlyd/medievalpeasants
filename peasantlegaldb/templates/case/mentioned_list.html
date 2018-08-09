@@ -1,22 +1,20 @@
-<h3 class="card-header text-center bg-grey">Places Mentioned List</h3>
-    <div class="card-body">
-            <table class="table table-bordered" id="mentioned_table" data-ajax="{% url 'api:places-mentioned-list' %}?case={{ view.kwargs.pk }}&expand=village&format=datatables" data-page-length="25">
-                <thead>
-                    <th>Village</th>
-                    <th>County</th>
-                    <th>Great Rumor</th>
-                    <th>Ancient Demesne</th>
-                    <th>Sessions</th>
-                    <th>Cases</th>
-                    <th>Residents</th>
-                    <th>Litigants</th>
-                    <th>Notes</th>
-                </thead>
-            </table>
-    </div>
+<table class="table table-bordered" id="mentioned_table" data-ajax="{% url 'api:places-mentioned-list' %}?case={{ view.kwargs.pk }}&expand=village&format=datatables" data-page-length="25">
+    <thead>
+        <th>Village</th>
+        <th>County</th>
+        <th>Great Rumor</th>
+        <th>Ancient Demesne</th>
+        <th>Sessions</th>
+        <th>Cases</th>
+        <th>Residents</th>
+        <th>Litigants</th>
+        <th>Notes</th>
+    </thead>
+</table>
 
 <script>
     var mentioned_table = $("#mentioned_table").dataTable({
+
         serverSide: true,
         columns:[
             {data: 'village.name',

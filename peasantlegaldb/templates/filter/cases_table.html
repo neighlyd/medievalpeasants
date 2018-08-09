@@ -26,8 +26,7 @@
     var urlParams = "{{ url_params }}";
     var du = Urls['api:case-list']() + "?format=datatables&expand=session" + urlParams;
     var caseTable = $('#caseTable').DataTable({
-        scrollX: true,
-        scrollY: 500,
+
         scrollCollapse: true,
         paging: true,
         serverSide: true,

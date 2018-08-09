@@ -1,19 +1,14 @@
-<div class="card">
-    <h3 class="card-header text-center bg-grey">Positions</h3>
-    <div class="card-body">
-            <table class="table table-bordered table-hover" id="position_table" data-ajax="{% url 'api:position-list' %}?person={{ view.kwargs.pk }}&expand=session&format=datatables" data-table-length="10">
-                <thead>
-                    <th>Title</th>
-                    <th>Session</th>
-                    <th>Definitive</th>
-                </thead>
-
-    </div>
-
-</div>
+<table class="table table-bordered table-hover" id="position_table" data-ajax="{% url 'api:position-list' %}?person={{ view.kwargs.pk }}&expand=session&format=datatables" data-table-length="10">
+    <thead>
+        <th>Title</th>
+        <th>Session</th>
+        <th>Definitive</th>
+    </thead>
+</table>
 
 <script>
     var position_table = $('#position_table').DataTable({
+
         serverSide: true,
         order: [[1, 'asc']],
         columns: [

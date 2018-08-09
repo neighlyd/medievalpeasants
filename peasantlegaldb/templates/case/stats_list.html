@@ -1,0 +1,34 @@
+{% if case.capitagium_count > 0 %}
+        <div class="card">
+            <span data-toggle="collapse" data-target="#capitagiumAccordionCollapse" aria-expanded="true" aria-controls="capitagiumAccordion">
+            <div class="card-header bg-grey" id="capitagiumAccordion">
+                <h5 class="mb-0">
+                    <button class="btn btn-link">Capitagium Info</button>
+                </h5>
+            </div>
+            </span>
+            <div id="capitagiumAccordionCollapse" class="collapse show" aria-labelledby="capitagiumAccordion">
+                <div class="card-body">
+                    <table class="table">
+                        <tr class="row m-0">
+                            <td class="d-inline-block col-4">Sum</td>
+                            <td>{{ case.capitagium_sum }}</td>
+                        </tr>
+                        <tr class="row m-0">
+                            <td class="d-inline-block col-4">Min.</td>
+                            <td>{{ case.capitagium_min|floatformat }}</td>
+                        </tr>
+                        <tr class="row m-0">
+                            <td class="d-inline-block col-4">Max</td>
+                            <td>{{ case.capitagium_max|floatformat }}</td>
+                        </tr>
+                        <tr class="row m-0">
+                            <td class="d-inline-block col-4">Avg.</td>
+                            <td>{{ case.capitagium_avg|floatformat }}</td>
+                        </tr>
+
+                    </table>
+                </div>
+            </div>
+    </div>
+{% endif %}

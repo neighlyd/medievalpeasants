@@ -1,29 +1,23 @@
-{% extends '_layout/_l_three_col.html' %}
-
-{% block navbar %}
-    {% include '_layout/__navbar.html' %}
-{% endblock %}
-
-{% block left_sidebar %}
-    <div class="list-group" id="selection_list" role="tablist">
-        <a class="list-group-item list-group-item-action active" href="#village_list" data-url="{% url 'hundred:villages' hundred.id %}" role="tab" data-toggle="list">Villages</a>
-        <a class="list-group-item list-group-item-action" href="#case_list" data-url="{% url 'hundred:cases' hundred.id %}" role="tab" data-toggle="list">Cases</a>
-        <a class="list-group-item list-group-item-action" href="#resident_list" data-url="{% url 'hundred:residents' hundred.id %}" role="tab" data-toggle="list">Known Residents</a>
-        <a class="list-group-item list-group-item-action" href="#litigant_list" data-url="{% url 'hundred:litigants' hundred.id %}" role="tab" data-toggle="list">Litigants</a>
-    </div>
-{% endblock %}
+{% extends '_layout/_l_two_col.html' %}
 
 {% block center_bar %}
     <div class="card">
-        <div class="card-header text-center">
-            <h2 class="card-title" id="county_name">{{ hundred.name }} </h2>
+        <div class="card-header text-center bg-grey">
+            <h2 class="card-title" id="hundred_name">{{ hundred.name }} </h2>
         </div>
-        <br>
-        <div class="tab-content" id="list_info">
-            <div class="tab-pane show active fade" id="village_list" role="tabpanel">{% include 'hundred/village_list.html' %}</div>
-            <div class="tab-pane fade" id="case_list" role="tabpanel"></div>
-            <div class="tab-pane fade" id="resident_list" role="tabpanel"></div>
-            <div class="tab-pane fade" id="litigant_list" role="tabpanel"></div>
+        <nav class="nav nav-pills" id="selection_list" role="tablist">
+            <a class="nav-item nav-link active" href="#village_list" data-url="{% url 'hundred:villages' hundred.id %}" role="tab" data-toggle="pill">Villages</a>
+            <a class="nav-item nav-link" href="#case_list" data-url="{% url 'hundred:cases' hundred.id %}" role="tab" data-toggle="pill">Cases</a>
+            <a class="nav-item nav-link" href="#resident_list" data-url="{% url 'hundred:residents' hundred.id %}" role="tab" data-toggle="pill">Known Residents</a>
+            <a class="nav-item nav-link" href="#litigant_list" data-url="{% url 'hundred:litigants' hundred.id %}" role="tab" data-toggle="pill">Litigants</a>
+        </nav>
+        <div class="card card-body">
+            <div class="tab-content" id="list_info">
+                <div class="tab-pane show active fade" id="village_list" role="tabpanel">{% include 'hundred/village_list.html' %}</div>
+                <div class="tab-pane fade" id="case_list" role="tabpanel"></div>
+                <div class="tab-pane fade" id="resident_list" role="tabpanel"></div>
+                <div class="tab-pane fade" id="litigant_list" role="tabpanel"></div>
+            </div>
         </div>
     </div>
 {% endblock %}
@@ -33,19 +27,17 @@
     <div class="container" style="position: sticky; top: 65px">
         {% if perms.peasantlegaldb.add_hundred %}
             <div class="btn-group" role="group">
-                <a class="btn btn-success" href="#">Add Hundred</a>
+                <a class="btn btn-success mb-3" href="#">Add Hundred</a>
             </div>
-            <br>
-            <br>
         {% endif %}
         {% if perms.peasantlegaldb.change_hundred %}
+            <hr>
             <div class="btn-group" role="group">
-                <a class="btn btn-warning" href="#">Edit Hundred</a>
+                <a class="btn btn-warning mb-3" href="#">Edit Hundred</a>
             </div>
-            <br>
-            <br>
         {% endif %}
         {% if perms.peasantlegaldb.delete_hundred %}
+            <hr>
             <div class="btn-group" role="group">
                 <a class="btn btn-danger" href="#">Delete Hundred</a>
             </div>

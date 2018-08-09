@@ -1,22 +1,16 @@
-<div class="card">
-    <h3 class="card-header text-center bg-grey">Damages</h3>
-    <div class="card-body">
-            <table class="table table-bordered table-hover" id="damage_table" data-ajax="{% url 'api:litigant-list' %}?litigant={{ view.kwargs.pk }}&damages=true&expand=damages,case&format=datatables" data-table-length="10">
-                <thead>
-                    <th>Details</th>
-                    <th>Case</th>
-                    <th>Session</th>
-                    <th class="text-center">Damages</th>
-                    <th>Court</th>
-                    <th>Case Type</th>
-                    <th>Role</th>
-                    <th>Verdict</th>
-                    <th>Litigants</th>
-                </thead>
-            </table>
-
-    </div>
-</div>
+<table class="table table-bordered table-hover" id="damage_table" data-ajax="{% url 'api:litigant-list' %}?litigant={{ view.kwargs.pk }}&damages=true&expand=damages,case&format=datatables" data-table-length="10">
+    <thead>
+        <th>Details</th>
+        <th>Case</th>
+        <th>Session</th>
+        <th class="text-center">Damages</th>
+        <th>Court</th>
+        <th>Case Type</th>
+        <th>Role</th>
+        <th>Verdict</th>
+        <th>Litigants</th>
+    </thead>
+</table>
 
 <script>
     var format_damage_summary = function( d ) {
@@ -40,6 +34,7 @@
     };
 
     var damage_table = $('#damage_table').DataTable({
+
         serverSide: true,
         order: [[2, 'asc']],
         ajax: {

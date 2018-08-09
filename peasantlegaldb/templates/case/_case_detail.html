@@ -1,67 +1,4 @@
-{% extends '_layout/_l_three_col.html' %}
-
-{% block navbar %}
-    {% include '_layout/__navbar.html' %}
-{% endblock %}
-
-{% block left_sidebar %}
-    <div class="list-group" id="selection_list" role="tablist">
-        <a class="list-group-item list-group-item-action active" data-toggle="list" role="tab" href="#list_litigants" aria-controls="list_litigants" aria-selected="true">Show Litigants</a>
-    {% if case.cornbot_exist %}
-        <a class="list-group-item list-group-item-action" data-toggle="list" role="tab" href="#list_cornbot" data-url="{% url 'case:cornbot' case.id %}" aria-controls="list_cornbot" aria-selected="false">Show Cornbot</a>
-    {% endif %}
-    {% if case.extrahura_exist %}
-        <a class="list-group-item list-group-item-action" data-toggle="list" role="tab" href="#list_extrahura" data-url="{% url 'case:extrahura' case.id %}" aria-controls="list_extrahura" aria-selected="false">Show Extrahura</a>
-    {% endif %}
-    {% if case.land_exist %}
-        <a class="list-group-item list-group-item-action" data-toggle="list" role="tab" href="#list_lands" data-url="{% url 'case:land' case.id %}" aria-controls="list_lands" aria-selected="false">Show Land</a>
-    {% endif %}
-    {% if case.mentioned_exist %}
-        <a class="list-group-item list-group-item-action" data-toggle="list" role="tab" href="#list_places" data-url="{% url 'case:mentioned' case.id %}" aria-controls="list_places" aria-selected="false">Show Places Mentioned</a>
-    {% endif %}
-    {% if case.murrain_exist %}
-        <a class="list-group-item list-group-item-action" data-toggle="list" role="tab" href="#list_murrains" data-url="{% url 'case:murrain' case.id %}" aria-controls="list_murrains" aria-selected="false">Show Murrain</a>
-    {% endif %}
-    {% if case.pledge_exist %}
-        <a class="list-group-item list-group-item-action" data-toggle="list" role="tab" href="#list_pledges" data-url="{% url 'case:pledges' case.id %}" aria-controls="list_pledges" aria-selected="false">Show Pledges</a>
-    {% endif %}
-    <br/>
-    {% if case.capitagium_count > 0 %}
-        <div class="card">
-            <span data-toggle="collapse" data-target="#capitagiumAccordionCollapse" aria-expanded="true" aria-controls="capitagiumAccordion">
-            <div class="card-header bg-grey" id="capitagiumAccordion">
-                <h5 class="mb-0">
-                    <button class="btn btn-link">Capitagium Info</button>
-                </h5>
-            </div>
-            </span>
-            <div id="capitagiumAccordionCollapse" class="collapse show" aria-labelledby="capitagiumAccordion">
-                <div class="card-body">
-                    <table class="table">
-                        <tr class="row m-0">
-                            <td class="d-inline-block col-4">Sum</td>
-                            <td>{{ case.capitagium_sum }}</td>
-                        </tr>
-                        <tr class="row m-0">
-                            <td class="d-inline-block col-4">Min.</td>
-                            <td>{{ case.capitagium_min|floatformat }}</td>
-                        </tr>
-                        <tr class="row m-0">
-                            <td class="d-inline-block col-4">Max</td>
-                            <td>{{ case.capitagium_max|floatformat }}</td>
-                        </tr>
-                        <tr class="row m-0">
-                            <td class="d-inline-block col-4">Avg.</td>
-                            <td>{{ case.capitagium_avg|floatformat }}</td>
-                        </tr>
-
-                    </table>
-                </div>
-            </div>
-        </div>
-    {% endif %}
-    </div>
-{% endblock %}
+{% extends '_layout/_l_two_col.html' %}
 
 {% block center_bar %}
 <div class="card">
@@ -72,8 +9,7 @@
     </div>
     <div class="card-body clearfix" id="main_info">
         <div class="d-flex justify-content-between flex-wrap">
-
-                        <div class="card p-0 col-lg-5">
+            <div class="card p-0 col-lg-5">
                             <h3 class="card-header bg-grey">Case Info:</h3>
                             <div class="card-body">
                                 <table class="table table-sm">
@@ -149,8 +85,7 @@
                                 </table>
                             </div>
                         </div>
-
-                        <div class="card p-0 col-lg-6">
+            <div class="card p-0 col-lg-6">
                             <h3 class="card-header bg-grey">Notes:</h3>
                                 <div class="card-body">
 
@@ -159,44 +94,61 @@
                                 </h6>
                             </div>
                         </div>
-                    </div>
+        </div>
     </div>
-    <br>
-    <div class="tab-content" id="lists">
-        <div class="tab-pane fade show active" id="list_litigants" role="tabpanel">{% include 'case/litigant_list.html' %}</div>
-        <div class="tab-pane fade" id="list_cornbot" role="tabpanel"></div>
-        <div class="tab-pane fade" id="list_extrahura" role="tabpanel"></div>
-        <div class="tab-pane fade" id="list_lands" role="tabpanel"></div>
-        <div class="tab-pane fade" id="list_places" role="tabpanel"></div>
-        <div class="tab-pane fade" id="list_murrains" role="tabpanel"></div>
-        <div class="tab-pane fade" id="list_pledges" role="tabpanel"></div>
+    <nav class="nav nav-pills mb-2 ml-4" id="selection_list" role="tablist">
+        <a class="nav-item nav-link active" data-toggle="pill" role="tab" href="#list_litigants" aria-controls="list_litigants" aria-selected="true">Show Litigants</a>
+    {% if case.cornbot_exist %}
+        <a class="nav-item nav-link" data-toggle="pill" role="tab" href="#list_cornbot" data-url="{% url 'case:cornbot' case.id %}" aria-controls="list_cornbot" aria-selected="false">Show Cornbot</a>
+    {% endif %}
+    {% if case.extrahura_exist %}
+        <a class="nav-item nav-link" data-toggle="pill" role="tab" href="#list_extrahura" data-url="{% url 'case:extrahura' case.id %}" aria-controls="list_extrahura" aria-selected="false">Show Extrahura</a>
+    {% endif %}
+    {% if case.land_exist %}
+        <a class="nav-item nav-link" data-toggle="pill" role="tab" href="#list_lands" data-url="{% url 'case:land' case.id %}" aria-controls="list_lands" aria-selected="false">Show Land</a>
+    {% endif %}
+    {% if case.mentioned_exist %}
+        <a class="nav-item nav-link" data-toggle="pill" role="tab" href="#list_places" data-url="{% url 'case:mentioned' case.id %}" aria-controls="list_places" aria-selected="false">Show Places Mentioned</a>
+    {% endif %}
+    {% if case.murrain_exist %}
+        <a class="nav-item nav-link" data-toggle="pill" role="tab" href="#list_murrains" data-url="{% url 'case:murrain' case.id %}" aria-controls="list_murrains" aria-selected="false">Show Murrain</a>
+    {% endif %}
+    {% if case.pledge_exist %}
+        <a class="nav-item nav-link" data-toggle="pill" role="tab" href="#list_pledges" data-url="{% url 'case:pledges' case.id %}" aria-controls="list_pledges" aria-selected="false">Show Pledges</a>
+    {% endif %}
+    </nav>
+    <div class="card">
+        <div class="card-body">
+            <div class="tab-content" id="lists">
+                <div class="tab-pane fade show active" id="list_litigants" role="tabpanel">{% include 'case/litigant_list.html' %}</div>
+                <div class="tab-pane fade" id="list_cornbot" role="tabpanel"></div>
+                <div class="tab-pane fade" id="list_extrahura" role="tabpanel"></div>
+                <div class="tab-pane fade" id="list_lands" role="tabpanel"></div>
+                <div class="tab-pane fade" id="list_places" role="tabpanel"></div>
+                <div class="tab-pane fade" id="list_murrains" role="tabpanel"></div>
+                <div class="tab-pane fade" id="list_pledges" role="tabpanel"></div>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}
 
 {% block right_sidebar %}
-    <div class="container" style="position: sticky; top: 65px">
-        {% if perms.peasantlegaldb.add_case %}
-            <div class="btn-group" role="group">
-                <a class="btn btn-success" href="{% url 'case:add' %}">Add Case</a>
-            </div>
-            <br>
-            <br>
-        {% endif %}
-        {% if perms.peasantlegaldb.change_case %}
-            <div class="btn-group" role="group">
-                <a class="btn btn-warning" href="{% url 'case:edit' case.pk %}">Edit Case</a>
-            </div>
-            <br>
-            <br>
-        {% endif %}
-        {% if perms.peasantlegaldb.delete_case %}
-            <div class="btn-group" role="group">
-                <a class="btn btn-danger" href="#">Delete Case</a>
-            </div>
-        {% endif %}
-    </div>
-
+    {% if perms.peasantlegaldb.add_case %}
+        <div class="btn-group mb-3" role="group">
+            <a class="btn btn-success" href="{% url 'case:add' %}">Add Case</a>
+        </div>
+    {% endif %}
+    {% if perms.peasantlegaldb.change_case %}
+        <div class="btn-group mb-3" role="group">
+            <a class="btn btn-warning" href="{% url 'case:edit' case.pk %}">Edit Case</a>
+        </div>
+    {% endif %}
+    {% if perms.peasantlegaldb.delete_case %}
+        <div class="btn-group" role="group">
+            <a class="btn btn-danger" href="#">Delete Case</a>
+        </div>
+    {% endif %}
 {% endblock %}
 
 {% block scripts %}

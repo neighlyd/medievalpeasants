@@ -1,26 +1,20 @@
-{% load template_tags %}
-{% if case.litigants.all %}
-<h3 class="card-header text-center bg-grey">Litigants</h3>
-
-<div class="card-body clearfix" id="main_info">
-    <table class="table table-bordered table-hover" id="litigant_table" style="width:100%" data-ajax="{% url 'api:litigant-list' %}?case={{ view.kwargs.pk }}&expand=person,amercements,capitagia,damages,fines,heriots,impercamenta,lands,pledges&format=datatables" data-page-length="25">
-        <thead>
-            <th>Name</th>
-            <th>Role</th>
-            <th>Ad Prox.</th>
-            <th>Distrain</th>
-            <th>Attach</th>
-            <th>Bail</th>
-            <th>Amercements</th>
-            <th>Capitagia</th>
-            <th>Damages</th>
-            <th>Fines</th>
-            <th>Heriot</th>
-            <th>Impercamenta</th>
-            <th>Lands</th>
-        </thead>
-    </table>
-</div>
+<table class="table table-bordered table-hover" id="litigant_table" style="width:100%" data-ajax="{% url 'api:litigant-list' %}?case={{ view.kwargs.pk }}&expand=person,amercements,capitagia,damages,fines,heriots,impercamenta,lands,pledges&format=datatables" data-page-length="25">
+    <thead>
+        <th>Name</th>
+        <th>Role</th>
+        <th>Ad Prox.</th>
+        <th>Distrain</th>
+        <th>Attach</th>
+        <th>Bail</th>
+        <th>Amercements</th>
+        <th>Capitagia</th>
+        <th>Damages</th>
+        <th>Fines</th>
+        <th>Heriot</th>
+        <th>Impercamenta</th>
+        <th>Lands</th>
+    </thead>
+</table>
 
 <script>
 
@@ -130,6 +124,7 @@
 
 
     var litigant_table = $("#litigant_table").DataTable({
+
         serverSide: true,
         hideEmptyCols: {
             columns: [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
@@ -263,4 +258,3 @@
     })
 
 </script>
-{% endif %}

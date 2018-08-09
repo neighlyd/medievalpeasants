@@ -21,7 +21,7 @@
     var urlParams = "{{ url_params }}";
     var du = Urls['api:village-list']() + "?format=datatables&expand=hundred,county" + urlParams;
     var villageTable = $("#villageTable").DataTable({
-        scrollX: true,
+
         serverSide: true,
         ajax: du,
         order: [1, "asc"],

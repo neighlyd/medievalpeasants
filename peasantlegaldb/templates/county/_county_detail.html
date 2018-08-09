@@ -1,28 +1,14 @@
-{% extends '_layout/_l_three_col.html' %}
-
-{% block navbar %}
-    {% include '_layout/__navbar.html' %}
-{% endblock %}
-
-{% block left_sidebar %}
-    <div class="list-group" id="selection_list" role="tablist">
-        <a class="list-group-item list-group-item-action active" href="#village_list" data-url="{% url 'county:villages' county.id %}" role="tab" data-toggle="list">Villages</a>
-        <a class="list-group-item list-group-item-action" href="#case_list" data-url="{% url 'county:cases' county.id %}" role="tab" data-toggle="list">Cases</a>
-        <a class="list-group-item list-group-item-action" href="#resident_list" data-url="{% url 'county:residents' county.id %}" role="tab" data-toggle="list">Known Residents</a>
-        <a class="list-group-item list-group-item-action" href="#litigant_list" data-url="{% url 'county:litigants' county.id %}" role="tab" data-toggle="list">Litigants</a>
-        <a class="list-group-item list-group-item-action" href="#hundred_list" data-url="{% url 'county:hundreds' county.id %}" role="tab" data-toggle="list">Hundreds</a>
-    </div>
-{% endblock %}
+{% extends '_layout/_l_two_col.html' %}
 
 {% block center_bar %}
     <div class="card">
-        <div class="card-header text-center">
+        <div class="card-header text-center bg-grey">
             <h2 class="card-title" id="county_name">{{ county.name }} </h2>
         </div>
         <div class="card-body clearfix" id="main_info">
             <div class="d-flex justify-content-between flex-wrap">
                 <div class="card p-0 col-12">
-                    <h3 class="card-header">Map:</h3>
+                    <h3 class="card-header bg-grey">Map:</h3>
 
                     <div class="card-body">
                         <div id="map"></div>
@@ -31,41 +17,44 @@
                 </div>
             </div>
         </div>
-        <br>
-        <div class="tab-content" id="list_info">
-            <div class="tab-pane show active fade" id="village_list" role="tabpanel">{% include 'county/village_list.html' %}</div>
-            <div class="tab-pane fade" id="case_list" role="tabpanel"></div>
-            <div class="tab-pane fade" id="resident_list" role="tabpanel"></div>
-            <div class="tab-pane fade" id="litigant_list" role="tabpanel"></div>
-            <div class="tab-pane fade" id="hundred_list" role="tabpanel"></div>
+
+        <nav>
+          <div class="nav nav-pills mb-2 ml-4" id="selection_list" role="tablist">
+            <a class="nav-item nav-link active" id="nav-villages-tab" href="#village_list" data-url="{% url 'county:villages' county.id %}" role="tab" data-toggle="pill" aria-controls="nav-villages" aria-selected="true">Villages</a>
+            <a class="nav-item nav-link" id="nav-cases-tab" href="#case_list" data-url="{% url 'county:cases' county.id %}" role="tab" data-toggle="pill" aria-controls="nav-cases" aria-selected="false">Cases</a>
+            <a class="nav-item nav-link" id="nav-residents-tab" href="#resident_list" data-url="{% url 'county:residents' county.id %}" role="tab" data-toggle="pill" aria-controls="nav-residents" aria-selected="false">Known Residents</a>
+            <a class="nav-item nav-link" id="nav-litigants-tab" href="#litigant_list" data-url="{% url 'county:litigants' county.id %}" role="tab" data-toggle="pill" aria-controls="nav-litigants" aria-selected="false">Litigants</a>
+            <a class="nav-item nav-link" id="nav-hundreds-tab" href="#hundred_list" data-url="{% url 'county:hundreds' county.id %}" role="tab" data-toggle="pill" aria-controls="nav-hundreds" aria-selected="false">Hundreds</a>
+          </div>
+        </nav>
+         <div class="card card-body">
+                <div class="tab-content" id="list_info">
+                    <div class="tab-pane show active fade" id="village_list" role="tabpanel" aria-labelledby="nav-villages-tab">{% include 'county/village_list.html' %}</div>
+                    <div class="tab-pane fade" id="case_list" role="tabpanel" aria-labelledby="nav-cases-tab"></div>
+                    <div class="tab-pane fade" id="resident_list" role="tabpanel" aria-labelledby="nav-residents-tab"></div>
+                    <div class="tab-pane fade" id="litigant_list" role="tabpanel" aria-labelledby="nav-litigants-tab"></div>
+                    <div class="tab-pane fade" id="hundred_list" role="tabpanel" aria-labelledby="nav-hundreds-tab"></div>
+                </div>
         </div>
     </div>
 {% endblock %}
 
 {% block right_sidebar %}
-
-    <div class="container" style="position: sticky; top: 65px">
-        {% if perms.peasantlegaldb.add_county %}
-            <div class="btn-group" role="group">
-                <a class="btn btn-success" href="#">Add County</a>
-            </div>
-            <br>
-            <br>
-        {% endif %}
-        {% if perms.peasantlegaldb.change_county %}
-            <div class="btn-group" role="group">
-                <a class="btn btn-warning" href="#">Edit County</a>
-            </div>
-            <br>
-            <br>
-        {% endif %}
-        {% if perms.peasantlegaldb.delete_county %}
-            <div class="btn-group" role="group">
-                <a class="btn btn-danger" href="#">Delete County</a>
-            </div>
-        {% endif %}
-    </div>
-
+    {% if perms.peasantlegaldb.add_county %}
+        <div class="btn-group mb-3" role="group">
+            <a class="btn btn-success" href="#">Add County</a>
+        </div>
+    {% endif %}
+    {% if perms.peasantlegaldb.change_county %}
+        <div class="btn-group" role="group">
+            <a class="btn btn-warning mb-3" href="#">Edit County</a>
+        </div>
+    {% endif %}
+    {% if perms.peasantlegaldb.delete_county %}
+        <div class="btn-group" role="group">
+            <a class="btn btn-danger" href="#">Delete County</a>
+        </div>
+    {% endif %}
 {% endblock %}
 
 {% block scripts %}
@@ -210,9 +199,7 @@
             });
 
         }
-
         google.maps.event.addDomListener(window, 'load', initialize);
-
 
     </script>
 
@@ -233,9 +220,6 @@
                }
             });
 
-            $('a[data-toggle="tab"').on('shown.bs.tab', function(e){
-                $.fn.dataTable.tables({visible: true, api: true}).columns.adjust().responsive.recalc();
-            });
         })
 
     </script>

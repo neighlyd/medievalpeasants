@@ -1,21 +1,16 @@
-<div class="card">
-    <h3 class="card-header text-center bg-grey">Fine List</h3>
-    <div class="card-body">
-            <table class="table table-bordered table-hover" id="fine_table" data-ajax="{% url 'api:litigant-list' %}?litigant={{ view.kwargs.pk }}&fines=true&expand=fines,case&format=datatables" data-table-length="10">
-                <thead>
-                    <th>Details</th>
-                    <th>Case</th>
-                    <th>Session</th>
-                    <th class="text-center">Fine</th>
-                    <th>Court</th>
-                    <th>Case Type</th>
-                    <th>Role</th>
-                    <th>Verdict</th>
-                    <th>Litigants</th>
-                </thead>
-    </div>
-
-</div>
+<table class="table table-bordered table-hover" id="fine_table" data-ajax="{% url 'api:litigant-list' %}?litigant={{ view.kwargs.pk }}&fines=true&expand=fines,case&format=datatables" data-table-length="10">
+    <thead>
+        <th>Details</th>
+        <th>Case</th>
+        <th>Session</th>
+        <th class="text-center">Fine</th>
+        <th>Court</th>
+        <th>Case Type</th>
+        <th>Role</th>
+        <th>Verdict</th>
+        <th>Litigants</th>
+    </thead>
+</table>
 
 <script>
 
@@ -38,6 +33,7 @@
     };
 
     var fine_table = $('#fine_table').DataTable({
+
         serverSide: true,
         order: [[2, 'asc']],
         ajax: {

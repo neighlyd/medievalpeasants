@@ -1,110 +1,103 @@
-{% extends '_layout/_l_three_col.html' %}
-
-{% block navbar %}
-    {% include '_layout/__navbar.html' %}
-{% endblock %}
-
-{% block left_sidebar %}
-    <div class="list-group" id="selection_list">
-        <a class="list-group-item list-group-item-action active" href="#session_list" data-url="{% url 'record:sessions' record.id %}" role="tab" data-toggle="list">Sessions</a>
-    </div>
-{% endblock %}
+{% extends '_layout/_l_two_col.html' %}
 
 {% block center_bar %}
     <div class="card">
-        <div class="card-header text-center">
+        <div class="card-header text-center bg-grey">
             <h2 class="card-title">Record - {{ record.name }}</h2>
         </div>
         <div class="card-body clearfix" id="main_info">
             <div class="d-flex justify-content-between flex-wrap">
 
-                            <div class="card p-0 col-lg-5">
-                                <h3 class="card-header">Info:</h3>
-                                <div class="card-body">
-                                    <table class="table table-sm">
-                                        <tr class="row m-0">
-                                            <td class="d-inline-block col-4"><b>Record Type:</b></td>
-                                            <td class="d-inline-block col-8">{{ record.get_record_type_display }}</td>
-                                        </tr>
-                                        <tr class="row m-0">
-                                            <td class="d-inline-block col-4"><b>Reel:</b></td>
-                                            <td class="d-inline-block col-8">{{ record.reel }}</td>
-                                        </tr>
-                                        <tr class="row m-0">
-                                            <td class="d-inline-block col-4"><b>Archive:</b></td>
-                                            <td class="d-inline-block col-8"><a href="{% url 'archive:detail' record.archive.id %}">{{ record.archive.name }}</a></td>
-                                        </tr>
-                                        <tr class="row m-0">
-                                            <td class="d-inline-block col-4"><b>Earliest Session:</b></td>
-                                            {% if record.earliest_session.id %}
-                                                <td class="d-inline-block col-8"><a href="{% url 'session:detail' record.earliest_session.id %}">{{ record.earliest_session.village.name }} - {{ record.earliest_session.get_law_term_display }}, {{ record.earliest_session.date.year }}</a></td>
-                                            {% else %}
-                                                <td class="d-inline-block col-8">None</td>
-                                            {% endif %}
-                                        </tr>
-                                        <tr class="row m-0">
-                                            <td class="d-inline-block col-4"><b>Latest Session:</b></td>
-                                            {% if record.latest_session.id %}
-                                                <td class="d-inline-block col-8"><a href="{% url 'session:detail' record.latest_session.id %}">{{ record.latest_session.village.name }} - {{ record.latest_session.get_law_term_display }}, {{ record.latest_session.date.year }}</a></td>
-                                            {% else %}
-                                                <td class="d-inline-block col-8">None</td>
-                                            {% endif %}
-                                        </tr>
-                                        <tr class="row m-0">
-                                            <td class="d-inline-block col-4"><b>Session Count:</b></td>
-                                            <td class="d-inline-block col-8">{{ record.session_count }}</td>
-                                        </tr>
-                                        <tr class="row m-0">
-                                            <td class="d-inline-block col-4"><b>Case Count:</b></td>
-                                            <td class="d-inline-block col-8">{{ record.case_count }}</td>
-                                        </tr>
+                <div class="card p-0 col-lg-5">
+                    <h3 class="card-header bg-grey">Info:</h3>
+                    <div class="card-body">
+                        <table class="table table-sm">
+                            <tr class="row m-0">
+                                <td class="d-inline-block col-4"><b>Record Type:</b></td>
+                                <td class="d-inline-block col-8">{{ record.get_record_type_display }}</td>
+                            </tr>
+                            <tr class="row m-0">
+                                <td class="d-inline-block col-4"><b>Reel:</b></td>
+                                <td class="d-inline-block col-8">{{ record.reel }}</td>
+                            </tr>
+                            <tr class="row m-0">
+                                <td class="d-inline-block col-4"><b>Archive:</b></td>
+                                <td class="d-inline-block col-8"><a href="{% url 'archive:detail' record.archive.id %}">{{ record.archive.name }}</a></td>
+                            </tr>
+                            <tr class="row m-0">
+                                <td class="d-inline-block col-4"><b>Earliest Session:</b></td>
+                                {% if record.earliest_session.id %}
+                                    <td class="d-inline-block col-8"><a href="{% url 'session:detail' record.earliest_session.id %}">{{ record.earliest_session.village.name }} - {{ record.earliest_session.get_law_term_display }}, {{ record.earliest_session.date.year }}</a></td>
+                                {% else %}
+                                    <td class="d-inline-block col-8">None</td>
+                                {% endif %}
+                            </tr>
+                            <tr class="row m-0">
+                                <td class="d-inline-block col-4"><b>Latest Session:</b></td>
+                                {% if record.latest_session.id %}
+                                    <td class="d-inline-block col-8"><a href="{% url 'session:detail' record.latest_session.id %}">{{ record.latest_session.village.name }} - {{ record.latest_session.get_law_term_display }}, {{ record.latest_session.date.year }}</a></td>
+                                {% else %}
+                                    <td class="d-inline-block col-8">None</td>
+                                {% endif %}
+                            </tr>
+                            <tr class="row m-0">
+                                <td class="d-inline-block col-4"><b>Session Count:</b></td>
+                                <td class="d-inline-block col-8">{{ record.session_count }}</td>
+                            </tr>
+                            <tr class="row m-0">
+                                <td class="d-inline-block col-4"><b>Case Count:</b></td>
+                                <td class="d-inline-block col-8">{{ record.case_count }}</td>
+                            </tr>
 
-                                    </table>
-                                </div>
-                            </div>
+                        </table>
+                    </div>
+                </div>
 
-                            <div class="card p-0 col-lg-6">
-                                <h3 class="card-header">Notes:</h3>
-                                    <div class="card-body">
+                <div class="card p-0 col-lg-6">
+                    <h3 class="card-header bg-grey">Notes:</h3>
+                        <div class="card-body">
 
-                                    <h6 class="card-text">
-                                            {{ record.notes | linebreaksbr }}
-                                    </h6>
-                                </div>
-                            </div>
-                        </div>
+                        <h6 class="card-text">
+                                {{ record.notes | linebreaksbr }}
+                        </h6>
+                    </div>
+                </div>
+            </div>
         </div>
-        <br>
-        <div class="tab-content" id="list_info">
-            <div class="tab-pane fade" id="session_list" role="tabpanel"></div>
+        <nav class="nav nav-pills mb-2 ml-4" id="selection_list">
+            <a class="nav-item nav-link active" href="#session_list" data-url="{% url 'record:sessions' record.id %}" role="tab" data-toggle="pill">Sessions</a>
+        </nav>
+        <div class="card card-body">
+            <div class="tab-content" id="list_info">
+                <div class="tab-pane show active fade" id="session_list" role="tabpanel">{% include 'record/session_list.html' %}</div>
+            </div>
         </div>
     </div>
 {% endblock %}
 
 {% block right_sidebar %}
-
-    <div class="container" style="position: sticky; top: 65px">
-        {% if perms.peasantlegaldb.add_record %}
-            <div class="btn-group" role="group">
-                <a class="btn btn-success" href="{% url 'record:add' %}">Add Record</a>
-            </div>
-            <br>
-            <br>
-        {% endif %}
-        {% if perms.peasantlegaldb.change_record %}
-            <div class="btn-group" role="group">
-                <a class="btn btn-warning" href="{% url 'record:edit' record.id %}">Edit Record</a>
-            </div>
-            <br>
-            <br>
-        {% endif %}
-        {% if perms.peasantlegaldb.delete_record %}
-            <div class="btn-group" role="group">
-                <a class="btn btn-danger" href="#">Delete Record</a>
-            </div>
-        {% endif %}
-    </div>
-
+    {% if perms.peasantlegaldb.add_record %}
+        <div class="btn-group" role="group">
+            <a class="btn btn-success mb-3" href="{% url 'record:add' %}">Add Record</a>
+        </div>
+    {% endif %}
+    {% if perms.peasantlegaldb.add_session %}
+        <div class="btn-group" role="group">
+            <a class="btn btn-success mb-3" href="{% url 'session:add' %}?record={{ record.id }}" >Add Session</a>
+        </div>
+    {% endif %}
+    {% if perms.peasantlegaldb.change_record %}
+        <hr>
+        <div class="btn-group" role="group">
+            <a class="btn btn-warning mb-3" href="{% url 'record:edit' record.id %}">Edit Record</a>
+        </div>
+    {% endif %}
+    {% if perms.peasantlegaldb.delete_record %}
+        <hr>
+        <div class="btn-group" role="group">
+            <a class="btn btn-danger" href="#">Delete Record</a>
+        </div>
+    {% endif %}
 {% endblock %}
 
 {% block scripts %}
@@ -128,9 +121,6 @@
                }
             });
 
-            $('a[data-toggle="tab"').on('shown.bs.tab', function(e){
-                $.fn.dataTable.tables({visible: true, api: true}).columns.adjust().responsive.recalc();
-            });
         })
     </script>
 

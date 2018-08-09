@@ -1,15 +1,10 @@
-<div class="card-header">
-    <h3 class="text-center">Hundred List</h3>
-</div>
-<div class="card-body">
-        <table class="table table-bordered table-hover" id="hundred_table" data-ajax="{% url 'api:hundred-list' %}?county={{ view.kwargs.pk }}&expand=villages&format=datatables" data-page-length="10">
-            <thead>
-                <th>Vill List</th>
-                <th>Hundred</th>
-                <th>Vill Count</th>
-            </thead>
-        </table>
-</div>
+<table class="table table-bordered table-hover" id="hundred_table" data-ajax="{% url 'api:hundred-list' %}?county={{ view.kwargs.pk }}&expand=villages&format=datatables" data-page-length="10">
+    <thead>
+        <th>Vill List</th>
+        <th>Hundred</th>
+        <th>Vill Count</th>
+    </thead>
+</table>
 
 <script>
 
@@ -30,6 +25,7 @@
     };
 
     var hundred_table = $("#hundred_table").DataTable({
+
         serverSide: true,
         order: [1, 'asc'],
         columns: [

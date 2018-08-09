@@ -1,7 +1,7 @@
 {% extends '_layout/_l_two_col.html' %}
 
 {% block center_bar %}
-
+<div class="card card-body">
     <table class="table table-bordered" id="relationship_table" data-ajax="{% url 'api:relationship-list' %}?confidence=false&expand=person_one,person_two&format=datatables" data-page-length="25">
         <thead>
             <th>Person One</th>
@@ -11,7 +11,7 @@
             <th>Confidence</th>
         </thead>
     </table>
-
+</div>
 {% endblock %}
 
 {% block scripts %}

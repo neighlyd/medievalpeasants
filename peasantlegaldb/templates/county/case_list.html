@@ -1,24 +1,19 @@
-<div class="card-header">
-    <h3 class="text-center">Case List</h3>
-</div>
-<div class="card-body">
-        <table class="table table-bordered table-hover" id="case_table" data-ajax="{% url 'api:case-list' %}?county={{ view.kwargs.pk }}&expand=session&format=datatables" data-page-length="10">
-            <thead>
-                <th>Notes</th>
-                <th>Case</th>
-                <th>Village</th>
-                <th>Session</th>
-                <th>Court Type</th>
-                <th>Case Type</th>
-                <th>Verdict</th>
-                <th>Litigant Count</th>
-                <th>Of Note</th>
-                <th>Villein</th>
-                <th>Active Sale</th>
-                <th>Incidental Land</th>
-            </thead>
-        </table>
-</div>
+<table class="table table-bordered table-hover" id="case_table" data-ajax="{% url 'api:case-list' %}?county={{ view.kwargs.pk }}&expand=session&format=datatables" data-page-length="10">
+    <thead>
+        <th>Notes</th>
+        <th>Case</th>
+        <th>Village</th>
+        <th>Session</th>
+        <th>Court Type</th>
+        <th>Case Type</th>
+        <th>Verdict</th>
+        <th>Litigant Count</th>
+        <th>Of Note</th>
+        <th>Villein</th>
+        <th>Active Sale</th>
+        <th>Incidental Land</th>
+    </thead>
+</table>
 
 <script>
 
@@ -33,6 +28,7 @@
         };
 
     var case_table = $("#case_table").DataTable({
+
         serverSide: true,
         columns: [
             {

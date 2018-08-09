@@ -1,25 +1,13 @@
-<div class="card">
-    <div class="card-header text-center bg-grey">
-        <h3>Record List</h3>
-        {% if perms.peasantlegaldb.add_record %}
-            <a href="{% url 'record:add' %}?archive={{ archive.id }}" class="btn btn-sm btn-success">Add Record</a>
-        {% endif %}
-    </div>
-
-    <div class="card-body">
-        <table class="table table-bordered table-hover" id="record_table" data-ajax="{% url 'api:record-list' %}?archive={{ archive.id }}&format=datatables" data-page-length="10">
-            <thead>
-                <th>Notes</th>
-                <th>Name</th>
-                <th>Record Type</th>
-                <th>Reel</th>
-                <th>Sessions</th>
-                <th>Cases</th>
-            </thead>
-        </table>
-    </div>
-
-</div>
+<table class="table table-bordered table-hover" id="record_table" data-ajax="{% url 'api:record-list' %}?archive={{ archive.id }}&format=datatables" data-page-length="10">
+    <thead>
+        <th>Notes</th>
+        <th>Name</th>
+        <th>Record Type</th>
+        <th>Reel</th>
+        <th>Sessions</th>
+        <th>Cases</th>
+    </thead>
+</table>
 
 <script>
 
@@ -33,6 +21,7 @@
     }
 
     var record_table = $("#record_table").DataTable({
+
         serverSide: true,
         columns: [
             {

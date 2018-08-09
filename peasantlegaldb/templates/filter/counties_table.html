@@ -18,7 +18,7 @@
     console.log(du);
     $('#countyTable').DataTable().destroy();
     var countyTable = $("#countyTable").DataTable({
-        scrollX: true,
+
         serverSide: true,
         ajax: du,
         order: [0, "asc"],

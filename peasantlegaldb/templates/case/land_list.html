@@ -1,14 +1,11 @@
-<h3 class="card-header text-center">Land</h3>
-    <div class="card-body">
-            <table class="table table-bordered table-hover" id="land_table" data-ajax="{% url 'api:land-list' %}?case={{ view.kwargs.pk }}&expand=tenants.litigant.person,tenants.litigant.case&format=datatables&distinct=true">
-                <thead>
-                    <th>History</th>
-                    <th>Land ID</th>
-                    <th>Parcels</th>
-                    <th>Notes</th>
-                </thead>
-            </table>
-    </div>
+<table class="table table-bordered table-hover" id="land_table" data-ajax="{% url 'api:land-list' %}?case={{ view.kwargs.pk }}&expand=tenants.litigant.person,tenants.litigant.case&format=datatables&distinct=true">
+    <thead>
+        <th>History</th>
+        <th>Land ID</th>
+        <th>Parcels</th>
+        <th>Notes</th>
+    </thead>
+</table>
 
 <script>
 
@@ -44,6 +41,7 @@
     };
 
     var land_table = $('#land_table').DataTable({
+
         serverSide: true,
         columns: [
             {

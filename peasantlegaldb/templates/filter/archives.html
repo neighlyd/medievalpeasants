@@ -16,7 +16,7 @@
     var archive_table = $('#archive_table').DataTable({
         serverSide: true,
         ajax: archiveDataUrl,
-        scrollX: true,
+
         columns: [
             {data: "name",
                 fnCreatedCell: function(nTd, cellData, rowData, row, col) {

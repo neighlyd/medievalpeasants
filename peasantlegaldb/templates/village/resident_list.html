@@ -1,20 +1,15 @@
-<div class="card">
-    <h3 class="card-header text-center">Known Resident List</h3>
-    <div class="card-body">
-            <table class="table table-bordered table-hover" id="resident_table" data-ajax="{% url 'api:person-list' %}?village_to_resident={{ view.kwargs.pk }}&expand=earliest_case,latest_case&format=datatables" data-page-length="10">
-                <thead>
-                    <th></th>
-                    <th>Name</th>
-                    <th>Status</th>
-                    <th>Gender</th>
-                    <th>1332 Tax</th>
-                    <th>1379 Tax</th>
-                    <th>Earliest Case</th>
-                    <th>Latest Case</th>
-                </thead>
-            </table>
-    </div>
-</div>
+<table class="table table-bordered table-hover" id="resident_table" data-ajax="{% url 'api:person-list' %}?village_to_resident={{ view.kwargs.pk }}&expand=earliest_case,latest_case&format=datatables" data-page-length="10">
+    <thead>
+        <th></th>
+        <th>Name</th>
+        <th>Status</th>
+        <th>Gender</th>
+        <th>1332 Tax</th>
+        <th>1379 Tax</th>
+        <th>Earliest Case</th>
+        <th>Latest Case</th>
+    </thead>
+</table>
 
 <script>
 
@@ -29,6 +24,7 @@
     };
 
     var resident_table = $("#resident_table").DataTable({
+
         serverSide: true,
         order: [1, "asc"],
         columns: [
@@ -92,19 +88,20 @@
 
     $('#resident_table').on('click', 'td.details-control', function(){
         var tr = $(this).closest('tr');
-        var tdi = tr.find("i.fa");
+        var tdi = tr.find("#check");
         var row = resident_table.row( tr );
-
-        if ( row.child.isShown() ) {
-            row.child.hide();
-            tr.removeClass('shown');
-            tdi.first().removeClass('fa-minus-square');
-            tdi.first().addClass('fa-plus-square');
-        } else {
-            row.child( format_notes( row.data() ) ).show();
-            tr.addClass('shown');
-            tdi.first().removeClass('fa-plus-square');
-            tdi.first().addClass('fa-minus-square');
+        if (tdi.prop('style').color !== 'gray') {
+            if (row.child.isShown()) {
+                row.child.hide();
+                tr.removeClass('shown');
+                tdi.first().removeClass('fa-minus-square');
+                tdi.first().addClass('fa-plus-square');
+            } else {
+                row.child(format_notes(row.data())).show();
+                tr.addClass('shown');
+                tdi.first().removeClass('fa-plus-square');
+                tdi.first().addClass('fa-minus-square');
+            }
         }
     });
 

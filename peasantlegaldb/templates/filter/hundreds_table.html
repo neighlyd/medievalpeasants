@@ -11,7 +11,7 @@
     var du = Urls['api:hundred-list']() + "?format=datatables&expand=county" + urlParams;
     $('#hundredTable').DataTable().destroy();
     var hundredTable = $("#hundredTable").DataTable({
-        scrollX: true,
+
         serverSide: true,
         ajax: du,
         columns: [
