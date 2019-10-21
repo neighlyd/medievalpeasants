@@ -25,7 +25,7 @@ factory-boy==2.9.2
 Faker==0.8.1
 hashids==1.2.0
 html5lib==1.0.1
-httpie==0.9.9
+httpie==1.0.3
 idna==2.6
 inflection==0.3.1
 ipdb==0.11
