@@ -13,7 +13,7 @@ django-filter==1.0.4
 django-js-reverse==0.7.3
 django-model-utils==3.1.2
 django-widget-tweaks==1.4.1
-djangorestframework==3.6.2
+djangorestframework==3.11.2
 djangorestframework-datatables==0.4.0
 dnspython==1.15.0
 drf-flex-fields==0.3.4
